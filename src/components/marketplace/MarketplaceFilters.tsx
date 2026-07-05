@@ -1,32 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { SearchFilters } from "@/pages/Marketplace";
 
 interface MarketplaceFiltersProps {
   filters: SearchFilters;
   onFilterChange: (filters: SearchFilters) => void;
+  /** Quick destination chips derived from live inventory — never hardcoded. */
+  destinationOptions?: string[];
 }
 
-const quickFilters = [
-  "Top Rated",
-  "Luxury",
-  "Budget Friendly",
-  "All-Inclusive",
-  "Adventure",
-  "Family",
-  "Solo Travel",
-  "Wellness",
-  "Design-led",
-  "Eco-conscious",
-  "Adults only",
-  "City breaks",
-];
-
-export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFiltersProps) {
+/* Every control here filters on a REAL column (destination, duration_days,
+   price, created_at, view_count/rating). The previous version showed twelve
+   aspirational category chips wired to a tags column nothing ever writes,
+   so picking one silently zeroed the results — the exact opposite of a
+   trustworthy filter system. */
+export function MarketplaceFilters({ filters, onFilterChange, destinationOptions = [] }: MarketplaceFiltersProps) {
   const [open, setOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     filters.minPrice ?? 0,
     filters.maxPrice ?? 10000,
@@ -39,29 +29,51 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
         setOpen(false);
       }
     }
-    if (open) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    // "click", not "mousedown": closing on mousedown re-renders the page
+    // between a user's mousedown and mouseup, which swallows their click on
+    // whatever they were actually trying to press (e.g. a removable chip).
+    if (open) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [open]);
 
   const sortOptions: { value: NonNullable<SearchFilters["sortBy"]>; label: string }[] = [
     { value: "newest", label: "Newest" },
-    { value: "top-rated", label: "Top Rated" },
+    { value: "top-rated", label: "Most popular" },
     { value: "price-low", label: "Price: Low" },
     { value: "price-high", label: "Price: High" },
   ];
   const activeSort = filters.sortBy ?? "newest";
 
-  const handleQuickFilter = (filter: string) => {
-    const newFilter = selectedFilter === filter ? null : filter;
-    setSelectedFilter(newFilter);
-    onFilterChange({
-      ...filters,
-      category: newFilter || undefined,
-    });
-  };
+  const durationOptions: { value: NonNullable<SearchFilters["durationBucket"]>; label: string }[] = [
+    { value: "1-3", label: "1–3 days" },
+    { value: "4-6", label: "4–6 days" },
+    { value: "7+", label: "7+ days" },
+  ];
 
   const priceActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
-  const activeCount = (selectedFilter ? 1 : 0) + (priceActive ? 1 : 0);
+  const activeCount =
+    (filters.durationBucket ? 1 : 0) +
+    (priceActive ? 1 : 0) +
+    (filters.destination ? 1 : 0);
+
+  const chipClass = (isActive: boolean) =>
+    `rounded-full px-3 py-1.5 text-xs font-medium transition ${
+      isActive
+        ? "bg-[#0c4d47] text-white"
+        : "border border-[#E5DFC6] bg-white text-[#4a4a4a] hover:bg-[#FBF9F0]"
+    }`;
+
+  const clearAll = () => {
+    setPriceRange([0, 10000]);
+    onFilterChange({
+      ...filters,
+      destination: "",
+      durationBucket: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+      sortBy: undefined,
+    });
+  };
 
   return (
     <div className="w-full md:w-auto relative" ref={wrapperRef}>
@@ -86,60 +98,51 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
       {/* Floating panel */}
       {open && (
         <div className="absolute right-0 top-[calc(100%+6px)] z-50 w-[340px] rounded-2xl border border-[#E5DFC6] bg-white shadow-lg px-5 py-5 space-y-4">
-          <div className="space-y-3">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">
-              Trip Type
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <ToggleGroup
-                type="single"
-                value={selectedFilter || ""}
-                onValueChange={(value) => handleQuickFilter(value)}
-                className="flex flex-wrap gap-2"
-              >
-                {quickFilters.map((filter) => (
-                  <ToggleGroupItem
-                    key={filter}
-                    value={filter}
-                    variant="standard"
-                    size="mobile"
-                    className="whitespace-nowrap"
-                  >
-                    {filter}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
+          {/* Destinations — from real inventory */}
+          {destinationOptions.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">
+                Destinations
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {destinationOptions.map((city) => {
+                  const isActive = (filters.destination || "").toLowerCase() === city.toLowerCase();
+                  return (
+                    <button
+                      key={city}
+                      type="button"
+                      onClick={() =>
+                        onFilterChange({ ...filters, destination: isActive ? "" : city })
+                      }
+                      className={chipClass(isActive)}
+                    >
+                      {city}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            {selectedFilter && (
-              <button
-                onClick={() => {
-                  setSelectedFilter(null);
-                  onFilterChange({ ...filters, category: undefined });
-                }}
-                className="mt-2 text-xs font-medium text-[#BFAD72] hover:underline"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
+          )}
 
-          <div className="space-y-3 pt-2 border-t border-[#E5DFC6]">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D] pt-2">
-              Sort by
+          {/* Duration */}
+          <div className={`space-y-3 ${destinationOptions.length > 0 ? "pt-2 border-t border-[#E5DFC6]" : ""}`}>
+            <p className={`text-xs font-medium uppercase tracking-wider text-[#8D8D8D] ${destinationOptions.length > 0 ? "pt-2" : ""}`}>
+              Duration
             </p>
             <div className="flex flex-wrap gap-2">
-              {sortOptions.map((opt) => {
-                const isActive = activeSort === opt.value;
+              {durationOptions.map((opt) => {
+                const isActive = filters.durationBucket === opt.value;
                 return (
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => onFilterChange({ ...filters, sortBy: opt.value })}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                      isActive
-                        ? "bg-[#0c4d47] text-white"
-                        : "border border-[#E5DFC6] bg-white text-[#4a4a4a] hover:bg-[#FBF9F0]"
-                    }`}
+                    onClick={() =>
+                      onFilterChange({
+                        ...filters,
+                        durationBucket: isActive ? undefined : opt.value,
+                      })
+                    }
+                    className={chipClass(isActive)}
                   >
                     {opt.label}
                   </button>
@@ -148,6 +151,26 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
             </div>
           </div>
 
+          {/* Sort */}
+          <div className="space-y-3 pt-2 border-t border-[#E5DFC6]">
+            <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D] pt-2">
+              Sort by
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => onFilterChange({ ...filters, sortBy: opt.value })}
+                  className={chipClass(activeSort === opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Price range */}
           <div className="space-y-3 pt-2 border-t border-[#E5DFC6]">
             <div className="flex items-center justify-between pt-2">
               <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">
@@ -175,18 +198,18 @@ export function MarketplaceFilters({ filters, onFilterChange }: MarketplaceFilte
               <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-[#BFAD72] bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFAD72]" />
               <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-[#BFAD72] bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BFAD72]" />
             </SliderPrimitive.Root>
-            {priceActive && (
-              <button
-                onClick={() => {
-                  setPriceRange([0, 10000]);
-                  onFilterChange({ ...filters, minPrice: undefined, maxPrice: undefined });
-                }}
-                className="text-xs font-medium text-[#BFAD72] hover:underline"
-              >
-                Reset price
-              </button>
-            )}
           </div>
+
+          {activeCount > 0 && (
+            <div className="pt-2 border-t border-[#E5DFC6]">
+              <button
+                onClick={clearAll}
+                className="pt-2 text-xs font-medium text-[#BFAD72] hover:underline"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
