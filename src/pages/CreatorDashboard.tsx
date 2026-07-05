@@ -236,7 +236,13 @@ export default function CreatorDashboard() {
     return acc;
   }, {} as Record<Exclude<LeafKey, "settings">, GroupKey>);
 
-  const requestedLeaf = (searchParams.get("tab") as LeafKey) || "overview";
+  // Stripe Connect returns to /creator-dashboard?stripe=success|refresh with
+  // no tab param. Landing on Earnings is what mounts the payout card, whose
+  // status check is the only writer of profiles.stripe_charges_enabled — so
+  // without this, finishing Stripe never unlocks guide publishing.
+  const stripeReturn = searchParams.get("stripe");
+  const requestedLeaf =
+    (searchParams.get("tab") as LeafKey) || (stripeReturn ? "earnings" : "overview");
   const initialIsSettings = requestedLeaf === "settings";
   const initialLeaf: LeafKey = initialIsSettings
     ? "settings"
