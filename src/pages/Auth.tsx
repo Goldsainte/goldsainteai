@@ -677,7 +677,7 @@ const Auth = () => {
                 { type: 'traveler' as AccountType, label: 'Traveler', desc: 'Book and plan luxury travel experiences' },
                 { type: 'creator' as AccountType, label: 'Creator', desc: 'Share travel content and inspire others' },
                 { type: 'agent' as AccountType, label: 'Travel Agent', desc: 'Professional agents · Application required' },
-                { type: 'brand' as AccountType, label: 'Brand / Hotel', desc: 'Hotels & lifestyle brands · Application required' },
+                { type: 'brand' as AccountType, label: 'Tour Operator', desc: 'Tour & experience operators · Application required' },
               ]).map(({ type, label, desc }) => (
                 <button
                   key={type}
