@@ -29,8 +29,8 @@ const roleOptions: { type: AccountType; title: string; description: string }[] =
   },
   {
     type: "brand",
-    title: "Brand / Hotel",
-    description: "You're a hotel, resort, or lifestyle brand and want a curated presence and insights on Goldsainte.",
+    title: "Tour Operator",
+    description: "You run tours and experiences and want to list bookable tours for Goldsainte travelers.",
   },
 ];
 
