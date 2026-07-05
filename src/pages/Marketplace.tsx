@@ -23,7 +23,7 @@ import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollecti
 import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
 import { BundleCard } from "@/components/marketplace/BundleCard";
-import { BookOpen, Search } from "lucide-react";
+import { BookOpen, Search, X } from "lucide-react";
 
 type Tab = "trips" | "trip-requests" | "itinerary-guides" | "bundles";
 
@@ -49,7 +49,17 @@ export interface SearchFilters {
   category?: string;
   minPrice?: number;
   maxPrice?: number;
+  durationBucket?: "1-3" | "4-6" | "7+";
   sortBy?: "newest" | "top-rated" | "price-low" | "price-high";
+}
+
+// Shared duration-bucket test — applies to anything with duration_days.
+function matchesDuration(days: number | null | undefined, bucket?: "1-3" | "4-6" | "7+") {
+  if (!bucket) return true;
+  const d = Number(days ?? 0);
+  if (bucket === "1-3") return d >= 1 && d <= 3;
+  if (bucket === "4-6") return d >= 4 && d <= 6;
+  return d >= 7;
 }
 
 export default function Marketplace() {
@@ -71,7 +81,6 @@ export default function Marketplace() {
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
 
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
-  const [guideSearch, setGuideSearch] = useState("");
   const [filters, setFilters] = useState<SearchFilters>({
     destination: searchParams.get("destination") || "",
     startDate: searchParams.get("startDate") || undefined,
@@ -240,9 +249,9 @@ export default function Marketplace() {
     const max = filters.maxPrice ?? 10000;
     return combined.filter((t) => {
       const p = t.price_per_person ?? 0;
-      return p >= min && p <= max;
+      return p >= min && p <= max && matchesDuration(t.duration_days, filters.durationBucket);
     });
-  }, [liveTrips, extraTrips, filters.minPrice, filters.maxPrice]);
+  }, [liveTrips, extraTrips, filters.minPrice, filters.maxPrice, filters.durationBucket]);
 
   // Trip Requests query — wired with search filters
   const { data: tripRequests, isLoading: isLoadingRequests } = useQuery({
@@ -307,7 +316,7 @@ export default function Marketplace() {
         .from("itinerary_products")
         .select(`
           id, creator_id, title, destination, duration_days, price, currency,
-          cover_image_url, description, created_at, status
+          cover_image_url, description, created_at, status, view_count
         `)
         .eq("status", "published")
         .order("created_at", { ascending: false });
@@ -322,11 +331,60 @@ export default function Marketplace() {
     },
   });
 
-  const filteredGuides = (itineraryGuides || []).filter((g: any) =>
-    !guideSearch ||
-    g.destination?.toLowerCase().includes(guideSearch.toLowerCase()) ||
-    g.title?.toLowerCase().includes(guideSearch.toLowerCase())
-  );
+  // Guides now respond to the SAME search + filter system as everything
+  // else (they previously only listened to a separate tab-local text box,
+  // which made the main search bar and Filters panel do nothing here).
+  const filteredGuides = useMemo(() => {
+    const q = (filters.destination || "").trim().toLowerCase();
+    const min = filters.minPrice ?? 0;
+    const max = filters.maxPrice ?? 10000;
+    const rows = (itineraryGuides || []).filter((g: any) => {
+      const matchesQuery =
+        !q ||
+        g.destination?.toLowerCase().includes(q) ||
+        g.title?.toLowerCase().includes(q) ||
+        g.description?.toLowerCase().includes(q);
+      const price = Number(g.price ?? 0);
+      return (
+        matchesQuery &&
+        price >= min &&
+        price <= max &&
+        matchesDuration(g.duration_days, filters.durationBucket)
+      );
+    });
+    const sorted = [...rows];
+    if (filters.sortBy === "price-low") {
+      sorted.sort((a: any, b: any) => Number(a.price ?? 0) - Number(b.price ?? 0));
+    } else if (filters.sortBy === "price-high") {
+      sorted.sort((a: any, b: any) => Number(b.price ?? 0) - Number(a.price ?? 0));
+    } else if (filters.sortBy === "top-rated") {
+      // Guides have no ratings yet — "Most popular" is backed by the real
+      // view_count column, never an invented score.
+      sorted.sort((a: any, b: any) => Number(b.view_count ?? 0) - Number(a.view_count ?? 0));
+    }
+    // default: already newest-first from the query
+    return sorted;
+  }, [itineraryGuides, filters.destination, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
+
+  // Quick destination chips, derived live from what's actually for sale.
+  // (The old hardcoded category chips filtered on a tags column that is
+  // never populated, so selecting one silently returned zero results.)
+  const destinationOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    const add = (dest?: string | null) => {
+      if (!dest) return;
+      const city = dest.split(",")[0].trim();
+      if (!city) return;
+      counts.set(city, (counts.get(city) || 0) + 1);
+    };
+    (itineraryGuides || []).forEach((g: any) => add(g.destination));
+    (liveTrips || []).forEach((t: any) => add(t.destination));
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([city]) => city);
+  }, [itineraryGuides, liveTrips]);
+
 
   const { data: bundles, isLoading: isLoadingBundles } = useQuery({
     queryKey: ["product-bundles-marketplace"],
@@ -346,6 +404,19 @@ export default function Marketplace() {
       return rows.map((r: any) => ({ ...r, creator: map.get(r.creator_id) || null }));
     },
   });
+
+  // Results count + removable filter chips (GetYourGuide-style feedback).
+  const activeResultCount =
+    activeTab === "itinerary-guides" ? filteredGuides.length
+    : activeTab === "trips" ? filteredLiveTrips.length
+    : activeTab === "trip-requests" ? (tripRequests?.length ?? 0)
+    : (bundles?.length ?? 0);
+  const resultNoun =
+    activeTab === "itinerary-guides" ? "guide"
+    : activeTab === "trips" ? "trip"
+    : activeTab === "trip-requests" ? "trip request"
+    : "bundle";
+  const priceChipActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
 
   const handleDeleteRequest = async (id: string) => {
     const { error } = await supabase.from("trip_requests").delete().eq("id", id);
@@ -542,29 +613,44 @@ export default function Marketplace() {
             <div className="flex-1 min-w-0">
               <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
             </div>
-            {activeTab !== "itinerary-guides" && (
-              <div className="md:shrink-0 md:w-[200px]">
-                <MarketplaceFilters filters={filters} onFilterChange={setFilters} />
-              </div>
-            )}
+            <div className="md:shrink-0 md:w-[200px]">
+              <MarketplaceFilters
+                filters={filters}
+                onFilterChange={setFilters}
+                destinationOptions={destinationOptions}
+              />
+            </div>
           </div>
 
           {activeTab === "trips" && <ForYouRow />}
 
-          {activeTab === "itinerary-guides" && (
-            <div className="mb-6 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A7151]" />
-                <input
-                  type="text"
-                  placeholder="Search by destination or title…"
-                  value={guideSearch}
-                  onChange={(e) => setGuideSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E5DFC6] bg-white text-sm focus:outline-none focus:border-[#C7A962] text-[#0a2225]"
-                />
-              </div>
-            </div>
-          )}
+          {/* Result count + removable refinement chips */}
+          <div className="mb-5 flex flex-wrap items-center gap-2">
+            <p className="text-sm text-[#6B7280]">
+              <span className="font-semibold text-[#0a2225]">{activeResultCount}</span>{" "}
+              {resultNoun}{activeResultCount === 1 ? "" : "s"}
+            </p>
+            {priceChipActive && (
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, minPrice: undefined, maxPrice: undefined })}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-3 py-1 text-xs text-[#0a2225] hover:border-[#C7A962]"
+              >
+                ${(filters.minPrice ?? 0).toLocaleString()}–${(filters.maxPrice ?? 10000).toLocaleString()}
+                <X className="h-3 w-3" />
+              </button>
+            )}
+            {filters.durationBucket && (
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, durationBucket: undefined })}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-3 py-1 text-xs text-[#0a2225] hover:border-[#C7A962]"
+              >
+                {filters.durationBucket} days
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
 
           {renderContent()}
 
