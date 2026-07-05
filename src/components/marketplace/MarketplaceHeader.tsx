@@ -1,50 +1,39 @@
-import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
 
+/* Integrated search hero: one headline line, subtitle, trust row — the
+   search bar (rendered by MarketplaceSearch directly below) is the hero's
+   centerpiece and inventory lands above the fold. The marketplace legal
+   disclaimer moved to the bottom of the page; the Post-a-Trip CTA lives in
+   the Travel menu and the Trip Requests tab. */
 export function MarketplaceHeader() {
+  const trust = [
+    "Every listing reviewed by our team",
+    "Stripe-secured checkout",
+    "Direct line to your specialist",
+  ];
   return (
-    <section className="border-b border-[#E5DFC6]/30 bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-6 md:py-12">
-        <div className="flex flex-col gap-4 md:gap-6">
-          {/* Hero content */}
-          <div className="space-y-2 md:space-y-3">
-            <h1 className="font-secondary text-2xl text-[#0a2225] md:text-4xl leading-tight">
-              Where your dream trip meets the perfect team.
-            </h1>
-            <p className="text-sm leading-relaxed text-[#4a4a4a] md:text-base max-w-2xl">
-              Post a trip request, compare tailored proposals, and build your journey with 
-              world-class travel specialists and agents.
-            </p>
-          </div>
-
-          {/* Primary & Secondary CTAs */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            {/* Primary CTA - Full width on mobile */}
-            <Link
-              to="/post-trip"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0C4D47] px-6 py-3 text-sm font-semibold text-[#E5DFC6] shadow-sm transition hover:bg-[#073331] w-full sm:w-auto"
-            >
-              Post a Trip Request
-            </Link>
-
-          </div>
-
-          {/* Marketplace Legal Disclaimer - Condensed on mobile */}
-          <p className="hidden md:block mt-1 max-w-2xl text-[11px] leading-relaxed text-[#818181]">
-            Goldsainte is a travel marketplace. All trips are designed and fulfilled 
-            by independent travel specialists, agents, and suppliers. Trip Request proposals 
-            reflect their own cancellation, refund, and deposit terms.
-          </p>
-          
-          {/* Mobile: Link to learn more */}
-          <Link
-            to="/cancellation-refund-policy"
-            className="md:hidden inline-flex items-center gap-1 text-[11px] text-[#8D8D8D] hover:text-[#0a2225]"
-          >
-            <span>Curated marketplace</span>
-            <ChevronRight className="h-3 w-3" />
-            <span className="underline">Learn more</span>
-          </Link>
+    <section className="border-b-0 bg-gradient-to-b from-white to-[#FDF9F0]">
+      <div className="mx-auto max-w-6xl px-4 pt-10 pb-2 md:pt-12 text-center">
+        <h1 className="font-secondary text-[26px] md:text-[34px] font-semibold leading-tight text-[#0a2225]">
+          Trips, tours &amp; guides — built by people who've been.
+        </h1>
+        <p className="mt-2 font-primary text-base md:text-lg text-[#6B7280]">
+          Curated journeys from vetted creators, agents, and tour operators worldwide.
+        </p>
+      </div>
+      {/* Trust row renders under the search bar via MarketplaceSearch's slot-free
+          layout — kept here as a sibling so the hero owns its own claims. */}
+      <div className="mx-auto max-w-6xl px-4 pb-1">
+        <div
+          className="mt-1 flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 font-sans text-xs text-[#9CA3AF]"
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
+          {trust.map((t) => (
+            <span key={t} className="inline-flex items-center gap-1.5">
+              <Check className="h-3 w-3 text-[#0c4d47]" />
+              {t}
+            </span>
+          ))}
         </div>
       </div>
     </section>
