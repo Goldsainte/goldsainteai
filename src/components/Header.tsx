@@ -419,7 +419,7 @@ export const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
+                      className="font-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
                     >
                       Travel
                       <ChevronDown className="h-3.5 w-3.5 transition-transform data-[state=open]:rotate-180" />
@@ -450,7 +450,7 @@ export const Header = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/creators')}
-                  className="rounded-full px-4 py-2 text-sm font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors"
+                  className="font-primary rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors"
                 >
                   Creators
                 </button>
@@ -459,7 +459,7 @@ export const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
+                      className="font-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
                     >
                       Partner
                       <ChevronDown className="h-3.5 w-3.5 transition-transform data-[state=open]:rotate-180" />
