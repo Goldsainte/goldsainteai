@@ -258,27 +258,43 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
   if (userError || !user) throw new Error("Not authenticated");
 
   // Reads from earnings_ledger — the table your Stripe webhook actually writes
-  // to on payment confirmation. The previous version of this function read
-  // bookings.creator_payout_cents / agent_payout_cents, which nothing in the
-  // codebase ever writes to, so it always showed $0 regardless of real
-  // earnings. earnings_ledger.amount is stored in dollars, not cents, so it's
-  // converted to cents here to keep the existing UI (which expects cents)
-  // working unchanged.
-  const { data, error } = await supabase
-    .from("earnings_ledger")
-    .select("id, booking_id, amount, currency, status, created_at, updated_at, bookings(status)")
-    .eq("user_id", user.id)
-    .eq("role", role)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    throw new Error("Could not load partner earnings");
+  // to on payment confirmation. The embedded bookings(status) join requires a
+  // booking_id → bookings FK that the live database is currently missing
+  // (generated types show only the payout_id relationship), which makes the
+  // embed fail with a "could not find relationship" error. Until the FK is
+  // added via SQL, fall back to the same query without the embed — the
+  // booking status column degrades to "unknown" but earnings still load.
+  let data: any[] | null = null;
+  let usedEmbed = true;
+  {
+    const res = await supabase
+      .from("earnings_ledger")
+      .select("id, booking_id, amount, currency, status, created_at, updated_at, bookings(status)")
+      .eq("user_id", user.id)
+      .eq("role", role)
+      .order("created_at", { ascending: false });
+    if (res.error) {
+      console.warn("earnings_ledger embed failed, retrying without join:", res.error.message);
+      usedEmbed = false;
+      const plain = await supabase
+        .from("earnings_ledger")
+        .select("id, booking_id, amount, currency, status, created_at, updated_at")
+        .eq("user_id", user.id)
+        .eq("role", role)
+        .order("created_at", { ascending: false });
+      if (plain.error) {
+        console.error(plain.error);
+        throw new Error("Could not load partner earnings");
+      }
+      data = plain.data;
+    } else {
+      data = res.data;
+    }
   }
 
   const bookings: PartnerEarningBooking[] = (data || []).map((row: any) => ({
     id: row.booking_id,
-    status: row.bookings?.status || "unknown",
+    status: (usedEmbed ? row.bookings?.status : null) || "unknown",
     payout_status: row.status,
     payout_paid_at: row.status === "paid" ? row.updated_at : null,
     currency: row.currency,
