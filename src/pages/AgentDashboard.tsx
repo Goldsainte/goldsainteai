@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,7 @@ import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 import { BackButton } from "@/components/ui/BackButton";
 import { CreatorGuidesTab } from "@/pages/creator/components/CreatorGuidesTab";
+import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 import { GettingStartedChecklist } from "@/components/onboarding/GettingStartedChecklist";
 import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
 import { Link } from "react-router-dom";
@@ -39,6 +40,17 @@ export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Deep-linkable tabs (?tab=guides etc.) — the guide builder's Stripe popup
+  // and Stripe Connect returns (?stripe=success) both need to land on Guides,
+  // where the payout card lives for agents.
+  const AGENT_TABS = ["available", "my-bids", "creator-collabs", "guides", "analytics", "performance", "availability", "verification", "settings"] as const;
+  const requestedTab = searchParams.get("tab");
+  const initialTab = AGENT_TABS.includes(requestedTab as (typeof AGENT_TABS)[number])
+    ? (requestedTab as string)
+    : searchParams.get("stripe")
+    ? "guides"
+    : "available";
   const [agent, setAgent] = useState<any>(null);
   const [allAgents, setAllAgents] = useState<any[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -436,7 +448,7 @@ export default function AgentDashboard() {
           </div>
         )}
 
-        <Tabs defaultValue="available" className="space-y-6">
+        <Tabs defaultValue={initialTab} className="space-y-6">
           <div className="relative">
             <TabsList className="w-full overflow-x-auto scrollbar-hide bg-transparent border-b border-[#E5DFC6] rounded-none h-11 justify-start gap-0 flex">
               <TabsTrigger value="available" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Available Jobs ({jobs.length})</TabsTrigger>
@@ -452,7 +464,11 @@ export default function AgentDashboard() {
             <div className="pointer-events-none absolute right-0 top-0 h-11 w-12 bg-gradient-to-l from-[#FDF9F0] to-transparent md:hidden" />
           </div>
 
-          <TabsContent value="guides">
+          <TabsContent value="guides" className="space-y-6">
+            {/* Payout setup lives here for agents: guide publishing requires
+                stripe_charges_enabled, and mounting this card runs the status
+                check that syncs it. Agents can't reach /creator-dashboard. */}
+            <CreatorStripeOnboarding />
             {/* Same guides studio creators use — itinerary_products is scoped
                 per-user by RLS, so agents author and sell their own guides. */}
             <CreatorGuidesTab />
