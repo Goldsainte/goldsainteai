@@ -122,9 +122,11 @@ export function CreatorHeroSection({
 
       {/* ── Identity band overlapping the cover ── */}
       <div className="mx-auto max-w-5xl px-4">
-        <div className="relative -mt-16 md:-mt-[72px] flex flex-wrap items-end gap-5 md:gap-7">
+        {/* Only the AVATAR overlaps the cover — the text column starts below
+            the image edge so the name never sits on a busy photo. */}
+        <div className="relative flex flex-wrap items-start gap-5 md:gap-7">
           {/* Avatar */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 -mt-16 md:-mt-[72px]">
             <div className="h-32 w-32 md:h-36 md:w-36 overflow-hidden rounded-[28px] border-[5px] border-[#FDF9F0] bg-[#F6F0E4] shadow-[0_8px_30px_rgba(10,34,37,0.18)]">
               {avatarUrl ? (
                 <img src={avatarUrl} alt={name} className="h-full w-full object-cover" loading="lazy" />
@@ -152,7 +154,7 @@ export function CreatorHeroSection({
           </div>
 
           {/* Name · badges · positioning · meta · chips */}
-          <div className="min-w-[260px] flex-1 pb-1">
+          <div className="min-w-[260px] flex-1 pt-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
               <h1 className="font-secondary text-3xl md:text-[40px] font-semibold leading-tight text-[#0a2225]">
                 {name}
@@ -195,7 +197,7 @@ export function CreatorHeroSection({
             {specialties.length > 0 && (
               <div className="mt-3.5 flex flex-wrap gap-2">
                 {specialties.slice(0, 6).map((s) => (
-                  <span key={s} className="rounded-full border border-[#E5DFC6] bg-white px-4 py-1.5 text-[15px] text-[#4a4a4a]">
+                  <span key={s} className="rounded-full border border-[#E5DFC6] bg-white px-4 py-1.5 text-[15px] capitalize text-[#4a4a4a]">
                     {s}
                   </span>
                 ))}
@@ -212,13 +214,13 @@ export function CreatorHeroSection({
             )}
           </div>
 
-          {/* Actions */}
-          <div className="flex w-full flex-wrap items-center gap-2.5 pb-2 md:w-auto">
+          {/* Actions — three equal pills on one row */}
+          <div className="flex w-full flex-wrap items-center gap-2.5 pt-4 md:w-auto">
             <Button
               onClick={onRequestTrip}
               className="h-12 flex-1 rounded-full bg-[#0c4d47] px-7 text-sm font-medium text-white shadow-sm hover:bg-[#0a3d39] md:flex-none"
             >
-              Request a Trip
+              Request a Service
             </Button>
             {!isOwnProfile && onMessage && (
               <Button
@@ -229,7 +231,12 @@ export function CreatorHeroSection({
                 Message
               </Button>
             )}
-            {!isOwnProfile && targetUserId && <FollowButton targetUserId={targetUserId} />}
+            {!isOwnProfile && targetUserId && (
+              <FollowButton
+                targetUserId={targetUserId}
+                className="h-12 flex-1 rounded-full border-[#E5DFC6] bg-white px-6 text-sm font-medium text-[#0a2225] hover:bg-[#f7f3ea] md:flex-none"
+              />
+            )}
           </div>
         </div>
       </div>
