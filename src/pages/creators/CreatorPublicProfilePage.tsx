@@ -195,6 +195,11 @@ export default function CreatorPublicProfilePage() {
   }, [id]);
 
   const isOwnProfile = user?.id === creator?.id;
+  // "View as traveler": Airbnb-style preview. While previewing, every
+  // owner affordance (camera, coach marks, builder CTAs, tier picker)
+  // disappears so the owner sees exactly what the public sees.
+  const [previewAsTraveler, setPreviewAsTraveler] = useState(false);
+  const effIsOwn = isOwnProfile && !previewAsTraveler;
 
   if (loading) {
     return (
@@ -233,7 +238,10 @@ export default function CreatorPublicProfilePage() {
   const firstName = (creator.display_name || creator.full_name || "").split(" ")[0] || displayName;
   const bio = creator.travel_philosophy || creator.bio || creatorData?.bio;
   const specialties = creatorData?.specialties || creator.creator_niches || [];
-  const positioningTitle = specialties[0] || "Travel Designer";
+  const rawSpecialty = specialties[0];
+  const positioningTitle = rawSpecialty
+    ? rawSpecialty.charAt(0).toUpperCase() + rawSpecialty.slice(1)
+    : "Travel Designer";
 
   const responseTimeHours = creatorData?.response_time_hours;
   const responseTimeText = responseTimeHours
@@ -245,6 +253,8 @@ export default function CreatorPublicProfilePage() {
     : null;
 
   const handleRequestTrip = () => navigate(`/post-trip?fromCreator=${creator.id}`);
+  const handlePreviewOnly = () =>
+    toast.info("Preview only — travelers can use this button.");
 
   const handleOpenMessage = () => {
     if (!user) {
@@ -305,14 +315,27 @@ export default function CreatorPublicProfilePage() {
               Back
             </button>
             <div className="flex items-center gap-2">
-              {isOwnProfile ? (
+              {isOwnProfile && previewAsTraveler ? (
+                /* Preview mode: all owner chrome collapses to one exit
+                   affordance — what remains below is byte-for-byte the
+                   public render. */
+                <Button
+                  onClick={() => setPreviewAsTraveler(false)}
+                  size="sm"
+                  className="bg-[#0a2225] hover:bg-[#0c4d47] text-white rounded-full h-9 px-4 text-xs"
+                >
+                  <Eye className="h-3.5 w-3.5 mr-1.5" /> Previewing as traveler — Exit
+                </Button>
+              ) : isOwnProfile ? (
                 <>
-                  <span
-                    className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#F5F0E0] px-3 py-1 text-[11px] text-[#6B7280]"
-                    title="This is how travelers see your profile."
+                  <button
+                    type="button"
+                    onClick={() => setPreviewAsTraveler(true)}
+                    className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#F5F0E0] hover:bg-[#EDE6D2] px-3 py-1.5 text-[11px] text-[#6B7280] hover:text-[#0a2225] transition-colors"
+                    title="See exactly what travelers see."
                   >
-                    <Eye className="h-3 w-3" /> Owner view
-                  </span>
+                    <Eye className="h-3 w-3" /> View as traveler
+                  </button>
                   <Button
                     onClick={() => navigate("/creator-dashboard?tab=portfolio")}
                     variant="outline"
@@ -380,10 +403,10 @@ export default function CreatorPublicProfilePage() {
           specialties={specialties}
           responseTimeText={responseTimeText}
           isVerified={Boolean(creator.is_verified)}
-          isOwnProfile={isOwnProfile}
-          targetUserId={isOwnProfile ? undefined : creator.id}
-          onRequestTrip={handleRequestTrip}
-          onMessage={isOwnProfile ? undefined : handleOpenMessage}
+          isOwnProfile={effIsOwn}
+          targetUserId={effIsOwn ? undefined : creator.id}
+          onRequestTrip={previewAsTraveler ? handlePreviewOnly : handleRequestTrip}
+          onMessage={effIsOwn ? undefined : previewAsTraveler ? handlePreviewOnly : handleOpenMessage}
           profileUserId={creator.id}
           onProfileUpdated={fetchProfile}
           memberSince={creator.created_at ?? null}
@@ -438,13 +461,13 @@ export default function CreatorPublicProfilePage() {
               creatorId={creator.id}
               fallbackPhotos={creator.featured_photos}
               instagramHandle={creator.instagram_handle}
-              isOwnProfile={isOwnProfile}
+              isOwnProfile={effIsOwn}
             />
           </div>
         </div>
 
         {/* ─── Empty portfolio state (owner only, nothing published yet) ─── */}
-        {isOwnProfile && trips.length === 0 && guides.length === 0 && (
+        {effIsOwn && trips.length === 0 && guides.length === 0 && (
           <div className="bg-[#FDF9F0]">
             <div className="mx-auto max-w-5xl px-4 pb-12 md:pb-16">
               <div className="rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-10 text-center">
@@ -574,10 +597,9 @@ export default function CreatorPublicProfilePage() {
         {/* ─── 3. SERVICES — Clarity Layer (Fiverr) ─── */}
         <div className="bg-[#FDF9F0]">
           <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-            <SectionLabel>Custom Services</SectionLabel>
             <CreatorServicesSection
               creatorId={creator.id}
-              isOwnProfile={isOwnProfile}
+              isOwnProfile={effIsOwn}
               creatorTier={creator.creator_tier}
             />
           </div>
@@ -624,21 +646,23 @@ export default function CreatorPublicProfilePage() {
         )}
 
         {/* ─── 5. ABOUT — Positioning Layer ─── */}
-        <div className="bg-[#FDF9F0]">
-          <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-            <SectionLabel>About</SectionLabel>
-            <CreatorAboutSection
-              bio={bio}
-              specialties={specialties}
-              certifications={creatorData?.certifications ?? null}
-              memberSince={creator.created_at ?? null}
-              responseTimeText={responseTimeText}
-            />
+        {/* Rendered only when there's real content — a section header with
+            nothing under it (or with chips repeated from the hero) is the
+            fastest way to look unfinished. */}
+        {Boolean(bio || (creatorData?.certifications?.length ?? 0) > 0) && (
+          <div className="bg-[#FDF9F0]">
+            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
+              <SectionLabel>About</SectionLabel>
+              <CreatorAboutSection
+                bio={bio}
+                certifications={creatorData?.certifications ?? null}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ─── 6. FINAL CTA ─── */}
-        {!isOwnProfile && (
+        {!effIsOwn && (
           <div className="bg-white">
             <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
               <GoldDivider />
