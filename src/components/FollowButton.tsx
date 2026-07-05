@@ -9,9 +9,11 @@ import { useEngagementFraud } from "@/hooks/useEngagementFraud";
 interface FollowButtonProps {
   targetUserId: string;
   onFollowSuccess?: () => void;
+  /** Overrides the default full-width sizing (e.g. inline pill in the profile hero). */
+  className?: string;
 }
 
-const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
+const FollowButton = ({ targetUserId, onFollowSuccess, className }: FollowButtonProps) => {
   const { user } = useAuth();
   const { checkEngagement } = useEngagementFraud();
   const [isFollowing, setIsFollowing] = useState(false);
@@ -103,7 +105,7 @@ const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
 
   if (loading) {
     return (
-      <Button variant="outline" className="w-full" disabled>
+      <Button variant="outline" className={className || "w-full"} disabled>
         <Loader2 className="h-4 w-4 animate-spin" />
       </Button>
     );
@@ -112,7 +114,7 @@ const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
   return (
     <Button
       variant={isFollowing ? "outline" : "default"}
-      className="w-full"
+      className={className || "w-full"}
       onClick={handleFollow}
       disabled={actionLoading}
     >
