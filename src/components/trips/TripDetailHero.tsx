@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Users, Clock, Activity, ChevronLeft, ChevronRight, Images, X } from "lucide-react";
+import { Calendar, Users, Clock, Activity, ChevronLeft, ChevronRight, Images, X, Star } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,11 @@ interface TripDetailHeroProps {
   durationNights?: number;
   activityLevel?: string;
   spotsAvailable?: number;
+  /** Real rating from packaged_trips.rating — header row shows it only when present. */
+  rating?: number | null;
+  destination?: string;
+  /** Right-aligned header actions (e.g. Share button). */
+  actionsSlot?: React.ReactNode;
 }
 
 export function TripDetailHero({
@@ -33,6 +38,9 @@ export function TripDetailHero({
   durationNights,
   activityLevel,
   spotsAvailable,
+  rating,
+  destination,
+  actionsSlot,
 }: TripDetailHeroProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -74,79 +82,120 @@ export function TripDetailHero({
 
   return (
     <section className="relative">
+      {/* ── Title block ABOVE the images (GetYourGuide pattern) ── */}
+      <div className="mb-4">
+        <h1 className="font-secondary text-3xl md:text-4xl font-bold text-[#0a2225] leading-tight">
+          {title}
+        </h1>
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {/* Only real numbers: the rating row renders solely when a rating exists. */}
+          {rating != null && rating > 0 && (
+            <span className="inline-flex items-center gap-1.5 text-sm text-[#0a2225]">
+              <Star className="h-4 w-4 fill-[#C7A962] text-[#C7A962]" />
+              <span className="font-semibold">{Number(rating).toFixed(1)}</span>
+            </span>
+          )}
+          {hostName && hostName !== "Host" && (
+            <span className="text-sm text-[#4a4a4a]">
+              Trip by <span className="font-medium text-[#0a2225]">{hostName}</span>
+            </span>
+          )}
+          {destination && (
+            <span className="text-sm text-[#6B7280]">{destination}</span>
+          )}
+          {actionsSlot && <span className="ml-auto">{actionsSlot}</span>}
+        </div>
+      </div>
+
       {useMosaic ? (
-        /* ── GetYourGuide-style mosaic: large lead tile + stacked side tiles ── */
-        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-2 md:h-[440px]">
-          {/* Lead tile */}
+        /* ── GetYourGuide mosaic 1:1 — clean images, no text overlay:
+              left half = lead tile; right half = wide tile over two small ── */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:h-[460px]">
+          {/* Lead tile — left half, full height */}
           <button
             type="button"
             onClick={() => openLightboxAt(0)}
-            className="relative md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl md:rounded-r-none group aspect-[16/10] md:aspect-auto"
+            className="relative overflow-hidden rounded-2xl md:rounded-r-none group aspect-[16/10] md:aspect-auto md:h-full"
           >
             <img
               src={allImages[0]}
               alt={title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
             {spotsAvailable !== undefined && spotsAvailable > 0 && (
-              <div className="absolute right-4 top-4 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-[#0a2225] shadow-lg">
+              <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-medium text-[#0a2225] shadow-lg">
                 {spotsAvailable} spots left
               </div>
             )}
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-left">
-              <h1 className="font-secondary text-2xl md:text-4xl font-bold text-white drop-shadow-lg">
-                {title}
-                {hostName && hostName !== "Host" && (
-                  <span className="text-[#C7B892]"> with {hostName}</span>
+          </button>
+
+          {/* Right half: wide tile on top, two small below */}
+          <div className="hidden md:flex flex-col gap-2 h-full min-h-0">
+            <button
+              type="button"
+              onClick={() => openLightboxAt(1)}
+              className="relative overflow-hidden rounded-tr-2xl group flex-[1.15] min-h-0"
+            >
+              <img
+                src={allImages[1]}
+                alt=""
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                loading="lazy"
+                onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+              />
+            </button>
+            <div className={`grid gap-2 flex-1 min-h-0 ${allImages.length > 3 ? "grid-cols-2" : "grid-cols-1"}`}>
+              <button
+                type="button"
+                onClick={() => openLightboxAt(2)}
+                className={`relative overflow-hidden group ${allImages.length > 3 ? "" : "rounded-br-2xl"}`}
+              >
+                <img
+                  src={allImages[2]}
+                  alt=""
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                />
+                {/* With exactly 3 images this tile spans full width and carries View all */}
+                {allImages.length === 3 && (
+                  <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-medium text-[#0a2225] shadow-lg group-hover:bg-white">
+                    <Images className="h-3.5 w-3.5" />
+                    View all
+                  </span>
                 )}
-              </h1>
+              </button>
+              {allImages.length > 3 && (
+                <button
+                  type="button"
+                  onClick={() => openLightboxAt(3)}
+                  className="relative overflow-hidden rounded-br-2xl group"
+                >
+                  <img
+                    src={allImages[3]}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    loading="lazy"
+                    onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                  />
+                  <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-medium text-[#0a2225] shadow-lg group-hover:bg-white">
+                    <Images className="h-3.5 w-3.5" />
+                    View all
+                  </span>
+                </button>
+              )}
             </div>
-          </button>
-          {/* Side tiles (hidden on mobile — lead tile carries mobile) */}
-          <button
-            type="button"
-            onClick={() => openLightboxAt(1)}
-            className="relative hidden md:block overflow-hidden rounded-tr-2xl group"
-          >
-            <img
-              src={allImages[1]}
-              alt=""
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              loading="lazy"
-              onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
-            />
-          </button>
-          <button
-            type="button"
-            onClick={() => openLightboxAt(2)}
-            className="relative hidden md:block overflow-hidden rounded-br-2xl group"
-          >
-            <img
-              src={allImages[2]}
-              alt=""
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              loading="lazy"
-              onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
-            />
-            <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-medium text-[#0a2225] shadow-lg group-hover:bg-white">
-              <Images className="h-3.5 w-3.5" />
-              View all {allImages.length}
-            </span>
-          </button>
+          </div>
         </div>
       ) : (
       <>
-      {/* Hero Image */}
+      {/* Hero Image (fallback for trips with fewer than 3 images) */}
       <div className="relative aspect-[21/9] md:aspect-[21/9] w-full overflow-hidden rounded-2xl">
         <img
           src={allImages[currentImageIndex] || "/placeholder.svg"}
           alt={title}
           className="h-full w-full object-cover"
         loading="lazy"/>
-        
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
         {/* Navigation Arrows */}
         {allImages.length > 1 && (
@@ -172,16 +221,6 @@ export function TripDetailHero({
             {spotsAvailable} spots left
           </div>
         )}
-
-        {/* Title Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-          <h1 className="font-secondary text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
-            {title}
-            {hostName && hostName !== "Host" && (
-              <span className="text-[#C7B892]"> with {hostName}</span>
-            )}
-          </h1>
-        </div>
       </div>
 
       {/* Thumbnail Strip */}
