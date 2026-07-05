@@ -1,26 +1,17 @@
 interface CreatorAboutSectionProps {
   bio: string | null | undefined;
-  specialties: string[];
   certifications: string[] | null;
-  memberSince: string | null; // ISO date string
-  responseTimeText: string | null;
 }
 
-export function CreatorAboutSection({
-  bio,
-  specialties,
-  certifications,
-  memberSince,
-  responseTimeText,
-}: CreatorAboutSectionProps) {
-  const memberYear = memberSince
-    ? new Date(memberSince).getFullYear()
-    : null;
-
+/* About = the story layer. Specialty chips, member-since, and response time
+   all live in the hero — repeating them here read as filler (the "small
+   startup" tell). This section now renders only content the hero doesn't
+   have: the creator's own words and any certifications. No content → no
+   section, Airbnb-style. */
+export function CreatorAboutSection({ bio, certifications }: CreatorAboutSectionProps) {
   const hasCerts = certifications && certifications.length > 0;
-  const hasContent = bio || specialties.length > 0 || hasCerts;
 
-  if (!hasContent) return null;
+  if (!bio && !hasCerts) return null;
 
   return (
     <div className="max-w-2xl">
@@ -31,23 +22,9 @@ export function CreatorAboutSection({
         </p>
       )}
 
-      {/* Specialties pills */}
-      {specialties.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-5">
-          {specialties.map((s) => (
-            <span
-              key={s}
-              className="rounded-full border border-[#E5DFC6] bg-white px-3.5 py-1.5 text-xs font-medium text-[#0a2225]"
-            >
-              {s}
-            </span>
-          ))}
-        </div>
-      )}
-
       {/* Certifications */}
       {hasCerts && (
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap gap-2">
           {certifications!.map((cert) => (
             <span
               key={cert}
@@ -58,17 +35,6 @@ export function CreatorAboutSection({
           ))}
         </div>
       )}
-
-      {/* Meta line */}
-      <div className="flex items-center gap-4 text-sm text-[#9CA3AF]">
-        {memberYear && <span>Member since {memberYear}</span>}
-        {responseTimeText && (
-          <>
-            <span className="text-[#E5DFC6]">·</span>
-            <span>{responseTimeText}</span>
-          </>
-        )}
-      </div>
     </div>
   );
 }
