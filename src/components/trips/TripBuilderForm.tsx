@@ -20,6 +20,10 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface TripBuilderFormProps {
+  /** Who is authoring: creators choose trip-vs-tour; tour operators are fixed
+      to tours; agents fixed to trips. Enforced again in RLS. */
+  listingKind?: "trip" | "tour";
+  allowListingChoice?: boolean;
   initialData?: any;
   onSave: (data: any, status: "draft" | "published") => void;
   saving: boolean;
@@ -87,7 +91,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
 }
 
 export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderFormProps>(function TripBuilderForm(
-  { initialData, onSave, saving, isEditing },
+  { initialData, onSave, saving, isEditing, listingKind, allowListingChoice },
   ref
 ) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -102,7 +106,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     title: "", description: "", destination: "", price_per_person: "", original_price: "",
     currency: "USD", duration_days: "", duration_nights: "", cover_image_url: "",
     image_gallery: [] as string[], video_url: "", max_participants: "", min_participants: "1",
-    trip_type: "", activity_level: "", tags: [] as string[], highlights: [] as string[],
+    trip_type: "", listing_type: (listingKind || "trip") as string, activity_level: "", tags: [] as string[], highlights: [] as string[],
     included: [] as string[], not_included: [] as string[], available_from: "", available_until: "",
     deposit_percentage: "30", balance_due_days: "", passport_required: true, visa_required: false,
     vaccination_required: false, fitness_level_required: "", cancellation_policy: "",
@@ -130,6 +134,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         max_participants: initialData.max_participants?.toString() || "",
         min_participants: initialData.min_participants?.toString() || "1",
         trip_type: initialData.trip_type || "",
+        listing_type: (initialData as any).listing_type || listingKind || "trip",
         activity_level: initialData.activity_level || "",
         tags: initialData.tags || [],
         highlights: initialData.highlights || [],
@@ -250,7 +255,8 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     video_url: formData.video_url || null,
     max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
     min_participants: parseInt(formData.min_participants) || 1,
-    trip_type: formData.trip_type || null, activity_level: formData.activity_level || null,
+    trip_type: formData.trip_type || null, listing_type: formData.listing_type || "trip",
+    activity_level: formData.activity_level || null,
     tags: formData.tags, highlights: formData.highlights, included: formData.included,
     not_included: formData.not_included,
     available_from: formData.available_from || null, available_until: formData.available_until || null,
@@ -410,6 +416,38 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     placeholder="Describe this trip experience..." rows={5} className={textareaClasses} />
                   <p className={helperClasses}>Aim for 150–300 words. Include what makes this trip different from booking it alone.</p>
                 </div>
+                {/* Listing kind — creators choose; tour operators and agents are fixed
+                    (and RLS enforces the same matrix server-side). */}
+                {(allowListingChoice || listingKind === "tour") && (
+                  <div className="md:col-span-2 mb-2">
+                    <Label className="text-[#0a2225]">Listing type</Label>
+                    {allowListingChoice ? (
+                      <div className="mt-2 flex gap-2">
+                        {(["trip", "tour"] as const).map((k) => (
+                          <button
+                            key={k}
+                            type="button"
+                            onClick={() => updateField("listing_type", k)}
+                            className={`rounded-full px-4 py-2 text-sm font-medium border transition ${
+                              formData.listing_type === k
+                                ? "bg-[#0c4d47] text-white border-[#0c4d47]"
+                                : "bg-white text-[#4a4a4a] border-[#E5DFC6] hover:bg-[#FBF9F0]"
+                            }`}
+                          >
+                            {k === "trip" ? "Packaged Trip" : "Bookable Tour"}
+                          </button>
+                        ))}
+                        <p className="self-center text-xs text-[#9CA3AF]">
+                          Tours appear in the marketplace's Tours tab.
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-sm text-[#4a4a4a]">
+                        Bookable Tour — tour-operator listings appear in the Tours tab.
+                      </p>
+                    )}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className={labelClasses}>Trip type</Label>
