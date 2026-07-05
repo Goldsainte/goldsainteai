@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BadgeCheck, Star, MapPin, Sparkles, Camera } from "lucide-react";
+import { BadgeCheck, Star, Sparkles, Camera, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import { ProfilePhotoModal } from "@/components/ProfilePhotoModal";
@@ -8,7 +8,7 @@ import { TierBadge, type CreatorTier } from "@/components/creator/TierBadge";
 interface CreatorHeroSectionProps {
   name: string;
   avatarUrl: string | null;
-  title: string; // positioning e.g. "Luxury Europe Travel Designer"
+  title: string; // positioning e.g. "Adventure"
   location: string | null;
   avgRating: number | null;
   reviewCount: number;
@@ -21,20 +21,36 @@ interface CreatorHeroSectionProps {
   isOwnProfile?: boolean;
   targetUserId?: string;
   onRequestTrip: () => void;
-  /** When provided (and not own profile), renders a Message button that opens
-   *  a direct-message composer. */
+  /** When provided (and not own profile), renders a Message button. */
   onMessage?: () => void;
-  /** Required when isOwnProfile is true — lets the edit controls know whose row to update. */
+  /** Required when isOwnProfile is true. */
   profileUserId?: string;
-  /** Called after a successful avatar upload so the parent can refetch. */
+  /** Called after a successful avatar/cover upload so the parent can refetch. */
   onProfileUpdated?: () => void;
   /** ISO date string (e.g. profiles.created_at) — shown as "Member since {year}". */
   memberSince?: string | null;
   followerCount?: number | null;
-  /** Real value from profiles.creator_tier — renders the actual Bronze/Silver/Gold/Platinum badge. */
+  /** Real value from profiles.creator_tier. */
   creatorTier?: CreatorTier | string | null;
+  /** profiles.cover_image_url — the full-bleed hero band. Null → brand gradient. */
+  coverImageUrl?: string | null;
+  /** Count of this creator's published guides — shown in the meta strip when > 0. */
+  guideCount?: number;
+  /** Owner-only: opens the cover photo modal (owned by the page for refetch). */
+  onEditCover?: () => void;
 }
 
+function formatCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+  return String(n);
+}
+
+/* Big-tech profile hero: full-bleed cover photo with the avatar overlapping
+   its bottom edge, a consolidated identity band (name · badges · positioning ·
+   inline earned-stats meta strip · chips), and right-aligned actions.
+   Stats stay earned-only per the honesty policy — the meta strip simply has
+   fewer separators on a brand-new profile, which still reads intentional. */
 export function CreatorHeroSection({
   name,
   avatarUrl,
@@ -42,11 +58,10 @@ export function CreatorHeroSection({
   location,
   avgRating,
   reviewCount,
-  tripsCompleted,
   specialties = [],
   responseTimeText,
   isVerified = false,
-  isOwnProfile,
+  isOwnProfile = false,
   targetUserId,
   onRequestTrip,
   onMessage,
@@ -55,151 +70,167 @@ export function CreatorHeroSection({
   memberSince,
   followerCount,
   creatorTier,
+  coverImageUrl,
+  guideCount = 0,
+  onEditCover,
 }: CreatorHeroSectionProps) {
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const canEdit = isOwnProfile && !!profileUserId;
+  const memberYear = memberSince ? new Date(memberSince).getFullYear() : null;
+  const showCompleteNudge = isOwnProfile && (!title || title === "Travel Designer") && !location;
 
-  const isGenericTitle = !title || title === "Travel Designer";
-  const showCompleteNudge = Boolean(isOwnProfile && (isGenericTitle || !location));
-  const memberSinceYear = memberSince ? new Date(memberSince).getFullYear() : null;
-  const canEdit = Boolean(isOwnProfile && profileUserId);
-
-  const formatCount = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k` : `${n}`);
-
-  const stats = [
-    // Big-tech rule: a stat that isn't earned yet simply doesn't render.
-    // No zeros, no dashes — the strip shrinks gracefully for new profiles.
-    ...(responseTimeText ? [{ label: "Response time", value: responseTimeText }] : []),
-    ...(tripsCompleted != null && tripsCompleted > 0
-      ? [{ label: "Trips designed", value: `${tripsCompleted}` }] : []),
-    ...(memberSinceYear ? [{ label: "Member since", value: `${memberSinceYear}` }] : []),
-    ...(followerCount != null && followerCount > 0
-      ? [{ label: "Followers", value: formatCount(followerCount) }] : []),
-  ];
+  // Inline meta entries — each only when real.
+  const meta: React.ReactNode[] = [];
+  if (memberYear) meta.push(<span key="m">Member since <b className="font-semibold text-[#0a2225]">{memberYear}</b></span>);
+  if (guideCount > 0) meta.push(<span key="g"><b className="font-semibold text-[#0a2225]">{guideCount}</b> guide{guideCount === 1 ? "" : "s"}</span>);
+  if (responseTimeText) meta.push(<span key="r">Responds in <b className="font-semibold text-[#0a2225]">{responseTimeText}</b></span>);
+  if (followerCount && followerCount > 0) meta.push(<span key="f"><b className="font-semibold text-[#0a2225]">{formatCount(followerCount)}</b> followers</span>);
+  if (location) meta.push(<span key="l">{location}</span>);
 
   return (
-    <section className="relative w-full">
-      <div className="mx-auto max-w-5xl px-4 pt-8 md:pt-12">
-        <div className="bg-white rounded-2xl border border-[#E5DFC6] shadow-lg p-6 md:p-8">
-          {/* Top row: avatar + name/badges + actions */}
-          <div className="flex flex-col md:flex-row md:items-center gap-5">
-            <div className="relative shrink-0">
-              <div className="h-20 w-20 md:h-24 md:w-24 rounded-2xl ring-2 ring-[#C7A962] overflow-hidden bg-[#E5DFC6]">
-                <img
-                  src={avatarUrl || "/placeholder.svg"}
-                  alt={name}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              {isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
-                  <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
+    <section>
+      {/* ── Cover band ── */}
+      <div
+        className={`relative h-[220px] md:h-[300px] ${
+          coverImageUrl ? "" : "bg-gradient-to-br from-[#0c4d47] via-[#0a3a35] to-[#0a2225]"
+        }`}
+        style={
+          coverImageUrl
+            ? { backgroundImage: `linear-gradient(to bottom, rgba(10,34,37,0.05), rgba(10,34,37,0.45)), url(${coverImageUrl})`, backgroundSize: "cover", backgroundPosition: "center 40%" }
+            : undefined
+        }
+      >
+        {!coverImageUrl && (
+          /* Brand-gradient fallback gets a quiet gold sheen so it never reads as a missing image */
+          <div className="absolute inset-0 opacity-[0.14]" style={{ background: "radial-gradient(ellipse at 30% 120%, #C7A962 0%, transparent 55%)" }} />
+        )}
+        {canEdit && onEditCover && (
+          <div className="absolute inset-x-0 bottom-0">
+            <div className="mx-auto max-w-5xl px-4 pb-5 flex justify-end">
+              <button
+                type="button"
+                onClick={onEditCover}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/35 bg-[#0a2225]/55 px-3.5 py-2 text-xs text-white backdrop-blur-sm hover:bg-[#0a2225]/75 transition"
+              >
+                <ImagePlus className="h-3.5 w-3.5" />
+                {coverImageUrl ? "Change cover" : "Add a cover photo"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Identity band overlapping the cover ── */}
+      <div className="mx-auto max-w-5xl px-4">
+        <div className="relative -mt-16 md:-mt-[72px] flex flex-wrap items-end gap-5 md:gap-7">
+          {/* Avatar */}
+          <div className="relative shrink-0">
+            <div className="h-32 w-32 md:h-36 md:w-36 overflow-hidden rounded-[28px] border-[5px] border-[#FDF9F0] bg-[#F6F0E4] shadow-[0_8px_30px_rgba(10,34,37,0.18)]">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={name} className="h-full w-full object-cover" loading="lazy" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center font-secondary text-4xl text-[#C7A962]">
+                  {name.charAt(0)}
                 </div>
               )}
-              {canEdit && (
-                <button
-                  type="button"
-                  onClick={() => setAvatarModalOpen(true)}
-                  aria-label="Edit profile photo"
-                  className="absolute -bottom-1 -left-1 h-6 w-6 flex items-center justify-center rounded-full bg-[#0a2225] border-2 border-white text-white hover:bg-[#0c4d47] transition-colors"
-                >
-                  <Camera className="h-3 w-3" />
-                </button>
-              )}
             </div>
-
-            <div className="min-w-0 flex-1">
-              <h1 className="font-secondary text-xl md:text-2xl text-[#0a2225] leading-tight flex items-center gap-2">
-                {name}
-                {isVerified && <BadgeCheck className="h-4.5 w-4.5 text-[#0c4d47] shrink-0" />}
-              </h1>
-              <p className="text-sm text-[#6B7280] mt-0.5">{title}</p>
-              {location && (
-                <p className="text-xs text-[#9CA3AF] mt-1 flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {location}
-                </p>
-              )}
-
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                {avgRating != null ? (
-                  <span className="flex items-center gap-1 text-sm text-[#0a2225] font-medium">
-                    <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
-                    {avgRating.toFixed(1)}
-                    <span className="text-[#9CA3AF] font-normal">({reviewCount})</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#FBF4E2] to-[#F1E2BB] border border-[#E6CF94] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#8A7136]">
-                    <Sparkles className="h-3 w-3" />
-                    New designer
-                  </span>
-                )}
-                {creatorTier && <TierBadge tier={creatorTier} size="md" />}
+            {isVerified && (
+              <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-0.5">
+                <BadgeCheck className="h-5 w-5 text-[#C7A962]" />
               </div>
-            </div>
-
-            <div className="flex items-center gap-3 shrink-0">
-              <Button
-                onClick={onRequestTrip}
-                className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-8 h-11 text-sm font-medium shadow-sm flex-1 md:flex-none"
+            )}
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => setAvatarModalOpen(true)}
+                aria-label="Edit profile photo"
+                className="absolute -bottom-1 -left-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#0a2225] text-white transition-colors hover:bg-[#0c4d47]"
               >
-                Request a Trip
-              </Button>
-              {!isOwnProfile && onMessage && (
-                <Button
-                  onClick={onMessage}
-                  variant="outline"
-                  className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#f7f3ea] rounded-full px-6 h-11 text-sm font-medium flex-1 md:flex-none"
-                >
-                  Message
-                </Button>
-              )}
-              {!isOwnProfile && targetUserId && (
-                <FollowButton targetUserId={targetUserId} />
-              )}
-            </div>
+                <Camera className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
-          {specialties.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-1.5">
-              {specialties.slice(0, 6).map((s) => (
-                <span
-                  key={s}
-                  className="rounded-full border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 py-1 text-xs text-[#0a2225]"
-                >
-                  {s}
+          {/* Name · badges · positioning · meta · chips */}
+          <div className="min-w-[260px] flex-1 pb-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 className="font-secondary text-3xl md:text-[40px] font-semibold leading-tight text-[#0a2225]">
+                {name}
+              </h1>
+              {isVerified && (
+                <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#0c4d47] text-white">
+                  <BadgeCheck className="h-3.5 w-3.5" />
                 </span>
-              ))}
+              )}
+              {avgRating != null ? (
+                <span className="flex items-center gap-1 text-sm font-medium text-[#0a2225]">
+                  <Star className="h-3.5 w-3.5 fill-[#C7A962] text-[#C7A962]" />
+                  {avgRating.toFixed(1)}
+                  <span className="font-normal text-[#9CA3AF]">({reviewCount})</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E6CF94] bg-gradient-to-r from-[#FBF4E2] to-[#F1E2BB] px-3 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#8A7136]">
+                  <Sparkles className="h-3 w-3" />
+                  New designer
+                </span>
+              )}
+              {creatorTier && <TierBadge tier={creatorTier} size="md" />}
             </div>
-          )}
 
-          {/* At-a-glance stats — one consistent card treatment, not color-coded per stat.
-              Exception: a single lonely "Member since" card reads as an empty
-              trophy shelf on brand-new profiles, so when it's the only stat it
-              collapses to one quiet line instead. */}
-          {stats.length === 0 ? null : stats.length === 1 && stats[0].label === "Member since" ? (
-            <div className="mt-6 pt-5 border-t border-[#E5DFC6]">
-              <p className="text-xs text-[#9CA3AF]">Member since {stats[0].value}</p>
-            </div>
-          ) : (
-          <div className="mt-6 pt-6 border-t border-[#E5DFC6] grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {stats.map((s) => (
-              <div key={s.label} className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3.5">
-                <p className="font-bold text-xl text-[#0a2225]">{s.value}</p>
-                <p className="text-[11px] text-[#9CA3AF] mt-0.5 font-medium">{s.label}</p>
-              </div>
-            ))}
-          </div>
-          )}
+            {title && (
+              <p className="mt-1.5 font-primary text-lg italic text-[#6B7280]">{title}</p>
+            )}
 
-          {showCompleteNudge && (
-            <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
-              <Sparkles className="h-3.5 w-3.5 text-[#C7A962] mt-0.5 shrink-0" />
-              <p className="font-primary text-xs text-[#6B7280] leading-relaxed">
-                Add your specialty and home base to help travelers find you.
+            {meta.length > 0 && (
+              <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[13px] text-[#6B7280]" style={{ fontFamily: "Inter, sans-serif" }}>
+                {meta.map((m, i) => (
+                  <span key={i} className="flex items-center gap-2">
+                    {i > 0 && <span className="text-[#D8CFAF]">·</span>}
+                    {m}
+                  </span>
+                ))}
               </p>
-            </div>
-          )}
+            )}
+
+            {specialties.length > 0 && (
+              <div className="mt-3.5 flex flex-wrap gap-2">
+                {specialties.slice(0, 6).map((s) => (
+                  <span key={s} className="rounded-full border border-[#E5DFC6] bg-white px-4 py-1.5 text-[15px] text-[#4a4a4a]">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {showCompleteNudge && (
+              <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-white px-3.5 py-2.5">
+                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
+                <p className="font-primary text-xs leading-relaxed text-[#6B7280]">
+                  Add your specialty and home base to help travelers find you.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex w-full flex-wrap items-center gap-2.5 pb-2 md:w-auto">
+            <Button
+              onClick={onRequestTrip}
+              className="h-12 flex-1 rounded-full bg-[#0c4d47] px-7 text-sm font-medium text-white shadow-sm hover:bg-[#0a3d39] md:flex-none"
+            >
+              Request a Trip
+            </Button>
+            {!isOwnProfile && onMessage && (
+              <Button
+                onClick={onMessage}
+                variant="outline"
+                className="h-12 flex-1 rounded-full border-[#E5DFC6] bg-white px-6 text-sm font-medium text-[#0a2225] hover:bg-[#f7f3ea] md:flex-none"
+              >
+                Message
+              </Button>
+            )}
+            {!isOwnProfile && targetUserId && <FollowButton targetUserId={targetUserId} />}
+          </div>
         </div>
       </div>
 
