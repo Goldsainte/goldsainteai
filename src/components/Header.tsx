@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -218,6 +218,13 @@ export const Header = () => {
                             >
                               <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm font-medium">Travel Marketplace</span>
+                            </DropdownMenuItem>
+                          <DropdownMenuItem
+                              onClick={() => navigate('/following')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                            >
+                              <Users className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm font-medium">Following</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate(primaryBookingsPath)}
