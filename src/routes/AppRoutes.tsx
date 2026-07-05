@@ -50,6 +50,7 @@ const CreatorOnboardingPage = lazy(() => import('@/pages/onboarding/CreatorOnboa
 const AgentProfile = lazy(() => import('@/pages/AgentProfile'));
 
 const AgentDashboard = lazy(() => import('@/pages/AgentDashboard'));
+const FollowingPage = lazy(() => import('@/pages/FollowingPage'));
 const AgentEarningsPage = lazy(() => import('@/pages/agent/AgentEarningsPage'));
 const AgentTripRequests = lazy(() => import('@/pages/AgentTripRequests'));
 const AgentContractBuilder = lazy(() => import('@/pages/agent/AgentContractBuilder'));
@@ -497,6 +498,7 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/creator-dashboard" element={<RequireAuth><CreatorDashboard /></RequireAuth>} />
+      <Route path="/following" element={<RequireAuth><FollowingPage /></RequireAuth>} />
       <Route path="/console/brand" element={<RequireAuth><BrandConsolePage /></RequireAuth>} />
       {/* New TikTok Creator Ecosystem Routes */}
       <Route path="/trip/:id" element={<RequireAuth><CreatorTripPage /></RequireAuth>} />
