@@ -114,7 +114,7 @@ export default function CreatorsPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<CreatorFilters>(defaultFilters);
   const [sortBy, setSortBy] = useState<"followers" | "engagement" | "relevance">(
-    "followers"
+    "relevance" // young marketplace: don't lead with a sort over mostly-zero counts
   );
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
@@ -463,7 +463,8 @@ export default function CreatorsPage() {
                     </div>
 
                     <div className="mt-3 flex flex-wrap gap-1.5 text-[10px]">
-                      {creator.followers != null && (
+                      {/* A metric that isn't impressive doesn't exist: never render zero counts. */}
+                      {creator.followers != null && creator.followers > 0 && (
                         <span className="rounded-full bg-[#f7f3ea] px-2.5 py-1 text-[#0a2225] slashed-zero tabular-nums">
                           {creator.followers.toLocaleString()} followers
                         </span>
