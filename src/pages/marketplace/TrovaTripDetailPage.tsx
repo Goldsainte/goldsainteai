@@ -297,27 +297,28 @@ export default function TrovaTripDetailPage() {
           />
         </div>
 
-        {/* Hero */}
-        <TripDetailHero
-          title={trip.title}
-          hostName={trip.creator?.full_name || "Host"}
-          coverImage={trip.cover_image_url || "/placeholder.svg"}
-          galleryImages={galleryImages}
-          startDate={trip.available_from || undefined}
-          endDate={trip.available_until || undefined}
-          groupSizeMin={trip.min_participants || undefined}
-          groupSizeMax={trip.max_participants || undefined}
-          groupSizeNote={trip.group_size_note || undefined}
-          durationDays={durationDays}
-          durationNights={durationNights}
-          activityLevel={trip.activity_level || undefined}
-          spotsAvailable={spotsAvailable || undefined}
-        />
-
-        {/* Two Column Layout */}
-        <div className="mt-8 grid gap-8 lg:grid-cols-3">
+        {/* Two Column Layout — hero lives in the main column so the booking
+            card flanks the image mosaic, GetYourGuide-style. */}
+        <div className="mt-2 grid gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
+            <TripDetailHero
+              title={trip.title}
+              hostName={trip.creator?.full_name || "Host"}
+              coverImage={trip.cover_image_url || "/placeholder.svg"}
+              galleryImages={galleryImages}
+              startDate={trip.available_from || undefined}
+              endDate={trip.available_until || undefined}
+              groupSizeMin={trip.min_participants || undefined}
+              groupSizeMax={trip.max_participants || undefined}
+              groupSizeNote={trip.group_size_note || undefined}
+              durationDays={durationDays}
+              durationNights={durationNights}
+              activityLevel={trip.activity_level || undefined}
+              spotsAvailable={spotsAvailable || undefined}
+              rating={trip.rating ?? null}
+              destination={trip.destination || undefined}
+            />
             <TripAboutSection description={trip.description || ""} />
             
             {isPlatformTrip ? (
