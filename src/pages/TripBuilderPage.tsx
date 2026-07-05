@@ -12,7 +12,7 @@ import { BackButton } from "@/components/ui/BackButton";
 
 export default function TripBuilderPage() {
   const { user, isLoading: authLoading } = useAuth();
-  const { isAgent, isCreator, loading: roleLoading } = useUserRole();
+  const { isAgent, isCreator, isBrand, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
@@ -40,12 +40,12 @@ export default function TripBuilderPage() {
       navigate("/auth?mode=signin");
       return;
     }
-    if (!isAgent && !isCreator) {
+    if (!isAgent && !isCreator && !isBrand) {
       toast.error("Only agents and creators can access the Trip Builder");
       navigate("/");
       return;
     }
-  }, [user, isAgent, isCreator, authLoading, roleLoading, navigate]);
+  }, [user, isAgent, isCreator, isBrand, authLoading, roleLoading, navigate]);
 
   useEffect(() => {
     if (editId && user) {
@@ -125,11 +125,17 @@ export default function TripBuilderPage() {
         ...rest,
         slug,
         status: persistedStatus,
-        creator_type: isAgent ? "agent" : "creator",
+        // Ownership matrix (mirrored in RLS): tour operators own via brand_id
+        // and may only create tours; agents own via agent_id, trips only;
+        // creators own via creator_id and may create either.
+        creator_type: isBrand ? "tour_operator" : isAgent ? "agent" : "creator",
         agent_id: isAgent ? user.id : null,
         creator_id: isCreator ? user.id : null,
+        brand_id: isBrand ? user.id : null,
         updated_at: new Date().toISOString(),
       };
+      if (isBrand) tripPayload.listing_type = "tour";
+      if (isAgent && !isCreator) tripPayload.listing_type = "trip";
 
       let tripId = editId;
       let savedSlug = slug;
@@ -317,6 +323,8 @@ export default function TripBuilderPage() {
               onSave={handleSave}
               saving={saving}
               isEditing={!!editId}
+              listingKind={isBrand ? "tour" : "trip"}
+              allowListingChoice={isCreator && !isBrand}
             />
           </div>
           <div className="hidden lg:flex flex-col w-60 flex-shrink-0">
