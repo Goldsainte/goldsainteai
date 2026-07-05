@@ -5,8 +5,6 @@ import {
   getPartnerBookingEarnings,
   type PartnerEarningSnapshot,
 } from "@/services/earningsService";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 
 function formatMoney(amountCents: number, currency: string) {
@@ -18,25 +16,9 @@ function formatMoney(amountCents: number, currency: string) {
 }
 
 export function CreatorEarningsTab() {
-  const { user } = useAuth();
   const [snapshot, setSnapshot] = useState<PartnerEarningSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasStripeAccount, setHasStripeAccount] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    async function checkStripe() {
-      if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("stripe_account_id")
-        .eq("id", user.id)
-        .maybeSingle();
-      setHasStripeAccount(!!data?.stripe_account_id);
-    }
-    checkStripe();
-  }, [user]);
-
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -60,10 +42,13 @@ export function CreatorEarningsTab() {
 
   return (
     <div className="space-y-6">
-      {/* Stripe Connect setup banner */}
-      {hasStripeAccount === false && (
-        <CreatorStripeOnboarding />
-      )}
+      {/* Stripe Connect setup card — always mounted. The card handles all
+          three states itself (not connected / pending "Continue Setup" /
+          active), and mounting it is what triggers check-creator-stripe-status,
+          which is the only thing that syncs profiles.stripe_charges_enabled —
+          the flag the publish gate reads. Hiding it when an account id exists
+          left half-finished onboarding with no way to resume. */}
+      <CreatorStripeOnboarding />
 
       {/* Summary cards */}
       <div className="grid gap-4 md:grid-cols-3">
