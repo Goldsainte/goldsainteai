@@ -66,10 +66,14 @@ export function CreatorHeroSection({
   const formatCount = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k` : `${n}`);
 
   const stats = [
-    { label: "Response time", value: responseTimeText || "New" },
-    { label: "Trips designed", value: tripsCompleted != null ? `${tripsCompleted}` : "0" },
-    { label: "Member since", value: memberSinceYear ? `${memberSinceYear}` : "—" },
-    { label: "Followers", value: followerCount != null && followerCount > 0 ? formatCount(followerCount) : "—" },
+    // Big-tech rule: a stat that isn't earned yet simply doesn't render.
+    // No zeros, no dashes — the strip shrinks gracefully for new profiles.
+    ...(responseTimeText ? [{ label: "Response time", value: responseTimeText }] : []),
+    ...(tripsCompleted != null && tripsCompleted > 0
+      ? [{ label: "Trips designed", value: `${tripsCompleted}` }] : []),
+    ...(memberSinceYear ? [{ label: "Member since", value: `${memberSinceYear}` }] : []),
+    ...(followerCount != null && followerCount > 0
+      ? [{ label: "Followers", value: formatCount(followerCount) }] : []),
   ];
 
   return (
