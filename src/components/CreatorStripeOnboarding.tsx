@@ -25,16 +25,18 @@ export const CreatorStripeOnboarding = () => {
   useEffect(() => {
     checkStatus();
     
-    // Check URL params for onboarding completion
+    // Check URL params for onboarding completion.
+    // stripe-connect-link returns to ?stripe=success / ?stripe=refresh;
+    // older links may still use ?onboarding=complete / ?refresh=true.
     const params = new URLSearchParams(window.location.search);
-    if (params.get('onboarding') === 'complete') {
+    if (params.get('onboarding') === 'complete' || params.get('stripe') === 'success') {
       toast({
         title: "Setup Complete!",
         description: "Your payout account has been configured successfully.",
       });
       checkStatus();
       window.history.replaceState({}, '', window.location.pathname);
-    } else if (params.get('refresh') === 'true') {
+    } else if (params.get('refresh') === 'true' || params.get('stripe') === 'refresh') {
       checkStatus();
       window.history.replaceState({}, '', window.location.pathname);
     }
