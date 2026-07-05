@@ -6,7 +6,6 @@ import logomark from "@/assets/logomark-gold.webp";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { ShareButton } from "@/components/ShareButton";
 import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
 
 interface LiveTripCardProps {
@@ -157,7 +156,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
       className="group cursor-pointer space-y-2.5"
     >
       {/* Image with optional editorial signal pill */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
         <TripCoverImage
           src={trip.cover_image_url}
           alt={trip.title}
@@ -175,14 +174,6 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           </span>
         )}
         <div className="absolute right-3 top-3 flex items-center gap-1.5">
-          <div onClick={(e) => e.stopPropagation()}>
-            <ShareButton
-              variant="icon"
-              url={`/marketplace/trip/${trip.slug || trip.id}`}
-              title={trip.title}
-              description={trip.destination}
-            />
-          </div>
           <button
             type="button"
             onClick={handleSave}
@@ -196,90 +187,80 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
         </div>
       </div>
 
-      {/* Content below image */}
-      <div className="space-y-1 px-0.5">
-        {trip.creator ? (
-          <div className="mb-1 flex items-center gap-1.5">
-            <CreatorAttribution creator={trip.creator} />
-            {roleBadge && (
-              <span
-                className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider ring-1 ${roleBadge.className}`}
-              >
-                {roleBadge.label}
+      {/* Content below image — mockup spec: eyebrow · fixed-height title ·
+          one meta line · footer (curator | From price). Ratings render only
+          when real; saves/booked counters and freshness stamps are gone. */}
+      <div className="rounded-b-2xl border border-t-0 border-[#E5DFC6] bg-white px-4 pb-4 pt-3.5 -mt-2.5 relative">
+        <p
+          className="text-[10.5px] uppercase tracking-[0.13em] text-[#8a7136]"
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
+          {trip.destination?.split(",").map((part) => part.trim()).filter(Boolean).join(" · ") || "\u00A0"}
+        </p>
+        <h3 className="mt-1.5 min-h-[46px] font-secondary text-[18px] font-medium leading-[1.28] text-[#0a2225] line-clamp-2">
+          {trip.title}
+        </h3>
+        <div
+          className="mt-2 flex items-center gap-2 text-[12.5px] text-[#6B7280]"
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
+          {typeof trip.rating === "number" && trip.rating > 0 ? (
+            <span className="flex items-center gap-1 text-[#0a2225]">
+              <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
+              <span className="font-medium">{trip.rating.toFixed(1)}</span>
+              {typeof trip.review_count === "number" && trip.review_count > 0 && (
+                <span className="text-[#6B7280]">({trip.review_count})</span>
+              )}
+            </span>
+          ) : (
+            <span>{getDuration()} nights{trip.trip_type ? ` · ${trip.trip_type.charAt(0).toUpperCase()}${trip.trip_type.slice(1)}` : ""}</span>
+          )}
+          {typeof trip.max_participants === "number" &&
+            typeof trip.current_bookings === "number" &&
+            trip.max_participants - trip.current_bookings > 0 &&
+            trip.max_participants - trip.current_bookings <= 3 && (
+              <span className="rounded-full bg-[#b85c3a]/10 px-2 py-0.5 text-[11px] font-medium text-[#b85c3a]">
+                {trip.max_participants - trip.current_bookings} spot
+                {trip.max_participants - trip.current_bookings === 1 ? "" : "s"} left
               </span>
             )}
-          </div>
-        ) : trip.creator_type === "platform" ? (
-          <div className="mb-1 flex items-center gap-1.5">
-            <img
-              src={logomark}
-              alt="Goldsainte"
-              className="h-5 w-5 rounded-full object-contain ring-1 ring-[#C7B892]/40 bg-[#0c4d47] p-0.5"
-              loading="lazy"
-            />
-            <span className="text-[11px] text-[#7A7151] truncate">
-              <span className="text-[#6B7280]">Curated by </span>
-              <span className="font-secondary italic text-[#0a2225]">Goldsainte</span>
-            </span>
-          </div>
-        ) : null}
-        {typeof trip.rating === "number" && trip.rating > 0 && (
-          <p className="flex items-center gap-1 text-[12px] text-[#0a2225]">
-            <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
-            <span className="font-medium">{trip.rating.toFixed(1)}</span>
-            {typeof trip.review_count === "number" && trip.review_count > 0 && (
-              <span className="text-[#6B7280]">({trip.review_count})</span>
-            )}
-          </p>
-        )}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-secondary text-sm md:text-[15px] text-[#0a2225] font-medium leading-snug line-clamp-1">
-            {trip.title}
-          </h3>
-          <span className="text-sm md:text-[15px] font-semibold text-[#0a2225] whitespace-nowrap">
-            {formatPrice(trip.price_per_person, trip.currency)}
-          </span>
         </div>
-
-        <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
-          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-          <span className="truncate">{trip.destination}</span>
-        </p>
-
-        <p className="flex items-center gap-1 text-[13px] text-[#6B7280]">
-          <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
-          <span>{getDuration()} nights</span>
-        </p>
-
-        {typeof trip.max_participants === "number" &&
-          typeof trip.current_bookings === "number" &&
-          trip.max_participants - trip.current_bookings > 0 &&
-          trip.max_participants - trip.current_bookings <= 3 && (
-            <span className="inline-block rounded-full bg-[#b85c3a]/10 px-2 py-0.5 text-[11px] font-medium text-[#b85c3a]">
-              Only {trip.max_participants - trip.current_bookings} spot
-              {trip.max_participants - trip.current_bookings === 1 ? "" : "s"} left
-            </span>
+        <div className="mt-3 flex items-end justify-between border-t border-[#f7f3ea] pt-3">
+          {trip.creator ? (
+            <div className="flex min-w-0 items-center gap-1.5">
+              <CreatorAttribution creator={trip.creator} />
+              {roleBadge && (
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider ring-1 ${roleBadge.className}`}
+                >
+                  {roleBadge.label}
+                </span>
+              )}
+            </div>
+          ) : trip.creator_type === "platform" ? (
+            <div className="flex min-w-0 items-center gap-1.5">
+              <img
+                src={logomark}
+                alt="Goldsainte"
+                className="h-5 w-5 rounded-full bg-[#0c4d47] object-contain p-0.5 ring-1 ring-[#C7B892]/40"
+                loading="lazy"
+              />
+              <span className="truncate text-[11px] text-[#6B7280]" style={{ fontFamily: "Inter, sans-serif" }}>
+                Goldsainte Concierge
+              </span>
+            </div>
+          ) : (
+            <span />
           )}
-
-        {(saveCount > 0 || bookingCount > 0) && (
-          <div className="pt-0.5 text-[11px] text-[#7A7151] space-y-0.5">
-            {saveCount > 0 && (
-              <p>{saveCount.toLocaleString()} saves</p>
-            )}
-            {bookingCount > 0 && (
-              <p>{bookingCount} booked</p>
-            )}
+          <div className="shrink-0 text-right">
+            <p className="text-[10.5px] text-[#9CA3AF]" style={{ fontFamily: "Inter, sans-serif" }}>
+              From
+            </p>
+            <p className="text-[16px] font-semibold text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
+              {formatPrice(trip.price_per_person, trip.currency)}
+            </p>
           </div>
-        )}
-
-        {trip.created_at && (() => {
-          const ageMs = Date.now() - new Date(trip.created_at).getTime();
-          const days = Math.floor(ageMs / (1000 * 60 * 60 * 24));
-          const months = Math.floor(days / 30);
-          if (days < 14) return <p className="pt-0.5 text-[11px] text-[#7A7151]/80">New</p>;
-          if (months < 3) return <p className="pt-0.5 text-[11px] text-[#7A7151]/80">{months}mo ago</p>;
-          return null;
-        })()}
+        </div>
       </div>
     </article>
   );
