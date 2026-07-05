@@ -67,7 +67,14 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   useEffect(() => {
     if (!expanded) return;
     const onDown = (e: MouseEvent) => {
-      if (sectionRef.current && !sectionRef.current.contains(e.target as Node)) {
+      // The click that OPENED the accordion unmounts the pill; in production
+      // builds React attaches this listener before that same native click
+      // finishes bubbling, so the detached pill reads as "outside" and the
+      // bar collapsed in the same click ("nothing happens"). Ignore detached
+      // targets and attach on the next tick so the opening click never counts.
+      const target = e.target as Node | null;
+      if (target && !target.isConnected) return;
+      if (sectionRef.current && target && !sectionRef.current.contains(target)) {
         setExpanded(false);
       }
     };
@@ -76,9 +83,12 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
     };
     // "click", not "mousedown" — see MarketplaceFilters: mousedown-close
     // swallows the click the user was making outside the bar.
-    document.addEventListener("click", onDown);
-    document.addEventListener("keydown", onKey);
+    const attach = window.setTimeout(() => {
+      document.addEventListener("click", onDown);
+      document.addEventListener("keydown", onKey);
+    }, 0);
     return () => {
+      window.clearTimeout(attach);
       document.removeEventListener("click", onDown);
       document.removeEventListener("keydown", onKey);
     };
