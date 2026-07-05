@@ -8,6 +8,7 @@ import { WriteReviewModal } from "@/components/profile/WriteReviewModal";
 import { CreatorHeroSection } from "@/components/creator/CreatorHeroSection";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAboutSection } from "@/components/creator/CreatorAboutSection";
+import { CoverPhotoModal } from "@/components/CoverPhotoModal";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +42,21 @@ function GoldDivider() {
 }
 
 // -- Section label component --
+/* Mockup-spec section header: gold eyebrow + Playfair headline (+ optional link) */
+function SectionHead({ eyebrow, title, link }: { eyebrow: string; title: string; link?: React.ReactNode }) {
+  return (
+    <div className="mb-6 flex items-end justify-between gap-4">
+      <div>
+        <p className="font-sans text-[13px] uppercase tracking-[0.25em] text-[#C7A962]" style={{ fontFamily: "Inter, sans-serif" }}>
+          {eyebrow}
+        </p>
+        <h2 className="mt-1.5 font-secondary text-[27px] font-semibold text-[#0a2225]">{title}</h2>
+      </div>
+      {link}
+    </div>
+  );
+}
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-4 mb-8">
@@ -199,6 +215,7 @@ export default function CreatorPublicProfilePage() {
   // owner affordance (camera, coach marks, builder CTAs, tier picker)
   // disappears so the owner sees exactly what the public sees.
   const [previewAsTraveler, setPreviewAsTraveler] = useState(false);
+  const [coverModalOpen, setCoverModalOpen] = useState(false);
   const effIsOwn = isOwnProfile && !previewAsTraveler;
 
   if (loading) {
@@ -404,6 +421,9 @@ export default function CreatorPublicProfilePage() {
           responseTimeText={responseTimeText}
           isVerified={Boolean(creator.is_verified)}
           isOwnProfile={effIsOwn}
+          coverImageUrl={(creator as any).cover_image_url || null}
+          guideCount={guides.length}
+          onEditCover={effIsOwn ? () => setCoverModalOpen(true) : undefined}
           targetUserId={effIsOwn ? undefined : creator.id}
           onRequestTrip={previewAsTraveler ? handlePreviewOnly : handleRequestTrip}
           onMessage={effIsOwn ? undefined : previewAsTraveler ? handlePreviewOnly : handleOpenMessage}
@@ -413,6 +433,38 @@ export default function CreatorPublicProfilePage() {
           followerCount={creator.creator_followers}
           creatorTier={creator.creator_tier}
         />
+
+        {/* ── In-page anchor nav (only sections that actually exist) ── */}
+        {(() => {
+          const anchors = [
+            guides.length > 0 && { id: "guides", label: "Guides" },
+            trips.length > 0 && { id: "trips", label: "Trips" },
+            ((creator.featured_photos?.length ?? 0) > 0 || (creator.featured_tiktok_videos?.length ?? 0) > 0 || creator.instagram_handle) &&
+              { id: "highlights", label: "Highlights" },
+            Boolean(bio || (creatorData?.certifications?.length ?? 0) > 0 || creator.location) && { id: "about", label: "About" },
+            reviewCount > 0 && { id: "reviews", label: "Reviews" },
+          ].filter(Boolean) as { id: string; label: string }[];
+          if (anchors.length < 2) return null;
+          return (
+            <div className="mx-auto max-w-5xl px-4">
+              <nav className="mt-9 flex gap-8 border-b border-[#E5DFC6] font-sans text-[13px]" style={{ fontFamily: "Inter, sans-serif" }}>
+                {anchors.map((a, i) => (
+                  <a
+                    key={a.id}
+                    href={`#${a.id}`}
+                    className={`pb-3.5 pt-1 tracking-[0.04em] transition-colors ${
+                      i === 0
+                        ? "border-b-2 border-[#0c4d47] font-semibold text-[#0a2225]"
+                        : "text-[#6B7280] hover:text-[#0a2225]"
+                    }`}
+                  >
+                    {a.label}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          );
+        })()}
 
         <Dialog open={messageOpen} onOpenChange={setMessageOpen}>
           <DialogContent className="bg-[#FDF9F0] border-[#E5DFC6] sm:max-w-md">
@@ -456,7 +508,7 @@ export default function CreatorPublicProfilePage() {
 
         {/* ─── Photo/video portfolio — was built but never wired into this page ─── */}
         <div className="bg-[#FDF9F0]">
-          <div className="mx-auto max-w-5xl px-4 pb-8 md:pb-12">
+          <div id="highlights" className="mx-auto max-w-5xl px-4 pb-8 md:pb-12 scroll-mt-24">
             <CreatorMediaGallery
               creatorId={creator.id}
               fallbackPhotos={creator.featured_photos}
@@ -499,8 +551,8 @@ export default function CreatorPublicProfilePage() {
         {/* ─── Curated Journeys (bookable trip packages) ─── */}
         {trips.length > 0 && (
           <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <SectionLabel>Curated Journeys</SectionLabel>
+            <div id="trips" className="mx-auto max-w-5xl px-4 py-12 md:py-16 scroll-mt-24">
+              <SectionHead eyebrow="Curated Journeys" title={`Trips with ${firstName}`} />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {trips.map((t) => (
                   <button
@@ -561,8 +613,8 @@ export default function CreatorPublicProfilePage() {
         {/* ─── Itinerary Guides ─── */}
         {guides.length > 0 && (
           <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <SectionLabel>Itinerary Guides</SectionLabel>
+            <div id="guides" className="mx-auto max-w-5xl px-4 py-12 md:py-16 scroll-mt-24">
+              <SectionHead eyebrow="Itinerary Guides" title={`Guides by ${firstName}`} />
               <div className="space-y-3">
                 {guides.map((g) => (
                   <button
@@ -608,9 +660,9 @@ export default function CreatorPublicProfilePage() {
         {/* ─── 4. REVIEWS — Proof Layer ─── */}
         {(reviewCount > 0 || (!authLoading && user && user.id !== creator.id)) && (
           <div className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
+            <div id="reviews" className="mx-auto max-w-5xl px-4 py-12 md:py-16 scroll-mt-24">
               <div className="flex items-center justify-between mb-8">
-                <SectionLabel>Reviews</SectionLabel>
+                <SectionHead eyebrow="Reviews" title="What travelers say" />
                 {!authLoading && user && user.id !== creator.id && (
                   <WriteReviewModal
                     revieweeId={creator.id}
@@ -649,45 +701,80 @@ export default function CreatorPublicProfilePage() {
         {/* Rendered only when there's real content — a section header with
             nothing under it (or with chips repeated from the hero) is the
             fastest way to look unfinished. */}
-        {Boolean(bio || (creatorData?.certifications?.length ?? 0) > 0) && (
+        {Boolean(bio || (creatorData?.certifications?.length ?? 0) > 0 || creator.location) && (
           <div className="bg-[#FDF9F0]">
-            <div className="mx-auto max-w-5xl px-4 py-12 md:py-16">
-              <SectionLabel>About</SectionLabel>
-              <CreatorAboutSection
-                bio={bio}
-                certifications={creatorData?.certifications ?? null}
-              />
+            <div id="about" className="mx-auto max-w-5xl px-4 py-12 md:py-16 scroll-mt-24">
+              <SectionHead eyebrow="About" title="The philosophy" />
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr] md:gap-12 items-start">
+                <CreatorAboutSection
+                  bio={bio}
+                  certifications={creatorData?.certifications ?? null}
+                />
+                {/* Facts card — every row conditional on real data */}
+                <div
+                  className="rounded-[20px] border border-[#E5DFC6] bg-white p-6 text-[13.5px]"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  {[
+                    creator.location && { k: "Home base", v: creator.location },
+                    positioningTitle && positioningTitle !== "Travel Designer" && { k: "Specialty", v: positioningTitle },
+                    creator.created_at && { k: "Member since", v: String(new Date(creator.created_at).getFullYear()) },
+                    responseTimeText && { k: "Responds in", v: responseTimeText },
+                  ]
+                    .filter(Boolean)
+                    .map((f: any, i, arr) => (
+                      <div
+                        key={f.k}
+                        className={`flex items-center justify-between py-3 text-[#6B7280] ${
+                          i < arr.length - 1 ? "border-b border-[#f7f3ea]" : ""
+                        }`}
+                      >
+                        <span>{f.k}</span>
+                        <span className="font-semibold text-[#0a2225]">{f.v}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
         {/* ─── 6. FINAL CTA ─── */}
         {!effIsOwn && (
-          <div className="bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 text-center">
-              <GoldDivider />
-              <div className="mt-10">
-                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-3">
-                  Start Your Journey With {firstName}
-                </h2>
-                <p className="font-primary text-sm text-[#6B7280] mb-8 max-w-md mx-auto">
-                  Share your travel style and get a personalized itinerary crafted just for you.
-                </p>
-                <Button
-                  onClick={handleRequestTrip}
-                  className="bg-[#0c4d47] hover:bg-[#0a3d39] text-white rounded-full px-10 h-12 text-sm font-medium shadow-sm"
-                >
-                  Request a Trip
-                </Button>
-                <p className="font-primary text-[10px] text-[#9CA3AF] mt-3">
-                  No commitment · Delivered in 24–48 hours
-                </p>
-              </div>
+          <div className="bg-[#0c4d47]">
+            <div className="mx-auto max-w-5xl px-4 py-16 md:py-20 text-center">
+              <h2 className="font-secondary text-[28px] md:text-[32px] font-semibold text-white mb-3">
+                Start Your Journey With {firstName}
+              </h2>
+              <p className="font-primary text-lg text-[#cfe0dc] mb-8 max-w-md mx-auto">
+                Share your travel style and get a personalized itinerary crafted just for you.
+              </p>
+              <Button
+                onClick={previewAsTraveler ? handlePreviewOnly : handleRequestTrip}
+                className="h-12 rounded-full bg-[#C7A962] px-10 text-sm font-semibold text-[#0a2225] shadow-sm hover:bg-[#b6984f]"
+              >
+                Request a Trip
+              </Button>
+              <p className="mt-4 font-sans text-xs text-[#9fc0ba]" style={{ fontFamily: "Inter, sans-serif" }}>
+                No commitment · Delivered in 24–48 hours
+              </p>
             </div>
           </div>
         )}
 
       </div>
+
+      {/* Owner-only cover upload — reuses the previously orphaned CoverPhotoModal,
+          which writes profiles.cover_image_url (already exposed via creator_directory). */}
+      {effIsOwn && (
+        <CoverPhotoModal
+          open={coverModalOpen}
+          onOpenChange={setCoverModalOpen}
+          userId={creator.id}
+          currentCoverUrl={(creator as any).cover_image_url || null}
+          onSuccess={fetchProfile}
+        />
+      )}
     </>
   );
 }
