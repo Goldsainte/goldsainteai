@@ -526,7 +526,7 @@ export default function CreatorPublicProfilePage() {
                 <Compass className="h-7 w-7 text-[#C7A962] mx-auto mb-3" />
                 <h3 className="font-secondary text-xl text-[#0a2225] mb-1.5">No published work yet</h3>
                 <p className="text-sm text-[#6B7280] max-w-sm mx-auto mb-5">
-                  Package a trip or build an itinerary guide to start filling this space — it's the first thing travelers see.
+                  Package a trip, create a bookable tour, or build an itinerary guide to start filling this space — it's the first thing travelers see.
                 </p>
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   <Button
@@ -536,6 +536,13 @@ export default function CreatorPublicProfilePage() {
                     Package a trip
                   </Button>
                   <Button
+                    onClick={() => navigate("/trip-builder")}
+                    variant="outline"
+                    className="border-[#E5DFC6] text-[#0a2225] rounded-full px-6 h-10 text-sm font-medium"
+                  >
+                    Create a tour
+                  </Button>
+                  <Button
                     onClick={() => navigate("/itinerary-builder")}
                     variant="outline"
                     className="border-[#E5DFC6] text-[#0a2225] rounded-full px-6 h-10 text-sm font-medium"
@@ -543,6 +550,9 @@ export default function CreatorPublicProfilePage() {
                     Build a guide
                   </Button>
                 </div>
+                <p className="mt-3 text-xs text-[#9CA3AF]">
+                  Tours use the Trip Builder — pick "Bookable Tour" as the listing type.
+                </p>
               </div>
             </div>
           </div>
@@ -753,7 +763,7 @@ export default function CreatorPublicProfilePage() {
                 onClick={previewAsTraveler ? handlePreviewOnly : handleRequestTrip}
                 className="h-12 rounded-full bg-[#C7A962] px-10 text-sm font-semibold text-[#0a2225] shadow-sm hover:bg-[#b6984f]"
               >
-                Request a Trip
+                Request a Service
               </Button>
               <p className="mt-4 font-sans text-xs text-[#9fc0ba]" style={{ fontFamily: "Inter, sans-serif" }}>
                 No commitment · Delivered in 24–48 hours
