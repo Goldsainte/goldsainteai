@@ -173,7 +173,15 @@ export function CreatorHeroSection({
             </div>
           )}
 
-          {/* At-a-glance stats — one consistent card treatment, not color-coded per stat */}
+          {/* At-a-glance stats — one consistent card treatment, not color-coded per stat.
+              Exception: a single lonely "Member since" card reads as an empty
+              trophy shelf on brand-new profiles, so when it's the only stat it
+              collapses to one quiet line instead. */}
+          {stats.length === 0 ? null : stats.length === 1 && stats[0].label === "Member since" ? (
+            <div className="mt-6 pt-5 border-t border-[#E5DFC6]">
+              <p className="text-xs text-[#9CA3AF]">Member since {stats[0].value}</p>
+            </div>
+          ) : (
           <div className="mt-6 pt-6 border-t border-[#E5DFC6] grid grid-cols-2 sm:grid-cols-4 gap-3">
             {stats.map((s) => (
               <div key={s.label} className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3.5">
@@ -182,6 +190,7 @@ export function CreatorHeroSection({
               </div>
             ))}
           </div>
+          )}
 
           {showCompleteNudge && (
             <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-3.5 py-2.5">
