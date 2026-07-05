@@ -681,7 +681,15 @@ export default function Marketplace() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 py-5 md:py-7">
-          {activeTab === "trips" && <ForYouRow />}
+          {/* Personalized rail only on the unrefined default view — once the
+              user narrows by destination, duration, price, or dates, the
+              results themselves are the answer and the rail is noise. */}
+          {activeTab === "trips" &&
+            !filters.destination &&
+            !filters.durationBucket &&
+            !priceChipActive &&
+            !filters.startDate &&
+            !filters.endDate && <ForYouRow />}
 
           {/* Result count + removable refinement chips */}
           <div className="mb-5 flex flex-wrap items-center gap-2">
