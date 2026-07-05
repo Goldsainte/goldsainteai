@@ -33,6 +33,8 @@ interface Props {
   isOwnProfile?: boolean;
   /** Real value from profiles.creator_tier — drives the accurate "you keep X%" line. Defaults to bronze if absent. */
   creatorTier?: CreatorTier | string | null;
+  /** Hide the built-in section label (e.g. inside a dashboard tab that already has one). */
+  hideLabel?: boolean;
 }
 
 const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string; cta: string }> = {
@@ -67,7 +69,7 @@ function formatPrice(cents: number, currency: string) {
   }).format(cents / 100);
 }
 
-export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }: Props) {
+export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, hideLabel }: Props) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -119,18 +121,25 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier }:
 
   const hasAny = services.length > 0;
 
+  // Public + no services: render nothing at all. Big-tech profiles never
+  // show an empty module with an apology — the section simply doesn't exist
+  // until there's something to sell. (Owners still see the tier picker.)
   if (!hasAny && !isOwnProfile) {
-    return (
-      <div className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] px-6 py-8 text-center">
-        <p className="text-sm text-[#6B7280]">
-          This creator hasn't listed custom services yet — check back soon, or send a trip request above.
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (
     <div>
+      {/* Section label lives here (not in the page) so it can never render
+          above an empty module. */}
+      {!hideLabel && (
+      <div className="flex items-center gap-4 mb-8">
+        <span className="font-primary text-sm uppercase tracking-[0.25em] text-[#C7A962] shrink-0">
+          Custom Services
+        </span>
+        <div className="h-px flex-1 bg-gradient-to-r from-[#C7A962]/30 to-transparent" />
+      </div>
+      )}
       {/* Add Service button for owners — only show once they have at least one service */}
       {isOwnProfile && hasAny && (
         <div className="flex justify-end mb-4">
