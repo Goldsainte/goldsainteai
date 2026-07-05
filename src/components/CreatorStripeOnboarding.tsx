@@ -23,7 +23,7 @@ export const CreatorStripeOnboarding = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    checkStatus();
+    checkStatus({ silent: true });
     
     // Check URL params for onboarding completion.
     // stripe-connect-link returns to ?stripe=success / ?stripe=refresh;
@@ -34,10 +34,10 @@ export const CreatorStripeOnboarding = () => {
         title: "Setup Complete!",
         description: "Your payout account has been configured successfully.",
       });
-      checkStatus();
+      checkStatus({ silent: true });
       window.history.replaceState({}, '', window.location.pathname);
     } else if (params.get('refresh') === 'true' || params.get('stripe') === 'refresh') {
-      checkStatus();
+      checkStatus({ silent: true });
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
@@ -54,7 +54,7 @@ export const CreatorStripeOnboarding = () => {
     return () => window.removeEventListener('start-stripe-onboarding', handler);
   }, []);
 
-  const checkStatus = async () => {
+  const checkStatus = async (opts?: { silent?: boolean }) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -69,11 +69,13 @@ export const CreatorStripeOnboarding = () => {
       setStatus(data);
     } catch (error: any) {
       console.error('Error checking status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to check payout status",
-        variant: "destructive",
-      });
+      if (!opts?.silent) {
+        toast({
+          title: "Error",
+          description: "Failed to check payout status",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -173,7 +175,7 @@ export const CreatorStripeOnboarding = () => {
           Payout Setup
         </CardTitle>
         <CardDescription>
-          Configure your bank account to receive earnings from virtual gifts
+          Connect your bank account through Stripe to receive payouts for guide sales, custom services, and trips
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -181,7 +183,7 @@ export const CreatorStripeOnboarding = () => {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Connect your bank account to start receiving payments from your fans
+              Payout verification is required before your guides can be approved and go live
             </AlertDescription>
           </Alert>
         )}
@@ -240,7 +242,7 @@ export const CreatorStripeOnboarding = () => {
 
         <Alert>
           <AlertDescription className="text-xs">
-            <strong>How it works:</strong> When fans send you virtual gifts, Goldsainte keeps 30% and you receive 70% directly to your bank account daily.
+            <strong>How it works:</strong> Stripe sends payouts directly to your bank account. Traveler payments are held for a short protected window before release, and Goldsainte's commission depends on your creator tier.
           </AlertDescription>
         </Alert>
       </CardContent>
