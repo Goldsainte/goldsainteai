@@ -307,7 +307,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
               Beyond selling fixed itinerary guides, you can offer personalised services that travelers request directly from your profile. You get paid when work is delivered — choose a tier below to get started.
             </p>
             <p className="text-xs text-[#9A9384]">
-              Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>.
+              Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>. Selling a scheduled tour? <a href="/trip-builder" className="underline text-[#0c4d47]">Create it in the Trip Builder</a> and choose "Bookable Tour".
             </p>
           </div>
 
