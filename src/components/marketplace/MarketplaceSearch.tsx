@@ -27,6 +27,11 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   });
   const [travelers, setTravelers] = useState(filters.travelers || 1);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  // TrovaTrip-style accordion: desktop search rests as a compact pill and
+  // expands into the full field bar on click. Sticky so it travels with
+  // the scroll like a real header search.
+  const [expanded, setExpanded] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +63,27 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Collapse the desktop accordion on outside click or Escape.
+  useEffect(() => {
+    if (!expanded) return;
+    const onDown = (e: MouseEvent) => {
+      if (sectionRef.current && !sectionRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    // "click", not "mousedown" — see MarketplaceFilters: mousedown-close
+    // swallows the click the user was making outside the bar.
+    document.addEventListener("click", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
+
   const selectSuggestion = (value: string) => {
     setDestination(value);
     setShowSuggestions(false);
@@ -78,6 +104,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   }, [filters.destination, filters.startDate, filters.endDate, filters.travelers]);
 
   const handleSearch = () => {
+    setExpanded(false);
     onSearch({
       destination: destination.trim(),
       startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
@@ -170,10 +197,35 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   );
 
   return (
-    <section className="border-b border-[#E5DFC6]/30 bg-white">
+    <section
+      ref={sectionRef}
+      className="sticky top-0 z-40 border-b border-[#E5DFC6]/30 bg-white/95 backdrop-blur-sm"
+    >
       <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
-        {/* Desktop search bar */}
-        <div className="hidden md:flex md:items-center md:divide-x md:divide-[#E5DFC6]/30 gap-3 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm">
+        {/* Desktop collapsed pill — expands into the full bar */}
+        {!expanded && (
+          <div className="hidden md:flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                setExpanded(true);
+                // Focus the destination field once the bar mounts.
+                setTimeout(() => inputRef.current?.focus(), 30);
+              }}
+              className="group flex items-center gap-3 rounded-full border border-[#E5DFC6] bg-white pl-5 pr-2 py-2 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <span className="text-sm text-[#0a2225] font-medium">
+                {getSummaryText()}
+              </span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#BFAD72] group-hover:bg-[#9d8f5d] transition-colors">
+                <Search className="h-4 w-4 text-white" />
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* Desktop search bar (expanded) */}
+        <div className={`${expanded ? "md:flex" : ""} hidden md:items-center md:divide-x md:divide-[#E5DFC6]/30 gap-3 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm`}>
           {/* Where */}
           <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-3">
             <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
