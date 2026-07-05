@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -411,6 +411,76 @@ export const Header = () => {
               <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
                 <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" loading="lazy"/>
               </a>
+
+              {/* Primary nav — TrovaTrip-style accordion dropdowns (desktop only).
+                  Every link targets a route that exists today; nothing aspirational. */}
+              <nav className="hidden lg:flex items-center gap-1 flex-1 ml-6">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
+                    >
+                      Travel
+                      <ChevronDown className="h-3.5 w-3.5 transition-transform data-[state=open]:rotate-180" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-primary">
+                    <DropdownMenuItem onClick={() => navigate('/marketplace')} className="cursor-pointer px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-[#0a2225]">Marketplace</p>
+                        <p className="text-xs text-[#6B7280]">Browse curated trips</p>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/marketplace?tab=itinerary-guides')} className="cursor-pointer px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-[#0a2225]">Itinerary Guides</p>
+                        <p className="text-xs text-[#6B7280]">Downloadable day-by-day guides</p>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/post-trip')} className="cursor-pointer px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-[#0a2225]">Post a Trip Request</p>
+                        <p className="text-xs text-[#6B7280]">Get tailored proposals from specialists</p>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/creators')}
+                  className="rounded-full px-4 py-2 text-sm font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors"
+                >
+                  Creators
+                </button>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
+                    >
+                      Partner
+                      <ChevronDown className="h-3.5 w-3.5 transition-transform data-[state=open]:rotate-180" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-primary">
+                    <DropdownMenuItem onClick={() => navigate('/apply/agent')} className="cursor-pointer px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-[#0a2225]">Become an Agent</p>
+                        <p className="text-xs text-[#6B7280]">Sell trips and guides on Goldsainte</p>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/apply/brand')} className="cursor-pointer px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-[#0a2225]">Partner Your Brand</p>
+                        <p className="text-xs text-[#6B7280]">Reach travelers through creators</p>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </nav>
 
               {/* Right side actions - Single Profile Menu */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
