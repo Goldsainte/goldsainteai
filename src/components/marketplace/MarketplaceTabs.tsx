@@ -21,6 +21,13 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
       icon: Plane,
       description: "Pre-packaged trips from verified creators & agents, ready to book instantly"
     },
+    {
+      id: "tours",
+      label: "Tours",
+      shortLabel: "Tours",
+      icon: Layers,
+      description: "Bookable day tours and multi-day tours from creators and vetted tour operators",
+    },
     { 
       id: "trip-requests", 
       label: "Trip Requests", 
@@ -34,13 +41,6 @@ export function MarketplaceTabs({ activeTab, onTabChange }: MarketplaceTabsProps
       shortLabel: "Guides",
       icon: BookOpen,
       description: "Downloadable and printable day-by-day guides from verified travel creators and specialists"
-    },
-    {
-      id: "bundles",
-      label: "Bundles",
-      shortLabel: "Bundles",
-      icon: Layers,
-      description: "Curated multi-product bundles — a trip plus matching guides at a reduced price",
     },
   ] as const;
 
