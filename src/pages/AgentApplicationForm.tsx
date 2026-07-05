@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Step10Documents } from "@/components/applications/steps/Step10Documents";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 
 const US_STATES: { code: string; name: string }[] = [
   { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
@@ -249,42 +250,73 @@ function AgentApplicationFormInner() {
 
       if (!saved) return;
       const parsed = JSON.parse(saved);
-      const label = [parsed?.firstName, parsed?.lastName].filter(Boolean).join(" ")
-        || parsed?.email
-        || "an unfinished application";
-      const resume = window.confirm(
-        `Resume your previous draft for ${label}?\n\nClick Cancel to start a new application.`
-      );
-      if (resume) {
-        setFormData((prev) => ({
-          ...prev,
-          ...parsed,
-          businessType: normalizeBusinessType(parsed.businessType),
-        }));
-        toast({ title: "Draft restored" });
-      } else {
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      const { __step: savedStep, ...savedData } = parsed ?? {};
+      setFormData((prev) => ({
+        ...prev,
+        ...savedData,
+        businessType: normalizeBusinessType(savedData.businessType),
+      }));
+      // Drop the user back on the step they left (never into the
+      // post-submission Verification step, which requires a server row).
+      if (typeof savedStep === "number" && savedStep > 1 && savedStep < 6) {
+        setStep(savedStep);
       }
+      // Deferred a tick so the toast can never fire before the global
+      // <Toaster /> has subscribed (possible when auth resolves synchronously).
+      setTimeout(() => toast({ title: "Draft restored" }), 0);
     } catch {
       /* noop */
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Autosave non-file fields whenever formData changes
+  // Autosave non-file fields (plus current step) whenever they change.
+  // File objects can't survive JSON round-trips, so they're stripped and
+  // the user re-attaches documents on the Documents step after a restore.
   useEffect(() => {
     if (!DRAFT_STORAGE_KEY) return;
+    // Never persist the post-submission Verification step as a draft —
+    // the server row is the source of truth once the application exists.
+    if (step >= 6) return;
     try {
       const {
         businessLicenseFile: _a,
         insuranceCertificateFile: _b,
         ...persistable
       } = formData;
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(persistable));
+      localStorage.setItem(
+        DRAFT_STORAGE_KEY,
+        JSON.stringify({ ...persistable, __step: step }),
+      );
     } catch {
       /* noop */
     }
-  }, [formData, DRAFT_STORAGE_KEY]);
+  }, [formData, step, DRAFT_STORAGE_KEY]);
+
+  // Explicit "Save & finish later": the draft is already autosaved above,
+  // so this just confirms it to the user and exits gracefully.
+  const saveDraftAndExit = () => {
+    try {
+      if (DRAFT_STORAGE_KEY) {
+        const {
+          businessLicenseFile: _a,
+          insuranceCertificateFile: _b,
+          ...persistable
+        } = formData;
+        localStorage.setItem(
+          DRAFT_STORAGE_KEY,
+          JSON.stringify({ ...persistable, __step: step }),
+        );
+      }
+    } catch {
+      /* noop */
+    }
+    toast({
+      title: "Draft saved",
+      description: "Your application is saved on this device. Pick up where you left off anytime.",
+    });
+    navigate("/");
+  };
 
   // Per-step validation with friendly toasts
   const validateStep = (currentStep: number): boolean => {
@@ -609,6 +641,13 @@ function AgentApplicationFormInner() {
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
       ) : <div />}
+      <button
+        type="button"
+        onClick={saveDraftAndExit}
+        className="self-center text-sm text-[#6B7280] underline underline-offset-4 decoration-[#C7A962]/50 hover:text-[#0a2225] hover:decoration-[#C7A962] transition-colors"
+      >
+        Save &amp; finish later
+      </button>
       <Button onClick={onNext} disabled={nextDisabled || isLoading} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">
         {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <>{nextLabel || "Next"} <ArrowRight className="ml-2 h-4 w-4" /></>}
       </Button>
@@ -805,7 +844,12 @@ function AgentApplicationFormInner() {
 
             <div>
               <Label className="text-sm font-medium text-[#0a2225]">Preferred Destinations</Label>
-              <Input value={formData.preferredDestinations} onChange={(e) => setFormData({ ...formData, preferredDestinations: e.target.value })} className={luxuryInputClasses} placeholder="e.g. Maldives, Italy, Japan" />
+              <CityAutocomplete
+                value={formData.preferredDestinations}
+                onChange={(value) => setFormData({ ...formData, preferredDestinations: value })}
+                placeholder="e.g. Maldives, Italy, Japan"
+                className={luxuryInputClasses}
+              />
             </div>
 
             <NavButtons onBack={() => setStep(1)} onNext={() => goToStep(3)} />
@@ -987,7 +1031,8 @@ function AgentApplicationFormInner() {
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
                 <Shield className="h-10 w-10 text-[#C7A962]" />
               </div>
-              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">One Last Step — Verify Your Identity</h3>
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-[#8a7136]">Final step</p>
+              <h3 className="mb-3 font-secondary text-[28px] font-semibold text-[#0a2225]">Verify Your Identity</h3>
               <p className="text-base text-[#6B7280] max-w-md mx-auto">
                 Completing Stripe Identity verification activates your advisor account
                 <strong className="text-[#0a2225]"> immediately</strong> — there is no waiting period
@@ -995,8 +1040,9 @@ function AgentApplicationFormInner() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/50 p-6">
-              <h4 className="mb-3 text-sm font-semibold text-[#0a2225]">What you'll need:</h4>
+            <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+              <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.2em] text-[#8a7136]">Before you begin</p>
+              <h4 className="mb-3 font-secondary text-lg text-[#0a2225]">What you'll need</h4>
               <ul className="space-y-2 text-sm text-[#6B7280]">
                 <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Government-issued photo ID</li>
                 <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Device with camera for selfie verification</li>
