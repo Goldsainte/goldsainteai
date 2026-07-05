@@ -218,7 +218,7 @@ export const CreatorStripeOnboarding = () => {
 
         <div className="space-y-2">
           <Button 
-            onClick={status?.connected && status.onboarding_complete ? checkStatus : startOnboarding}
+            onClick={() => (status?.connected && status.onboarding_complete ? checkStatus() : startOnboarding())}
             disabled={onboarding || loading}
             className="w-full h-12"
           >
