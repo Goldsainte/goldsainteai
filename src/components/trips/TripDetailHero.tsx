@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Users, Clock, Activity, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Users, Clock, Activity, ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,15 @@ export function TripDetailHero({
   spotsAvailable,
 }: TripDetailHeroProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const allImages = [coverImage, ...galleryImages].filter(Boolean);
+  // GetYourGuide-style mosaic needs at least 3 real images; anything fewer
+  // falls back to the single hero so sparse trips never show empty tiles.
+  const useMosaic = allImages.length >= 3;
+  const openLightboxAt = (idx: number) => {
+    setCurrentImageIndex(idx);
+    setLightboxOpen(true);
+  };
 
   const formatDateRange = () => {
     if (!startDate || !endDate) return "Dates TBD";
@@ -66,6 +74,69 @@ export function TripDetailHero({
 
   return (
     <section className="relative">
+      {useMosaic ? (
+        /* ── GetYourGuide-style mosaic: large lead tile + stacked side tiles ── */
+        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-2 md:h-[440px]">
+          {/* Lead tile */}
+          <button
+            type="button"
+            onClick={() => openLightboxAt(0)}
+            className="relative md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl md:rounded-r-none group aspect-[16/10] md:aspect-auto"
+          >
+            <img
+              src={allImages[0]}
+              alt={title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            {spotsAvailable !== undefined && spotsAvailable > 0 && (
+              <div className="absolute right-4 top-4 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-[#0a2225] shadow-lg">
+                {spotsAvailable} spots left
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-left">
+              <h1 className="font-secondary text-2xl md:text-4xl font-bold text-white drop-shadow-lg">
+                {title}
+                {hostName && hostName !== "Host" && (
+                  <span className="text-[#C7B892]"> with {hostName}</span>
+                )}
+              </h1>
+            </div>
+          </button>
+          {/* Side tiles (hidden on mobile — lead tile carries mobile) */}
+          <button
+            type="button"
+            onClick={() => openLightboxAt(1)}
+            className="relative hidden md:block overflow-hidden rounded-tr-2xl group"
+          >
+            <img
+              src={allImages[1]}
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              loading="lazy"
+              onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+            />
+          </button>
+          <button
+            type="button"
+            onClick={() => openLightboxAt(2)}
+            className="relative hidden md:block overflow-hidden rounded-br-2xl group"
+          >
+            <img
+              src={allImages[2]}
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              loading="lazy"
+              onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+            />
+            <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-medium text-[#0a2225] shadow-lg group-hover:bg-white">
+              <Images className="h-3.5 w-3.5" />
+              View all {allImages.length}
+            </span>
+          </button>
+        </div>
+      ) : (
+      <>
       {/* Hero Image */}
       <div className="relative aspect-[21/9] md:aspect-[21/9] w-full overflow-hidden rounded-2xl">
         <img
@@ -130,6 +201,50 @@ export function TripDetailHero({
               <img src={img} alt="" className="h-full w-full object-cover" loading="lazy"/>
             </button>
           ))}
+        </div>
+      )}
+      </>
+      )}
+
+      {/* Lightbox — full gallery viewer for the mosaic */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[80] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            aria-label="Close gallery"
+            onClick={() => setLightboxOpen(false)}
+            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <img
+            src={allImages[currentImageIndex]}
+            alt={title}
+            className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+          <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-sm text-white/80 tabular-nums">
+            {currentImageIndex + 1} / {allImages.length}
+          </p>
         </div>
       )}
 
