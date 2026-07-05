@@ -283,6 +283,14 @@ export default function CreatorPublicProfilePage() {
       <Helmet>
         <title>{displayName} · Goldsainte Creators</title>
         <meta name="description" content={bio || `Discover ${displayName} on Goldsainte`} />
+        {/* Rich link previews. Note: client-rendered tags only reach scrapers
+            that execute JS; full coverage needs server-rendered OG per profile
+            (queued post-launch). */}
+        <meta property="og:type" content="profile" />
+        <meta property="og:title" content={`${displayName} · Goldsainte`} />
+        <meta property="og:description" content={bio || `Plan your next trip with ${displayName} on Goldsainte.`} />
+        {creator.avatar_url && <meta property="og:image" content={creator.avatar_url} />}
+        <meta name="twitter:card" content={creator.avatar_url ? "summary_large_image" : "summary"} />
       </Helmet>
 
       <div className="min-h-screen bg-[#FDF9F0]">
