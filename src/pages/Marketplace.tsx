@@ -16,7 +16,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackButton } from "@/components/ui/BackButton";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
-import { LiveSignalRow } from "@/components/marketplace/LiveSignalRow";
 import { QuietlyActiveFooter } from "@/components/marketplace/QuietlyActiveFooter";
 import { ForYouRow } from "@/components/marketplace/ForYouRow";
 import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
@@ -72,6 +71,27 @@ export default function Marketplace() {
   }, [user?.id]);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Live inventory counts for the segmented tabs — exact head counts, no
+  // estimates. Rendered only after they load.
+  const { data: tabCounts } = useQuery({
+    queryKey: ["marketplace-tab-counts"],
+    queryFn: async () => {
+      const [trips, tours, guides, requests] = await Promise.all([
+        supabase.from("packaged_trips").select("id", { count: "exact", head: true }).eq("status", "published").eq("listing_type", "trip"),
+        supabase.from("packaged_trips").select("id", { count: "exact", head: true }).eq("status", "published").eq("listing_type", "tour"),
+        supabase.from("itinerary_products").select("id", { count: "exact", head: true }).eq("status", "published"),
+        supabase.from("trip_requests").select("id", { count: "exact", head: true }).eq("status", "open"),
+      ]);
+      return {
+        trips: trips.count ?? undefined,
+        tours: tours.count ?? undefined,
+        "itinerary-guides": guides.count ?? undefined,
+        "trip-requests": requests.count ?? undefined,
+      } as Record<string, number | undefined>;
+    },
+    staleTime: 60_000,
+  });
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
 
@@ -366,6 +386,27 @@ export default function Marketplace() {
     return sorted;
   }, [itineraryGuides, filters.destination, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
 
+  // Destination rail tiles: city + live count + a real cover image from the
+  // inventory itself (never external stock lookups).
+  const destinationRail = useMemo(() => {
+    const map = new Map<string, { city: string; count: number; image: string | null }>();
+    const add = (dest?: string | null, img?: string | null) => {
+      if (!dest) return;
+      const city = dest.split(",")[0].trim();
+      if (!city) return;
+      const cur = map.get(city) || { city, count: 0, image: null };
+      cur.count += 1;
+      if (!cur.image && img) cur.image = img;
+      map.set(city, cur);
+    };
+    (liveTrips || []).forEach((t: any) => add(t.destination, t.cover_image_url));
+    (itineraryGuides || []).forEach((g: any) => add(g.destination, g.cover_image_url));
+    return [...map.values()]
+      .filter((d) => d.image)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6) as { city: string; count: number; image: string }[];
+  }, [liveTrips, itineraryGuides]);
+
   // Quick destination chips, derived live from what's actually for sale.
   // (The old hardcoded category chips filtered on a tags column that is
   // never populated, so selecting one silently returned zero results.)
@@ -625,21 +666,21 @@ export default function Marketplace() {
         <MarketplaceHeader />
         <MarketplaceSearch onSearch={handleSearch} filters={filters} onClearFilters={handleClearFilters} />
 
-        <div className="mx-auto max-w-6xl px-4 py-4 md:py-8">
-          {activeTab === "trips" && <LiveSignalRow />}
-          <div className="mb-6 md:mb-8 flex flex-col gap-4 md:flex-row md:items-start">
-            <div className="flex-1 min-w-0">
-              <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
-            </div>
-            <div className="md:shrink-0 md:w-[200px]">
-              <MarketplaceFilters
-                filters={filters}
-                onFilterChange={setFilters}
-                destinationOptions={destinationOptions}
-              />
-            </div>
+        {/* ── Sticky control rail: segmented categories + direct filters (mockup spec).
+              The signal-chips row is gone — one chip was visibly broken and the
+              big unverifiable numbers eroded trust faster than empty space. ── */}
+        <div className="sticky top-14 sm:top-16 md:top-20 z-30 border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
+            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} counts={tabCounts} />
+            <MarketplaceFilters
+              filters={filters}
+              onFilterChange={setFilters}
+              destinationOptions={destinationOptions}
+            />
           </div>
+        </div>
 
+        <div className="mx-auto max-w-6xl px-4 py-5 md:py-7">
           {activeTab === "trips" && <ForYouRow />}
 
           {/* Result count + removable refinement chips */}
@@ -671,6 +712,50 @@ export default function Marketplace() {
           </div>
 
           {renderContent()}
+
+          {/* ── Destination rail — generated from live inventory, doubles as
+                internal linking. Renders only with 3+ real destinations. ── */}
+          {activeTab === "trips" && destinationRail.length >= 3 && (
+            <section className="mt-14">
+              <p className="font-sans text-[12.5px] uppercase tracking-[0.25em] text-[#C7A962]" style={{ fontFamily: "Inter, sans-serif" }}>
+                Where to next
+              </p>
+              <h2 className="mt-1.5 font-secondary text-[26px] font-semibold text-[#0a2225]">
+                Destinations with open journeys
+              </h2>
+              <div className="mt-5 grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-6">
+                {destinationRail.map((d) => (
+                  <button
+                    key={d.city}
+                    type="button"
+                    onClick={() => setFilters({ ...filters, destination: d.city })}
+                    className="group relative aspect-[1/1.15] overflow-hidden rounded-2xl text-left"
+                  >
+                    <img
+                      src={d.image}
+                      alt={d.city}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-3">
+                      <p className="font-sans text-[10px] text-white/85" style={{ fontFamily: "Inter, sans-serif" }}>
+                        {d.count} journey{d.count === 1 ? "" : "s"}
+                      </p>
+                      <p className="font-secondary text-[17px] text-white drop-shadow">{d.city}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Marketplace legal line — moved from the hero (mockup spec) */}
+          <p className="mx-auto mt-14 max-w-2xl text-center text-[11px] leading-relaxed text-[#9CA3AF]">
+            Goldsainte is a travel marketplace. All trips are designed and fulfilled by independent travel
+            specialists, agents, and suppliers. Trip Request proposals reflect their own cancellation,
+            refund, and deposit terms.
+          </p>
 
           {activeTab === "trips" && (
             <>
