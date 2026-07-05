@@ -9,15 +9,17 @@ interface MarketplaceTabsProps {
    active segment, live counts. Replaces the icon+description tab pills. */
 export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceTabsProps) {
   const tabs = [
-    { id: "trips", label: "Handpicked Trips" },
-    { id: "tours", label: "Tours" },
-    { id: "itinerary-guides", label: "Itinerary Guides" },
-    { id: "trip-requests", label: "Trip Requests" },
+    { id: "trips", label: "Handpicked Trips", shortLabel: "Trips" },
+    { id: "tours", label: "Tours", shortLabel: "Tours" },
+    { id: "itinerary-guides", label: "Itinerary Guides", shortLabel: "Guides" },
+    { id: "trip-requests", label: "Trip Requests", shortLabel: "Requests" },
   ] as const;
 
   return (
+    /* Mobile: all four tabs visible in a 2×2 grid with short labels —
+       no horizontal scrolling to discover categories. Desktop: one pill row. */
     <div
-      className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-[#E5DFC6] bg-white p-1"
+      className="grid w-full grid-cols-2 gap-1 rounded-2xl border border-[#E5DFC6] bg-white p-1 sm:flex sm:w-auto sm:max-w-full sm:items-center sm:rounded-full"
       style={{ fontFamily: "Inter, sans-serif" }}
       role="tablist"
     >
@@ -30,11 +32,12 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
             role="tab"
             aria-selected={active}
             onClick={() => onTabChange(t.id)}
-            className={`whitespace-nowrap rounded-full px-4 py-2.5 text-[13px] transition-colors ${
+            className={`whitespace-nowrap rounded-xl px-3 py-2.5 text-center text-[13px] transition-colors sm:rounded-full sm:px-4 ${
               active ? "bg-[#0c4d47] font-semibold text-white" : "text-[#6B7280] hover:text-[#0a2225]"
             }`}
           >
-            {t.label}
+            <span className="sm:hidden">{t.shortLabel}</span>
+            <span className="hidden sm:inline">{t.label}</span>
             {typeof n === "number" && (
               <span className={active ? "ml-1.5 text-white/70" : "ml-1.5 text-[#9CA3AF]"}>· {n}</span>
             )}
