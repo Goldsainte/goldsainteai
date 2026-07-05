@@ -316,18 +316,21 @@ export const Header = () => {
                             )}
                           </div>
 
-                          <DropdownMenuSeparator className="bg-border/50" />
-
-                          {/* Secondary */}
-                          <div className="py-2">
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/apply/agent')} 
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
-                            >
-                              <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Become an Agent</span>
-                            </DropdownMenuItem>
-                          </div>
+                          {/* Secondary — hidden for agents (they already are one) */}
+                          {!isAgentAccount && (
+                            <>
+                              <DropdownMenuSeparator className="bg-border/50" />
+                              <div className="py-2">
+                                <DropdownMenuItem 
+                                  onClick={() => navigate('/apply/agent')} 
+                                  className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                                >
+                                  <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                  <span className="text-sm font-medium">Become an Agent</span>
+                                </DropdownMenuItem>
+                              </div>
+                            </>
+                          )}
 
                           <DropdownMenuSeparator className="bg-border/50" />
 
@@ -633,18 +636,21 @@ export const Header = () => {
                           )}
                         </div>
 
-                        <DropdownMenuSeparator className="bg-border/50" />
-
-                        {/* Secondary */}
-                        <div className="py-2">
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/apply/agent')} 
-                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                          >
-                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Become an Agent</span>
-                          </DropdownMenuItem>
-                        </div>
+                        {/* Secondary — hidden for agents (they already are one) */}
+                        {!isAgentAccount && (
+                          <>
+                            <DropdownMenuSeparator className="bg-border/50" />
+                            <div className="py-2">
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/apply/agent')} 
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                              >
+                                <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                                <span className="text-sm font-medium">Become an Agent</span>
+                              </DropdownMenuItem>
+                            </div>
+                          </>
+                        )}
 
                         <DropdownMenuSeparator className="bg-border/50" />
 
