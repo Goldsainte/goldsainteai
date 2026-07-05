@@ -61,14 +61,14 @@ export default function MessagesPage() {
           <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-[#C7B892] bg-[#FFFBF0] px-3 py-2 text-xs text-[#5a4a1a]">
             <div className="flex items-center gap-2 min-w-0">
               <UserCircle2 className="h-4 w-4 shrink-0 text-[#C7A962]" />
-              <span className="truncate">Add your name so your specialist knows who they're talking to.</span>
+              <span className="min-w-0 leading-snug">Add your name so your specialist knows who they're talking to.</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Button
                 size="sm"
                 variant="outline"
                 className="h-7 border-[#C7B892] text-xs"
-                onClick={() => navigate('/profile/edit')}
+                onClick={() => navigate('/profile')}
               >
                 Add name
               </Button>
