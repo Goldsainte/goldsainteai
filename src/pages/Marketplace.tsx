@@ -22,10 +22,9 @@ import { ForYouRow } from "@/components/marketplace/ForYouRow";
 import { AdaptiveCollectionRow } from "@/components/marketplace/AdaptiveCollectionRow";
 import { ThisWeekFooter } from "@/components/marketplace/ThisWeekFooter";
 import { ItineraryGuideCard } from "@/components/marketplace/ItineraryGuideCard";
-import { BundleCard } from "@/components/marketplace/BundleCard";
 import { BookOpen, Search, X } from "lucide-react";
 
-type Tab = "trips" | "trip-requests" | "itinerary-guides" | "bundles";
+type Tab = "trips" | "trip-requests" | "itinerary-guides" | "tours";
 
 const FILTER_TAG_MAP: Record<string, string[]> = {
   "Bucket List": ["bucket-list", "bucket list", "once-in-a-lifetime", "iconic", "wonder"],
@@ -76,7 +75,7 @@ export default function Marketplace() {
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
 
-  const validTabs: Tab[] = ["trips", "trip-requests", "itinerary-guides", "bundles"];
+  const validTabs: Tab[] = ["trips", "trip-requests", "itinerary-guides", "tours"];
   const rawTab = (searchParams.get("tab") as string) || "trips";
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
 
@@ -139,6 +138,7 @@ export default function Marketplace() {
           wishlist_count, booking_count, view_count, is_verified, created_at,
           creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
         `)
+        .eq("listing_type", "trip")
         .eq("status", "published");
 
       // Destination filter
@@ -386,36 +386,59 @@ export default function Marketplace() {
   }, [itineraryGuides, liveTrips]);
 
 
-  const { data: bundles, isLoading: isLoadingBundles } = useQuery({
-    queryKey: ["product-bundles-marketplace"],
+  const { data: tours, isLoading: isLoadingTours } = useQuery({
+    queryKey: ["marketplace-tours"],
+    enabled: activeTab === "tours",
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("product_bundles")
-        .select("*")
+        .from("packaged_trips")
+        .select(`
+          id, slug, title, destination, cover_image_url, price_per_person, currency,
+          duration_nights, highlights, creator_type,
+          duration_days, max_participants, current_bookings, difficulty_level,
+          rating, review_count, available_from, available_until, tags,
+          wishlist_count, booking_count, view_count, is_verified, created_at,
+          creator:profiles!packaged_trips_creator_id_fkey(id, full_name, avatar_url, home_base, content_style_tags, is_verified)
+        `)
+        .eq("listing_type", "tour")
         .eq("status", "published")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      const rows = data || [];
-      const creatorIds = [...new Set(rows.map((r: any) => r.creator_id).filter(Boolean))];
-      const { data: profiles } = creatorIds.length
-        ? await supabase.from("profiles").select("id, full_name, username").in("id", creatorIds)
-        : { data: [] as any[] };
-      const map = new Map((profiles || []).map((p: any) => [p.id, p]));
-      return rows.map((r: any) => ({ ...r, creator: map.get(r.creator_id) || null }));
+      return data || [];
     },
   });
+
+  // Tours respond to the same filter system as trips.
+  const filteredTours = useMemo(() => {
+    const q = (filters.destination || "").trim().toLowerCase();
+    const min = filters.minPrice ?? 0;
+    const max = filters.maxPrice ?? 10000;
+    const rows = (tours || []).filter((t: any) => {
+      const matchesQuery =
+        !q ||
+        t.destination?.toLowerCase().includes(q) ||
+        t.title?.toLowerCase().includes(q);
+      const p = Number(t.price_per_person ?? 0);
+      return matchesQuery && p >= min && p <= max && matchesDuration(t.duration_days, filters.durationBucket);
+    });
+    const sorted = [...rows];
+    if (filters.sortBy === "price-low") sorted.sort((a: any, b: any) => (a.price_per_person ?? 0) - (b.price_per_person ?? 0));
+    else if (filters.sortBy === "price-high") sorted.sort((a: any, b: any) => (b.price_per_person ?? 0) - (a.price_per_person ?? 0));
+    else if (filters.sortBy === "top-rated") sorted.sort((a: any, b: any) => (b.view_count ?? 0) - (a.view_count ?? 0));
+    return sorted;
+  }, [tours, filters.destination, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
 
   // Results count + removable filter chips (GetYourGuide-style feedback).
   const activeResultCount =
     activeTab === "itinerary-guides" ? filteredGuides.length
     : activeTab === "trips" ? filteredLiveTrips.length
     : activeTab === "trip-requests" ? (tripRequests?.length ?? 0)
-    : (bundles?.length ?? 0);
+    : filteredTours.length;
   const resultNoun =
     activeTab === "itinerary-guides" ? "guide"
     : activeTab === "trips" ? "trip"
     : activeTab === "trip-requests" ? "trip request"
-    : "bundle";
+    : "tour";
   const priceChipActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
 
   const handleDeleteRequest = async (id: string) => {
@@ -558,8 +581,8 @@ export default function Marketplace() {
       );
     }
 
-    if (activeTab === "bundles") {
-      if (isLoadingBundles) {
+    if (activeTab === "tours") {
+      if (isLoadingTours) {
         return (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -568,23 +591,18 @@ export default function Marketplace() {
           </div>
         );
       }
-      if (!bundles?.length) {
+      if (!filteredTours?.length) {
         return (
           <div className="py-16 text-center">
-            <h3 className="font-secondary text-xl text-[#0a2225]">No bundles yet</h3>
+            <h3 className="font-secondary text-xl text-[#0a2225]">No tours match yet</h3>
             <p className="mt-2 text-sm text-[#6B7280]">
-              Creators are crafting curated bundles. Check back soon.
+              Bookable tours from creators and tour operators will appear here.
             </p>
           </div>
         );
       }
-      return (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {bundles.map((b: any) => (
-            <BundleCard key={b.id} bundle={b} />
-          ))}
-        </div>
-      );
+      /* Tours share packaged_trips, so the trip grid and detail page work as-is. */
+      return <LiveTripGrid trips={filteredTours as any} />;
     }
 
     return null;
