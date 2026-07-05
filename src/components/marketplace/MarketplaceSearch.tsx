@@ -213,13 +213,13 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
     >
       <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
         {/* Desktop search bar — the hero centerpiece (mockup spec) */}
-        <div className="mx-auto hidden max-w-[780px] md:flex md:items-center md:divide-x md:divide-[#E5DFC6]/40 gap-2 rounded-full border border-[#E5DFC6] bg-white py-1.5 pl-2 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
+        <div className="mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-7 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
           {/* Where */}
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-3">
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 pr-4">
+            <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Where
             </label>
-            <div className="relative min-w-0">
+            <div className="relative flex h-9 min-w-0 items-center">
               <MapPin className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
               <Input
                 ref={inputRef}
@@ -262,25 +262,27 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
           </div>
 
           {/* Dates — using MobileDatePicker in range mode */}
-          <div className="flex flex-1 flex-col gap-1.5 px-3">
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
+          <div className="flex flex-1 flex-col justify-center gap-1.5 px-5">
+            <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Dates
             </label>
-            <MobileDatePicker
-              mode="range"
-              dateRange={dateRange}
-              onDateRangeChange={handleDateRangeChange}
-              placeholder="Check-in – Check-out"
-              className="border-0 bg-transparent p-0 pl-0 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent"
-            />
+            <div className="flex h-9 items-center">
+              <MobileDatePicker
+                mode="range"
+                dateRange={dateRange}
+                onDateRangeChange={handleDateRangeChange}
+                placeholder="Check-in – Check-out"
+                className="border-0 bg-transparent p-0 pl-0 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent"
+              />
+            </div>
           </div>
 
           {/* Travelers */}
-          <div className="flex flex-1 flex-col gap-1.5 px-3">
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
+          <div className="flex flex-1 flex-col justify-center gap-1.5 px-5">
+            <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Travelers
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex h-9 items-center gap-2">
               <Users className="h-4 w-4 text-[#8D8D8D]" />
               <TravelerStepper />
             </div>
