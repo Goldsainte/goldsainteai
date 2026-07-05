@@ -275,7 +275,7 @@ export default function CreatorDashboard() {
       case "guides":
         return <CreatorGuidesTab />;
       case "services":
-        return user?.id ? <CreatorServicesSection creatorId={user.id} isOwnProfile={true} creatorTier={profile?.creator_tier} /> : null;
+        return user?.id ? <CreatorServicesSection creatorId={user.id} isOwnProfile={true} creatorTier={profile?.creator_tier} hideLabel /> : null;
       case "performance":
         return (
           <div className="space-y-6">
