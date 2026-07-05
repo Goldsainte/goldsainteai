@@ -30,7 +30,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   // TrovaTrip-style accordion: desktop search rests as a compact pill and
   // expands into the full field bar on click. Sticky so it travels with
   // the scroll like a real header search.
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -209,33 +209,11 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   return (
     <section
       ref={sectionRef}
-      className="sticky top-14 sm:top-16 md:top-20 z-40 border-b border-[#E5DFC6]/30 bg-white/95 backdrop-blur-sm"
+      className="bg-gradient-to-b from-[#FDF9F0] to-[#FDF9F0]"
     >
       <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
-        {/* Desktop collapsed pill — expands into the full bar */}
-        {!expanded && (
-          <div className="hidden md:flex justify-center">
-            <button
-              type="button"
-              onClick={() => {
-                setExpanded(true);
-                // Focus the destination field once the bar mounts.
-                setTimeout(() => inputRef.current?.focus(), 30);
-              }}
-              className="group flex items-center gap-3 rounded-full border border-[#E5DFC6] bg-white pl-5 pr-2 py-2 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <span className="text-sm text-[#0a2225] font-medium">
-                {getSummaryText()}
-              </span>
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#BFAD72] group-hover:bg-[#9d8f5d] transition-colors">
-                <Search className="h-4 w-4 text-white" />
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Desktop search bar (expanded) */}
-        <div className={`${expanded ? "md:flex" : ""} hidden md:items-center md:divide-x md:divide-[#E5DFC6]/30 gap-3 rounded-2xl border border-[#E5DFC6] bg-white p-3 shadow-sm`}>
+        {/* Desktop search bar — the hero centerpiece (mockup spec) */}
+        <div className="mx-auto hidden max-w-[780px] md:flex md:items-center md:divide-x md:divide-[#E5DFC6]/40 gap-2 rounded-full border border-[#E5DFC6] bg-white py-1.5 pl-2 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
           {/* Where */}
           <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-3">
             <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
