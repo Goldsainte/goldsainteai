@@ -156,7 +156,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
       className="group cursor-pointer space-y-2.5"
     >
       {/* Image with optional editorial signal pill */}
-      <div className="relative aspect-square overflow-hidden rounded-2xl shadow-[0_6px_16px_rgba(10,34,37,0.12)] sm:aspect-[4/3] sm:rounded-b-none sm:shadow-none">
+      <div className="relative aspect-square overflow-hidden rounded-2xl shadow-[0_6px_16px_rgba(10,34,37,0.12)] sm:shadow-none sm:transition-shadow sm:duration-300 sm:group-hover:shadow-[0_6px_16px_rgba(10,34,37,0.12)]">
         <TripCoverImage
           src={trip.cover_image_url}
           alt={trip.title}
@@ -190,18 +190,18 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
       {/* Content below image — mockup spec: eyebrow · fixed-height title ·
           one meta line · footer (curator | From price). Ratings render only
           when real; saves/booked counters and freshness stamps are gone. */}
-      <div className="relative px-0.5 pt-2 sm:-mt-2.5 sm:rounded-b-2xl sm:border sm:border-t-0 sm:border-[#E5DFC6] sm:bg-white sm:px-3 sm:pb-3 sm:pt-2.5">
+      <div className="relative px-0.5 pt-2">
         <p
-          className="text-[10.5px] uppercase tracking-[0.13em] text-[#8a7136]"
+          className="truncate text-[10.5px] uppercase tracking-[0.13em] text-[#8a7136]"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {trip.destination?.split(",").map((part) => part.trim()).filter(Boolean).join(" · ") || "\u00A0"}
         </p>
-        <h3 className="mt-1 min-h-0 line-clamp-1 sm:min-h-[40px] sm:line-clamp-2 font-secondary text-[15px] sm:text-[15.5px] font-medium leading-[1.35] text-[#0a2225]">
+        <h3 className="mt-1 line-clamp-1 font-secondary text-[15px] font-medium leading-[1.35] text-[#0a2225]">
           {trip.title}
         </h3>
         <div
-          className="mt-1.5 flex items-center gap-2 text-[12px] text-[#6B7280]"
+          className="mt-1 flex h-[22px] items-center gap-2 overflow-hidden text-[12px] text-[#6B7280]"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {typeof trip.rating === "number" && trip.rating > 0 ? (
@@ -225,7 +225,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
               </span>
             )}
         </div>
-        <div className="mt-3 flex items-end justify-between border-t border-[#f7f3ea] pt-3">
+        <div className="mt-2 flex items-end justify-between border-t border-[#E5DFC6]/50 pt-2">
           {trip.creator ? (
             <div className="flex min-w-0 items-center gap-1.5">
               <CreatorAttribution creator={trip.creator} />
