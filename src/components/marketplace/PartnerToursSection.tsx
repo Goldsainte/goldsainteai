@@ -67,12 +67,23 @@ export function PartnerToursSection({ destination, minPrice, maxPrice, sortBy, d
     retry: 1,
   });
 
+  // Viator's productUrl is the affiliate deep link to the EXACT product —
+  // commission depends on it. Normalize to absolute https so a scheme-less
+  // or relative URL can never fall back to a generic page.
+  const absolutize = (u?: string | null): string | null => {
+    if (!u) return null;
+    if (u.startsWith("http://") || u.startsWith("https://")) return u;
+    if (u.startsWith("//")) return "https:" + u;
+    return "https://www.viator.com" + (u.startsWith("/") ? "" : "/") + u;
+  };
+
   // Only tours we can actually send people to (affiliate URL present),
   // honoring the marketplace price filter, in the requested sort order.
   const durationFilterActive = !!durationBucket;
   const tours = durationFilterActive
     ? []
     : (data ?? [])
+        .map((t) => ({ ...t, productUrl: absolutize(t.productUrl) }))
         .filter((t) => t.productUrl && t.title && t.thumbnailURL)
         .filter((t) => {
           if (typeof t.fromPrice !== "number") return true;
