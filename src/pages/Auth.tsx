@@ -127,6 +127,21 @@ const Auth = () => {
 
       const routeAfterAuth = async () => {
         try {
+          // Admins bypass profile-completeness routing entirely. Hand-created
+          // admin accounts may have a NULL account_type / incomplete flags and
+          // must never be funneled into first-time onboarding.
+          const { data: adminRole } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("role", "admin")
+            .maybeSingle();
+          if (adminRole) {
+            clearPersistedAuthFlow();
+            navigate("/admin", { replace: true });
+            return;
+          }
+
           const { data: profile, error } = await supabase
             .from("profiles")
             .select("account_type, onboarding_completed, is_profile_complete")
@@ -358,6 +373,21 @@ const Auth = () => {
     } else {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Admins skip the "complete your profile" gate below — an admin whose
+        // profile predates account_type would otherwise be shown the
+        // first-time account-type picker on every sign-in.
+        const { data: adminRole } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        if (adminRole) {
+          setIsLoading(false);
+          clearPersistedAuthFlow();
+          navigate("/admin", { replace: true });
+          return;
+        }
         const { data: profile } = await supabase
           .from("profiles")
           .select("account_type, is_profile_complete, onboarding_completed")
