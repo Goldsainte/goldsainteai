@@ -653,6 +653,10 @@ export default function Marketplace() {
           ) : null}
           <PartnerToursSection
             destination={filters.destination}
+            minPrice={filters.minPrice}
+            maxPrice={filters.maxPrice}
+            sortBy={filters.sortBy}
+            durationBucket={filters.durationBucket}
             onCountChange={setPartnerTourCount}
           />
           {!filteredTours?.length && partnerTourCount === 0 && (
