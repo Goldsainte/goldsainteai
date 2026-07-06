@@ -29,6 +29,13 @@ interface PartnerTour {
 
 interface PartnerToursSectionProps {
   destination?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: "newest" | "top-rated" | "price-low" | "price-high";
+  /** Viator results carry no duration data, so this filter can't be applied
+      to partner inventory — when set, the section says so instead of
+      silently ignoring it. */
+  durationBucket?: "1-3" | "4-6" | "7+";
   /** Reports how many partner tours rendered (0 on empty/error) so the tab
       count and results line can include them. */
   onCountChange?: (n: number) => void;
@@ -44,7 +51,7 @@ const formatPrice = (price: number, currency: string) =>
     maximumFractionDigits: Number.isInteger(price) ? 0 : 2,
   }).format(price);
 
-export function PartnerToursSection({ destination, onCountChange }: PartnerToursSectionProps) {
+export function PartnerToursSection({ destination, minPrice, maxPrice, sortBy, durationBucket, onCountChange }: PartnerToursSectionProps) {
   const dest = destination?.trim() || "";
 
   const { data, isLoading, isError } = useQuery({
@@ -60,10 +67,25 @@ export function PartnerToursSection({ destination, onCountChange }: PartnerTours
     retry: 1,
   });
 
-  // Only tours we can actually send people to (affiliate URL present).
-  const tours = (data ?? []).filter(
-    (t) => t.productUrl && t.title && t.thumbnailURL
-  );
+  // Only tours we can actually send people to (affiliate URL present),
+  // honoring the marketplace price filter, in the requested sort order.
+  const durationFilterActive = !!durationBucket;
+  const tours = durationFilterActive
+    ? []
+    : (data ?? [])
+        .filter((t) => t.productUrl && t.title && t.thumbnailURL)
+        .filter((t) => {
+          if (typeof t.fromPrice !== "number") return true;
+          if (typeof minPrice === "number" && minPrice > 0 && t.fromPrice < minPrice) return false;
+          if (typeof maxPrice === "number" && maxPrice < 10000 && t.fromPrice > maxPrice) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          if (sortBy === "price-low") return (a.fromPrice ?? Infinity) - (b.fromPrice ?? Infinity);
+          if (sortBy === "price-high") return (b.fromPrice ?? 0) - (a.fromPrice ?? 0);
+          if (sortBy === "top-rated") return (b.rating ?? 0) - (a.rating ?? 0);
+          return 0; // "newest" is meaningless for partner inventory — keep Viator relevance
+        });
 
   useEffect(() => {
     if (!isLoading) onCountChange?.(isError ? 0 : tours.length);
@@ -71,6 +93,15 @@ export function PartnerToursSection({ destination, onCountChange }: PartnerTours
   }, [isLoading, isError, tours.length]);
 
   if (isError) return null;
+
+  if (durationFilterActive) {
+    return (
+      <p className="mt-2 text-[12.5px] text-[#6B7280]" style={inter}>
+        Partner tours from Viator can't be filtered by duration — clear the
+        duration filter to see them.
+      </p>
+    );
+  }
 
   if (isLoading) {
     return (
