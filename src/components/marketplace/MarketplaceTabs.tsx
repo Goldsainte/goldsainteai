@@ -1,3 +1,5 @@
+import { Map, Ticket, BookOpen, PenLine } from "lucide-react";
+
 interface MarketplaceTabsProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -5,45 +7,77 @@ interface MarketplaceTabsProps {
   counts?: Partial<Record<"trips" | "tours" | "itinerary-guides" | "trip-requests", number>>;
 }
 
-/* Segmented control (mockup spec): one white pill container, forest-filled
-   active segment, live counts. Replaces the icon+description tab pills. */
+/* Desktop: segmented pill control (mockup spec). Mobile: Airbnb-style
+   category row — icon above a small label, active tab underlined,
+   horizontally scrollable. */
 export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceTabsProps) {
   const tabs = [
-    { id: "trips", label: "Handpicked Trips", shortLabel: "Trips" },
-    { id: "tours", label: "Tours", shortLabel: "Tours" },
-    { id: "itinerary-guides", label: "Itinerary Guides", shortLabel: "Guides" },
-    { id: "trip-requests", label: "Trip Requests", shortLabel: "Requests" },
+    { id: "trips", label: "Handpicked Trips", shortLabel: "Trips", Icon: Map },
+    { id: "tours", label: "Tours", shortLabel: "Tours", Icon: Ticket },
+    { id: "itinerary-guides", label: "Itinerary Guides", shortLabel: "Guides", Icon: BookOpen },
+    { id: "trip-requests", label: "Trip Requests", shortLabel: "Requests", Icon: PenLine },
   ] as const;
 
   return (
-    /* Mobile: all four tabs visible in a 2×2 grid with short labels —
-       no horizontal scrolling to discover categories. Desktop: one pill row. */
-    <div
-      className="grid w-full grid-cols-2 gap-1 rounded-2xl border border-[#E5DFC6] bg-white p-1 sm:flex sm:w-auto sm:max-w-full sm:items-center sm:rounded-full"
-      style={{ fontFamily: "Inter, sans-serif" }}
-      role="tablist"
-    >
-      {tabs.map((t) => {
-        const active = activeTab === t.id;
-        const n = counts?.[t.id];
-        return (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onTabChange(t.id)}
-            className={`whitespace-nowrap rounded-xl px-3 py-2.5 text-center text-[13px] transition-colors sm:rounded-full sm:px-4 ${
-              active ? "bg-[#0c4d47] font-semibold text-white" : "text-[#6B7280] hover:text-[#0a2225]"
-            }`}
-          >
-            <span className="sm:hidden">{t.shortLabel}</span>
-            <span className="hidden sm:inline">{t.label}</span>
-            {typeof n === "number" && (
-              <span className={active ? "ml-1.5 text-white/70" : "ml-1.5 text-[#9CA3AF]"}>· {n}</span>
-            )}
-          </button>
-        );
-      })}
-    </div>
+    <>
+      {/* ---- Mobile: Airbnb category row ---- */}
+      <div
+        className="flex w-full items-stretch gap-6 overflow-x-auto border-b border-[#E5DFC6] px-1 sm:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{ fontFamily: "Inter, sans-serif" }}
+        role="tablist"
+      >
+        {tabs.map(({ id, shortLabel, Icon }) => {
+          const active = activeTab === id;
+          const n = counts?.[id];
+          return (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => onTabChange(id)}
+              className={`flex min-w-[56px] flex-none flex-col items-center gap-1 pb-2.5 pt-1 transition-colors ${
+                active
+                  ? "border-b-2 border-[#0c4d47] text-[#0a2225]"
+                  : "border-b-2 border-transparent text-[#6B7280]"
+              }`}
+            >
+              <Icon className={`h-5 w-5 ${active ? "text-[#0c4d47]" : "text-[#8D8D8D]"}`} strokeWidth={active ? 2.2 : 1.8} />
+              <span className={`whitespace-nowrap text-[12px] ${active ? "font-semibold" : "font-medium"}`}>
+                {shortLabel}
+                {typeof n === "number" && <span className={active ? " text-[#0c4d47]/60" : " text-[#9CA3AF]"}> {n}</span>}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ---- Desktop: segmented pill (unchanged) ---- */}
+      <div
+        className="hidden sm:flex w-auto max-w-full items-center rounded-full border border-[#E5DFC6] bg-white p-1"
+        style={{ fontFamily: "Inter, sans-serif" }}
+        role="tablist"
+      >
+        {tabs.map(({ id, label }) => {
+          const active = activeTab === id;
+          const n = counts?.[id];
+          return (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => onTabChange(id)}
+              className={`whitespace-nowrap rounded-full px-4 py-2.5 text-center text-[13px] transition-colors ${
+                active ? "bg-[#0c4d47] font-semibold text-white" : "text-[#6B7280] hover:text-[#0a2225]"
+              }`}
+            >
+              {label}
+              {typeof n === "number" && (
+                <span className={active ? "ml-1.5 text-white/70" : "ml-1.5 text-[#9CA3AF]"}>· {n}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }
