@@ -762,13 +762,20 @@ export default function PostTripPage() {
           </button>
 
           {currentStep < TOTAL_STEPS - 1 ? (
-            <button type="button" onClick={goNext}
+            // key + explicit onClick on both branches: without distinct keys,
+            // React MUTATES this same <button> node into the submit button when
+            // goNext() flips currentStep to the review step — and because the
+            // native click's default action runs AFTER React re-renders, the
+            // browser sees a submit button and fires the form submit. Result:
+            // tapping Continue on step 4 posted the trip and skipped review
+            // entirely (reproduced on the prod bundle, mobile viewport).
+            <button key="step-continue" type="button" onClick={goNext}
               className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-2.5 text-sm font-semibold hover:bg-[#073331] transition-colors">
               Continue
               <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
-            <button type="submit" disabled={submitting}
+            <button key="step-submit" type="button" onClick={handleSubmit} disabled={submitting}
               className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-2.5 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60 transition-colors">
               {submitting ? "Posting..." : "Post this trip"}
               <ArrowRight className="h-4 w-4" />
