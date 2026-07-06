@@ -12,9 +12,12 @@ interface MarketplaceSearchProps {
   onSearch: (filters: SearchFilters) => void;
   filters: SearchFilters;
   onClearFilters?: () => void;
+  /** Render without the section background / outer padding, for embedding
+      inside another hero (e.g. the homepage). Bar itself is identical. */
+  embedded?: boolean;
 }
 
-export function MarketplaceSearch({ onSearch, filters, onClearFilters }: MarketplaceSearchProps) {
+export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded = false }: MarketplaceSearchProps) {
   const [destination, setDestination] = useState(filters.destination || "");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
     if (filters.startDate || filters.endDate) {
@@ -209,9 +212,9 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
   return (
     <section
       ref={sectionRef}
-      className="bg-gradient-to-b from-[#FDF9F0] to-[#FDF9F0]"
+      className={embedded ? "" : "bg-gradient-to-b from-[#FDF9F0] to-[#FDF9F0]"}
     >
-      <div className="mx-auto max-w-4xl px-4 py-4 md:py-6">
+      <div className={embedded ? "mx-auto max-w-4xl" : "mx-auto max-w-4xl px-4 py-4 md:py-6"}>
         {/* Desktop search bar — the hero centerpiece (mockup spec) */}
         <div className="mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-7 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
           {/* Where */}
@@ -320,6 +323,14 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters }: Marketp
                       setShowSuggestions(true);
                     }}
                     onFocus={() => setShowSuggestions(true)}
+                    onKeyDown={(e) => {
+                      // Mobile keyboards have a return/go key — make it search,
+                      // same as the desktop field.
+                      if (e.key === "Enter") {
+                        setShowSuggestions(false);
+                        handleSearch();
+                      }
+                    }}
                   />
                   {showSuggestions && filteredSuggestions.length > 0 && (
                     <div
