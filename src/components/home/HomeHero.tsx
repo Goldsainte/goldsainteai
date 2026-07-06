@@ -123,8 +123,8 @@ export function HomeHero() {
               <Link to="/post-trip" className="whitespace-nowrap font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
                 Post your dream trip →
               </Link>
-              <span aria-hidden="true" className="mx-3 text-[#C7A962]">·</span>
-              <span className="whitespace-nowrap">
+              <span aria-hidden="true" className="mx-3 hidden text-[#C7A962] md:inline">·</span>
+              <span className="mt-1.5 block md:mt-0 md:inline md:whitespace-nowrap">
                 Are you a creator?{" "}
                 <Link to="/auth?mode=signup&role=creator" className="font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
                   Earn from your travels →
@@ -160,7 +160,7 @@ export function HomeHero() {
                           />
                         )}
                       </div>
-                      <p className="mt-2 font-secondary text-[12px] md:text-[13px] leading-snug text-[#0a2225] line-clamp-2 md:line-clamp-1 transition-colors group-hover:text-[#0c4d47]">
+                      <p className="mt-2 font-secondary text-[12px] md:text-[13px] leading-snug text-[#0a2225] line-clamp-1 transition-colors group-hover:text-[#0c4d47]">
                         {trip.title}
                       </p>
                       {typeof trip.price_per_person === "number" && (
