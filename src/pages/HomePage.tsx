@@ -38,10 +38,10 @@ function FeaturedTripsSection() {
           <h2 className="font-secondary text-2xl md:text-4xl text-[#0a2225]">Featured Trips</h2>
           <Link to="/marketplace" className="text-sm text-[#0c4d47] hover:underline">View all trips →</Link>
         </div>
-        <div className="grid gap-x-4 gap-y-7 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-4 md:grid-cols-3 lg:grid-cols-6">
           {trips.map((trip: any) => (
-            <Link key={trip.id} to={`/marketplace/trip/${trip.slug || trip.id}`} className="group space-y-2.5">
-              <div className="aspect-[4/3] overflow-hidden rounded-xl md:rounded-2xl bg-[#F5F0E8]">
+            <Link key={trip.id} to={`/marketplace/trip/${trip.slug || trip.id}`} className="group block">
+              <div className="aspect-square overflow-hidden rounded-2xl bg-[#F5F0E8] shadow-[0_6px_16px_rgba(10,34,37,0.12)] sm:shadow-none sm:transition-shadow sm:duration-300 sm:group-hover:shadow-[0_6px_16px_rgba(10,34,37,0.12)]">
                 <TripCoverImage
                   src={trip.cover_image_url}
                   alt={trip.title}
@@ -49,10 +49,12 @@ function FeaturedTripsSection() {
                   loading="lazy"
                 />
               </div>
-              <h3 className="font-secondary text-[14.5px] text-[#0a2225] font-medium leading-snug line-clamp-1">{trip.title}</h3>
-              <p className="text-[13px] text-[#6B7280]">{trip.destination} · {trip.duration_days} days</p>
-              <p className="text-[13px] text-[#0a2225] font-medium">
-                from ${trip.price_per_person?.toLocaleString()} per person
+              <h3 className="mt-2 line-clamp-1 font-secondary text-[14px] font-medium leading-snug text-[#0a2225]">{trip.title}</h3>
+              <p className="truncate text-[12px] text-[#6B7280]" style={{ fontFamily: "Inter, sans-serif" }}>
+                {trip.destination} · {trip.duration_days} days
+              </p>
+              <p className="mt-0.5 text-[13px] font-semibold text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
+                from ${trip.price_per_person?.toLocaleString()}
               </p>
             </Link>
           ))}
