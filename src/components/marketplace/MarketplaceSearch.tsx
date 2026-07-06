@@ -218,7 +218,9 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
         {/* Desktop search bar — the hero centerpiece (mockup spec) */}
         <div className="mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-7 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
           {/* Where */}
-          <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 pr-4">
+          <div className={embedded
+            ? "flex min-w-[150px] flex-[1.3] flex-col justify-center gap-1.5 pr-3"
+            : "flex min-w-0 flex-1 flex-col justify-center gap-1.5 pr-4"}>
             <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Where
             </label>
@@ -265,11 +267,13 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           </div>
 
           {/* Dates — using MobileDatePicker in range mode */}
-          <div className="flex flex-1 flex-col justify-center gap-1.5 px-5">
+          <div className={embedded
+            ? "flex min-w-0 flex-1 flex-col justify-center gap-1.5 px-3"
+            : "flex flex-1 flex-col justify-center gap-1.5 px-5"}>
             <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Dates
             </label>
-            <div className="flex h-9 items-center">
+            <div className="flex h-9 min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate">
               <MobileDatePicker
                 mode="range"
                 dateRange={dateRange}
@@ -281,7 +285,9 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           </div>
 
           {/* Travelers */}
-          <div className="flex flex-1 flex-col justify-center gap-1.5 px-5">
+          <div className={embedded
+            ? "flex flex-none flex-col justify-center gap-1.5 px-3"
+            : "flex flex-1 flex-col justify-center gap-1.5 px-5"}>
             <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Travelers
             </label>
@@ -292,7 +298,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           </div>
 
           {/* Search Button */}
-          <div className="flex items-center px-3 pt-1 md:pt-0">
+          <div className={embedded ? "flex items-center px-2 pt-1 md:pt-0" : "flex items-center px-3 pt-1 md:pt-0"}>
             <Button
               size="icon"
               className="h-12 w-12 rounded-full bg-[#BFAD72] hover:bg-[#9d8f5d] shadow-sm"
