@@ -190,18 +190,18 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
       {/* Content below image — mockup spec: eyebrow · fixed-height title ·
           one meta line · footer (curator | From price). Ratings render only
           when real; saves/booked counters and freshness stamps are gone. */}
-      <div className="rounded-b-2xl border border-t-0 border-[#E5DFC6] bg-white px-4 pb-4 pt-3.5 -mt-2.5 relative">
+      <div className="rounded-b-2xl border border-t-0 border-[#E5DFC6] bg-white px-3 pb-3 pt-2.5 -mt-2.5 relative">
         <p
           className="text-[10.5px] uppercase tracking-[0.13em] text-[#8a7136]"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {trip.destination?.split(",").map((part) => part.trim()).filter(Boolean).join(" · ") || "\u00A0"}
         </p>
-        <h3 className="mt-1.5 min-h-[46px] font-secondary text-[18px] font-medium leading-[1.28] text-[#0a2225] line-clamp-2">
+        <h3 className="mt-1 min-h-[40px] font-secondary text-[15.5px] font-medium leading-[1.3] text-[#0a2225] line-clamp-2">
           {trip.title}
         </h3>
         <div
-          className="mt-2 flex items-center gap-2 text-[12.5px] text-[#6B7280]"
+          className="mt-1.5 flex items-center gap-2 text-[12px] text-[#6B7280]"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {typeof trip.rating === "number" && trip.rating > 0 ? (
@@ -256,7 +256,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
             <p className="text-[10.5px] text-[#9CA3AF]" style={{ fontFamily: "Inter, sans-serif" }}>
               From
             </p>
-            <p className="text-[16px] font-semibold text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
+            <p className="text-[15px] font-semibold text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
               {formatPrice(trip.price_per_person, trip.currency)}
             </p>
           </div>
