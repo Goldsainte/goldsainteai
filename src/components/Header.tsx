@@ -442,6 +442,12 @@ export const Header = () => {
                         <p className="text-xs text-[#6B7280]">Browse curated trips</p>
                       </div>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/marketplace?tab=tours')} className="cursor-pointer px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium text-[#0a2225]">Tours</p>
+                        <p className="text-xs text-[#6B7280]">Bookable tours &amp; experiences</p>
+                      </div>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/marketplace?tab=itinerary-guides')} className="cursor-pointer px-4 py-3">
                       <div>
                         <p className="text-sm font-medium text-[#0a2225]">Itinerary Guides</p>
