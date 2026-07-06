@@ -429,13 +429,13 @@ export const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="font-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
+                      className="font-secondary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
                     >
                       Travel
                       <ChevronDown className="h-3.5 w-3.5 transition-transform data-[state=open]:rotate-180" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-primary">
+                  <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-secondary">
                     <DropdownMenuItem onClick={() => navigate('/marketplace')} className="cursor-pointer px-4 py-3">
                       <div>
                         <p className="text-sm font-medium text-[#0a2225]">Marketplace</p>
@@ -460,7 +460,7 @@ export const Header = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/creators')}
-                  className="font-primary rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors"
+                  className="font-secondary rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors"
                 >
                   Creators
                 </button>
@@ -469,13 +469,13 @@ export const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="font-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
+                      className="font-secondary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-medium text-[#E5DFC6] hover:bg-white/10 transition-colors focus:outline-none data-[state=open]:bg-white/10"
                     >
                       Partner
                       <ChevronDown className="h-3.5 w-3.5 transition-transform data-[state=open]:rotate-180" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-primary">
+                  <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-secondary">
                     <DropdownMenuItem onClick={() => navigate('/apply/agent')} className="cursor-pointer px-4 py-3">
                       <div>
                         <p className="text-sm font-medium text-[#0a2225]">Become an Agent</p>
