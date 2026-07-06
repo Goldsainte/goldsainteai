@@ -197,7 +197,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
         >
           {trip.destination?.split(",").map((part) => part.trim()).filter(Boolean).join(" · ") || "\u00A0"}
         </p>
-        <h3 className="mt-1 min-h-0 sm:min-h-[40px] font-secondary text-[15.5px] font-medium leading-[1.3] text-[#0a2225] line-clamp-2">
+        <h3 className="mt-1 min-h-0 line-clamp-1 sm:min-h-[40px] sm:line-clamp-2 font-secondary text-[15px] sm:text-[15.5px] font-medium leading-[1.35] text-[#0a2225]">
           {trip.title}
         </h3>
         <div
