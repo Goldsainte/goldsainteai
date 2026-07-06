@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { useEngagementFraud } from "@/hooks/useEngagementFraud";
 
 interface FollowButtonProps {
@@ -14,6 +15,7 @@ interface FollowButtonProps {
 }
 
 const FollowButton = ({ targetUserId, onFollowSuccess, className }: FollowButtonProps) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { checkEngagement } = useEngagementFraud();
   const [isFollowing, setIsFollowing] = useState(false);
@@ -88,8 +90,26 @@ const FollowButton = ({ targetUserId, onFollowSuccess, className }: FollowButton
 
         if (error) throw error;
         setIsFollowing(true);
-        toast.success('Following!');
-        
+
+        // Close the "followed... now what?" loop: name the person and link
+        // straight to /following. Name lookup is best-effort via the public
+        // creator_directory view — the toast still fires without it.
+        let followedName: string | null = null;
+        try {
+          const { data: dir } = await supabase
+            .from('creator_directory' as unknown as 'profiles')
+            .select('display_name, full_name')
+            .eq('id', targetUserId)
+            .maybeSingle();
+          followedName = (dir as any)?.display_name || (dir as any)?.full_name || null;
+        } catch { /* best-effort only */ }
+        toast.success(followedName ? `Following ${followedName}` : 'Following!', {
+          action: {
+            label: 'See everyone you follow →',
+            onClick: () => navigate('/following'),
+          },
+        });
+
         // Call the success callback if provided
         if (onFollowSuccess) {
           onFollowSuccess();
