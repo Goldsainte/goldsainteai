@@ -142,7 +142,7 @@ export function PartnerToursSection({ destination, minPrice, maxPrice, sortBy, d
             className="group block"
           >
             {/* Image — identical treatment to LiveTripCard */}
-            <div className="relative aspect-square overflow-hidden rounded-2xl shadow-[0_6px_16px_rgba(10,34,37,0.12)] sm:aspect-[4/3] sm:rounded-b-none sm:shadow-none">
+            <div className="relative aspect-square overflow-hidden rounded-2xl shadow-[0_6px_16px_rgba(10,34,37,0.12)] sm:shadow-none sm:transition-shadow sm:duration-300 sm:group-hover:shadow-[0_6px_16px_rgba(10,34,37,0.12)]">
               <img
                 src={t.thumbnailURL}
                 alt={t.title}
@@ -160,14 +160,14 @@ export function PartnerToursSection({ destination, minPrice, maxPrice, sortBy, d
             </div>
 
             {/* Body — identical responsive treatment to LiveTripCard */}
-            <div className="relative px-0.5 pt-2 sm:-mt-2.5 sm:rounded-b-2xl sm:border sm:border-t-0 sm:border-[#E5DFC6] sm:bg-white sm:px-3 sm:pb-3 sm:pt-2.5">
-              <p className="text-[10.5px] uppercase tracking-[0.13em] text-[#8a7136]" style={inter}>
+            <div className="relative px-0.5 pt-2">
+              <p className="truncate text-[10.5px] uppercase tracking-[0.13em] text-[#8a7136]" style={inter}>
                 {t.destination || "\u00A0"}
               </p>
-              <h3 className="mt-1 min-h-0 line-clamp-1 sm:min-h-[40px] sm:line-clamp-2 font-secondary text-[15px] sm:text-[15.5px] font-medium leading-[1.35] text-[#0a2225]">
+              <h3 className="mt-1 line-clamp-1 font-secondary text-[15px] font-medium leading-[1.35] text-[#0a2225]">
                 {t.title}
               </h3>
-              <div className="mt-1.5 flex items-center gap-2 text-[12px] text-[#6B7280]" style={inter}>
+              <div className="mt-1 flex h-[22px] items-center gap-2 overflow-hidden text-[12px] text-[#6B7280]" style={inter}>
                 {typeof t.rating === "number" && t.rating > 0 ? (
                   <span className="flex items-center gap-1 text-[#0a2225]">
                     <Star className="h-3 w-3 fill-[#C7A962] text-[#C7A962]" />
