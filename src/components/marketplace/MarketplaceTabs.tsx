@@ -22,7 +22,7 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
     <>
       {/* ---- Mobile: Airbnb category row ---- */}
       <div
-        className="flex w-full items-stretch gap-6 overflow-x-auto border-b border-[#E5DFC6] px-1 sm:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="grid w-full grid-cols-4 border-b border-[#E5DFC6] sm:hidden"
         style={{ fontFamily: "Inter, sans-serif" }}
         role="tablist"
       >
@@ -35,7 +35,7 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
               role="tab"
               aria-selected={active}
               onClick={() => onTabChange(id)}
-              className={`flex min-w-[56px] flex-none flex-col items-center gap-1 pb-2.5 pt-1 transition-colors ${
+              className={`flex flex-col items-center justify-end gap-1 pb-2.5 pt-1 transition-colors ${
                 active
                   ? "border-b-2 border-[#0c4d47] text-[#0a2225]"
                   : "border-b-2 border-transparent text-[#6B7280]"
