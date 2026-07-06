@@ -56,11 +56,11 @@ export function HomeHero() {
     }).format(price);
 
   return (
-    <section className="bg-[#f7f3ea] text-[#0a2225]">
-      <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center">
+    <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100svh-56px)]">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-12 md:h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-stretch md:h-full">
           {/* LEFT: category → promise → search → two doors */}
-          <div>
+          <div className="flex flex-col justify-center">
             {/* Pill badge (unchanged) */}
             <div className="flex justify-center md:justify-start">
               <div className="inline-flex items-center gap-1.5 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 md:py-1.5 text-[10px] md:text-sm font-medium uppercase tracking-[0.06em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
@@ -97,9 +97,9 @@ export function HomeHero() {
             <form
               role="search"
               onSubmit={(e) => { e.preventDefault(); goToMarketplace(); }}
-              className="mt-7 flex items-stretch rounded-full border border-[#E5DFC6] bg-white pl-6 pr-2 py-2 shadow-[0_14px_34px_rgba(10,34,37,0.10)] max-w-[560px] mx-auto md:mx-0"
+              className="mt-7 flex items-stretch rounded-full border border-[#E5DFC6] bg-white pl-6 pr-2 py-2 shadow-[0_14px_34px_rgba(10,34,37,0.10)] max-w-[640px] mx-auto md:mx-0"
             >
-              <div className="flex-1 min-w-0 border-r border-[#E5DFC6] pr-4 py-1">
+              <div className="flex-[1.4] min-w-0 border-r border-[#E5DFC6] pr-4 py-1">
                 <label htmlFor="hero-destination" className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7136]" style={inter}>
                   Where
                 </label>
@@ -116,7 +116,7 @@ export function HomeHero() {
               <button
                 type="button"
                 onClick={goToMarketplace}
-                className="hidden sm:block flex-1 min-w-0 border-r border-[#E5DFC6] px-4 py-1 text-left"
+                className="hidden sm:block flex-1 min-w-0 whitespace-nowrap border-r border-[#E5DFC6] px-4 py-1 text-left"
               >
                 <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7136]" style={inter}>When</span>
                 <span className="mt-0.5 block text-[13.5px] text-[#6B7280]" style={inter}>Any dates</span>
@@ -124,7 +124,7 @@ export function HomeHero() {
               <button
                 type="button"
                 onClick={goToMarketplace}
-                className="hidden sm:block flex-1 min-w-0 px-4 py-1 text-left"
+                className="hidden sm:block flex-1 min-w-0 whitespace-nowrap px-4 py-1 text-left"
               >
                 <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7136]" style={inter}>Travelers</span>
                 <span className="mt-0.5 block text-[13.5px] text-[#6B7280]" style={inter}>Any group</span>
@@ -138,18 +138,21 @@ export function HomeHero() {
               </button>
             </form>
 
-            {/* Two doors */}
-            <div className="mt-5 flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 text-[13.5px]" style={inter}>
-              <Link to="/post-trip" className="font-semibold text-[#0c4d47] border-b border-[#C7A962] pb-0.5 hover:border-[#8a7136]">
+            {/* Two doors — plain inline flow so both links share one exact
+                baseline (a global 44px touch-target min-height inflates
+                anchors that become flex items, so we keep these inline). */}
+            <p className="mt-5 text-center md:text-left text-[13.5px] leading-6 text-[#6B7280]" style={inter}>
+              <Link to="/post-trip" className="whitespace-nowrap font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
                 Post your dream trip →
               </Link>
-              <span className="text-[#6B7280]">
+              <span aria-hidden="true" className="mx-3 text-[#C7A962]">·</span>
+              <span className="whitespace-nowrap">
                 Are you a creator?{" "}
-                <Link to="/auth?mode=signup&role=creator" className="font-semibold text-[#0c4d47] border-b border-[#C7A962] pb-0.5 hover:border-[#8a7136]">
+                <Link to="/auth?mode=signup&role=creator" className="font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
                   Earn from your travels →
                 </Link>
               </span>
-            </div>
+            </p>
 
             {/* Popular Trips — real inventory only; hides itself below 3 */}
             {popularTrips && popularTrips.length >= 3 && (
@@ -194,12 +197,12 @@ export function HomeHero() {
             )}
           </div>
 
-          {/* RIGHT: luxury mosaic — unchanged */}
-          <div>
-            <div className="relative">
+          {/* RIGHT: luxury mosaic — original full-height sizing */}
+          <div className="md:h-full md:max-h-[calc(100svh-56px-96px)]">
+            <div className="relative h-full aspect-[4/5] md:aspect-auto">
               <div className="absolute inset-0 translate-x-2 translate-y-2 md:translate-x-4 md:translate-y-4 rounded-3xl md:rounded-[32px] border border-[#E5DFC6]/80" />
-              <div className="relative overflow-hidden rounded-3xl md:rounded-[32px] bg-white/90 p-2 md:p-3 shadow-[0_18px_40px_rgba(10,34,37,0.18)]">
-                <div className="grid grid-cols-3 grid-rows-2 gap-2 md:gap-3 h-[320px] md:h-[400px]">
+              <div className="relative h-full overflow-hidden rounded-3xl md:rounded-[32px] bg-white/90 p-2 md:p-3 shadow-[0_18px_40px_rgba(10,34,37,0.18)] flex flex-col">
+                <div className="grid grid-cols-3 grid-rows-2 gap-2 md:gap-3 flex-1 min-h-0">
                   <div className="col-span-2 row-span-2 overflow-hidden rounded-3xl">
                     <img src={heroMainImg} alt="Infinity pool overlooking the sea" className="h-full w-full object-cover" loading="eager" fetchPriority="high" decoding="async" />
                   </div>
