@@ -1,10 +1,10 @@
 import { HomeHero } from "@/components/home/HomeHero";
-import { TwoWaysComparison } from "@/components/home/TwoWaysComparison";
-import { BuiltForEverySideSection, HowGoldsainteWorksSection, TrustSafetyPaymentsSection } from "@/sections/HomeLuxurySections";
-import { RoleSpecificCTAs } from "@/components/home/RoleSpecificCTAs";
 import { StatsStrip } from "@/components/home/StatsStrip";
-import { CameraRollHighlight } from "@/components/home/CameraRollHighlight";
-import { HomeTestimonials } from "@/components/home/HomeTestimonials";
+import { HowItWorksSteps } from "@/components/home/HowItWorksSteps";
+import { DreamTripBand } from "@/components/home/DreamTripBand";
+import { EarnSection } from "@/components/home/EarnSection";
+import { TrustPlaque } from "@/components/home/TrustPlaque";
+import { FinalCTABand } from "@/components/home/FinalCTABand";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -67,14 +67,12 @@ export default function HomePage() {
     <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
       <HomeHero />
       <StatsStrip />
-      <HowGoldsainteWorksSection />
-      <CameraRollHighlight />
+      <HowItWorksSteps />
       <FeaturedTripsSection />
-      <TwoWaysComparison />
-      <RoleSpecificCTAs />
-      {/* <BuiltForEverySideSection /> */}
-      <TrustSafetyPaymentsSection />
-      <HomeTestimonials />
+      <DreamTripBand />
+      <EarnSection />
+      <TrustPlaque />
+      <FinalCTABand />
     </main>
   );
 }
