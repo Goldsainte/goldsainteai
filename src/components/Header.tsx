@@ -224,7 +224,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                             >
                               <Users className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              <span className="text-sm font-medium">Following</span>
+                              <span className="text-sm font-medium">Saved &amp; Following</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate(primaryBookingsPath)}
