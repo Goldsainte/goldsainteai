@@ -293,7 +293,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
             <div className="relative flex h-[18px] min-w-0 items-center">
               <Input
                 ref={inputRef}
-                className="h-[18px] w-full truncate border-0 bg-transparent p-0 text-sm leading-[18px] text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0" style={{ fontFamily: "Inter, sans-serif" }}
+                className="h-[18px] w-full truncate border-0 bg-transparent text-sm leading-[18px] text-[#0a2225] placeholder:text-[#6B7280] focus-visible:ring-0 focus-visible:ring-offset-0" style={{ fontFamily: "Inter, sans-serif", padding: 0 }}
                 placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => {
@@ -342,7 +342,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                 dateRange={dateRange}
                 onDateRangeChange={handleDateRangeChange}
                 placeholder="Add dates"
-                className="border-0 bg-transparent p-0 pl-0 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent"
+                className={`border-0 bg-transparent p-0 pl-0 text-sm ${dateRange?.from ? "text-[#0a2225]" : "text-[#6B7280]"} focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent`}
               />
             </div>
           </div>
@@ -358,7 +358,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-[18px] min-h-0 items-center text-sm leading-[18px] text-[#6B7280] whitespace-nowrap" style={{ fontFamily: "Inter, sans-serif" }}
+                    className={`flex h-[18px] min-h-0 items-center text-sm leading-[18px] whitespace-nowrap ${travelers > 1 ? "text-[#0a2225]" : "text-[#6B7280]"}`} style={{ fontFamily: "Inter, sans-serif" }}
                     aria-label="Set number of travelers"
                   >
                     <span>{travelers > 1 ? `${travelers} guests` : "Add guests"}</span>
