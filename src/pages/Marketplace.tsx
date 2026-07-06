@@ -504,7 +504,7 @@ export default function Marketplace() {
     if (activeTab === "trips") {
       if (isLoadingTrips) {
         return (
-          <div className="grid gap-x-4 gap-y-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid gap-x-4 gap-y-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="aspect-[4/3] w-full rounded-xl" />
@@ -562,7 +562,7 @@ export default function Marketplace() {
     if (activeTab === "trip-requests") {
       if (isLoadingRequests) {
         return (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
