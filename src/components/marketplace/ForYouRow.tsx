@@ -59,9 +59,9 @@ export function ForYouRow() {
         </div>
       </div>
       <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex gap-4 sm:gap-5">
+        <div className="flex gap-3 sm:gap-5">
           {data.trips.map((t: any) => (
-            <div key={t.id} className="w-[180px] shrink-0 sm:w-[200px] md:w-[220px]">
+            <div key={t.id} className="w-[172px] shrink-0 sm:w-[200px] md:w-[220px]">
               <LiveTripCard trip={t} />
             </div>
           ))}
