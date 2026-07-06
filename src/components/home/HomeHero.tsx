@@ -68,7 +68,7 @@ export function HomeHero() {
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100svh-56px)]">
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-12 md:h-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-stretch md:h-full">
+        <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr] gap-10 md:gap-10 items-stretch md:h-full">
           {/* LEFT: category → promise → search → two doors */}
           <div className="flex flex-col justify-center">
             {/* Pill badge (unchanged) */}
