@@ -28,7 +28,7 @@ interface LiveTripGridProps {
 
 export function LiveTripGrid({ trips }: LiveTripGridProps) {
   return (
-    <div className="grid gap-x-4 gap-y-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="grid gap-x-4 gap-y-8 grid-cols-1 sm:gap-y-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {trips.map((trip) => (
         <LiveTripCard key={trip.id} trip={trip as any} />
       ))}
