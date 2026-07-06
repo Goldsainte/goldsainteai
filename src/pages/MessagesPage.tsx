@@ -56,7 +56,7 @@ export default function MessagesPage() {
   return (
     <div className="flex flex-col overflow-hidden bg-[#FDF9F0] h-[calc(100dvh-3.5rem)] sm:h-[calc(100dvh-4rem)] md:h-[calc(100dvh-5rem)]">
       {/* Compact header — back button inline with the title */}
-      <div className="container mx-auto w-full max-w-6xl px-4 pt-3 pb-2 shrink-0">
+      <div className="container mx-auto w-full max-w-6xl px-4 pt-1 pb-0 md:pt-3 md:pb-2 shrink-0">
         {showProfileBanner && (
           <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-[#C7B892] bg-[#FFFBF0] px-3 py-2 text-xs text-[#5a4a1a]">
             <div className="flex items-center gap-2 min-w-0">
@@ -83,7 +83,7 @@ export default function MessagesPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-1.5">
+        <div className="hidden md:flex items-center gap-1.5">
           <BackButton className="-ml-2" />
           <Sparkles className="hidden h-5 w-5 text-[#C7A962] sm:block" />
           <h1 className="font-secondary text-lg font-semibold text-[#0a2225] md:text-xl">
@@ -97,7 +97,7 @@ export default function MessagesPage() {
 
       {/* Inbox fills the rest of the viewport; pad the bottom on mobile so the
           composer clears the fixed MobileBottomNav (lg:hidden). */}
-      <div className="container mx-auto w-full max-w-6xl flex-1 min-h-0 px-4 pb-[4.75rem] lg:pb-3">
+      <div className="container mx-auto w-full max-w-6xl flex-1 min-h-0 px-0 pb-2 md:px-4 md:pb-3">
         <DirectMessageInbox />
       </div>
     </div>
