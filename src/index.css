@@ -1075,3 +1075,14 @@ All colors MUST be HSL.
   font-size: 1.05em; line-height: 1.5;
 }
 .prose-editorial hr { border: 0; border-top: 1px solid #E5DFC6; margin: 1.8em 0; }
+
+/* ---------------------------------------------------------------------------
+   Desktop search pill opts out of the global 44px touch-target minimums
+   (lines ~131 & ~580). It's pointer-driven UI sized to Airbnb's 66px bar;
+   the mobile search pill/card keeps full touch targets.
+--------------------------------------------------------------------------- */
+.searchbar-slim input,
+.searchbar-slim button {
+  min-height: 0 !important;
+  min-width: 0 !important;
+}
