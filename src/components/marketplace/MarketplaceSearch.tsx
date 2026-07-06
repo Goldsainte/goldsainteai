@@ -284,18 +284,16 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
     >
       <div className={embedded ? "mx-auto max-w-4xl" : "mx-auto max-w-4xl px-4 py-4 md:py-6"}>
         {/* Desktop search bar — the hero centerpiece (mockup spec) */}
-        <div className="searchbar-slim mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-7 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
+        <div className="searchbar-slim mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-1 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
           {/* Where */}
-          <div className={embedded
-            ? "flex min-w-[150px] flex-[1.3] flex-col justify-center gap-0.5 pr-3"
-            : "flex min-w-0 flex-1 flex-col justify-center gap-0.5 pr-4"}>
-            <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-6">
+            <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
               Where
             </label>
             <div className="relative flex h-[18px] min-w-0 items-center">
               <Input
                 ref={inputRef}
-                className="h-[18px] w-full truncate border-0 bg-transparent p-0 text-sm leading-[18px] text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-[18px] w-full truncate border-0 bg-transparent p-0 text-sm leading-[18px] text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0" style={{ fontFamily: "Inter, sans-serif" }}
                 placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => {
@@ -334,13 +332,11 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           </div>
 
           {/* Dates — using MobileDatePicker in range mode */}
-          <div className={embedded
-            ? "flex flex-none flex-col justify-center gap-0.5 px-3"
-            : "flex flex-1 flex-col justify-center gap-0.5 px-5"}>
-            <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-6">
+            <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
               When
             </label>
-            <div className="flex h-[18px] min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate">
+            <div className="flex h-[18px] min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate [&_svg]:hidden" style={{ fontFamily: "Inter, sans-serif" }}>
               <MobileDatePicker
                 mode="range"
                 dateRange={dateRange}
@@ -354,18 +350,17 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           {/* Who — Airbnb-style text trigger opening the guest-stepper popover,
               in BOTH modes (Airbnb's bar has no inline stepper). */}
           {true ? (
-            <div className="flex flex-none flex-col justify-center gap-0.5 px-3">
-              <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+            <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-6">
+              <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
                 Who
               </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-[18px] min-h-0 items-center gap-1.5 text-sm leading-[18px] text-[#0a2225] whitespace-nowrap"
+                    className="flex h-[18px] min-h-0 items-center text-sm leading-[18px] text-[#6B7280] whitespace-nowrap" style={{ fontFamily: "Inter, sans-serif" }}
                     aria-label="Set number of travelers"
                   >
-                    <Users className="h-4 w-4 text-[#8D8D8D]" />
                     <span>{travelers > 1 ? `${travelers} guests` : "Add guests"}</span>
                   </button>
                 </PopoverTrigger>
@@ -413,7 +408,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
             </div>
           ) : (
             <div className="flex flex-1 flex-col justify-center gap-0.5 px-5">
-              <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+              <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
                 Who
               </label>
               <div className="flex h-9 items-center gap-2">
