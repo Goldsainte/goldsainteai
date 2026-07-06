@@ -76,6 +76,11 @@ export default function Marketplace() {
   const [searchParams, setSearchParams] = useSearchParams();
   // Viator partner tours rendered on the Tours tab; null = not yet known.
   const [partnerTourCount, setPartnerTourCount] = useState<number | null>(null);
+  // Standalone tours search: "I'm in New York, just show me tours" without a
+  // trip search. Draft commits on submit (Enter / Search) so we don't hit the
+  // Viator function per keystroke; falls back to the main destination filter.
+  const [tourSearchDraft, setTourSearchDraft] = useState("");
+  const [tourQuery, setTourQuery] = useState("");
 
   // Live inventory counts for the segmented tabs — exact head counts, no
   // estimates. Rendered only after they load.
@@ -458,9 +463,12 @@ export default function Marketplace() {
     },
   });
 
-  // Tours respond to the same filter system as trips.
+  // Tours-tab search takes priority; falls back to the main destination filter.
+  const toursLocation = (tourQuery || filters.destination || "").trim();
+
+  // Tours respond to the same filter system as trips, plus the tours-tab search.
   const filteredTours = useMemo(() => {
-    const q = (filters.destination || "").trim().toLowerCase();
+    const q = toursLocation.toLowerCase();
     const min = filters.minPrice ?? 0;
     const max = filters.maxPrice ?? 10000;
     const rows = (tours || []).filter((t: any) => {
@@ -476,7 +484,7 @@ export default function Marketplace() {
     else if (filters.sortBy === "price-high") sorted.sort((a: any, b: any) => (b.price_per_person ?? 0) - (a.price_per_person ?? 0));
     else if (filters.sortBy === "top-rated") sorted.sort((a: any, b: any) => (b.view_count ?? 0) - (a.view_count ?? 0));
     return sorted;
-  }, [tours, filters.destination, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
+  }, [tours, toursLocation, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
 
   // Results count + removable filter chips (GetYourGuide-style feedback).
   const activeResultCount =
@@ -632,13 +640,53 @@ export default function Marketplace() {
     }
 
     if (activeTab === "tours") {
+      /* Standalone tours search — tours are a destination product of their
+         own ("I'm in New York, show me tours"), so they get their own search
+         box instead of requiring a trip search. Commits on submit only. */
+      const toursSearchBar = (
+        <form
+          onSubmit={(e) => { e.preventDefault(); setTourQuery(tourSearchDraft.trim()); }}
+          className="mb-5 flex items-center gap-2"
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
+          <div className="relative flex-1 min-w-0">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+            <input
+              type="search"
+              value={tourSearchDraft}
+              onChange={(e) => setTourSearchDraft(e.target.value)}
+              placeholder="Search tours — city, landmark, or activity"
+              aria-label="Search tours"
+              className="w-full rounded-full border border-[#E5DFC6] bg-white py-2.5 pl-11 pr-4 text-sm text-[#0a2225] placeholder:text-[#9CA3AF] focus:border-[#C7A962] focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            className="shrink-0 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-semibold text-[#E5DFC6] transition-colors hover:bg-[#073331]"
+          >
+            Search
+          </button>
+          {tourQuery && (
+            <button
+              type="button"
+              onClick={() => { setTourQuery(""); setTourSearchDraft(""); }}
+              className="shrink-0 text-sm text-[#6B7280] underline underline-offset-4 hover:text-[#0a2225]"
+            >
+              Clear
+            </button>
+          )}
+        </form>
+      );
       if (isLoadingTours) {
         return (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-[4/3] w-full rounded-2xl" />
-            ))}
-          </div>
+          <>
+            {toursSearchBar}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[4/3] w-full rounded-2xl" />
+              ))}
+            </div>
+          </>
         );
       }
       /* Native tours first (packaged_trips listing_type='tour'), then
@@ -646,13 +694,14 @@ export default function Marketplace() {
          dimensions. The empty state shows only when BOTH are empty. */
       return (
         <>
+          {toursSearchBar}
           {filteredTours?.length ? (
             <div className="mb-8">
               <LiveTripGrid trips={filteredTours as any} />
             </div>
           ) : null}
           <PartnerToursSection
-            destination={filters.destination}
+            destination={toursLocation}
             minPrice={filters.minPrice}
             maxPrice={filters.maxPrice}
             sortBy={filters.sortBy}
@@ -661,9 +710,13 @@ export default function Marketplace() {
           />
           {!filteredTours?.length && partnerTourCount === 0 && (
             <div className="py-16 text-center">
-              <h3 className="font-secondary text-xl text-[#0a2225]">No tours match yet</h3>
+              <h3 className="font-secondary text-xl text-[#0a2225]">
+                {toursLocation ? `No tours found for “${toursLocation}” yet` : "No tours match yet"}
+              </h3>
               <p className="mt-2 text-sm text-[#6B7280]">
-                Bookable tours from creators and tour operators will appear here.
+                {toursLocation
+                  ? "Try a nearby city, a landmark, or an activity like “food tour”."
+                  : "Bookable tours from creators and tour operators will appear here."}
               </p>
             </div>
           )}
