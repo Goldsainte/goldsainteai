@@ -53,6 +53,8 @@ export function HomeHero() {
     if (f.startDate) params.set("startDate", f.startDate);
     if (f.endDate) params.set("endDate", f.endDate);
     if (f.travelers && f.travelers > 1) params.set("travelers", String(f.travelers));
+    if (f.infants && f.infants > 0) params.set("infants", String(f.infants));
+    if (f.pets && f.pets > 0) params.set("pets", String(f.pets));
     const qs = params.toString();
     navigate(qs ? `/marketplace?${qs}` : "/marketplace");
   };
