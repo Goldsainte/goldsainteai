@@ -30,6 +30,8 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
     return undefined;
   });
   const [travelers, setTravelers] = useState(filters.travelers || 1);
+  // Mobile: Airbnb-style collapsed pill that expands into the full card.
+  const [mobileOpen, setMobileOpen] = useState(false);
   // Airbnb-style guest breakdown (embedded popover). Adults + children are
   // the "travelers" the marketplace filters on; infants and pets don't count
   // toward capacity (Airbnb semantics) but are carried in the search.
@@ -131,6 +133,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
 
   const handleSearch = () => {
     setExpanded(false);
+    setMobileOpen(false);
     onSearch({
       destination: destination.trim(),
       startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
@@ -436,7 +439,48 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
 
         {/* Mobile: always-open stacked search */}
         <div className="md:hidden">
+          {!mobileOpen ? (
+            /* Airbnb mobile pill: magnifier + bold "Where to?" + gray summary.
+               Tapping expands the full search card below. */
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open search"
+              className="flex w-full items-center gap-3 rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-left shadow-[0_3px_12px_rgba(10,34,37,0.08)]"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              <Search className="h-4 w-4 flex-none text-[#0a2225]" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[14px] font-semibold text-[#0a2225]">
+                  {destination.trim() || "Where to?"}
+                </span>
+                <span className="block truncate text-[12px] text-[#6B7280]">
+                  {[
+                    destination.trim() ? null : "Anywhere",
+                    dateRange?.from
+                      ? `${format(dateRange.from, "MMM d")}${dateRange.to ? ` – ${format(dateRange.to, "MMM d")}` : ""}`
+                      : "Any dates",
+                    travelers > 1 ? `${travelers} travelers` : "Add travelers",
+                  ].filter(Boolean).join(" · ")}
+                </span>
+              </span>
+            </button>
+          ) : (
           <div className="rounded-2xl border border-[#E5DFC6] bg-white p-4 shadow-sm space-y-4">
+              {/* Card header with close */}
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
+                  Search
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  aria-label="Close search"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225]"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
               {/* Where */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
@@ -522,6 +566,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                 Search
               </Button>
           </div>
+          )}
         </div>
 
         {/* Active filter chips */}
