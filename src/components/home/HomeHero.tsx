@@ -3,12 +3,12 @@
 // with both audiences answered in the "two doors" row beneath the search.
 // Popular Trips shows REAL inventory only (featured, else newest published)
 // and hides itself below 3 trips — no fabricated fallbacks, ever.
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search } from "lucide-react";
+import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
+import type { SearchFilters } from "@/pages/Marketplace";
 
 import heroMainImg from "@/assets/maximilien-t-scharner-FD0Ga_KJTwM-unsplash.webp"; // infinity pool
 import heroSecondaryImg from "@/assets/austin-distel-riQNJpiaGgE-unsplash.webp"; // treehouse / hammock
@@ -16,10 +16,12 @@ import heroTertiaryImg from "@/assets/felix-rostig-UmV2wr-Vbq8-unsplash.webp"; /
 
 const inter = { fontFamily: "Inter, sans-serif" } as const;
 
+// Module-level constant — fresh objects per render cause needless re-inits.
+const HERO_SEARCH_FILTERS: SearchFilters = { destination: "", travelers: 1 };
+
 export function HomeHero() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [destination, setDestination] = useState("");
 
   const { data: popularTrips } = useQuery({
     queryKey: ["hero-popular-trips"],
@@ -42,9 +44,17 @@ export function HomeHero() {
     },
   });
 
-  const goToMarketplace = () => {
-    const q = destination.trim();
-    navigate(q ? `/marketplace?destination=${encodeURIComponent(q)}` : "/marketplace");
+  // The hero embeds the real MarketplaceSearch; searching here carries the
+  // full query (destination, dates, travelers) into /marketplace, which
+  // initializes its filters from these exact URL params.
+  const handleHeroSearch = (f: SearchFilters) => {
+    const params = new URLSearchParams();
+    if (f.destination) params.set("destination", f.destination);
+    if (f.startDate) params.set("startDate", f.startDate);
+    if (f.endDate) params.set("endDate", f.endDate);
+    if (f.travelers && f.travelers > 1) params.set("travelers", String(f.travelers));
+    const qs = params.toString();
+    navigate(qs ? `/marketplace?${qs}` : "/marketplace");
   };
 
   const formatPrice = (price: number, currency: string) =>
@@ -93,50 +103,16 @@ export function HomeHero() {
               or post your dream trip and let the experts come to you.
             </p>
 
-            {/* Search bar — the primary CTA. Routes into the marketplace. */}
-            <form
-              role="search"
-              onSubmit={(e) => { e.preventDefault(); goToMarketplace(); }}
-              className="mt-7 flex items-stretch rounded-full border border-[#E5DFC6] bg-white pl-6 pr-2 py-2 shadow-[0_14px_34px_rgba(10,34,37,0.10)] max-w-[640px] mx-auto md:mx-0"
-            >
-              <div className="flex-[1.4] min-w-0 border-r border-[#E5DFC6] pr-4 py-1">
-                <label htmlFor="hero-destination" className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7136]" style={inter}>
-                  Where
-                </label>
-                <input
-                  id="hero-destination"
-                  type="text"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  placeholder="Search destinations"
-                  className="mt-0.5 w-full bg-transparent text-[13.5px] text-[#0a2225] placeholder:text-[#6B7280] focus:outline-none"
-                  style={inter}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={goToMarketplace}
-                className="hidden sm:block flex-1 min-w-0 whitespace-nowrap border-r border-[#E5DFC6] px-4 py-1 text-left"
-              >
-                <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7136]" style={inter}>When</span>
-                <span className="mt-0.5 block text-[13.5px] text-[#6B7280]" style={inter}>Any dates</span>
-              </button>
-              <button
-                type="button"
-                onClick={goToMarketplace}
-                className="hidden sm:block flex-1 min-w-0 whitespace-nowrap px-4 py-1 text-left"
-              >
-                <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7136]" style={inter}>Travelers</span>
-                <span className="mt-0.5 block text-[13.5px] text-[#6B7280]" style={inter}>Any group</span>
-              </button>
-              <button
-                type="submit"
-                aria-label="Search trips"
-                className="ml-2 flex h-11 w-11 flex-none items-center justify-center self-center rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331] transition-colors"
-              >
-                <Search className="h-4.5 w-4.5" size={18} />
-              </button>
-            </form>
+            {/* Search bar — the SAME MarketplaceSearch component the
+                marketplace hero uses (embedded mode strips its section
+                bg/padding). One component, one look, on every viewport. */}
+            <div className="mt-6">
+              <MarketplaceSearch
+                embedded
+                filters={HERO_SEARCH_FILTERS}
+                onSearch={handleHeroSearch}
+              />
+            </div>
 
             {/* Two doors — plain inline flow so both links share one exact
                 baseline (a global 44px touch-target min-height inflates
