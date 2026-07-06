@@ -69,7 +69,16 @@ export function HomeHero() {
 
   return (
     <section className="bg-[#f7f3ea] text-[#0a2225] md:min-h-[calc(100svh-56px)]">
-      <div className="mx-auto max-w-6xl px-4 py-10 md:py-12 md:h-full">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-8 md:h-full">
+        {/* Desktop: Airbnb-style search bar at the top, full content width —
+            out of the hero column, so headline and collage keep their space. */}
+        <div className="mx-auto mb-9 hidden max-w-[780px] md:block">
+          <MarketplaceSearch
+            embedded
+            filters={HERO_SEARCH_FILTERS}
+            onSearch={handleHeroSearch}
+          />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-stretch md:h-full">
           {/* LEFT: category → promise → search → two doors */}
           <div className="flex flex-col justify-center">
@@ -108,7 +117,8 @@ export function HomeHero() {
             {/* Search bar — the SAME MarketplaceSearch component the
                 marketplace hero uses (embedded mode strips its section
                 bg/padding). One component, one look, on every viewport. */}
-            <div className="mt-6">
+            {/* Mobile keeps the collapsed pill here in the hero flow. */}
+            <div className="mt-6 md:hidden">
               <MarketplaceSearch
                 embedded
                 filters={HERO_SEARCH_FILTERS}
