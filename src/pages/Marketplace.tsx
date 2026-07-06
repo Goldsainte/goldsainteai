@@ -47,6 +47,8 @@ export interface SearchFilters {
   category?: string;
   minPrice?: number;
   maxPrice?: number;
+  infants?: number;
+  pets?: number;
   durationBucket?: "1-3" | "4-6" | "7+";
   sortBy?: "newest" | "top-rated" | "price-low" | "price-high";
 }
@@ -105,6 +107,8 @@ export default function Marketplace() {
     startDate: searchParams.get("startDate") || undefined,
     endDate: searchParams.get("endDate") || undefined,
     travelers: parseInt(searchParams.get("travelers") || "1") || 1,
+    infants: parseInt(searchParams.get("infants") || "0") || undefined,
+    pets: parseInt(searchParams.get("pets") || "0") || undefined,
   });
 
   // Persist filters to URL
@@ -115,6 +119,8 @@ export default function Marketplace() {
     if (filters.startDate) params.set("startDate", filters.startDate);
     if (filters.endDate) params.set("endDate", filters.endDate);
     if (filters.travelers && filters.travelers > 1) params.set("travelers", filters.travelers.toString());
+    if (filters.infants && filters.infants > 0) params.set("infants", filters.infants.toString());
+    if (filters.pets && filters.pets > 0) params.set("pets", filters.pets.toString());
     setSearchParams(params, { replace: true });
   }, [activeTab, filters, setSearchParams]);
 
