@@ -6,6 +6,7 @@ import { MarketplaceHeader } from "@/components/marketplace/MarketplaceHeader";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
 import { MarketplaceTabs } from "@/components/marketplace/MarketplaceTabs";
+import { PartnerToursSection } from "@/components/marketplace/PartnerToursSection";
 import { LiveTripGrid } from "@/components/marketplace/LiveTripGrid";
 import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { EmptyState } from "@/components/marketplace/EmptyState";
@@ -73,6 +74,8 @@ export default function Marketplace() {
   }, [user?.id]);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  // Viator partner tours rendered on the Tours tab; null = not yet known.
+  const [partnerTourCount, setPartnerTourCount] = useState<number | null>(null);
 
   // Live inventory counts for the segmented tabs — exact head counts, no
   // estimates. Rendered only after they load.
@@ -480,7 +483,7 @@ export default function Marketplace() {
     activeTab === "itinerary-guides" ? filteredGuides.length
     : activeTab === "trips" ? filteredLiveTrips.length
     : activeTab === "trip-requests" ? (tripRequests?.length ?? 0)
-    : filteredTours.length;
+    : filteredTours.length + (partnerTourCount ?? 0);
   const resultNoun =
     activeTab === "itinerary-guides" ? "guide"
     : activeTab === "trips" ? "trip"
@@ -638,18 +641,30 @@ export default function Marketplace() {
           </div>
         );
       }
-      if (!filteredTours?.length) {
-        return (
-          <div className="py-16 text-center">
-            <h3 className="font-secondary text-xl text-[#0a2225]">No tours match yet</h3>
-            <p className="mt-2 text-sm text-[#6B7280]">
-              Bookable tours from creators and tour operators will appear here.
-            </p>
-          </div>
-        );
-      }
-      /* Tours share packaged_trips, so the trip grid and detail page work as-is. */
-      return <LiveTripGrid trips={filteredTours as any} />;
+      /* Native tours first (packaged_trips listing_type='tour'), then
+         clearly-labeled Viator partner inventory in identical card
+         dimensions. The empty state shows only when BOTH are empty. */
+      return (
+        <>
+          {filteredTours?.length ? (
+            <div className="mb-8">
+              <LiveTripGrid trips={filteredTours as any} />
+            </div>
+          ) : null}
+          <PartnerToursSection
+            destination={filters.destination}
+            onCountChange={setPartnerTourCount}
+          />
+          {!filteredTours?.length && partnerTourCount === 0 && (
+            <div className="py-16 text-center">
+              <h3 className="font-secondary text-xl text-[#0a2225]">No tours match yet</h3>
+              <p className="mt-2 text-sm text-[#6B7280]">
+                Bookable tours from creators and tour operators will appear here.
+              </p>
+            </div>
+          )}
+        </>
+      );
     }
 
     return null;
@@ -677,7 +692,21 @@ export default function Marketplace() {
               big unverifiable numbers eroded trust faster than empty space. ── */}
         <div className="sticky top-14 sm:top-16 md:top-20 z-30 border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
-            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} counts={tabCounts} />
+            <MarketplaceTabs
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              counts={
+                tabCounts
+                  ? {
+                      ...tabCounts,
+                      tours:
+                        partnerTourCount === null && (tabCounts.tours ?? 0) === 0
+                          ? undefined // don't flash "Tours 0" while Viator loads
+                          : (tabCounts.tours ?? 0) + (partnerTourCount ?? 0),
+                    }
+                  : tabCounts
+              }
+            />
             <MarketplaceFilters
               filters={filters}
               onFilterChange={setFilters}
