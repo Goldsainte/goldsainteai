@@ -289,15 +289,14 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           <div className={embedded
             ? "flex min-w-[150px] flex-[1.3] flex-col justify-center gap-0.5 pr-3"
             : "flex min-w-0 flex-1 flex-col justify-center gap-0.5 pr-4"}>
-            <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
+            <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
               Where
             </label>
             <div className="relative flex h-[18px] min-w-0 items-center">
-              <MapPin className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
               <Input
                 ref={inputRef}
-                className="h-[18px] w-full truncate border-0 bg-transparent p-0 pl-6 text-sm leading-[18px] text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
-                placeholder={embedded ? "Where to?" : "Where are you going?"}
+                className="h-[18px] w-full truncate border-0 bg-transparent p-0 text-sm leading-[18px] text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
+                placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => {
                   setDestination(e.target.value);
@@ -338,27 +337,26 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           <div className={embedded
             ? "flex flex-none flex-col justify-center gap-0.5 px-3"
             : "flex flex-1 flex-col justify-center gap-0.5 px-5"}>
-            <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
-              Dates
+            <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+              When
             </label>
             <div className="flex h-[18px] min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate">
               <MobileDatePicker
                 mode="range"
                 dateRange={dateRange}
                 onDateRangeChange={handleDateRangeChange}
-                placeholder={embedded ? "Add dates" : "Check-in – Check-out"}
+                placeholder="Add dates"
                 className="border-0 bg-transparent p-0 pl-0 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent"
               />
             </div>
           </div>
 
-          {/* Travelers — embedded (homepage) mode uses an Airbnb-style text
-              trigger that opens the stepper in a popover: the inline stepper
-              is too wide for the hero column. Marketplace keeps it inline. */}
-          {embedded ? (
+          {/* Who — Airbnb-style text trigger opening the guest-stepper popover,
+              in BOTH modes (Airbnb's bar has no inline stepper). */}
+          {true ? (
             <div className="flex flex-none flex-col justify-center gap-0.5 px-3">
-              <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
-                Travelers
+              <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+                Who
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -368,7 +366,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                     aria-label="Set number of travelers"
                   >
                     <Users className="h-4 w-4 text-[#8D8D8D]" />
-                    <span>{travelers} {travelers === 1 ? "traveler" : "travelers"}</span>
+                    <span>{travelers > 1 ? `${travelers} guests` : "Add guests"}</span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent align="end" sideOffset={10} className="w-[340px] rounded-2xl border-[#E5DFC6] bg-white p-5 shadow-lg">
@@ -415,8 +413,8 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
             </div>
           ) : (
             <div className="flex flex-1 flex-col justify-center gap-0.5 px-5">
-              <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
-                Travelers
+              <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]">
+                Who
               </label>
               <div className="flex h-9 items-center gap-2">
                 <Users className="h-4 w-4 text-[#8D8D8D]" />
@@ -460,7 +458,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                     dateRange?.from
                       ? `${format(dateRange.from, "MMM d")}${dateRange.to ? ` – ${format(dateRange.to, "MMM d")}` : ""}`
                       : "Any dates",
-                    travelers > 1 ? `${travelers} travelers` : "Add travelers",
+                    travelers > 1 ? `${travelers} guests` : "Add guests",
                   ].filter(Boolean).join(" · ")}
                 </span>
               </span>
@@ -532,7 +530,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               {/* Dates */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                  Dates
+                  When
                 </label>
                 <MobileDatePicker
                   mode="range"
@@ -546,7 +544,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               {/* Travelers */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                  Travelers
+                  Who
                 </label>
                 <div className="flex items-center gap-3 rounded-xl border border-[#E5DFC6] bg-[#FBF9F0] px-4 py-2.5">
                   <Users className="h-4 w-4 text-[#8D8D8D]" />
