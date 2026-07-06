@@ -284,19 +284,19 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
     >
       <div className={embedded ? "mx-auto max-w-4xl" : "mx-auto max-w-4xl px-4 py-4 md:py-6"}>
         {/* Desktop search bar — the hero centerpiece (mockup spec) */}
-        <div className="mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-7 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
+        <div className="searchbar-slim mx-auto hidden max-w-[780px] md:flex md:items-stretch md:divide-x md:divide-[#E5DFC6]/40 rounded-full border border-[#E5DFC6] bg-white py-3 pl-7 pr-2 shadow-[0_6px_24px_rgba(10,34,37,0.07)]">
           {/* Where */}
           <div className={embedded
-            ? "flex min-w-[150px] flex-[1.3] flex-col justify-center gap-1.5 pr-3"
-            : "flex min-w-0 flex-1 flex-col justify-center gap-1.5 pr-4"}>
+            ? "flex min-w-[150px] flex-[1.3] flex-col justify-center gap-0.5 pr-3"
+            : "flex min-w-0 flex-1 flex-col justify-center gap-0.5 pr-4"}>
             <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Where
             </label>
-            <div className="relative flex h-9 min-w-0 items-center">
+            <div className="relative flex h-[18px] min-w-0 items-center">
               <MapPin className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
               <Input
                 ref={inputRef}
-                className="w-full truncate border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-[18px] w-full truncate border-0 bg-transparent p-0 pl-6 text-sm leading-[18px] text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder={embedded ? "Where to?" : "Where are you going?"}
                 value={destination}
                 onChange={(e) => {
@@ -336,12 +336,12 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
 
           {/* Dates — using MobileDatePicker in range mode */}
           <div className={embedded
-            ? "flex flex-none flex-col justify-center gap-1.5 px-3"
-            : "flex flex-1 flex-col justify-center gap-1.5 px-5"}>
+            ? "flex flex-none flex-col justify-center gap-0.5 px-3"
+            : "flex flex-1 flex-col justify-center gap-0.5 px-5"}>
             <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Dates
             </label>
-            <div className="flex h-9 min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate">
+            <div className="flex h-[18px] min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate">
               <MobileDatePicker
                 mode="range"
                 dateRange={dateRange}
@@ -356,7 +356,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               trigger that opens the stepper in a popover: the inline stepper
               is too wide for the hero column. Marketplace keeps it inline. */}
           {embedded ? (
-            <div className="flex flex-none flex-col justify-center gap-1.5 px-3">
+            <div className="flex flex-none flex-col justify-center gap-0.5 px-3">
               <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
                 Travelers
               </label>
@@ -364,7 +364,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-9 items-center gap-1.5 text-sm text-[#0a2225] whitespace-nowrap"
+                    className="flex h-[18px] min-h-0 items-center gap-1.5 text-sm leading-[18px] text-[#0a2225] whitespace-nowrap"
                     aria-label="Set number of travelers"
                   >
                     <Users className="h-4 w-4 text-[#8D8D8D]" />
@@ -414,7 +414,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               </Popover>
             </div>
           ) : (
-            <div className="flex flex-1 flex-col justify-center gap-1.5 px-5">
+            <div className="flex flex-1 flex-col justify-center gap-0.5 px-5">
               <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
                 Travelers
               </label>
@@ -429,7 +429,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           <div className={embedded ? "flex items-center px-2 pt-1 md:pt-0" : "flex items-center px-3 pt-1 md:pt-0"}>
             <Button
               size="icon"
-              className="h-12 w-12 rounded-full bg-[#BFAD72] hover:bg-[#9d8f5d] shadow-sm"
+              className="h-10 w-10 rounded-full bg-[#BFAD72] hover:bg-[#9d8f5d] shadow-sm"
               onClick={handleSearch}
             >
               <Search className="h-5 w-5 text-white" />
