@@ -125,14 +125,16 @@ const AuthCallback = () => {
               const accountType =
                 pending.accountType || profile.account_type || 'traveler';
               trackEvent('sign_up', { account_type: accountType });
-              const isProfessional =
-                accountType === 'creator' ||
-                accountType === 'agent' ||
-                accountType === 'brand';
-              // Travelers receive their welcome from the account-type step,
-              // which always has their name. Only send the professional
-              // welcome here, to avoid sending a duplicate welcome email.
-              if (isProfessional) {
+              // Agents and brands are identity-gated: their
+              // "You're verified — your account is live" email must fire ONLY
+              // from stripe-identity-webhook after real Stripe Identity
+              // verification (agent_application.identity_verified). Sending it
+              // here — at mere email confirmation — told unverified,
+              // unapproved applicants they were verified. Creators have no
+              // identity gate, so their welcome still sends here. Travelers
+              // receive their welcome from the account-type step.
+              const sendsWelcomeAtEmailConfirm = accountType === 'creator';
+              if (sendsWelcomeAtEmailConfirm) {
                 const firstName =
                   pending.firstName || profile.first_name || undefined;
                 void supabase.functions
