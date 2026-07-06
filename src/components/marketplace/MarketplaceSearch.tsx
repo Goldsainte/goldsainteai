@@ -30,6 +30,18 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
     return undefined;
   });
   const [travelers, setTravelers] = useState(filters.travelers || 1);
+  // Airbnb-style guest breakdown (embedded popover). Adults + children are
+  // the "travelers" the marketplace filters on; infants and pets don't count
+  // toward capacity (Airbnb semantics) but are carried in the search.
+  const [adults, setAdults] = useState(Math.max(1, filters.travelers || 1));
+  const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
+  const [pets, setPets] = useState(0);
+  const setGuests = (nextAdults: number, nextChildren: number) => {
+    setAdults(nextAdults);
+    setChildren(nextChildren);
+    setTravelers(nextAdults + nextChildren);
+  };
   const [showSuggestions, setShowSuggestions] = useState(false);
   // TrovaTrip-style accordion: desktop search rests as a compact pill and
   // expands into the full field bar on click. Sticky so it travels with
@@ -124,6 +136,8 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
       startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
       endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
       travelers,
+      infants: infants > 0 ? infants : undefined,
+      pets: pets > 0 ? pets : undefined,
     });
   };
 
@@ -186,6 +200,56 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
   };
 
   // Traveler stepper component
+  const GuestRow = ({
+    title,
+    subtitle,
+    subtitleUnderlined = false,
+    value,
+    onDecrement,
+    onIncrement,
+    decrementDisabled,
+    incrementDisabled,
+    last = false,
+  }: {
+    title: string;
+    subtitle: string;
+    subtitleUnderlined?: boolean;
+    value: number;
+    onDecrement: () => void;
+    onIncrement: () => void;
+    decrementDisabled: boolean;
+    incrementDisabled: boolean;
+    last?: boolean;
+  }) => (
+    <div className={`flex items-center justify-between py-4 first:pt-0 ${last ? "pb-0" : "border-b border-[#E5DFC6]/60"}`}>
+      <div>
+        <p className="text-[15px] font-medium leading-tight text-[#0a2225]">{title}</p>
+        <p className={`mt-0.5 text-[13px] text-[#8D8D8D] ${subtitleUnderlined ? "underline underline-offset-2 decoration-[#8D8D8D]/60" : ""}`}>{subtitle}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onDecrement}
+          disabled={decrementDisabled}
+          aria-label={`Decrease ${title.toLowerCase()}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225] transition hover:border-[#BFAD72] disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </button>
+        <span className="min-w-[2ch] text-center text-sm font-medium tabular-nums text-[#0a2225]">{value}</span>
+        <button
+          type="button"
+          onClick={onIncrement}
+          disabled={incrementDisabled}
+          aria-label={`Increase ${title.toLowerCase()}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225] transition hover:border-[#BFAD72] disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+
   const TravelerStepper = ({ compact = false }: { compact?: boolean }) => (
     <div className="flex items-center gap-2">
       <button
@@ -304,11 +368,45 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                     <span>{travelers} {travelers === 1 ? "traveler" : "travelers"}</span>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent align="end" sideOffset={10} className="w-auto rounded-2xl border-[#E5DFC6] bg-white p-4 shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-[#0a2225]">Travelers</span>
-                    <TravelerStepper />
-                  </div>
+                <PopoverContent align="end" sideOffset={10} className="w-[340px] rounded-2xl border-[#E5DFC6] bg-white p-5 shadow-lg">
+                  <GuestRow
+                    title="Adults"
+                    subtitle="Ages 13 or above"
+                    value={adults}
+                    onDecrement={() => setGuests(Math.max(1, adults - 1), children)}
+                    onIncrement={() => setGuests(adults + 1, children)}
+                    decrementDisabled={adults <= 1}
+                    incrementDisabled={adults + children >= 20}
+                  />
+                  <GuestRow
+                    title="Children"
+                    subtitle="Ages 2 – 12"
+                    value={children}
+                    onDecrement={() => setGuests(adults, Math.max(0, children - 1))}
+                    onIncrement={() => setGuests(adults, children + 1)}
+                    decrementDisabled={children <= 0}
+                    incrementDisabled={adults + children >= 20}
+                  />
+                  <GuestRow
+                    title="Infants"
+                    subtitle="Under 2"
+                    value={infants}
+                    onDecrement={() => setInfants(Math.max(0, infants - 1))}
+                    onIncrement={() => setInfants(Math.min(5, infants + 1))}
+                    decrementDisabled={infants <= 0}
+                    incrementDisabled={infants >= 5}
+                  />
+                  <GuestRow
+                    title="Pets"
+                    subtitle="Bringing a service animal?"
+                    subtitleUnderlined
+                    value={pets}
+                    onDecrement={() => setPets(Math.max(0, pets - 1))}
+                    onIncrement={() => setPets(Math.min(5, pets + 1))}
+                    decrementDisabled={pets <= 0}
+                    incrementDisabled={pets >= 5}
+                    last
+                  />
                 </PopoverContent>
               </Popover>
             </div>
