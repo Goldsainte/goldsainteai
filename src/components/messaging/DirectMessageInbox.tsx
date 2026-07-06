@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
 import {
   Archive,
+  Search as SearchIcon,
   Settings,
   Send,
   Check,
@@ -54,6 +55,8 @@ export function DirectMessageInbox() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("primary");
+  // IG-style inbox search — client-side filter across the active folder.
+  const [inboxQuery, setInboxQuery] = useState("");
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -374,14 +377,17 @@ export function DirectMessageInbox() {
   };
 
   const getConversationList = () => {
-    switch (activeTab) {
-      case "requests":
-        return conversations.requests;
-      case "archived":
-        return conversations.archived;
-      default:
-        return conversations.primary;
-    }
+    const list =
+      activeTab === "requests" ? conversations.requests
+      : activeTab === "archived" ? conversations.archived
+      : conversations.primary;
+    const q = inboxQuery.trim().toLowerCase();
+    if (!q) return list;
+    return list.filter(
+      (c) =>
+        c.otherParticipant.displayName.toLowerCase().includes(q) ||
+        (c.lastMessagePreview || "").toLowerCase().includes(q)
+    );
   };
 
   const isRequest =
@@ -417,90 +423,92 @@ export function DirectMessageInbox() {
   }
 
   return (
-    <div className="flex h-full min-h-0 border border-[#E5DFC6]/60 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className="flex h-full min-h-0 overflow-hidden bg-white md:border md:border-[#E5DFC6]/60 md:rounded-2xl md:shadow-sm">
       {/* Left Panel - Conversation List */}
       <div
         className={cn(
-          "w-full md:w-80 min-h-0 border-r border-[#E5DFC6]/50 flex-col bg-[#FDFBF7]",
+          "w-full md:w-80 min-h-0 md:border-r md:border-[#E5DFC6]/50 flex-col bg-white md:bg-[#FDFBF7]",
           selectedConversation ? "hidden md:flex" : "flex"
         )}
       >
-        <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between">
-          <h2 className="font-secondary text-lg font-semibold text-[#0a2225]">Inbox</h2>
-          <div className="flex items-center gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm"
+        {/* IG-style inbox header: bold title left, compose pen right. */}
+        <div className="px-4 pt-3 pb-1 flex items-center justify-between">
+          <h2 className="font-secondary text-[22px] font-semibold text-[#0a2225]">Messages</h2>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setShowRecipientSearch(true)}
-              className="text-[#C7A962] hover:text-[#0a2225] hover:bg-[#F6F0E4] gap-1.5"
+              aria-label="New message"
+              className="text-[#0a2225] hover:bg-[#F6F0E4] h-10 w-10"
             >
-              <PenSquare className="h-4 w-4" />
-              <span className="text-xs">New</span>
+              <PenSquare className="h-[22px] w-[22px]" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setShowSettings(true)}
-              className="text-[#5a6c6e] hover:text-[#0a2225] hover:bg-[#F6F0E4]"
+              aria-label="Message settings"
+              className="text-[#5a6c6e] hover:bg-[#F6F0E4] h-10 w-10"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <div className="flex border-b border-[#E5DFC6]/40 mx-4 mt-2">
-            <button
-              onClick={() => setActiveTab("primary")}
-              className={`flex-1 pb-2.5 text-xs font-medium tracking-wide transition-all border-b-2 ${
-                activeTab === "primary"
-                  ? "border-[#0a2225] text-[#0a2225]"
-                  : "border-transparent text-[#9CA3AF] hover:text-[#5a6c6e]"
-              }`}
-            >
-              Inbox
-              {totalUnread > 0 && (
-                <Badge className="ml-1.5 h-4 px-1.5 text-[10px] bg-[#C7A962] text-white rounded-full">
-                  {totalUnread}
-                </Badge>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("requests")}
-              className={`flex-1 pb-2.5 text-xs font-medium tracking-wide transition-all border-b-2 ${
-                activeTab === "requests"
-                  ? "border-[#0a2225] text-[#0a2225]"
-                  : "border-transparent text-[#9CA3AF] hover:text-[#5a6c6e]"
-              }`}
-            >
-              Requests
-              {requestCount > 0 && (
-                <Badge className="ml-1.5 h-4 px-1.5 text-[10px] bg-[#C7A962] text-white rounded-full">
-                  {requestCount}
-                </Badge>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("archived")}
-              className={`flex-1 pb-2.5 text-xs font-medium tracking-wide transition-all border-b-2 ${
-                activeTab === "archived"
-                  ? "border-[#0a2225] text-[#0a2225]"
-                  : "border-transparent text-[#9CA3AF] hover:text-[#5a6c6e]"
-              }`}
-            >
-              Archive
-            </button>
+        {/* IG-style search field */}
+        <div className="px-4 pt-1 pb-2">
+          <div className="relative">
+            <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+            <input
+              type="search"
+              value={inboxQuery}
+              onChange={(e) => setInboxQuery(e.target.value)}
+              placeholder="Search"
+              aria-label="Search messages"
+              style={{ fontFamily: "Inter, sans-serif" }}
+              className="w-full rounded-xl border-0 bg-[#F2F0EA] py-2.5 pl-10 pr-4 text-[15px] text-[#0a2225] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#C7A962]/50"
+            />
           </div>
+        </div>
 
-          <ScrollArea className="flex-1 mt-3">
-            <div className="px-3">
+        {/* IG-style folder pills: Primary · General · Requests
+            ("General" is the archived bucket — same semantics as Instagram's
+            secondary folder; internal keys unchanged). */}
+        <div className="flex items-center gap-2 px-4 pb-2" style={{ fontFamily: "Inter, sans-serif" }}>
+          {([
+            { key: "primary", label: "Primary", count: totalUnread },
+            { key: "archived", label: "General", count: 0 },
+            { key: "requests", label: "Requests", count: requestCount },
+          ] as const).map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              aria-pressed={activeTab === t.key}
+              className={`rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors ${
+                activeTab === t.key
+                  ? "bg-[#0a2225] text-white"
+                  : "bg-white text-[#5a6c6e] border border-[#E5DFC6] hover:text-[#0a2225]"
+              }`}
+            >
+              {t.label}
+              {t.count > 0 && (
+                <span className={activeTab === t.key ? " text-white/70" : " text-[#C7A962]"}> {t.count}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+            <div>
               {getConversationList().length === 0 ? (
                 <div className="text-center py-16">
                   <p className="font-secondary text-[#0a2225] text-base">
                     {activeTab === "requests"
                       ? "No message requests"
                       : activeTab === "archived"
-                      ? "No archived conversations"
+                      ? "Nothing in General"
                       : "No conversations yet"}
                   </p>
                   <p className="text-sm text-[#5a6c6e] mt-2 max-w-[220px] mx-auto leading-relaxed">
@@ -508,7 +516,7 @@ export function DirectMessageInbox() {
                       ? "Start a conversation with a creator or travel agent"
                       : activeTab === "requests"
                       ? "When someone new reaches out, you'll see it here"
-                      : "Archived conversations will appear here"}
+                      : "Conversations you move out of Primary will appear here"}
                   </p>
                 </div>
               ) : (
@@ -531,8 +539,8 @@ export function DirectMessageInbox() {
                 ))
               )}
             </div>
-          </ScrollArea>
-        </Tabs>
+          </div>
+        </div>
       </div>
 
       {/* Right Panel - Messages */}
@@ -545,8 +553,8 @@ export function DirectMessageInbox() {
         {selectedConversation ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between bg-white">
-              <div className="flex items-center gap-3">
+            <div className="p-4 border-b border-[#E5DFC6]/50 flex items-center justify-between gap-2 bg-white">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -565,13 +573,13 @@ export function DirectMessageInbox() {
                     {selectedConversation.otherParticipant.displayName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-secondary font-semibold text-[#0a2225]">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-secondary font-semibold text-[#0a2225] truncate">
                       {selectedConversation.otherParticipant.displayName}
                     </span>
                     {selectedConversation.otherParticipant.isVerified && (
-                      <Shield className="h-3.5 w-3.5 text-[#C7A962]" />
+                      <Shield className="h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
                     )}
                   </div>
                   <span className="text-xs text-[#5a6c6e] capitalize">
@@ -584,7 +592,7 @@ export function DirectMessageInbox() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 shrink-0">
                 <Button
                   variant="ghost"
                   size="xs"
@@ -897,43 +905,47 @@ function ConversationItem({
   onClick: () => void;
   onDelete?: () => void;
 }) {
+  // Instagram-style compact relative time: 5m, 2h, 3d, 2w.
+  const compactTime = (iso: string) => {
+    const mins = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+    if (mins < 60) return `${mins}m`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return `${days}d`;
+    return `${Math.floor(days / 7)}w`;
+  };
+  const unread = conversation.unreadCount > 0;
+
   return (
     <div className="relative group">
       <button
         onClick={onClick}
-        className={`w-full p-3 rounded-xl text-left transition-all mb-1.5 ${
-          isActive 
-            ? "bg-white border border-[#C7A962]/30 shadow-sm" 
-            : "hover:bg-white/80 border border-transparent"
+        className={`w-full px-4 py-2 text-left transition-colors ${
+          isActive ? "md:bg-[#F6F0E4]/70" : "hover:bg-[#F6F0E4]/40 active:bg-[#F6F0E4]/60"
         }`}
       >
-        <div className="flex items-start gap-3">
-          <Avatar className="h-10 w-10 border-2 border-[#E5DFC6]">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-14 w-14 shrink-0">
             <AvatarImage src={conversation.otherParticipant.avatarUrl || undefined} />
-            <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] font-secondary">
+            <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225] font-secondary text-lg">
               {conversation.otherParticipant.displayName.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-secondary font-medium truncate text-sm text-[#0a2225]">
-                {conversation.otherParticipant.displayName}
-              </span>
+          <div className="flex-1 min-w-0" style={{ fontFamily: "Inter, sans-serif" }}>
+            <p className={`truncate text-[15px] leading-5 ${unread ? "font-semibold text-[#0a2225]" : "font-normal text-[#0a2225]"}`}>
+              {conversation.otherParticipant.displayName}
+            </p>
+            <div className="mt-0.5 flex items-baseline min-w-0">
+              <p className={`truncate text-[14px] leading-5 ${unread ? "font-medium text-[#0a2225]" : "text-[#6B7280]"}`}>
+                {conversation.lastMessagePreview || "No messages yet"}
+              </p>
               {conversation.lastMessageAt && (
-                <span className="text-[11px] text-[#6B7280] whitespace-nowrap">
-                  {formatDistanceToNow(new Date(conversation.lastMessageAt), { addSuffix: true })}
-                </span>
+                <span className="shrink-0 whitespace-pre text-[14px] leading-5 text-[#6B7280]"> · {compactTime(conversation.lastMessageAt)}</span>
               )}
             </div>
-            <p className="text-xs text-[#5a6c6e] truncate mt-0.5">
-              {conversation.lastMessagePreview || "No messages yet"}
-            </p>
           </div>
-          {conversation.unreadCount > 0 && (
-            <Badge className="h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-[#C7A962] text-white rounded-full">
-              {conversation.unreadCount}
-            </Badge>
-          )}
+          {unread && <span aria-label="Unread" className="ml-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#0c4d47]" />}
         </div>
       </button>
       {onDelete && (
