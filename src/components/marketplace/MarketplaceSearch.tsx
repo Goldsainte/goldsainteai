@@ -5,6 +5,7 @@ import { MapPin, Search, Users, Minus, Plus, X, Calendar as CalendarIcon } from 
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { MobileDatePicker } from "@/components/MobileDatePicker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useDestinationSuggestions } from "@/hooks/useDestinationSuggestions";
 import type { SearchFilters } from "@/pages/Marketplace";
 
@@ -229,7 +230,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               <Input
                 ref={inputRef}
                 className="w-full truncate border-0 bg-transparent p-0 pl-6 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0"
-                placeholder="Where are you going?"
+                placeholder={embedded ? "Where to?" : "Where are you going?"}
                 value={destination}
                 onChange={(e) => {
                   setDestination(e.target.value);
@@ -268,7 +269,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
 
           {/* Dates — using MobileDatePicker in range mode */}
           <div className={embedded
-            ? "flex min-w-0 flex-1 flex-col justify-center gap-1.5 px-3"
+            ? "flex flex-none flex-col justify-center gap-1.5 px-3"
             : "flex flex-1 flex-col justify-center gap-1.5 px-5"}>
             <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
               Dates
@@ -278,24 +279,50 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                 mode="range"
                 dateRange={dateRange}
                 onDateRangeChange={handleDateRangeChange}
-                placeholder="Check-in – Check-out"
+                placeholder={embedded ? "Add dates" : "Check-in – Check-out"}
                 className="border-0 bg-transparent p-0 pl-0 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent"
               />
             </div>
           </div>
 
-          {/* Travelers */}
-          <div className={embedded
-            ? "flex flex-none flex-col justify-center gap-1.5 px-3"
-            : "flex flex-1 flex-col justify-center gap-1.5 px-5"}>
-            <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
-              Travelers
-            </label>
-            <div className="flex h-9 items-center gap-2">
-              <Users className="h-4 w-4 text-[#8D8D8D]" />
-              <TravelerStepper />
+          {/* Travelers — embedded (homepage) mode uses an Airbnb-style text
+              trigger that opens the stepper in a popover: the inline stepper
+              is too wide for the hero column. Marketplace keeps it inline. */}
+          {embedded ? (
+            <div className="flex flex-none flex-col justify-center gap-1.5 px-3">
+              <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
+                Travelers
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-9 items-center gap-1.5 text-sm text-[#0a2225] whitespace-nowrap"
+                    aria-label="Set number of travelers"
+                  >
+                    <Users className="h-4 w-4 text-[#8D8D8D]" />
+                    <span>{travelers} {travelers === 1 ? "traveler" : "travelers"}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" sideOffset={10} className="w-auto rounded-2xl border-[#E5DFC6] bg-white p-4 shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-[#0a2225]">Travelers</span>
+                    <TravelerStepper />
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-1 flex-col justify-center gap-1.5 px-5">
+              <label className="block h-[13px] text-[10px] font-semibold uppercase leading-[13px] tracking-wider text-[#8D8D8D]">
+                Travelers
+              </label>
+              <div className="flex h-9 items-center gap-2">
+                <Users className="h-4 w-4 text-[#8D8D8D]" />
+                <TravelerStepper />
+              </div>
+            </div>
+          )}
 
           {/* Search Button */}
           <div className={embedded ? "flex items-center px-2 pt-1 md:pt-0" : "flex items-center px-3 pt-1 md:pt-0"}>
