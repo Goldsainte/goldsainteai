@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, CheckCircle2, Shield, ArrowRight, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Step10Documents } from "@/components/applications/steps/Step10Documents";
-import { CityAutocomplete } from "@/components/CityAutocomplete";
+import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 
 const US_STATES: { code: string; name: string }[] = [
   { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
@@ -621,7 +621,23 @@ function AgentApplicationFormInner() {
       if (data.url) window.location.href = data.url;
     } catch (error: any) {
       console.error('Stripe verification error:', error);
-      toast({ title: "Verification setup failed", description: error.message || "Please try again.", variant: "destructive" });
+      // supabase-js wraps non-2xx responses in FunctionsHttpError whose
+      // .message is always the generic "Edge Function returned a non-2xx
+      // status code" — the function's actual JSON explanation lives in
+      // error.context (a Response). Surface it so the toast says WHAT failed
+      // (missing secret, Stripe Identity not enabled, etc.), not just THAT
+      // it failed.
+      let description = error?.message || "Please try again.";
+      try {
+        if (error?.context && typeof error.context.json === "function") {
+          const body = await error.context.json();
+          if (body?.message || body?.error) {
+            description = body.message || body.error;
+            console.error('Stripe verification error body:', body);
+          }
+        }
+      } catch { /* keep the generic message */ }
+      toast({ title: "Verification setup failed", description, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -844,11 +860,14 @@ function AgentApplicationFormInner() {
 
             <div>
               <Label className="text-sm font-medium text-[#0a2225]">Preferred Destinations</Label>
-              <CityAutocomplete
+              {/* Same Google Places autocomplete as creator onboarding.
+                  (The OSM-based CityAutocomplete is blocked by our CSP
+                  connect-src in production — google maps is allowlisted.) */}
+              <GoogleCityAutocomplete
                 value={formData.preferredDestinations}
                 onChange={(value) => setFormData({ ...formData, preferredDestinations: value })}
                 placeholder="e.g. Maldives, Italy, Japan"
-                className={luxuryInputClasses}
+                inputClassName={luxuryInputClasses}
               />
             </div>
 
