@@ -807,15 +807,28 @@ All colors MUST be HSL.
   overflow-x: clip; /* no scroll container; older Safari falls back to hidden */
     }
     
-    /* Ensure all cards and containers don't overflow */
-    [class*="Card"],
-    [class*="card"],
-    .grid,
-    .flex {
+    /* Ensure all cards and containers don't overflow.
+       :where(:not(...)) keeps this at single-class specificity while skipping
+       explicit horizontal scrollers — without the guards this rule silently
+       disables every card rail / chip row on phones. */
+    [class*="Card"]:where(:not(.overflow-x-auto)):where(:not(.overflow-x-scroll)),
+    [class*="card"]:where(:not(.overflow-x-auto)):where(:not(.overflow-x-scroll)),
+    .grid:where(:not(.overflow-x-auto)):where(:not(.overflow-x-scroll)),
+    .flex:where(:not(.overflow-x-auto)):where(:not(.overflow-x-scroll)) {
       max-width: 100%;
       overflow-x: hidden;
   overflow-x: clip; /* no scroll container; older Safari falls back to hidden */
       min-width: 0;
+    }
+
+    /* Rows nested inside an explicit horizontal rail must keep their natural
+       width and stay unclipped, or the rail has nothing to pan. */
+    .overflow-x-auto > .flex,
+    .overflow-x-auto > .grid,
+    .overflow-x-scroll > .flex,
+    .overflow-x-scroll > .grid {
+      max-width: none;
+      overflow-x: visible;
     }
     
     /* Ensure images don't overflow */
