@@ -56,6 +56,8 @@ export interface AuthEmailLayoutProps {
   cta?: { label: string; url: string }
   /** When provided, renders a centered OTP code block instead of the CTA */
   otp?: { code: string; caption?: string }
+  /** When provided, renders a labeled key/value summary block (e.g. receipt details) */
+  details?: { label: string; value: string }[]
 }
 
 export const AuthEmailLayout = ({
@@ -66,6 +68,7 @@ export const AuthEmailLayout = ({
   steps,
   cta,
   otp,
+  details,
 }: AuthEmailLayoutProps) => (
   <Html lang="en" dir="ltr">
     <head>
@@ -90,6 +93,19 @@ export const AuthEmailLayout = ({
           <h1>{headline}</h1>
           <p className="tagline">{tagline}</p>
           <p className="lede">{lede}</p>
+
+          {details && details.length > 0 && (
+            <table role="presentation" className="steps" cellPadding={0} cellSpacing={0} border={0} style={{ marginTop: '8px' }}>
+              <tbody>
+                {details.map((d, i) => (
+                  <tr key={i}>
+                    <td className="body" style={{ opacity: 0.6, width: '50%' }}>{d.label}</td>
+                    <td className="body" style={{ textAlign: 'right', fontWeight: 600, opacity: 1 }}>{d.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
           {cta && (
             <>
