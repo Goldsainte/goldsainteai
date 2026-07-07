@@ -14,6 +14,10 @@ interface ProposalMessageCardProps {
   isSelf: boolean;
   currentUserId: string;
   recipientId: string; // the other participant (the agent who sent it, when traveler views)
+  /** Trip context from the conversation (e.g. an Ask-a-Question thread) so the
+      booking inherits the marketplace trip's cover image + title. */
+  tripId?: string | null;
+  tripTitle?: string | null;
 }
 
 export function ProposalMessageCard({
@@ -21,6 +25,8 @@ export function ProposalMessageCard({
   isSelf,
   currentUserId,
   recipientId,
+  tripId,
+  tripTitle,
 }: ProposalMessageCardProps) {
   const [accepting, setAccepting] = useState(false);
   const meta = message.metadata || {};
@@ -45,7 +51,15 @@ export function ProposalMessageCard({
           status: "deposit_pending",
           partner_payout: 0,
           platform_commission: 0,
-          metadata: { source: "chat_proposal", proposal_message_id: message.id },
+          metadata: {
+            source: "chat_proposal",
+            proposal_message_id: message.id,
+            // Carry the conversation's trip context so My Bookings and the
+            // booking page show the SAME cover photo + title as the
+            // marketplace card the traveler fell in love with.
+            ...(tripId ? { trip_id: tripId } : {}),
+            ...(tripTitle ? { trip_title: tripTitle } : {}),
+          },
         } as any)
         .select("id")
         .single();
