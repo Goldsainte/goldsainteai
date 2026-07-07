@@ -1,10 +1,9 @@
-
 // src/pages/MyBookingsPage.tsx
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Clock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
  
 type TripMeta = {
   id: string;
@@ -26,7 +25,7 @@ type BookingRow = {
   trip: TripMeta | null;
 };
  
-const BOOKING_STATUSES = ["confirmed", "payment_pending", "paid_in_full", "completed"];
+const BOOKING_STATUSES = ["confirmed", "payment_pending", "paid_in_full", "completed", "cancelled"];
  
 function formatCurrency(value: number | null | undefined, currency: string | null | undefined) {
   if (value == null) return "—";
@@ -133,148 +132,217 @@ export default function MyBookingsPage() {
     };
   }, [navigate]);
  
+  const upcoming = bookings.filter(
+    (b) => !["completed", "cancelled"].includes(b.status)
+  );
+  const past = bookings.filter((b) =>
+    ["completed", "cancelled"].includes(b.status)
+  );
+
   return (
     <>
       <Helmet>
         <title>My Bookings · Goldsainte</title>
       </Helmet>
- 
+
       <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
-        <div className="mx-auto max-w-5xl px-4 py-12">
-          <header className="space-y-2">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
-              Your journeys
-            </p>
-            <h1 className="font-serif text-3xl md:text-4xl text-[#0a2225]">
-              My Bookings
-            </h1>
-            <p className="max-w-2xl text-sm text-[#4a4a4a]">
-              Trips you've confirmed through Goldsainte, with all the details
-              your creators and travel agents are working from.
+        <div className="mx-auto max-w-6xl px-6 pt-16 pb-24 md:pt-20">
+          {/* Editorial header */}
+          <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#8D6B2F]">
+                Your journeys
+              </p>
+              <h1 className="mt-3 font-secondary text-4xl leading-[1.02] text-[#0a2225] md:text-5xl">
+                Where you're
+                <br />
+                headed next
+              </h1>
+            </div>
+            <p className="max-w-xs text-[13px] leading-relaxed text-[#0a2225]/55 md:text-right">
+              Payments, contracts, and your specialist — every detail, held in
+              one place.
             </p>
           </header>
- 
-          <section className="mt-10">
-            {loading ? (
-              <div className="space-y-4">
-                {Array.from({ length: 3 }).map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="h-40 rounded-3xl bg-white/60 ring-1 ring-[#E5DFC6] animate-pulse"
-                  />
-                ))}
-              </div>
-            ) : bookings.length === 0 ? (
+
+          {loading ? (
+            <div className="mt-14 grid gap-5 md:grid-cols-2">
+              {Array.from({ length: 2 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="h-72 rounded-2xl bg-white/50 ring-1 ring-[#E5DFC6] animate-pulse"
+                />
+              ))}
+            </div>
+          ) : bookings.length === 0 ? (
+            <div className="mt-14">
               <EmptyState />
-            ) : (
-              <div className="space-y-5">
-                {bookings.map((b) => (
-                  <BookingCard key={b.id} booking={b} />
-                ))}
-              </div>
-            )}
-          </section>
+            </div>
+          ) : (
+            <>
+              {/* Upcoming */}
+              <SectionRule left="Upcoming" right={past.length > 0 ? "" : "Past journeys"} />
+              {upcoming.length === 0 ? (
+                <p className="mt-6 text-sm italic text-[#0a2225]/50">
+                  No upcoming journeys yet — your next one starts in the
+                  marketplace.
+                </p>
+              ) : (
+                <div className="mt-6 grid gap-5 md:grid-cols-2">
+                  {upcoming.map((b) => (
+                    <BookingCard key={b.id} booking={b} />
+                  ))}
+                </div>
+              )}
+
+              {/* Past */}
+              {past.length > 0 && (
+                <>
+                  <div className="mt-14">
+                    <SectionRule left="Past journeys" right="" />
+                  </div>
+                  <div className="mt-6 grid gap-5 md:grid-cols-2">
+                    {past.map((b) => (
+                      <BookingCard key={b.id} booking={b} muted />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
       </main>
     </>
   );
 }
- 
+
+function SectionRule({ left, right }: { left: string; right: string }) {
+  return (
+    <div className="mt-12 flex items-center gap-4">
+      <span className="text-[10px] uppercase tracking-[0.24em] text-[#0a2225]">
+        {left}
+      </span>
+      <span className="h-px flex-1 bg-[#E5DFC6]" />
+      {right ? (
+        <span className="text-[10px] uppercase tracking-[0.24em] text-[#0a2225]/35">
+          {right}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function EmptyState() {
   return (
-    <div className="rounded-3xl border border-[#E5DFC6] bg-white/80 px-6 py-16 text-center">
-      <h2 className="font-serif text-2xl text-[#0a2225]">
-        Your travel story starts here
+    <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-20 text-center">
+      <h2 className="font-secondary text-3xl text-[#0a2225]">
+        Your first journey awaits
       </h2>
-      <p className="mt-3 text-sm text-[#4a4a4a]">
-        Browse storyboards and request a trip with one of our creators or
-        travel agents.
+      <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-[#0a2225]/60">
+        Explore trips curated by our creators and travel agents. When you book,
+        it'll live here — with every detail and a direct line to your
+        specialist.
       </p>
       <Link
         to="/marketplace"
-        className="mt-6 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white hover:bg-[#0a2225] transition-colors"
+        className="mt-8 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-7 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
       >
         Explore the marketplace
       </Link>
     </div>
   );
 }
- 
-function BookingCard({ booking }: { booking: BookingRow }) {
+
+function BookingCard({
+  booking,
+  muted,
+}: {
+  booking: BookingRow;
+  muted?: boolean;
+}) {
   const trip = booking.trip;
   const reference = bookingReference(booking.id);
- 
+  const title =
+    trip?.title || (booking.metadata as any)?.trip_title || "Goldsainte Trip";
+  const hasImage = !!trip?.cover_image_url;
+  const total = booking.total_price ?? 0;
+  const deposit = booking.deposit_amount ?? 0;
+  const balance = Math.max(0, total - deposit);
+  const balanceLine =
+    booking.status === "paid_in_full" || (total > 0 && balance === 0)
+      ? "Paid in full"
+      : booking.status === "cancelled"
+      ? "Cancelled"
+      : booking.status === "completed"
+      ? "Completed"
+      : `${formatCurrency(balance, booking.currency)} balance due`;
+
   return (
     <Link
       to={`/bookings/${booking.id}`}
-      className="group flex flex-col md:flex-row overflow-hidden rounded-3xl bg-white ring-1 ring-[#E5DFC6] shadow-sm hover:shadow-md transition-shadow"
+      className={`group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)] ${
+        muted ? "opacity-80 hover:opacity-100" : ""
+      }`}
     >
-      <div className="relative md:w-56 aspect-[16/10] md:aspect-[4/3] bg-[#f0ebdd] shrink-0">
-        {trip?.cover_image_url ? (
+      {/* Photo IS the card */}
+      <div className="relative h-56 overflow-hidden md:h-60">
+        {hasImage ? (
           <img
-            src={trip.cover_image_url}
-            alt={trip.title || trip.destination || "Trip cover"}
-            className="absolute inset-0 h-full w-full object-cover"
+            src={trip!.cover_image_url!}
+            alt={title}
             loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] uppercase tracking-[0.18em] text-[#8D8D8D]">
-            Goldsainte
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+            <span className="font-secondary text-xl italic text-[#C7A962]/80">
+              Goldsainte
+            </span>
           </div>
         )}
-      </div>
- 
-      <div className="flex-1 p-5 flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-[#8D6B2F]">
-              {reference}
-            </p>
-            <h2 className="mt-1 font-serif text-lg text-[#0a2225] line-clamp-2">
-              {trip?.title || "Goldsainte trip"}
-            </h2>
-          </div>
-          <span className="shrink-0 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-[10px] font-medium text-[#0c4d47]">
-            {statusLabel(booking.status)}
-          </span>
-        </div>
- 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-[#4a4a4a]">
+
+        {/* Status pill on the photo */}
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+          {statusLabel(booking.status)}
+        </span>
+
+        {/* Bottom scrim with serif title */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
           {trip?.destination && (
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-[#8D6B2F]" />
+            <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">
               {trip.destination}
-            </span>
+            </p>
           )}
-          {trip?.duration_days ? (
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-[#8D6B2F]" />
-              {trip.duration_days} days
-            </span>
-          ) : null}
-          <span className="text-[#8D8D8D]">
-            Booked {new Date(booking.created_at).toLocaleDateString()}
+          <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
+            {title}
+          </p>
+          <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+            {trip?.duration_days
+              ? `${trip.duration_days} ${trip.duration_days === 1 ? "day" : "days"} · `
+              : ""}
+            Booked{" "}
+            {new Date(booking.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </p>
+        </div>
+      </div>
+
+      {/* Slim footer strip */}
+      <div className="flex items-center justify-between px-5 py-3.5">
+        <span className="text-[11.5px] text-[#0a2225]/50">
+          <span className="font-mono text-[10.5px] tracking-wide">
+            {reference}
           </span>
-        </div>
- 
-        <div className="mt-auto grid grid-cols-2 gap-4 border-t border-[#E5DFC6] pt-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[#8D8D8D]">
-              Deposit
-            </p>
-            <p className="mt-1 text-sm font-semibold text-[#0a2225]">
-              {formatCurrency(booking.deposit_amount, booking.currency)}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[#8D8D8D]">
-              Trip total
-            </p>
-            <p className="mt-1 text-sm font-semibold text-[#0a2225]">
-              {formatCurrency(booking.total_price, booking.currency)}
-            </p>
-          </div>
-        </div>
+          {" · "}
+          {balanceLine}
+        </span>
+        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47]">
+          View journey
+          <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </span>
       </div>
     </Link>
   );
