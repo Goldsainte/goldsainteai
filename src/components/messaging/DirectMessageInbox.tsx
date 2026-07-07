@@ -182,12 +182,14 @@ export function DirectMessageInbox() {
     }
   }, [messages]);
 
-  // Mark as read when viewing conversation
+  // Mark as read when viewing conversation — also re-fires when a new
+  // message lands while the thread is already open (messages.length changes),
+  // so the unread ring clears instead of lingering after you've seen it.
   useEffect(() => {
     if (selectedConversation && selectedConversation.unreadCount > 0) {
       manageConversation(selectedConversation.id, "mark_read");
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, messages.length]);
 
   // Auto-focus input when conversation selected. preventScroll stops the
   // browser from yanking the whole page down to the composer on load.
@@ -1063,7 +1065,7 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={`w-fit max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
+        className={`w-fit max-w-[85%] sm:max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
           isSelf
             ? "bg-[#E8DCC8] text-[#0a2225]"
             : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]/40"
