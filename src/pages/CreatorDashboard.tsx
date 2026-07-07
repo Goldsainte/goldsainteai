@@ -444,7 +444,10 @@ export default function CreatorDashboard() {
           </Tabs>
         )}
 
-        {/* Editorial footer */}
+        {/* Editorial footer — wayfinding for the deeper studio tabs. Hidden on
+            Overview, where the hero + how-it-works steps already cover the
+            same ground (was reading as triple-duplicated copy). */}
+        {activeLeaf !== "overview" && (
         <footer className="mt-16 pt-10 border-t border-[#0a2225]/10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             <div>
@@ -500,6 +503,7 @@ export default function CreatorDashboard() {
             </div>
           </div>
         </footer>
+        )}
       </div>
     </main>
   );
