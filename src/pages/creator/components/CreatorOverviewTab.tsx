@@ -119,10 +119,10 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
               <div className="mt-4 space-y-3">
                 {path.steps.map((step, i) => (
                   <div key={i} className="flex gap-3">
-                    <span className="w-5 shrink-0 font-secondary text-[15px] italic text-[#8a7a3f]">
+                    <span className="w-5 shrink-0 font-secondary text-sm italic text-[#c7a962]">
                       {romans[i]}
                     </span>
-                    <p className="text-[13.5px] leading-relaxed text-[#0a2225]/65">
+                    <p className="text-sm leading-relaxed text-[#0a2225]/65">
                       {step}
                     </p>
                   </div>
@@ -138,7 +138,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
               How you get paid
             </p>
-            <p className="mt-2.5 max-w-md text-[13.5px] leading-relaxed text-[#0a2225]/65">
+            <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-[#0a2225]/65">
               You set your price — your costs and your margin are yours to
               build in. Travelers pay a 3.5% service fee on top; a matching
               3.5% platform fee comes out of your payout. That is
@@ -148,10 +148,10 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             </p>
           </div>
           <div className="shrink-0 text-center">
-            <p className="font-secondary text-4xl text-[#0a2225]">
-              7<span className="text-2xl">%</span>
+            <p className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
+              7<span className="text-xl">%</span>
             </p>
-            <p className="mt-1 text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+            <p className="mt-1.5 text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55">
               Total · 3.5 + 3.5
             </p>
           </div>
@@ -159,8 +159,8 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
 
         {/* New here — quiet guide signpost */}
         <div className="mt-7 flex flex-col gap-3 border-t border-[#0a2225]/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-[13px] text-[#0a2225]/60">
-            <span className="mr-3.5 text-[10px] uppercase tracking-[0.24em] text-[#0c4d47]/70">
+          <span className="text-sm text-[#0a2225]/60">
+            <span className="mr-3.5 text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
               New here?
             </span>
             The full guide to proposals, payouts, and fees.
