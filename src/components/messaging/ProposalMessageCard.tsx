@@ -33,6 +33,11 @@ export function ProposalMessageCard({
   const price: number = Number(meta.price) || 0;
   const depositPct: number = Number(meta.depositPercentage) || 25;
   const depositAmount = Math.round(price * (depositPct / 100));
+  // Canonical guest-side platform fee: 3.5% added on top of the deposit
+  // (host-side 3.5% is deducted from payout server-side). 7% total, always.
+  const GUEST_FEE_RATE = 0.035;
+  const guestServiceFee = Math.round(depositAmount * GUEST_FEE_RATE * 100) / 100;
+  const depositTotal = Math.round((depositAmount + guestServiceFee) * 100) / 100;
   const note: string = meta.note || "";
 
   const handleAccept = async () => {
@@ -59,6 +64,8 @@ export function ProposalMessageCard({
             // marketplace card the traveler fell in love with.
             ...(tripId ? { trip_id: tripId } : {}),
             ...(tripTitle ? { trip_title: tripTitle } : {}),
+            guest_service_fee: guestServiceFee,
+            guest_service_fee_rate: GUEST_FEE_RATE,
           },
         } as any)
         .select("id")
@@ -71,7 +78,7 @@ export function ProposalMessageCard({
       const { data, error } = await supabase.functions.invoke("trip-checkout-create", {
         body: {
           tripBookingId: booking.id,
-          amountTotalCents: depositAmount * 100,
+          amountTotalCents: Math.round(depositTotal * 100),
           currency: "usd",
           successUrl: `${window.location.origin}/booking-confirmation?booking=${booking.id}`,
           cancelUrl: `${window.location.origin}/messages`,
@@ -111,7 +118,8 @@ export function ProposalMessageCard({
         <span className="text-xs text-[#5a6c6e]">total</span>
       </div>
       <p className="mt-1 text-sm text-[#0a2225]">
-        Deposit: <strong>${depositAmount.toLocaleString()}</strong> ({depositPct}%)
+        Deposit: <strong>${depositTotal.toLocaleString()}</strong> ({depositPct}%
+        + 3.5% service fee)
       </p>
       {note && (
         <p className="mt-3 text-sm text-[#4a4a4a] whitespace-pre-wrap leading-relaxed">
