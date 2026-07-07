@@ -33,26 +33,27 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
   const fmt = (n: number) =>
     `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
-  const steps = [
+  const earningPaths = [
     {
       n: "01",
-      title: "Browse trip requests",
-      body:
-        "Travelers post the journeys they want. Pick a brief that fits your taste and expertise.",
+      title: "Answer a brief",
+      steps: [
+        "Travelers post the journeys they want. Pick a brief that fits your taste.",
+        "Send a tailored proposal — your itinerary, price, and timeline — right in the chat.",
+        "The traveler accepts and pays their deposit without ever leaving the thread.",
+      ],
     },
     {
       n: "02",
-      title: "Send a tailored proposal",
-      body:
-        "Build a thoughtful itinerary with your price, inclusions, and timeline. We handle escrow.",
-    },
-    {
-      n: "03",
-      title: "Get booked & paid on-platform",
-      body:
-        "Travelers confirm, payments are held in escrow, funds release as milestones complete.",
+      title: "Publish your own",
+      steps: [
+        "Package a trip you know by heart — or a digital guide — in the trip builder.",
+        "It lists on the marketplace with your name and your price.",
+        "Travelers book it directly — no proposal needed, you wake up to bookings.",
+      ],
     },
   ];
+  const romans = ["i.", "ii.", "iii."];
 
   const statItems = [
     { label: "Active proposals", value: loading ? "—" : stats.activeProposals.toString() },
@@ -99,19 +100,77 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         </div>
       </section>
 
-      {/* How it works — editorial three-step */}
+      {/* How it works — two earning paths, editorial */}
       <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
-        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-6 md:mb-8">
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
           How Goldsainte works for creators
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8">
-          {steps.map((s) => (
-            <div key={s.n} className="space-y-3">
-              <p className="font-secondary text-2xl text-[#c7a962]">{s.n}</p>
-              <h3 className="font-secondary text-xl text-[#0a2225]">{s.title}</h3>
-              <p className="text-sm leading-relaxed text-[#0a2225]/65">{s.body}</p>
+        <h2 className="mt-3 font-secondary text-2xl md:text-3xl text-[#0a2225]">
+          Two ways to earn
+        </h2>
+
+        <div className="mt-7 grid grid-cols-1 gap-y-10 gap-x-12 md:grid-cols-2">
+          {earningPaths.map((path) => (
+            <div key={path.n}>
+              <p className="font-secondary text-2xl text-[#c7a962]">{path.n}</p>
+              <h3 className="mt-2 font-secondary text-xl text-[#0a2225]">
+                {path.title}
+              </h3>
+              <div className="mt-4 space-y-3">
+                {path.steps.map((step, i) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="w-5 shrink-0 font-secondary text-[15px] italic text-[#8a7a3f]">
+                      {romans[i]}
+                    </span>
+                    <p className="text-[13.5px] leading-relaxed text-[#0a2225]/65">
+                      {step}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
+        </div>
+
+        {/* How you get paid */}
+        <div className="mt-9 flex flex-col gap-6 border-t border-[#0a2225]/10 pt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+              How you get paid
+            </p>
+            <p className="mt-2.5 max-w-md text-[13.5px] leading-relaxed text-[#0a2225]/65">
+              You set your price — your costs and your margin are yours to
+              build in. Travelers pay a 3.5% service fee on top; a matching
+              3.5% platform fee comes out of your payout. That is
+              Goldsainte&apos;s entire take: 7% total, flat, on every booking.
+              Every payment is held in escrow and releases as milestones
+              complete.
+            </p>
+          </div>
+          <div className="shrink-0 text-center">
+            <p className="font-secondary text-4xl text-[#0a2225]">
+              7<span className="text-2xl">%</span>
+            </p>
+            <p className="mt-1 text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+              Total · 3.5 + 3.5
+            </p>
+          </div>
+        </div>
+
+        {/* New here — quiet guide signpost */}
+        <div className="mt-7 flex flex-col gap-3 border-t border-[#0a2225]/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-[13px] text-[#0a2225]/60">
+            <span className="mr-3.5 text-[10px] uppercase tracking-[0.24em] text-[#0c4d47]/70">
+              New here?
+            </span>
+            The full guide to proposals, payouts, and fees.
+          </span>
+          <Link
+            to="/how-it-works/creator"
+            className="shrink-0 text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+          >
+            Read the guide →
+          </Link>
         </div>
       </section>
 
