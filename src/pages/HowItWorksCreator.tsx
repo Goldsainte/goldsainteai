@@ -9,7 +9,7 @@ const STEPS: HowItWorksStep[] = [
   { number: "03", icon: CreditCard, title: "Connect Stripe Connect", description: "Link your bank to receive commissions on bookings and guide sales automatically.", cta: { label: "Set up payouts", to: "/creator-dashboard?tab=earnings" } },
   { number: "04", icon: Camera, title: "Publish a trip or sell a guide", description: "Choose your monetisation: build a packaged trip travelers can book, or sell a polished itinerary guide." },
   { number: "05", icon: Share2, title: "Share your profile", description: "Your public creator profile is your storefront. Drive traffic from wherever you have an audience — TikTok, Instagram, YouTube, X, your blog, your newsletter, or any social platform." },
-  { number: "06", icon: DollarSign, title: "Get paid on every booking", description: "Earn up to 80% commission on bookings driven through your profile and content. Funds settle on a clear schedule." },
+  { number: "06", icon: DollarSign, title: "Get paid on every booking", description: "You set your price and keep 96.5% of it. Goldsainte's only fee is 3.5% from you and 3.5% from the traveler. Funds settle on a clear schedule." },
   { number: "07", icon: Star, title: "Build your reputation", description: "Great reviews unlock featured placement across the marketplace, accelerating future bookings." },
 ];
 
@@ -22,7 +22,7 @@ export default function HowItWorksCreator() {
       subtitle={t('howItWorks.creator.subtitle', 'A complete commerce layer for travel creators — sell trips, sell guides, get paid.')}
       steps={STEPS}
       factCard={{
-        text: "Creators earn between 85% and 92% commission depending on tier. Payouts settle through Stripe Connect within 2 business days.",
+        text: "You keep 96.5% of the price you set. Goldsainte's platform fee is a flat 3.5% from you plus 3.5% from the traveler (7% total, always). Payouts settle through Stripe Connect within 2 business days.",
         icon: TrendingUp,
       }}
       extraSection={<CurrenciesAndPayouts />}
