@@ -268,11 +268,11 @@ export default function AgentDashboard() {
     try {
       const agentPrice = parseFloat(formData.get('proposed_price') as string);
       
-      // Calculate pricing with fees
-      // Customer sees agentPrice + 3% service fee
-      // Agent receives agentPrice - 15% success fee
-      const serviceFee = agentPrice * 0.03;
-      const successFee = agentPrice * 0.15;
+      // Calculate pricing with fees — Goldsainte standard 7% total:
+      // Customer sees agentPrice + 3.5% service fee
+      // Agent receives agentPrice - 3.5% platform fee
+      const serviceFee = agentPrice * 0.035;
+      const successFee = agentPrice * 0.035;
       const customerPrice = agentPrice + serviceFee;
       const agentPayout = agentPrice - successFee;
 
@@ -284,8 +284,8 @@ export default function AgentDashboard() {
           proposed_price: customerPrice, // Customer-facing price (for backwards compatibility)
           agent_quoted_price: agentPrice,
           customer_facing_price: customerPrice,
-          service_fee_percentage: 3.0,
-          success_fee_percentage: 15.0,
+          service_fee_percentage: 3.5,
+          success_fee_percentage: 3.5,
           platform_service_fee: serviceFee,
           platform_success_fee: successFee,
           agent_payout_amount: agentPayout,
@@ -556,8 +556,8 @@ export default function AgentDashboard() {
             <form onSubmit={handlePlaceBid} className="space-y-4">
               <Alert className="mb-4">
                 <AlertDescription className="text-xs">
-                  Enter your base service price. Customer will see your price + 3% platform service fee. 
-                  You'll receive your quoted price minus 15% success fee after job completion.
+                  Enter your base service price. Customer will see your price + 3.5% platform service fee. 
+                  You'll receive your quoted price minus a 3.5% platform fee after job completion.
                 </AlertDescription>
               </Alert>
               
@@ -573,7 +573,7 @@ export default function AgentDashboard() {
                   placeholder="Enter your price (e.g., 1000)"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Customer will be charged your price + 3% service fee
+                  Customer will be charged your price + 3.5% service fee
                 </p>
               </div>
               
