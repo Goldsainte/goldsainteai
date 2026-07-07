@@ -736,6 +736,8 @@ export function DirectMessageInbox() {
                                 recipientId={
                                   selectedConversation!.otherParticipant.id
                                 }
+                                tripId={selectedConversation!.tripId}
+                                tripTitle={selectedConversation!.tripTitle}
                               />
                             </div>
                           ) : (
