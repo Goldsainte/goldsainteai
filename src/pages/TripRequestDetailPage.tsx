@@ -228,8 +228,8 @@ export default function TripRequestDetailPage() {
         const agentShare = parseFloat(proposal.agentShare || "0");
         const totalShare = creatorShare + agentShare;
 
-        if (Math.abs(totalShare - 85) > 0.1) {
-          setError("Creator and agent shares must add up to 85%.");
+        if (Math.abs(totalShare - 96.5) > 0.1) {
+          setError("Creator and agent shares must add up to 96.5% (Goldsainte keeps a 3.5% platform fee).");
           setSubmitting(false);
           return;
         }
@@ -238,9 +238,9 @@ export default function TripRequestDetailPage() {
         agentCommissionPct = agentShare;
       } else {
         if (proposal.proposerRole === "agent") {
-          agentCommissionPct = 80;
+          agentCommissionPct = 96.5;
         } else {
-          creatorCommissionPct = 80;
+          creatorCommissionPct = 96.5;
         }
       }
 
