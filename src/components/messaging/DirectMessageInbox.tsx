@@ -1065,13 +1065,21 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={`max-w-[min(32rem,80%)] rounded-[1.25rem] px-4 py-3 ${
+        className={`max-w-[min(32rem,80%)] rounded-[18px] px-3.5 py-2 ${
           isSelf
             ? "bg-[#E8DCC8] text-[#0a2225]"
             : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]/40"
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap break-words leading-relaxed text-[#0a2225]">
+        <p
+          className="whitespace-pre-wrap break-words text-[#0a2225]"
+          style={{
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+            fontSize: "15px",
+            lineHeight: "1.35",
+          }}
+        >
           {renderTextWithMentions(message.body, () => {}).map((part, idx) =>
             typeof part === "string" ? (
               <span key={idx}>{part}</span>
@@ -1090,8 +1098,15 @@ function MessageBubble({
             )
           )}
         </p>
-        <div className={`flex items-center gap-1 mt-1.5 ${isSelf ? "justify-end" : "justify-start"}`}>
-          <span className="text-[11px] text-[#9CA3AF]">
+        <div className={`flex items-center gap-1 mt-0.5 ${isSelf ? "justify-end" : "justify-start"}`}>
+          <span
+            className="text-[#9CA3AF]"
+            style={{
+              fontFamily:
+                '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+              fontSize: "10px",
+            }}
+          >
             {format(new Date(message.created_at), "HH:mm")}
           </span>
           {isSelf && (
