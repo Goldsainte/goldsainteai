@@ -24,9 +24,10 @@ export async function createDispute(params: {
     throw new Error("Could not create dispute.");
   }
 
-  // Update booking status to disputed
+  // Update booking status to disputed. Real bookings live in trip_bookings
+  // (the `bookings` table is legacy/empty), so update there.
   await supabase
-    .from("bookings")
+    .from("trip_bookings")
     .update({ status: "disputed" })
     .eq("id", params.bookingId);
 
