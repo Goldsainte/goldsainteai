@@ -1065,7 +1065,7 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={`w-fit max-w-[85%] sm:max-w-[70%] rounded-[1.25rem] px-4 py-3 ${
+        className={`max-w-[min(32rem,80%)] rounded-[1.25rem] px-4 py-3 ${
           isSelf
             ? "bg-[#E8DCC8] text-[#0a2225]"
             : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]/40"
