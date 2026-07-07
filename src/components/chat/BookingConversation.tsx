@@ -151,7 +151,7 @@ export function BookingConversation({
             return (
               <div
                 key={msg.id}
-                className={`rounded-2xl px-4 py-3 max-w-[85%] ${
+                className={`rounded-[18px] px-3.5 py-2 max-w-[85%] ${
                   isSelf
                     ? "bg-[#E8DCC8] ml-auto"
                     : "bg-white border border-[#E5DFC6]"
@@ -166,7 +166,15 @@ export function BookingConversation({
                     minute: "2-digit",
                   })}
                 </p>
-                <p className="text-sm text-[#0a2225] leading-relaxed whitespace-pre-line">
+                <p
+                  className="text-[#0a2225] whitespace-pre-line"
+                  style={{
+                    fontFamily:
+                      '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: "15px",
+                    lineHeight: "1.35",
+                  }}
+                >
                   {msg.body}
                 </p>
               </div>
