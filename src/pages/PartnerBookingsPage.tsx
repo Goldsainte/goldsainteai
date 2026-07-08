@@ -13,9 +13,12 @@ type BookingRow = {
   status: string;
   partner_role: string;
   total_price: number;
+  deposit_amount: number | null;
   partner_payout: number;
   currency: string;
   created_at: string;
+  metadata: Record<string, any> | null;
+  traveler: { display_name: string | null; full_name: string | null } | null;
   trip_requests: {
     id: string;
     title: string | null;
@@ -49,9 +52,15 @@ export default function PartnerBookingsPage() {
           status,
           partner_role,
           total_price,
+          deposit_amount,
           partner_payout,
           currency,
           created_at,
+          metadata,
+          traveler:traveler_id (
+            display_name,
+            full_name
+          ),
           trip_requests:trip_request_id (
             id,
             title,
@@ -90,19 +99,21 @@ export default function PartnerBookingsPage() {
 
       <div className="flex-1 bg-[#f7f3ea] text-[#0a2225]">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
-          <header className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962]">
-              Partner dashboard
+          <header className="max-w-2xl">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#8D6B2F]">
+              Partner studio
             </p>
-            <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
-              My Goldsainte Bookings
+            <h1 className="mt-3 font-secondary text-4xl leading-[1.02] text-[#0a2225] md:text-5xl">
+              Bookings with you
             </h1>
-            <p className="text-sm text-[#6B7280]">
-              These are trips travelers have booked with you as a TikTok creator or travel agent.
+            <p className="mt-4 text-[15px] leading-relaxed text-[#0a2225]/60">
+              Every trip a traveler has confirmed with you — payments held in
+              escrow until you release them, with Goldsainte's flat 3.5% on
+              each side.
             </p>
           </header>
 
-          <section className="mt-6">
+          <section className="mt-12">
             {loading ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, idx) => (
@@ -184,30 +195,49 @@ function PartnerBookingRowCard({
 
   const total =
     booking.total_price != null
-      ? `$${(booking.total_price / 100).toFixed(2)} ${booking.currency}`
+      ? `$${Number(booking.total_price).toFixed(2)}`
       : "—";
-
-  const payout =
-    booking.partner_payout != null
-      ? `$${(booking.partner_payout / 100).toFixed(2)} ${booking.currency}`
-      : "—";
+  // Until release, show the expected 96.5% payout (Goldsainte keeps 3.5%);
+  // after release, show the recorded figure.
+  const payoutValue =
+    booking.partner_payout && booking.partner_payout > 0
+      ? Number(booking.partner_payout)
+      : Math.round(Number(booking.total_price || 0) * 96.5) / 100;
+  const payoutLabel =
+    booking.partner_payout && booking.partner_payout > 0
+      ? "Your payout"
+      : "Est. payout (96.5%)";
+  const payout = `$${payoutValue.toFixed(2)}`;
 
   return (
     <Link
       to={`/booking/${booking.id}`}
       className="flex flex-col gap-2 rounded-3xl bg-[#f6f3ea]/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <p className="text-xs text-[#6B7280]">
-            Booked {new Date(booking.created_at).toLocaleDateString()}
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+            GS-{booking.id.slice(0, 8).toUpperCase()} · Booked{" "}
+            {new Date(booking.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
           </p>
-          <h2 className="mt-1 text-sm font-semibold">
-            {trip?.title || trip?.destination || "Goldsainte trip"}
+          <h2 className="mt-1.5 font-secondary text-xl leading-tight text-[#0a2225]">
+            {trip?.title ||
+              (booking.metadata as any)?.trip_title ||
+              trip?.destination ||
+              "Goldsainte Trip"}
           </h2>
+          {(booking.traveler?.display_name || booking.traveler?.full_name) && (
+            <p className="mt-1 text-[13px] text-[#0a2225]/55">
+              Traveler:{" "}
+              {booking.traveler?.display_name || booking.traveler?.full_name}
+            </p>
+          )}
         </div>
-        <span className="rounded-full bg-[#0c4d47]/8 px-3 py-1 text-[10px] font-medium text-[#0c4d47]">
-          {booking.status}
+        <span className="shrink-0 rounded-full bg-[#0c4d47] px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+          {booking.status.replace(/_/g, " ")}
         </span>
       </div>
 
@@ -226,14 +256,18 @@ function PartnerBookingRowCard({
             </span>
           )}
         </div>
-        <div className="flex flex-col items-end gap-1 text-right">
-          <span className="inline-flex items-center gap-1">
-            <HandCoins className="h-3 w-3 text-[#8D8D8D]" />
-            Total: {total}
+        <div className="flex flex-col items-end gap-0.5 text-right">
+          <span className="text-[13px] text-[#0a2225]/60">
+            Total{" "}
+            <span className="ml-1 font-secondary text-[16px] text-[#0a2225]">
+              {total}
+            </span>
           </span>
-          <span className="inline-flex items-center gap-1 text-[10px]">
-            <HandCoins className="h-3 w-3 text-[#8D8D8D]" />
-            Your payout: {payout}
+          <span className="text-[12px] text-[#0a2225]/55">
+            {payoutLabel}{" "}
+            <span className="ml-1 font-secondary text-[15px] text-[#0c4d47]">
+              {payout}
+            </span>
           </span>
         </div>
       </div>
@@ -244,9 +278,9 @@ function PartnerBookingRowCard({
             size="sm"
             onClick={handleRelease}
             disabled={releasing}
-            className="bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white text-xs"
+            className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] hover:bg-[#0a2225]"
           >
-            {releasing ? "Releasing…" : "Release Deposit"}
+            {releasing ? "Releasing…" : "Release deposit"}
           </Button>
         </div>
       )}
