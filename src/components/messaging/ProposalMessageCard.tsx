@@ -92,11 +92,32 @@ export function ProposalMessageCard({
       if (!data?.paymentUrl) throw new Error("No checkout URL returned");
       window.location.href = data.paymentUrl;
     } catch (err: any) {
-      toast({
-        title: "Couldn't start checkout",
-        description: err.message,
-        variant: "destructive",
-      });
+      // Edge-function errors carry the real JSON body on err.context —
+      // surface the human message instead of "non-2xx status code".
+      let body: any = null;
+      try {
+        body = await err?.context?.json?.();
+      } catch {
+        /* no parseable body */
+      }
+      if (body?.code === "CONTRACT_NOT_EXECUTED") {
+        toast({
+          title: "One signature to go",
+          description:
+            "Your trip contract needs to be signed before the deposit. Taking you to it now…",
+        });
+        if (body.contractId) {
+          setTimeout(() => {
+            window.location.href = `/contract/${body.contractId}/sign`;
+          }, 1400);
+        }
+      } else {
+        toast({
+          title: "Couldn't start checkout",
+          description: body?.message || err.message,
+          variant: "destructive",
+        });
+      }
     } finally {
       setAccepting(false);
     }
