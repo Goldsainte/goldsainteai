@@ -194,6 +194,44 @@ export default function BookingDetailPage() {
     (d) => d.status === "open" || d.status === "under_review"
   );
 
+  const [payingBalance, setPayingBalance] = useState(false);
+
+  async function handlePayBalance() {
+    if (!booking || payingBalance) return;
+    // Unpaid booking (e.g. arrived via a signed contract's "Continue to
+    // deposit") → collect the DEPOSIT; confirmed booking → collect the balance.
+    const isDepositStage = booking.status !== "confirmed";
+    const balanceDue = isDepositStage
+      ? booking.deposit_amount ?? 0
+      : Math.max(0, (booking.total_price ?? 0) - (booking.deposit_amount ?? 0));
+    if (balanceDue <= 0) return;
+    setPayingBalance(true);
+    try {
+      // Traveler-side 3.5% service fee applies to the amount being collected,
+      // mirroring the deposit path. 7% total platform standard.
+      const fee = Math.round(balanceDue * 0.035 * 100) / 100;
+      const chargeTotal = Math.round((balanceDue + fee) * 100) / 100;
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "trip-checkout-create",
+        {
+          body: {
+            tripBookingId: booking.id,
+            amountTotalCents: Math.round(chargeTotal * 100),
+            currency: (booking.currency || "usd").toLowerCase(),
+            successUrl: `${window.location.origin}/bookings/${booking.id}`,
+            cancelUrl: `${window.location.origin}/bookings/${booking.id}`,
+          },
+        }
+      );
+      if (fnError) throw fnError;
+      if (!data?.paymentUrl) throw new Error("No checkout URL returned");
+      window.location.href = data.paymentUrl;
+    } catch (e) {
+      console.error("Pay balance failed", e);
+      setPayingBalance(false);
+    }
+  }
+
   const currency = booking?.currency || "USD";
   const total = booking?.total_price ?? 0;
   const deposit = booking?.deposit_amount ?? 0;
@@ -363,6 +401,38 @@ export default function BookingDetailPage() {
                       <span>Due</span>
                       <span className="text-[#0a2225]">Before departure</span>
                     </p>
+                    {["deposit_pending", "pending", "payment_pending"].includes(
+                      booking.status
+                    ) &&
+                      (booking.deposit_amount ?? 0) > 0 && (
+                        <button
+                          type="button"
+                          onClick={handlePayBalance}
+                          disabled={payingBalance}
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-2.5 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        >
+                          {payingBalance
+                            ? "Preparing checkout…"
+                            : `Pay deposit · ${formatMoney(deposit, currency)} + 3.5% fee`}
+                        </button>
+                      )}
+                    {booking.status === "confirmed" && balance > 0 && (
+                      <button
+                        type="button"
+                        onClick={handlePayBalance}
+                        disabled={payingBalance}
+                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-2.5 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                      >
+                        {payingBalance
+                          ? "Preparing checkout…"
+                          : `Pay balance · ${formatMoney(balance, currency)} + 3.5% fee`}
+                      </button>
+                    )}
+                    {booking.status === "paid_in_full" && (
+                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2 text-center text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/60">
+                        Paid in full — nothing further due
+                      </p>
+                    )}
                   </div>
                 </div>
 
