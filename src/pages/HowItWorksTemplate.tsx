@@ -53,7 +53,7 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, 
           {steps.map((step) => (
             <li key={step.number} className="py-14 md:py-16 border-t border-[#E5DFC6] grid md:grid-cols-12 gap-8 md:gap-14">
               <div className="md:col-span-4">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+                <p className="font-secondary text-3xl md:text-4xl text-[#C7A962]">
                   {step.number}
                 </p>
               </div>
