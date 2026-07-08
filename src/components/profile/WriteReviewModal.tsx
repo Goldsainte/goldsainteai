@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,6 +22,27 @@ export function WriteReviewModal({ revieweeId, revieweeName, onSuccess, children
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // Reviews are reserved for travelers who have actually booked with this
+  // person. null = checking, false = not eligible, true = eligible.
+  const [eligible, setEligible] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!open || !user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("trip_bookings")
+        .select("id")
+        .eq("traveler_id", user.id)
+        .eq("partner_id", revieweeId)
+        .in("status", ["confirmed", "paid_in_full", "completed"])
+        .limit(1);
+      if (!cancelled) setEligible(!!data && data.length > 0);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, user, revieweeId]);
 
   const handleSubmit = async () => {
     if (!user) {
@@ -30,6 +51,10 @@ export function WriteReviewModal({ revieweeId, revieweeName, onSuccess, children
     }
     if (rating === 0) {
       toast.error("Please select a rating");
+      return;
+    }
+    if (eligible === false) {
+      toast.error(`Reviews are reserved for travelers who've booked with ${revieweeName}.`);
       return;
     }
 
@@ -67,6 +92,15 @@ export function WriteReviewModal({ revieweeId, revieweeName, onSuccess, children
         <div className="space-y-4 pt-2">
           {/* Star rating */}
           <div>
+            {eligible === false && (
+              <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4 mb-2">
+                <p className="text-sm text-[#0a2225]/70 leading-relaxed">
+                  Reviews are reserved for travelers who have booked with{" "}
+                  {revieweeName} through Goldsainte. Once you complete a
+                  journey together, you can share your experience here.
+                </p>
+              </div>
+            )}
             <p className="text-sm text-muted-foreground mb-2">Your rating</p>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -105,7 +139,7 @@ export function WriteReviewModal({ revieweeId, revieweeName, onSuccess, children
 
           <Button
             onClick={handleSubmit}
-            disabled={submitting || rating === 0}
+            disabled={submitting || rating === 0 || eligible !== true}
             className="w-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white"
           >
             {submitting ? (
