@@ -218,8 +218,10 @@ export default function BookingDetailPage() {
             tripBookingId: booking.id,
             amountTotalCents: Math.round(chargeTotal * 100),
             currency: (booking.currency || "usd").toLowerCase(),
-            successUrl: `${window.location.origin}/bookings/${booking.id}`,
-            cancelUrl: `${window.location.origin}/bookings/${booking.id}`,
+            // trip-checkout-create appends `&session_id=...`, so the URL must
+            // already contain a query string (learned the hard way).
+            successUrl: `${window.location.origin}/bookings/${booking.id}?paid=1`,
+            cancelUrl: `${window.location.origin}/bookings/${booking.id}?canceled=1`,
           },
         }
       );
@@ -409,7 +411,7 @@ export default function BookingDetailPage() {
                           type="button"
                           onClick={handlePayBalance}
                           disabled={payingBalance}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-2.5 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
                         >
                           {payingBalance
                             ? "Preparing checkout…"
@@ -421,7 +423,7 @@ export default function BookingDetailPage() {
                         type="button"
                         onClick={handlePayBalance}
                         disabled={payingBalance}
-                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-2.5 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
                       >
                         {payingBalance
                           ? "Preparing checkout…"
@@ -429,7 +431,7 @@ export default function BookingDetailPage() {
                       </button>
                     )}
                     {booking.status === "paid_in_full" && (
-                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2 text-center text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/60">
+                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[12px] uppercase tracking-[0.14em] text-[#0a2225]/60">
                         Paid in full — nothing further due
                       </p>
                     )}
