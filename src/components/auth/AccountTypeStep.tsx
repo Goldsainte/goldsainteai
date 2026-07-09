@@ -83,7 +83,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
           id: user.id,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
-          phone: phone.trim(),
+          phone: phone.trim() || null,
           account_type: accountType,
           is_profile_complete: accountType !== "brand",
           // Auto-complete onboarding for travelers (no legacy AI intake)
