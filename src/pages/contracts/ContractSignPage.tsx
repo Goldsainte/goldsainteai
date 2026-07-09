@@ -34,6 +34,7 @@ import {
   ShieldCheck,
   Loader2,
   Download,
+  CheckCircle2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SignaturePad from "react-signature-canvas";
@@ -467,28 +468,83 @@ export default function ContractSignPage() {
   // Render
   // -------------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4 gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <div className="flex items-start justify-between flex-wrap gap-3">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Trip Service Agreement</h1>
-              <p className="text-muted-foreground">
-                {contract.trip_info?.destination ?? "Trip details"}
+    <div className="min-h-screen bg-[#f7f3ea]">
+      {/* Command bar — two-tier */}
+      <div className="sticky top-0 z-40 shadow-[0_2px_16px_rgba(10,34,37,0.28)]">
+        <div className="bg-gradient-to-r from-[#0c4d47] to-[#0a2225]">
+          <div className="mx-auto flex h-[72px] max-w-4xl items-center gap-4 px-4 md:px-6">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label="Back"
+              className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#E5DFC6]/28 text-[#E5DFC6] transition-colors hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">
+                Trip Service Agreement
               </p>
+              <h1 className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">
+                {contract.trip_info?.destination ?? "Your Trip"}
+              </h1>
             </div>
-            <div className="flex items-center gap-3">{statusBadge(contract.status)}</div>
+            {contract.status === "fully_executed" ? (
+              <button
+                type="button"
+                onClick={() => downloadContractPdf(contract.id)}
+                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#C7A962] px-6 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d]"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Download PDF</span>
+                <span className="sm:hidden">PDF</span>
+              </button>
+            ) : (
+              <span className="shrink-0 rounded-full border border-[#E5DFC6]/35 px-4 py-2 text-[10.5px] uppercase tracking-[0.16em] text-[#E5DFC6]">
+                {String(contract.status).replace(/_/g, " ")}
+              </span>
+            )}
           </div>
         </div>
+        <div className="border-t border-white/10 bg-[#083530]">
+          <div className="mx-auto flex h-[46px] max-w-4xl items-center gap-6 px-4 md:px-6">
+            <span className="flex items-center gap-2 text-[13px] text-[#E5DFC6]/78">
+              <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
+                {String((contract.field_values as any)?.agentName || "A").trim().charAt(0).toUpperCase()}
+              </span>
+              <span className="hidden sm:inline">{(contract.field_values as any)?.agentName || "Agent"}</span>
+              <span className={`h-[9px] w-[9px] rounded-full ${contract.agent_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
+            </span>
+            <span className="flex items-center gap-2 text-[13px] text-[#E5DFC6]/78">
+              <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
+                {String(contract.traveler_info?.firstName || "T").trim().charAt(0).toUpperCase()}
+              </span>
+              <span className="hidden sm:inline">
+                {`${contract.traveler_info?.firstName ?? ""} ${contract.traveler_info?.lastName ?? ""}`.trim() || "Traveler"}
+              </span>
+              <span className={`h-[9px] w-[9px] rounded-full ${contract.traveler_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
+            </span>
+            {contract.creator_id && (
+              <span className="flex items-center gap-2 text-[13px] text-[#E5DFC6]/78">
+                <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">C</span>
+                <span className="hidden sm:inline">Creator</span>
+                <span className={`h-[9px] w-[9px] rounded-full ${contract.creator_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
+              </span>
+            )}
+            <div className="flex-1" />
+            {contract.status === "fully_executed" ? (
+              <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#C7A962]">
+                <CheckCircle2 className="h-4 w-4" /> Fully executed
+              </span>
+            ) : hasSigned ? (
+              <span className="text-[12.5px] text-[#E5DFC6]/78">Waiting for the other party</span>
+            ) : (
+              <span className="text-[12.5px] text-[#E5DFC6]/78">Awaiting your signature</span>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto max-w-4xl px-4 py-8">
 
         {/* Fully executed banner */}
         {contract.status === "fully_executed" && (
