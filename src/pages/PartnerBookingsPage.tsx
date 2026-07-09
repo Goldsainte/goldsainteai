@@ -86,24 +86,38 @@ export default function PartnerBookingsPage() {
         const rows = (data ?? []) as BookingRow[];
         setBookings(rows.map((r) => ({ ...r, traveler: null })) as BookingRow[]);
 
-        // Traveler names load separately — if this fails, the page still works.
+        // Traveler names + trip cover images load separately — if either
+        // fails, the page still works.
         const ids = Array.from(
           new Set(rows.map((r: any) => r.traveler_id).filter(Boolean))
         );
-        if (ids.length > 0) {
-          const { data: profs } = await supabase
-            .from("profiles")
-            .select("id, display_name, full_name")
-            .in("id", ids);
-          if (profs && isMounted) {
-            const byId = new Map(profs.map((p: any) => [p.id, p]));
-            setBookings(
-              rows.map((r: any) => ({
-                ...r,
-                traveler: byId.get(r.traveler_id) ?? null,
-              })) as BookingRow[]
-            );
-          }
+        const tripIds = Array.from(
+          new Set(
+            rows
+              .map((r: any) => (r.metadata as any)?.trip_id)
+              .filter(Boolean)
+          )
+        );
+        const [profsRes, coversRes] = await Promise.all([
+          ids.length > 0
+            ? supabase.from("profiles").select("id, display_name, full_name").in("id", ids)
+            : Promise.resolve({ data: null }),
+          tripIds.length > 0
+            ? supabase.from("packaged_trips").select("id, cover_image_url").in("id", tripIds)
+            : Promise.resolve({ data: null }),
+        ]);
+        if (isMounted) {
+          const byId = new Map(((profsRes.data as any[]) ?? []).map((p: any) => [p.id, p]));
+          const coverById = new Map(
+            ((coversRes.data as any[]) ?? []).map((t: any) => [t.id, t.cover_image_url])
+          );
+          setBookings(
+            rows.map((r: any) => ({
+              ...r,
+              traveler: byId.get(r.traveler_id) ?? null,
+              cover: coverById.get((r.metadata as any)?.trip_id) ?? null,
+            })) as BookingRow[]
+          );
         }
       }
 
@@ -162,7 +176,7 @@ export default function PartnerBookingsPage() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="grid items-start gap-5 lg:grid-cols-2">
                 {bookings.map((b) => (
                   <PartnerBookingRowCard
                     key={b.id}
@@ -261,58 +275,72 @@ function PartnerBookingRowCard({
   return (
     <Link
       to={`/booking/${booking.id}`}
-      className="block rounded-2xl bg-white p-5 shadow-[0_2px_16px_rgba(0,0,0,0.07)] ring-1 ring-transparent transition hover:ring-[#C7A962]/60 md:p-6"
+      className="block overflow-hidden rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] ring-1 ring-transparent transition hover:ring-[#C7A962]/60"
     >
-      {/* Identity + status */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+      {/* Cover */}
+      <div className="relative h-44 w-full">
+        {(booking as any).cover ? (
+          <img
+            src={(booking as any).cover}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/20 to-transparent" />
+        <span className="absolute right-3 top-3 rounded-full bg-[#0a2225]/55 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6] backdrop-blur-sm">
+          {booking.status.replace(/_/g, " ")}
+        </span>
+        <div className="absolute inset-x-4 bottom-3">
+          <p className="text-[9.5px] uppercase tracking-[0.22em] text-[#E5DFC6]/75">
             GS-{booking.id.slice(0, 8).toUpperCase()} · Booked{" "}
             {new Date(booking.created_at).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
             })}
           </p>
-          <h2 className="mt-1.5 truncate font-secondary text-[22px] leading-tight text-[#0a2225]">
+          <h2 className="mt-1 truncate font-secondary text-[21px] leading-tight text-[#fdfaf2]">
             {title}
           </h2>
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            <span className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47] text-[11px] font-medium text-[#E5DFC6]">
-                {initial}
-              </span>
-              <span className="text-[13.5px] text-[#0a2225]/75">
-                {travelerName || "Traveler"}
-              </span>
-            </span>
-            {dates && (
-              <span className="text-[13px] text-[#0a2225]/50">· {dates}</span>
-            )}
-            {travelers > 0 && (
-              <span className="text-[13px] text-[#0a2225]/50">
-                · {travelers} traveler{travelers === 1 ? "" : "s"}
-              </span>
-            )}
-          </div>
         </div>
-        <span className="shrink-0 rounded-full bg-[#0c4d47] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
-          {booking.status.replace(/_/g, " ")}
+      </div>
+
+      <div className="p-4 md:p-5">
+      {/* Traveler + meta */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <span className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47] text-[11px] font-medium text-[#E5DFC6]">
+            {initial}
+          </span>
+          <span className="text-[13.5px] text-[#0a2225]/75">
+            {travelerName || "Traveler"}
+          </span>
         </span>
+        {dates && (
+          <span className="text-[13px] text-[#0a2225]/50">· {dates}</span>
+        )}
+        {travelers > 0 && (
+          <span className="text-[13px] text-[#0a2225]/50">
+            · {travelers} traveler{travelers === 1 ? "" : "s"}
+          </span>
+        )}
       </div>
 
       {/* Money */}
-      <div className="mt-5 grid max-w-md grid-cols-2 gap-4 rounded-xl bg-[#fdfaf2] px-4 py-3.5">
+      <div className="mt-4 grid grid-cols-2 gap-4 rounded-xl bg-[#fdfaf2] px-4 py-3">
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45">
             Trip total
           </p>
-          <p className="mt-0.5 font-secondary text-[19px] text-[#0a2225]">{total}</p>
+          <p className="mt-0.5 font-secondary text-[17px] text-[#0a2225]">{total}</p>
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45">
             {payoutLabel}
           </p>
-          <p className="mt-0.5 font-secondary text-[19px] text-[#0c4d47]">{payout}</p>
+          <p className="mt-0.5 font-secondary text-[17px] text-[#0c4d47]">{payout}</p>
           <p className="text-[10.5px] text-[#0a2225]/40">
             96.5% after Goldsainte's 3.5%
           </p>
@@ -345,6 +373,7 @@ function PartnerBookingRowCard({
             {releasing ? "Releasing…" : "Release deposit"}
           </button>
         )}
+      </div>
       </div>
     </Link>
   );
