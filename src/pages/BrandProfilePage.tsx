@@ -42,6 +42,41 @@ interface BrandCollection {
 export default function BrandProfilePage() {
   const { profileId } = useParams();
   const navigate = useNavigate();
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [inquiryMsg, setInquiryMsg] = useState("");
+  const [inquirySending, setInquirySending] = useState(false);
+
+  async function sendInquiry() {
+    if (!inquiryMsg.trim() || !profileId) return;
+    setInquirySending(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate(`/auth?returnTo=/brands/${profileId}`);
+        return;
+      }
+      const { data: me } = await supabase
+        .from("profiles")
+        .select("display_name, full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      const { error } = await supabase.from("brand_inquiries").insert({
+        brand_profile_id: profileId,
+        sender_id: user.id,
+        sender_name: me?.display_name || me?.full_name || null,
+        message: inquiryMsg.trim(),
+      });
+      if (error) throw error;
+      toast.success("Inquiry sent — they'll see it in their console.");
+      setInquiryMsg("");
+      setInquiryOpen(false);
+    } catch (e: any) {
+      console.error("Inquiry failed:", e);
+      toast.error(e.message || "Couldn't send your inquiry");
+    } finally {
+      setInquirySending(false);
+    }
+  }
   const [brand, setBrand] = useState<BrandProfile | null>(null);
   const [collections, setCollections] = useState<BrandCollection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -164,6 +199,48 @@ export default function BrandProfilePage() {
       </Helmet>
 
       <div className="min-h-screen bg-[#FDF9F0]">
+        {/* ── Send an inquiry ── */}
+        <div className="mx-auto max-w-6xl px-4 pt-6">
+          {inquiryOpen ? (
+            <div className="rounded-2xl bg-white p-5 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Send an inquiry</p>
+              <textarea
+                value={inquiryMsg}
+                onChange={(e) => setInquiryMsg(e.target.value)}
+                rows={3}
+                placeholder="Tell them what you're planning — dates, group size, the experience you're after…"
+                className="mt-3 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] outline-none transition-colors focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/30"
+              />
+              <div className="mt-3 flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setInquiryOpen(false)}
+                  className="rounded-full border border-[#0a2225]/20 px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={sendInquiry}
+                  disabled={inquirySending || !inquiryMsg.trim()}
+                  className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                >
+                  {inquirySending ? "Sending…" : "Send inquiry"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setInquiryOpen(true)}
+                className="rounded-full bg-[#0c4d47] px-6 py-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+              >
+                Send an inquiry
+              </button>
+            </div>
+          )}
+        </div>
         {/* Back button */}
         <div className="sticky top-0 z-10 bg-[#FDF9F0]/80 backdrop-blur-sm border-b border-[#E5DFC6]/40">
           <div className="mx-auto max-w-6xl px-4 py-3">
