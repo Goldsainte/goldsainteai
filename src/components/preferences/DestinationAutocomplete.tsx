@@ -253,7 +253,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
               <button
                 type="button"
                 aria-label={`Remove ${destination}`}
-                className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[#6B7280] transition-colors hover:bg-[#E5DFC6] hover:text-[#0a2225]"
+                className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
                 onClick={() => handleRemoveDestination(destination)}
               >
                 <X className="h-3.5 w-3.5" />
