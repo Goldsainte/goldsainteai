@@ -287,6 +287,49 @@ serve(async (req) => {
       return jsonResponse(req, { cancellation_terms: terms });
     }
 
+    // ── MODE: contract_draft — fill the template contract's prose fields ──
+    if (mode === "contract_draft") {
+      const travelerName = String(body.traveler_name ?? "").slice(0, 80).trim();
+      const agency = String(body.agency ?? "").slice(0, 80).trim();
+      const tripTitle = String(body.trip_title ?? "").slice(0, 120).trim();
+      const totalCost = Number(body.total_cost) || 0;
+      const depositAmount = Number(body.deposit_amount) || 0;
+      if (!destination && !tripTitle) {
+        return jsonResponse(req, { error: "Need trip context to draft from." }, 400);
+      }
+      const system = [
+        "You draft the variable clauses of a travel services agreement for Goldsainte, a luxury travel marketplace.",
+        VOICE,
+        "Plain, professional contract language a traveler can read without a lawyer. 2-4 sentences per clause unless noted. Use ONLY the monetary figures provided — never invent amounts, percentages, or deadlines beyond sensible defaults expressed in words.",
+        'Output strict JSON with EXACTLY these keys: { "services_description": string, "cancellation_terms": string, "modification_policy": string, "traveler_duties": string, "insurance_recommendation": string, "liability_limit": string }',
+        "services_description: one flowing sentence listing the concrete services for THIS trip (planning, reservations, transfers, on-trip support as appropriate).",
+        "cancellation_terms: a tiered refund schedule consistent with the deposit amount given; plain language.",
+        "traveler_duties: one sentence of comma-separated obligations.",
+        "insurance_recommendation and liability_limit: one short sentence each.",
+      ].join(" ");
+      const user = [
+        tripTitle ? `Trip: ${tripTitle}` : "",
+        destination ? `Destination: ${destination}` : "",
+        dates ? `Dates: ${dates}` : "",
+        travelerName ? `Traveler: ${travelerName}` : "",
+        agency ? `Agency: ${agency}` : "",
+        totalCost ? `Total cost: $${totalCost.toLocaleString()}` : "",
+        depositAmount ? `Deposit: $${depositAmount.toLocaleString()}` : "",
+        "",
+        "Draft the six clauses now.",
+      ].filter((l) => l !== "").join("\n");
+      const out = await callOpenAI(system, user, 700);
+      const clean = (v: unknown, max = 900) => String(v ?? "").slice(0, max).trim();
+      return jsonResponse(req, {
+        services_description: clean(out.services_description),
+        cancellation_terms: clean(out.cancellation_terms),
+        modification_policy: clean(out.modification_policy),
+        traveler_duties: clean(out.traveler_duties),
+        insurance_recommendation: clean(out.insurance_recommendation, 300),
+        liability_limit: clean(out.liability_limit, 300),
+      });
+    }
+
     return jsonResponse(req, { error: "unknown mode" }, 400);
   } catch (e) {
     console.error("ai-proposal-polish error", e);
