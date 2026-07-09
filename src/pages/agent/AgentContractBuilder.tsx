@@ -13,6 +13,8 @@ import {
   Upload,
   FileText,
   CheckCircle2,
+  ShieldCheck,
+  Lock,
 } from "lucide-react";
 
 type ContractSection = {
@@ -108,6 +110,19 @@ const DEFAULT_SECTIONS: ContractSection[] = [
 ];
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+
+const PROTECTS: Record<string, string> = {
+  parties: "Names exactly who is bound by this agreement.",
+  services: "Defines the scope you're accountable for — nothing more.",
+  payment: "Locks in the price and payment schedule you're owed.",
+  cancellation: "Sets exactly what you keep if plans change.",
+  liability: "Caps your exposure and puts insurance on the record.",
+  modifications: "Shields you from unpaid change requests.",
+  force_majeure: "Protects both parties when events beyond control intervene.",
+  dispute_resolution: "Keeps disagreements in mediation before court.",
+  data_privacy: "Commits both parties to lawful handling of personal data.",
+  responsibilities: "Places key obligations squarely on the traveler.",
+};
 
 const labelCls = "text-sm font-medium text-[#0a2225]";
 const inputCls =
@@ -515,13 +530,31 @@ export default function AgentContractBuilder() {
     }
   }
 
+  const requiredStatus = DEFAULT_SECTIONS.map((sec) => ({
+    id: sec.id,
+    missing: (sec.fields ?? []).filter((f) => {
+      if (!f.required) return false;
+      const v = (fieldValues[f.name] ?? f.value ?? "").trim();
+      if (!v) return true;
+      if (f.name === "governingLaw" && v.includes("[State/Country]")) return true;
+      return false;
+    }).length,
+  }));
+  const missingCount = requiredStatus.reduce((n, r) => n + r.missing, 0);
+
   const sendDisabled =
-    saving || !agentSignature || (sourceType === "uploaded" && !uploadedPdfPath);
-  const sendHint = !agentSignature
-    ? "Sign at the bottom to enable sending"
-    : sourceType === "uploaded" && !uploadedPdfPath
-      ? "Upload your contract PDF first"
-      : "";
+    saving ||
+    !agentSignature ||
+    (sourceType === "uploaded" && !uploadedPdfPath) ||
+    (sourceType === "template" && missingCount > 0);
+  const sendHint =
+    sourceType === "template" && missingCount > 0
+      ? `${missingCount} required field${missingCount === 1 ? "" : "s"} to complete`
+      : !agentSignature
+        ? "Sign at the bottom to enable sending"
+        : sourceType === "uploaded" && !uploadedPdfPath
+          ? "Upload your contract PDF first"
+          : "";
 
   if (loading) {
     return (
@@ -585,6 +618,11 @@ export default function AgentContractBuilder() {
               Send to traveler
             </button>
             {sendHint && <span className="text-[11px] text-[#E5DFC6]/60">{sendHint}</span>}
+            {!sendDisabled && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#C7A962]">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Ready to send
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -646,25 +684,62 @@ export default function AgentContractBuilder() {
               </p>
             </div>
 
+            {/* Why this protects you */}
+            <div className="grid gap-2 sm:grid-cols-3">
+              {[
+                { icon: ShieldCheck, text: "Timestamped e-signatures from both parties" },
+                { icon: Lock, text: "Traveler funds held in escrow until milestones" },
+                { icon: FileText, text: "Executed PDF delivered to both parties" },
+              ].map(({ icon: Icon, text }) => (
+                <div
+                  key={text}
+                  className="flex items-start gap-2.5 rounded-xl bg-white px-3.5 py-3 shadow-[0_2px_16px_rgba(0,0,0,0.05)]"
+                >
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#0c4d47]" />
+                  <span className="text-[12.5px] leading-snug text-[#0a2225]/70">{text}</span>
+                </div>
+              ))}
+            </div>
+
             {/* Sections */}
             {DEFAULT_SECTIONS.map((section, i) => (
               <div
                 key={section.id}
                 className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7"
               >
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                  Section {ROMAN[i] ?? i + 1}
-                </p>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                    Section {ROMAN[i] ?? i + 1}
+                  </p>
+                  {(section.fields?.some((f) => f.required) ?? false) &&
+                    ((requiredStatus.find((r) => r.id === section.id)?.missing ?? 0) === 0 ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0c4d47]">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Complete
+                      </span>
+                    ) : (
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-[#8D6B2F]">
+                        {requiredStatus.find((r) => r.id === section.id)?.missing} required
+                      </span>
+                    ))}
+                </div>
                 <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
                   {section.title}
                 </h2>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]/55">
                   {section.content}
                 </p>
+                {PROTECTS[section.id] && (
+                  <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/[0.06] px-3 py-1.5 text-[12px] text-[#0c4d47]">
+                    <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                    {PROTECTS[section.id]}
+                  </p>
+                )}
                 {section.fields && section.fields.length > 0 && (
                   <div className="mt-5 space-y-4">
                     {section.fields.map((field) => {
                       const value = fieldValues[field.name] ?? field.value ?? "";
+                      const isPlaceholder =
+                        field.name === "governingLaw" && value.includes("[State/Country]");
                       return (
                         <div key={field.name} className="space-y-1.5">
                           <label htmlFor={field.name} className={labelCls}>
@@ -687,6 +762,11 @@ export default function AgentContractBuilder() {
                               onChange={(e) => setField(field.name, e.target.value)}
                               className={inputCls}
                             />
+                          )}
+                          {isPlaceholder && (
+                            <p className="text-[12px] text-[#8D6B2F]">
+                              Replace the placeholder with your governing state or country — this can't be sent until it's real.
+                            </p>
                           )}
                         </div>
                       );
