@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
 import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
@@ -195,6 +196,7 @@ export default function BookingDetailPage() {
   );
 
   const [payingBalance, setPayingBalance] = useState(false);
+  const [contractGate, setContractGate] = useState<{ contractId: string | null } | null>(null);
 
   async function handlePayBalance() {
     if (!booking || payingBalance) return;
@@ -205,6 +207,7 @@ export default function BookingDetailPage() {
       ? booking.deposit_amount ?? 0
       : Math.max(0, (booking.total_price ?? 0) - (booking.deposit_amount ?? 0));
     if (balanceDue <= 0) return;
+    setContractGate(null);
     setPayingBalance(true);
     try {
       // Traveler-side 3.5% service fee applies to the amount being collected,
@@ -228,8 +231,19 @@ export default function BookingDetailPage() {
       if (fnError) throw fnError;
       if (!data?.paymentUrl) throw new Error("No checkout URL returned");
       window.location.href = data.paymentUrl;
-    } catch (e) {
+    } catch (e: any) {
       console.error("Pay balance failed", e);
+      try {
+        const resp = e?.context;
+        if (resp && typeof resp.json === "function") {
+          const body = await resp.json();
+          if (body?.code === "CONTRACT_NOT_EXECUTED") {
+            setContractGate({ contractId: body.contractId ?? null });
+          }
+        }
+      } catch {
+        /* ignore parse errors */
+      }
       setPayingBalance(false);
     }
   }
@@ -392,6 +406,23 @@ export default function BookingDetailPage() {
                   <p className="mt-1.5 text-[11px] text-[#0a2225]/45">
                     {progressPct}% paid · held in escrow
                   </p>
+                  {contractGate && (
+                    <div className="mt-4 rounded-xl border border-[#C7A962]/50 bg-[#C7A962]/10 p-3.5">
+                      <p className="text-[13px] leading-relaxed text-[#8D6B2F]">
+                        Your trip contract needs a signature before payment can proceed.
+                      </p>
+                      {contractGate.contractId && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/contract/${contractGate.contractId}/sign?type=traveler`)}
+                          className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                        >
+                          Review &amp; sign contract
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   <div className="mt-4 border-t border-[#E5DFC6] pt-4">
                     <p className="flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
                       <span>Balance remaining</span>
@@ -437,6 +468,8 @@ export default function BookingDetailPage() {
                     )}
                   </div>
                 </div>
+
+                <ContractStatusCard variant="traveler" bookingId={booking.id} />
 
                 <div className="rounded-2xl bg-[#0c4d47] px-6 py-5">
                   <div className="flex items-center gap-3">
