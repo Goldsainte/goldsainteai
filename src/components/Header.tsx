@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -268,7 +268,7 @@ export const Header = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="w-80 max-h-[80vh] overflow-y-auto rounded-3xl border-0 bg-white py-1 shadow-[0_8px_28px_rgba(10,34,37,0.22)] z-[100]"
+                      className="!w-[280px] max-h-[80vh] !overflow-y-auto !rounded-2xl !border-0 !bg-white py-1 !shadow-[0_8px_28px_rgba(10,34,37,0.22)] z-[100]"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
                       {user ? (
@@ -378,6 +378,20 @@ export const Header = () => {
                                 <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
                               </DropdownMenuItem>
                             )}
+                            <DropdownMenuItem
+                              onClick={() => navigate('/travel-settings')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Settings className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Account Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/help')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <HelpCircle className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Help Center</span>
+                            </DropdownMenuItem>
                           </div>
 
                           {/* Secondary — hidden for agents (they already are one) */}
@@ -608,7 +622,7 @@ export const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-[400px] max-h-[80vh] overflow-y-auto rounded-3xl border-0 bg-white py-1 shadow-[0_8px_28px_rgba(10,34,37,0.22)] z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                    className="!w-[280px] max-h-[80vh] !overflow-y-auto !rounded-2xl !border-0 !bg-white py-1 !shadow-[0_8px_28px_rgba(10,34,37,0.22)] z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     {user ? (
@@ -622,6 +636,13 @@ export const Header = () => {
                           >
                             <ShoppingCart className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                             <span className="text-[15px] font-medium text-[#0a2225]">Travel Marketplace</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/following')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
+                          >
+                            <Users className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                            <span className="text-[15px] font-medium text-[#0a2225]">Saved &amp; Following</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate(primaryBookingsPath)}
@@ -711,6 +732,20 @@ export const Header = () => {
                               <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
                             </DropdownMenuItem>
                           )}
+                            <DropdownMenuItem
+                              onClick={() => navigate('/travel-settings')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Settings className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Account Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/help')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <HelpCircle className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Help Center</span>
+                            </DropdownMenuItem>
                         </div>
 
                         {/* Secondary — hidden for agents (they already are one) */}
