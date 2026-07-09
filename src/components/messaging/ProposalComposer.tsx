@@ -40,18 +40,26 @@ export function ProposalComposer({
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("direct_messages").insert({
-        conversation_id: conversationId,
-        sender_id: senderId,
-        body: `Proposal: $${priceNum.toLocaleString()} (${depPct}% deposit)`,
-        message_type: "proposal",
-        metadata: {
-          price: priceNum,
-          depositPercentage: depPct,
-          note: note.trim(),
-        },
-      } as any);
+      // Send through the edge function (not a direct insert) so the
+      // recipient gets a "New trip proposal" notification. The function
+      // passes message_type/metadata through, keeping the proposal card.
+      const { data, error } = await supabase.functions.invoke(
+        "send-direct-message",
+        {
+          body: {
+            conversationId,
+            message: `Proposal: $${priceNum.toLocaleString()} (${depPct}% deposit)`,
+            messageType: "proposal",
+            messageMetadata: {
+              price: priceNum,
+              depositPercentage: depPct,
+              note: note.trim(),
+            },
+          },
+        }
+      );
       if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
       toast({ title: "Proposal sent" });
       onSent?.();
       onClose();
