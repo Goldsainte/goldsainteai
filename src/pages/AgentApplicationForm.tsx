@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -955,6 +956,14 @@ function AgentApplicationFormInner() {
             <div>
               <Label className="text-sm font-medium text-[#0a2225]">Why Goldsainte?</Label>
               <Textarea value={formData.whyGoldsainte} onChange={(e) => setFormData({ ...formData, whyGoldsainte: e.target.value })} className={`${luxuryInputClasses} min-h-[100px]`} placeholder="What excites you about partnering with Goldsainte?" />
+              <div className="mt-2 flex justify-end">
+                <AIRewriteButton
+                  value={formData.whyGoldsainte}
+                  onRewrite={(t) => setFormData({ ...formData, whyGoldsainte: t })}
+                  fieldLabel="Why Goldsainte?"
+                  persona="a travel agent applying to join Goldsainte"
+                />
+              </div>
             </div>
 
             <NavButtons onBack={() => setStep(2)} onNext={() => goToStep(4)} />
