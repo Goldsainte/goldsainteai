@@ -907,31 +907,45 @@ export default function BrandOnboarding() {
 
       case 5: // Identity Verification
         return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
-                <Shield className="h-10 w-10 text-[#C7A962]" />
-              </div>
-              <h3 className="mb-3 font-secondary text-2xl text-[#0a2225]">Identity Verification</h3>
-              <p className="text-base text-[#6B7280] max-w-md mx-auto">
-                Complete identity verification to submit your brand application. This typically takes 2-3 minutes.
+          <div className="space-y-10">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                Final step
+              </p>
+              <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">
+                Verify your identity
+              </h3>
+              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
+                A two-minute check handled by Stripe, our secure verification partner — the same
+                system trusted by the world's leading platforms. Your documents go directly to
+                Stripe; Goldsainte never stores your ID.
               </p>
             </div>
 
-            <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/50 p-6">
-              <h4 className="mb-3 text-sm font-semibold text-[#0a2225]">What you'll need:</h4>
-              <ul className="space-y-2 text-sm text-[#6B7280]">
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Government-issued photo ID</li>
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Device with camera for selfie verification</li>
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />2-3 minutes to complete</li>
-              </ul>
+            <div className="border-y border-[#0a2225]/10 py-7">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                Have ready
+              </p>
+              <div className="mt-4 space-y-3.5 text-[15.5px] leading-relaxed text-[#0a2225]/80">
+                <p className="flex gap-4">
+                  <i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>
+                  A government-issued photo ID — passport or driver's license.
+                </p>
+                <p className="flex gap-4">
+                  <i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>
+                  A device with a camera, for a quick selfie match.
+                </p>
+                <p className="flex gap-4">
+                  <i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>
+                  About two minutes of your time.
+                </p>
+              </div>
             </div>
 
-            <Alert className="bg-[#F5EFE1] border-[#E5DFC6]">
-              <AlertDescription className="text-[#0a2225]">
-                After verification, our team will review your application within 2-3 business days.
-              </AlertDescription>
-            </Alert>
+            <p className="text-[13.5px] leading-relaxed text-[#0a2225]/50">
+              Once you're verified, our team reviews your application — typically within 2–3
+              business days. You'll hear from us the moment your house is approved.
+            </p>
           </div>
         );
 
@@ -1012,7 +1026,7 @@ export default function BrandOnboarding() {
                 >
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting...</>
                     : verificationStatus === 'success' ? <><CheckCircle className="mr-2 h-4 w-4" />Redirecting...</>
-                    : <><Shield className="mr-2 h-4 w-4" />Submit & Verify Identity</>}
+                    : <>Submit & verify identity</>}
                 </Button>
               )}
             </div>
