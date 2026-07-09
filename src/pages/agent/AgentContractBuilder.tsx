@@ -570,59 +570,67 @@ export default function AgentContractBuilder() {
       tripData?.end_date ? ` – ${format(new Date(tripData.end_date), "M/d/yyyy")}` : ""
     }`;
 
-  const pill =
-    "rounded-full border border-[#E5DFC6]/30 px-3.5 py-1.5 text-[11px] uppercase tracking-[0.14em] text-[#E5DFC6]";
-
   return (
     <div className="min-h-screen bg-[#f7f3ea]">
-      {/* Letterhead */}
-      <div className="bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
-        <div className="mx-auto max-w-3xl px-4 py-8 md:px-6 md:py-10">
+      {/* Command bar — sticky, DocuSign-style */}
+      <div className="sticky top-0 z-40 border-b border-white/10 bg-gradient-to-r from-[#0c4d47] to-[#0a2225] shadow-[0_2px_16px_rgba(10,34,37,0.25)]">
+        <div className="mx-auto flex h-[68px] max-w-3xl items-center gap-3 px-4 md:px-6">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-[#E5DFC6]/70 transition-colors hover:text-[#E5DFC6]"
+            aria-label="Back"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#E5DFC6]/70 transition-colors hover:bg-white/10 hover:text-[#E5DFC6]"
           >
-            <ChevronLeft className="h-4 w-4" /> Back
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962]">
-            Trip Service Agreement
-          </p>
-          <h1 className="mt-2 font-secondary text-3xl leading-tight text-[#fdfaf2] md:text-4xl">
-            {tripData?.title || tripData?.destination || "Contract"}
-          </h1>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {tripData?.destination && <span className={pill}>{tripData.destination}</span>}
-            {dates && <span className={pill}>{dates}</span>}
-            {travelerData?.full_name && (
-              <span className={pill}>Traveler · {travelerData.full_name}</span>
-            )}
+          <div className="min-w-0 flex-1">
+            <p className="text-[9px] uppercase tracking-[0.28em] text-[#C7A962]">
+              Trip Service Agreement
+            </p>
+            <div className="flex items-baseline gap-2.5">
+              <h1 className="truncate font-secondary text-[19px] leading-tight text-[#fdfaf2]">
+                {tripData?.title || tripData?.destination || "Contract"}
+              </h1>
+              {travelerData?.full_name && (
+                <span className="hidden shrink-0 text-[12px] text-[#E5DFC6]/60 sm:inline">
+                  · {travelerData.full_name}
+                </span>
+              )}
+              {dates && (
+                <span className="hidden shrink-0 text-[12px] text-[#E5DFC6]/45 lg:inline">
+                  · {dates}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2.5">
+            {sendHint ? (
+              <span className="hidden text-[11px] text-[#E5DFC6]/60 md:inline">{sendHint}</span>
+            ) : (
+              !sendDisabled && (
+                <span className="hidden items-center gap-1.5 text-[11px] font-medium text-[#C7A962] md:inline-flex">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Ready
+                </span>
+              )
+            )}
             <button
               type="button"
               onClick={handleSaveDraft}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6]/50 px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6]/40 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.1em] text-[#E5DFC6] transition-colors hover:bg-white/10 disabled:opacity-50"
             >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save draft
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline">Save</span>
             </button>
             <button
               type="button"
               onClick={handleSendToTraveler}
               disabled={sendDisabled}
-              className="inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-6 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#C7A962] px-5 py-2 text-[11px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-40"
             >
-              <Send className="h-4 w-4" />
-              Send to traveler
+              <Send className="h-3.5 w-3.5" />
+              Send
             </button>
-            {sendHint && <span className="text-[11px] text-[#E5DFC6]/60">{sendHint}</span>}
-            {!sendDisabled && (
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#C7A962]">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Ready to send
-              </span>
-            )}
           </div>
         </div>
       </div>
