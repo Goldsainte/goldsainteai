@@ -56,6 +56,8 @@ type ContractRow = {
   traveler_id: string;
   creator_id: string | null;
   contract_sections: ContractSection[];
+  source_type?: string | null;
+  uploaded_pdf_path?: string | null;
   traveler_info: Record<string, any>;
   trip_info: Record<string, any>;
   field_values: Record<string, string>;
@@ -98,6 +100,7 @@ export default function ContractSignPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [contract, setContract] = useState<ContractRow | null>(null);
+  const [uploadedPdfUrl, setUploadedPdfUrl] = useState<string | null>(null);
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<Role>(null);
@@ -157,6 +160,14 @@ export default function ContractSignPage() {
       }
 
       setContract(contractData as unknown as ContractRow);
+
+      const uploadedPath = (contractData as any)?.uploaded_pdf_path;
+      if ((contractData as any)?.source_type === "uploaded" && uploadedPath) {
+        const { data: signed } = await supabase.storage
+          .from("contracts")
+          .createSignedUrl(uploadedPath, 3600);
+        setUploadedPdfUrl(signed?.signedUrl ?? null);
+      }
       setEditedFieldValues({
         ...(contractData.field_values as Record<string, string>),
       });
@@ -599,6 +610,27 @@ export default function ContractSignPage() {
         )}
 
         {/* Contract sections */}
+        {contract.source_type === "uploaded" ? (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-xl">Agreement Document</CardTitle>
+              <CardDescription>
+                This agreement was provided by your travel specialist. Review the full document below, then sign underneath.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {uploadedPdfUrl ? (
+                <iframe
+                  src={uploadedPdfUrl}
+                  title="Contract document"
+                  className="h-[720px] w-full rounded-lg border"
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">Loading document…</p>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
         <div className="space-y-6 mb-8">
           {contract.contract_sections.map((section, index) => (
             <Card key={section.id}>
@@ -663,9 +695,10 @@ export default function ContractSignPage() {
             </Card>
           ))}
         </div>
+        )}
 
         {/* Edit / propose-revision controls */}
-        {contract.status === "pending_signatures" && (
+        {contract.status === "pending_signatures" && contract.source_type !== "uploaded" && (
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
