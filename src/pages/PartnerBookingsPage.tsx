@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { MapPin, HandCoins, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
@@ -51,6 +52,7 @@ export default function PartnerBookingsPage() {
           id,
           status,
           partner_role,
+          traveler_id,
           total_price,
           deposit_amount,
           partner_payout,
@@ -65,6 +67,8 @@ export default function PartnerBookingsPage() {
             id,
             title,
             destination,
+            start_date,
+            end_date,
             travelers_adults,
             travelers_children
           )
@@ -271,6 +275,17 @@ function PartnerBookingRowCard({
           </span>
         </div>
       </div>
+
+      <ContractStatusCard
+        variant="agent"
+        bookingId={booking.id}
+        travelerId={(booking as any).traveler_id ?? null}
+        partnerRole={booking.partner_role ?? null}
+        tripTitle={(booking as any).trip_requests?.title || (booking.metadata as any)?.trip_title || null}
+        destination={(booking as any).trip_requests?.destination ?? null}
+        startDate={(booking as any).trip_requests?.start_date ?? null}
+        endDate={(booking as any).trip_requests?.end_date ?? null}
+      />
 
       {booking.status === "confirmed" && (
         <div className="mt-1 flex justify-end">
