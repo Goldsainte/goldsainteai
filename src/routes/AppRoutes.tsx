@@ -82,7 +82,7 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
-const PartnerBookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
+const PartnerBookingDetailPage = lazy(() => import('@/pages/PartnerBookingDetailPage'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
