@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
 import { MarketplaceHeader } from "@/components/marketplace/MarketplaceHeader";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
 import { MarketplaceTabs } from "@/components/marketplace/MarketplaceTabs";
 import { PartnerToursSection } from "@/components/marketplace/PartnerToursSection";
@@ -790,24 +791,20 @@ export default function Marketplace() {
               {resultNoun}{activeResultCount === 1 ? "" : "s"}
             </p>
             {priceChipActive && (
-              <button
-                type="button"
-                onClick={() => setFilters({ ...filters, minPrice: undefined, maxPrice: undefined })}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-3 py-1 text-xs text-[#0a2225] hover:border-[#C7A962]"
+              <FilterChip
+                removeLabel="Remove price filter"
+                onRemove={() => setFilters({ ...filters, minPrice: undefined, maxPrice: undefined })}
               >
                 ${(filters.minPrice ?? 0).toLocaleString()}–${(filters.maxPrice ?? 10000).toLocaleString()}
-                <X className="h-3 w-3" />
-              </button>
+              </FilterChip>
             )}
             {filters.durationBucket && (
-              <button
-                type="button"
-                onClick={() => setFilters({ ...filters, durationBucket: undefined })}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-3 py-1 text-xs text-[#0a2225] hover:border-[#C7A962]"
+              <FilterChip
+                removeLabel="Remove duration filter"
+                onRemove={() => setFilters({ ...filters, durationBucket: undefined })}
               >
                 {filters.durationBucket} days
-                <X className="h-3 w-3" />
-              </button>
+              </FilterChip>
             )}
           </div>
 
