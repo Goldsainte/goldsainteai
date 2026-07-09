@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Search, Users, Minus, Plus, X, Calendar as CalendarIcon } from "lucide-react";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { MobileDatePicker } from "@/components/MobileDatePicker";
@@ -566,45 +567,33 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
         {hasActiveFilters && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {filters.destination && (
-              <span className="inline-flex h-8 items-center gap-1 rounded-full border border-[#0a2225]/20 bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
-                <MapPin className="mr-0.5 h-3.5 w-3.5 text-[#0a2225]/50" />
+              <FilterChip
+                icon={<MapPin />}
+                removeLabel="Remove destination filter"
+                onRemove={() => handleRemoveFilter("destination")}
+              >
                 {filters.destination}
-                <button
-                  onClick={() => handleRemoveFilter("destination")}
-                  aria-label="Remove destination filter"
-                  className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </span>
+              </FilterChip>
             )}
             {(filters.startDate || filters.endDate) && (
-              <span className="inline-flex h-8 items-center gap-1 rounded-full border border-[#0a2225]/20 bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
-                <CalendarIcon className="mr-0.5 h-3.5 w-3.5 text-[#0a2225]/50" />
+              <FilterChip
+                icon={<CalendarIcon />}
+                removeLabel="Remove date filter"
+                onRemove={() => handleRemoveFilter("dates")}
+              >
                 {filters.startDate && format(new Date(filters.startDate + "T00:00:00"), "MMM d")}
                 {filters.startDate && filters.endDate && "–"}
                 {filters.endDate && format(new Date(filters.endDate + "T00:00:00"), "MMM d")}
-                <button
-                  onClick={() => handleRemoveFilter("dates")}
-                  aria-label="Remove date filter"
-                  className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </span>
+              </FilterChip>
             )}
             {filters.travelers && filters.travelers > 1 && (
-              <span className="inline-flex h-8 items-center gap-1 rounded-full border border-[#0a2225]/20 bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
-                <Users className="mr-0.5 h-3.5 w-3.5 text-[#0a2225]/50" />
+              <FilterChip
+                icon={<Users />}
+                removeLabel="Remove travelers filter"
+                onRemove={() => handleRemoveFilter("travelers")}
+              >
                 {filters.travelers} travelers
-                <button
-                  onClick={() => handleRemoveFilter("travelers")}
-                  aria-label="Remove travelers filter"
-                  className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </span>
+              </FilterChip>
             )}
             <button
               onClick={onClearFilters}
