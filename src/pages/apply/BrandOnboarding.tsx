@@ -236,7 +236,7 @@ export default function BrandOnboarding() {
       else if (imageType === 'cover') setFormData(prev => ({ ...prev, coverImageUrl: urlData.publicUrl }));
       else setFormData(prev => ({ ...prev, galleryUrls: [...prev.galleryUrls, urlData.publicUrl] }));
       toast.success(`${imageType} uploaded`);
-    } catch (error) { console.error(error); toast.error('Upload failed'); }
+    } catch (error: any) { console.error(error); toast.error(error?.message || 'Upload failed'); }
   };
 
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
@@ -244,9 +244,11 @@ export default function BrandOnboarding() {
     if (!file) return;
     if (file.size > 50 * 1024 * 1024) { toast.error('File must be < 50MB'); return; }
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('You need to be signed in to upload documents.');
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = `brand-documents/${fileName}`;
+      const filePath = `${user.id}/${fileName}`;
       const { error } = await supabase.storage.from('application-documents').upload(filePath, file);
       if (error) throw error;
       // Bucket is private — store a long-lived signed URL (1 year)
@@ -256,7 +258,7 @@ export default function BrandOnboarding() {
       if (signError || !urlData) throw signError ?? new Error('Failed to sign URL');
       setUploadedDocuments(prev => [...prev, { type: documentType, url: urlData.signedUrl, uploadedAt: new Date().toISOString(), fileName: file.name, fileSize: file.size }]);
       toast.success(`${documentType} uploaded`);
-    } catch (error) { console.error(error); toast.error('Upload failed'); }
+    } catch (error: any) { console.error(error); toast.error(error?.message || 'Upload failed'); }
   };
 
   const formatCityLabel = (value: string) =>
