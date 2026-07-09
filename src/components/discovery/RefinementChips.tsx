@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { cn } from "@/lib/utils";
 import { CategoryChips, getRefinementSuggestions } from "@/components/ui/CategoryChips";
 
@@ -57,18 +57,15 @@ export function RefinementChips({
       {refinementPath.length > 1 && (
         <div className="flex flex-wrap gap-1.5 py-2 -mx-4 px-4">
           {refinementPath.slice(1).map((term, i) => (
-            <span
+            <FilterChip
               key={`${term}-${i}`}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0a2225] text-white text-sm font-medium animate-in fade-in slide-in-from-left-2 duration-200"
+              variant="dark"
+              removeLabel={`Remove ${term}`}
+              onRemove={() => onPopToIndex(i + 1)}
+              className="animate-in fade-in slide-in-from-left-2 duration-200"
             >
               {term}
-              <button
-                onClick={() => onPopToIndex(i + 1)}
-                className="ml-0.5 opacity-60 hover:opacity-100 transition-opacity"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
+            </FilterChip>
           ))}
           {refinementPath.length > 2 && (
             <button
