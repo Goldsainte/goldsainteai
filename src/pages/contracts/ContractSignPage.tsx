@@ -234,6 +234,18 @@ export default function ContractSignPage() {
       });
       if (error) throw error;
 
+      try {
+        await supabase.functions.invoke("send-contract-notification", {
+          body: {
+            contractId: contract.id,
+            event: "revision_proposed",
+            actorRole: userRole,
+          },
+        });
+      } catch (nErr) {
+        console.error("Revision notify failed (non-fatal):", nErr);
+      }
+
       toast({
         title: "Changes proposed",
         description:
@@ -372,6 +384,24 @@ export default function ContractSignPage() {
         .update(updates)
         .eq("id", contract.id);
       if (error) throw error;
+
+      // Notify the counterparty — or everyone if this signature executed it
+      try {
+        const after: any = { ...contract, ...updates };
+        const executed =
+          !!after.agent_signed_at &&
+          !!after.traveler_signed_at &&
+          (!contract.creator_id || !!after.creator_signed_at);
+        await supabase.functions.invoke("send-contract-notification", {
+          body: {
+            contractId: contract.id,
+            event: executed ? "executed" : "signed",
+            actorRole: userRole,
+          },
+        });
+      } catch (nErr) {
+        console.error("Contract notify failed (non-fatal):", nErr);
+      }
 
       toast({
         title: "Contract signed",
