@@ -235,24 +235,42 @@ export default function BrandOnboarding() {
     window.scrollTo(0, 0);
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, imageType: 'logo' | 'cover' | 'gallery') => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be < 5MB'); return; }
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) { toast.error('Image must be JPEG, PNG, or WebP'); return; }
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = `brand-media/${imageType}/${fileName}`;
-      const { error } = await supabase.storage.from('brand-collections').upload(filePath, file);
-      if (error) throw error;
-      const { data: urlData } = supabase.storage.from('brand-collections').getPublicUrl(filePath);
-      if (imageType === 'logo') setFormData(prev => ({ ...prev, logoUrl: urlData.publicUrl }));
-      else if (imageType === 'cover') setFormData(prev => ({ ...prev, coverImageUrl: urlData.publicUrl }));
-      else setFormData(prev => ({ ...prev, galleryUrls: [...prev.galleryUrls, urlData.publicUrl] }));
-      toast.success(`${imageType} uploaded`);
-    } catch (error: any) { console.error(error); toast.error(error?.message || 'Upload failed'); }
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, imageType: string) => {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = '';
+    if (files.length === 0) return;
+    const selected =
+      imageType === 'gallery'
+        ? files.slice(0, Math.max(0, 12 - formData.galleryUrls.length))
+        : files.slice(0, 1);
+    if (imageType === 'gallery' && selected.length < files.length) {
+      toast.error('Gallery holds up to 12 images — extra files were skipped.');
+    }
+    let uploaded = 0;
+    for (const file of selected) {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const filePath = `brand-media/${imageType}/${fileName}`;
+        const { error } = await supabase.storage.from('brand-collections').upload(filePath, file);
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from('brand-collections').getPublicUrl(filePath);
+        if (imageType === 'logo') setFormData(prev => ({ ...prev, logoUrl: urlData.publicUrl }));
+        else if (imageType === 'cover') setFormData(prev => ({ ...prev, coverImageUrl: urlData.publicUrl }));
+        else setFormData(prev => ({ ...prev, galleryUrls: [...prev.galleryUrls, urlData.publicUrl] }));
+        uploaded += 1;
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error?.message || 'Upload failed');
+      }
+    }
+    if (uploaded > 0) {
+      toast.success(
+        imageType === 'gallery'
+          ? `${uploaded} image${uploaded === 1 ? '' : 's'} uploaded`
+          : `${imageType} uploaded`
+      );
+    }
   };
 
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
@@ -621,7 +639,7 @@ export default function BrandOnboarding() {
                 {formData.logoUrl ? (
                   <div className="relative w-32 h-32 border border-[#E5DFC6] rounded-xl overflow-hidden">
                     <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" loading="lazy"/>
-                    <button type="button" onClick={() => setFormData({ ...formData, logoUrl: '' })} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"><X className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => setFormData({ ...formData, logoUrl: '' })} className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2225]/70 text-[#E5DFC6] backdrop-blur-sm transition-colors hover:bg-[#0a2225]"><X className="h-4 w-4" /></button>
                   </div>
                 ) : (
                   <label className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
@@ -639,7 +657,7 @@ export default function BrandOnboarding() {
                 {formData.coverImageUrl ? (
                   <div className="relative w-full h-48 border border-[#E5DFC6] rounded-xl overflow-hidden">
                     <img src={formData.coverImageUrl} alt="Cover" className="w-full h-full object-cover" loading="lazy"/>
-                    <button type="button" onClick={() => setFormData({ ...formData, coverImageUrl: '' })} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"><X className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => setFormData({ ...formData, coverImageUrl: '' })} className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2225]/70 text-[#E5DFC6] backdrop-blur-sm transition-colors hover:bg-[#0a2225]"><X className="h-4 w-4" /></button>
                   </div>
                 ) : (
                   <label className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
@@ -657,13 +675,13 @@ export default function BrandOnboarding() {
                 {formData.galleryUrls.map((url, index) => (
                   <div key={index} className="relative aspect-square border border-[#E5DFC6] rounded-xl overflow-hidden">
                     <img src={url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" loading="lazy"/>
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, galleryUrls: prev.galleryUrls.filter((_, i) => i !== index) }))} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"><X className="h-3 w-3" /></button>
+                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, galleryUrls: prev.galleryUrls.filter((_, i) => i !== index) }))} className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2225]/70 text-[#E5DFC6] backdrop-blur-sm transition-colors hover:bg-[#0a2225]"><X className="h-3 w-3" /></button>
                   </div>
                 ))}
                 {formData.galleryUrls.length < 12 && (
                   <label className="flex items-center justify-center aspect-square border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
                     <div className="text-center"><Upload className="mx-auto h-6 w-6 text-[#C7A962]" /><p className="mt-1 text-xs text-[#6B7280]">Add</p></div>
-                    <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg,image/webp" onChange={(e) => handleImageUpload(e, 'gallery')} />
+                    <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg,image/webp" multiple onChange={(e) => handleImageUpload(e, 'gallery')} />
                   </label>
                 )}
               </div>
