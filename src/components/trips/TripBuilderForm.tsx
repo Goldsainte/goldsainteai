@@ -9,6 +9,7 @@ import {
   Save, Send, X, Loader2, Shuffle, CalendarIcon, Sparkles,
   Check, ChevronLeft, ChevronRight,
 } from "lucide-react";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrayFieldEditor } from "./ArrayFieldEditor";
@@ -819,12 +820,13 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   {formData.departure_dates.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {formData.departure_dates.map((iso) => (
-                        <span key={iso} className="inline-flex items-center gap-2 rounded-full bg-[#FDF9F0] border border-[#E5DFC6] px-3 py-1.5 text-xs text-[#0a2225]">
+                        <FilterChip
+                          key={iso}
+                          removeLabel="Remove departure date"
+                          onRemove={() => removeDepartureDate(iso)}
+                        >
                           {format(new Date(iso), "MMM d, yyyy")}
-                          <button type="button" onClick={() => removeDepartureDate(iso)} className="text-[#6B7280] hover:text-red-500">
-                            <X className="h-3 w-3" />
-                          </button>
-                        </span>
+                        </FilterChip>
                       ))}
                     </div>
                   ) : (
