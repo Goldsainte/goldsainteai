@@ -163,7 +163,16 @@ export default function AgentContractBuilder() {
         .single();
       if (tripError) throw tripError;
       setTripData(trip);
-      setTravelerData(trip.profiles);
+      let traveler: any = (trip as any).profiles ?? null;
+      if (!traveler && trip.traveler_id) {
+        const { data: tp } = await supabase
+          .from("profiles")
+          .select("full_name, email, id")
+          .eq("id", trip.traveler_id)
+          .maybeSingle();
+        traveler = tp ?? null;
+      }
+      setTravelerData(traveler);
 
       // Real booking figures beat guesses
       let booking: any = null;
@@ -334,7 +343,16 @@ export default function AgentContractBuilder() {
 
   // ── Save (returns the contract id — never trust stale state) ──
   async function handleSaveDraft(): Promise<string | null> {
-    if (!tripId || !tripData || !travelerData) return null;
+    if (!tripId || !tripData || !travelerData) {
+      toast({
+        variant: "destructive",
+        title: "Trip details incomplete",
+        description: !travelerData
+          ? "Couldn't find this trip's traveler — go back to the booking and open the contract again."
+          : "The page is still loading — give it a second and try again.",
+      });
+      return null;
+    }
     if (sourceType === "uploaded" && !uploadedPdfPath) {
       toast({
         variant: "destructive",
@@ -561,7 +579,7 @@ export default function AgentContractBuilder() {
             <button
               type="button"
               onClick={() => setSourceType("template")}
-              className={`flex-1 rounded-xl px-4 py-3 text-[13px] font-medium transition-colors ${
+              className={`flex-1 rounded-xl px-4 py-3 text-[14.5px] font-medium transition-colors ${
                 sourceType === "template"
                   ? "bg-[#0c4d47] text-white"
                   : "text-[#0a2225]/60 hover:bg-[#f7f3ea]"
@@ -572,7 +590,7 @@ export default function AgentContractBuilder() {
             <button
               type="button"
               onClick={() => setSourceType("uploaded")}
-              className={`flex-1 rounded-xl px-4 py-3 text-[13px] font-medium transition-colors ${
+              className={`flex-1 rounded-xl px-4 py-3 text-[14.5px] font-medium transition-colors ${
                 sourceType === "uploaded"
                   ? "bg-[#0c4d47] text-white"
                   : "text-[#0a2225]/60 hover:bg-[#f7f3ea]"
@@ -581,7 +599,7 @@ export default function AgentContractBuilder() {
               Upload your own
             </button>
           </div>
-          <p className="px-3 pb-2 pt-2.5 text-[12px] leading-relaxed text-[#0a2225]/50">
+          <p className="px-3 pb-2 pt-2.5 text-[13.5px] leading-relaxed text-[#0a2225]/50">
             {sourceType === "template"
               ? "A structured agreement your traveler signs online — draft it with AI or fill it by hand."
               : "Already have a contract your business uses? Upload the PDF — your traveler reviews and signs that exact document."}
@@ -605,7 +623,7 @@ export default function AgentContractBuilder() {
                 )}
                 {aiDrafting ? "Drafting your contract…" : "Draft contract with Goldsainte AI"}
               </button>
-              <p className="mt-2 text-[12px] leading-relaxed text-[#0a2225]/55">
+              <p className="mt-2 text-[13.5px] leading-relaxed text-[#0a2225]/55">
                 Fills every clause from this trip and booking — names, real amounts, dates, and
                 plain-language terms. You review and edit each section before anything is sent.
               </p>
@@ -620,10 +638,10 @@ export default function AgentContractBuilder() {
                 <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                   Section {ROMAN[i] ?? i + 1}
                 </p>
-                <h2 className="mt-1.5 font-secondary text-[20px] leading-snug text-[#0a2225]">
+                <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
                   {section.title}
                 </h2>
-                <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">
+                <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]/55">
                   {section.content}
                 </p>
                 {section.fields && section.fields.length > 0 && (
@@ -665,10 +683,10 @@ export default function AgentContractBuilder() {
           /* Upload your own */
           <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
             <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your document</p>
-            <h2 className="mt-1.5 font-secondary text-[20px] leading-snug text-[#0a2225]">
+            <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
               Upload your contract
             </h2>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">
+            <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]/55">
               Your traveler reviews this exact document and signs it electronically. The final
               download includes a Goldsainte signature certificate appended to your PDF.
             </p>
@@ -677,7 +695,7 @@ export default function AgentContractBuilder() {
               <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#0c4d47]/25 bg-[#0c4d47]/[0.05] px-4 py-3.5">
                 <span className="flex min-w-0 items-center gap-2.5">
                   <FileText className="h-5 w-5 shrink-0 text-[#0c4d47]" />
-                  <span className="truncate text-[14px] font-medium text-[#0a2225]">
+                  <span className="truncate text-[15px] font-medium text-[#0a2225]">
                     {uploadedFileName || "Contract.pdf"}
                   </span>
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-[#0c4d47]" />
@@ -694,7 +712,7 @@ export default function AgentContractBuilder() {
                 ) : (
                   <Upload className="h-7 w-7 text-[#C7A962]" />
                 )}
-                <span className="text-[14px] font-medium text-[#0a2225]">
+                <span className="text-[15px] font-medium text-[#0a2225]">
                   {uploading ? "Uploading…" : "Choose your contract PDF"}
                 </span>
                 <span className="text-[12px] text-[#0a2225]/45">PDF only · up to 10 MB</span>
@@ -713,10 +731,10 @@ export default function AgentContractBuilder() {
         {/* Agent signature */}
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Execution</p>
-          <h2 className="mt-1.5 font-secondary text-[20px] leading-snug text-[#0a2225]">
+          <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
             Agent signature
           </h2>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">
+          <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]/55">
             By signing, you confirm the information is accurate and you agree to the terms.
           </p>
           <div className="mt-5 rounded-xl border-2 border-dashed border-[#E5DFC6] p-4">
