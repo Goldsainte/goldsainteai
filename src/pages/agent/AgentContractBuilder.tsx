@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,8 @@ type ContractSection = {
 
 export default function AgentContractBuilder() {
   const { tripId } = useParams<{ tripId: string }>();
+  const [searchParams] = useSearchParams();
+  const linkedBookingId = searchParams.get("bookingId");
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -203,7 +205,10 @@ export default function AgentContractBuilder() {
         agent_signature: agentSignature || null,
         status: "draft",
       };
-      
+      if (linkedBookingId) {
+        (contractData as any).booking_id = linkedBookingId;
+      }
+
       if (contractId) {
         const { error } = await supabase
           .from("trip_contracts")
@@ -282,7 +287,21 @@ export default function AgentContractBuilder() {
       });
       
       if (emailError) throw emailError;
-      
+
+      // Auto-DM the traveler a signing link (non-fatal if it fails)
+      try {
+        const signLink = `${window.location.origin}/contract/${contractId}/sign?type=traveler`;
+        await supabase.functions.invoke("send-direct-message", {
+          body: {
+            recipientId: travelerData.id,
+            message: `I've prepared your trip contract${tripData?.destination ? ` for ${tripData.destination}` : ""}. Please review and sign here: ${signLink}`,
+            tripTitle: tripData?.title || tripData?.destination || "Trip contract",
+          },
+        });
+      } catch (dmErr) {
+        console.error("Contract DM failed (non-fatal):", dmErr);
+      }
+
       toast({
         title: "Contract Sent",
         description: "The contract has been sent to the traveler for signature",
