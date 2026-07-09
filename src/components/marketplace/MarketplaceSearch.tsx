@@ -566,37 +566,49 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
         {hasActiveFilters && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {filters.destination && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]">
-                <MapPin className="h-3 w-3 text-[#8D8D8D]" />
+              <span className="inline-flex h-8 items-center gap-1 rounded-full border border-[#0a2225]/20 bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
+                <MapPin className="mr-0.5 h-3.5 w-3.5 text-[#0a2225]/50" />
                 {filters.destination}
-                <button onClick={() => handleRemoveFilter("destination")} className="ml-0.5 hover:text-[#BFAD72]">
-                  <X className="h-3 w-3" />
+                <button
+                  onClick={() => handleRemoveFilter("destination")}
+                  aria-label="Remove destination filter"
+                  className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
+                >
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             )}
             {(filters.startDate || filters.endDate) && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]">
-                <CalendarIcon className="h-3 w-3 text-[#8D8D8D]" />
+              <span className="inline-flex h-8 items-center gap-1 rounded-full border border-[#0a2225]/20 bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
+                <CalendarIcon className="mr-0.5 h-3.5 w-3.5 text-[#0a2225]/50" />
                 {filters.startDate && format(new Date(filters.startDate + "T00:00:00"), "MMM d")}
                 {filters.startDate && filters.endDate && "–"}
                 {filters.endDate && format(new Date(filters.endDate + "T00:00:00"), "MMM d")}
-                <button onClick={() => handleRemoveFilter("dates")} className="ml-0.5 hover:text-[#BFAD72]">
-                  <X className="h-3 w-3" />
+                <button
+                  onClick={() => handleRemoveFilter("dates")}
+                  aria-label="Remove date filter"
+                  className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
+                >
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             )}
             {filters.travelers && filters.travelers > 1 && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FBF9F0] px-3 py-1 text-xs text-[#0a2225]">
-                <Users className="h-3 w-3 text-[#8D8D8D]" />
+              <span className="inline-flex h-8 items-center gap-1 rounded-full border border-[#0a2225]/20 bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
+                <Users className="mr-0.5 h-3.5 w-3.5 text-[#0a2225]/50" />
                 {filters.travelers} travelers
-                <button onClick={() => handleRemoveFilter("travelers")} className="ml-0.5 hover:text-[#BFAD72]">
-                  <X className="h-3 w-3" />
+                <button
+                  onClick={() => handleRemoveFilter("travelers")}
+                  aria-label="Remove travelers filter"
+                  className="flex h-5 w-5 items-center justify-center rounded-full text-[#0a2225]/60 transition-colors hover:bg-[#0a2225]/8 hover:text-[#0a2225]"
+                >
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             )}
             <button
               onClick={onClearFilters}
-              className="text-xs font-medium text-[#BFAD72] hover:text-[#9d8f5d] transition-colors"
+              className="ml-1 text-[13px] font-medium text-[#0a2225]/60 underline underline-offset-4 decoration-[#0a2225]/25 transition-colors hover:text-[#0a2225]"
             >
               Clear all
             </button>
