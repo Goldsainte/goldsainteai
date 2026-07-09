@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { GoogleCityAutocomplete } from '@/components/GoogleCityAutocomplete';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -430,6 +431,14 @@ export default function BrandOnboarding() {
             <div>
               <Label className="font-medium text-[#0a2225]">Brand Bio * (Min 100 characters)</Label>
               <Textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} className={`${luxuryInputClasses} min-h-[120px] ${errors.bio ? 'border-red-500' : ''}`} rows={4} placeholder="Describe your brand, what makes it unique..." />
+              <div className="mt-2 flex justify-end">
+                <AIRewriteButton
+                  value={formData.bio}
+                  onRewrite={(t) => setFormData({ ...formData, bio: t })}
+                  fieldLabel="Brand description"
+                  persona="a tour operator applying to join Goldsainte"
+                />
+              </div>
               <p className="text-sm text-[#6B7280] mt-1">{formData.bio.length} characters</p>
               {errors.bio && <p className="text-sm text-red-500 mt-1">{errors.bio}</p>}
             </div>
@@ -506,14 +515,14 @@ export default function BrandOnboarding() {
                       value={cityInput}
                       onChange={setCityInput}
                       placeholder="Add one city or location"
-                      inputClassName={luxuryInputClasses}
+                      inputClassName={`${luxuryInputClasses} h-12 min-h-0 rounded-xl`}
                     />
                   </div>
                   <Button
                     type="button"
                     onClick={addCity}
                     variant="outline"
-                    className="min-w-[120px] border-[#E5DFC6] px-5 text-[#0a2225] hover:bg-[#E5DFC6]/20"
+                    className="h-12 min-w-[120px] rounded-xl border-[#E5DFC6] px-5 text-[#0a2225] hover:bg-[#E5DFC6]/20"
                   >
                     Add city
                   </Button>
