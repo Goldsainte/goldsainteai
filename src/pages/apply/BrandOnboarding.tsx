@@ -248,6 +248,10 @@ export default function BrandOnboarding() {
     }
     let uploaded = 0;
     for (const file of selected) {
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error(`${file.name} is ${(file.size / 1048576).toFixed(1)} MB — the limit is 15 MB. Skipped.`);
+        continue;
+      }
       try {
         const fileExt = file.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
