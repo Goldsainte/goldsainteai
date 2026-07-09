@@ -531,45 +531,48 @@ export default function NewProposalPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f3ea] text-[#0a2225] flex flex-col">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-50 shadow-[0_2px_14px_rgba(10,34,37,0.16)]">
+      {/* Command bar — two-tier */}
+      <header className="sticky top-0 z-50 shadow-[0_2px_16px_rgba(10,34,37,0.28)]">
         <div className="bg-gradient-to-r from-[#0c4d47] to-[#0a2225]">
-          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
-            <button onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')} className="text-[#E5DFC6]/60 hover:text-[#E5DFC6] transition-colors">
+          <div className="mx-auto flex h-[72px] max-w-5xl items-center gap-4 px-4 md:px-6">
+            <button
+              onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')}
+              aria-label="Back"
+              className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#E5DFC6]/28 text-[#E5DFC6] transition-colors hover:bg-white/10"
+            >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962]/95">Submit a Proposal</p>
-              <p className="mt-0.5 font-secondary text-[22px] leading-tight text-[#fdfaf2] truncate">{tripData.title || "Trip Request"}</p>
-              <div className="flex flex-wrap gap-2 mt-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">Submit a Proposal</p>
+              <p className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">{tripData.title || "Trip Request"}</p>
+            </div>
+            <div className="hidden shrink-0 items-center gap-4 text-[13px] text-[#E5DFC6]/65 md:flex">
               {tripData.destination && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
-                  <MapPin className="h-3 w-3" />{tripData.destination}
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5" />{tripData.destination}
                 </span>
               )}
               {tripData.start_date && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
-                  <Calendar className="h-3 w-3" />{format(new Date(tripData.start_date), "MMM d")}
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />{format(new Date(tripData.start_date), "MMM d")}
                   {tripData.end_date && ` – ${format(new Date(tripData.end_date), "MMM d")}`}
                 </span>
               )}
               {(tripData.budget_min || tripData.budget_max) && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
-                  <DollarSign className="h-3 w-3" />
+                <span className="inline-flex items-center gap-1.5">
+                  <DollarSign className="h-3.5 w-3.5" />
                   {tripData.budget_min && `$${tripData.budget_min.toLocaleString()}`}
                   {tripData.budget_min && tripData.budget_max && " – "}
                   {tripData.budget_max && `$${tripData.budget_max.toLocaleString()}`}
                 </span>
               )}
-              </div>
             </div>
           </div>
         </div>
-        {/* Step indicator — site-standard pill tabs (matches MarketplaceTabs) */}
-        <div className="border-b border-[#0a2225]/10 bg-[#fdfaf2]/95 backdrop-blur-sm">
-          <div className="max-w-5xl mx-auto px-4 py-2.5">
+        <div className="border-t border-white/10 bg-[#083530]">
+          <div className="mx-auto max-w-5xl px-4 md:px-6">
             <div
-              className="flex items-center gap-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="flex h-[46px] items-center gap-1.5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               style={{ fontFamily: "Inter, sans-serif" }}
               role="tablist"
             >
@@ -581,17 +584,20 @@ export default function NewProposalPage() {
                   aria-selected={i === step}
                   onClick={() => { if (i < step) { setStep(i); setAttempted(false); } }}
                   disabled={i > step}
-                  className={`whitespace-nowrap rounded-full px-4 py-2.5 text-center text-[13px] transition-colors ${
+                  className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-[12.5px] transition-colors ${
                     i === step
-                      ? "bg-[#0c4d47] font-semibold text-white"
+                      ? "bg-[#C7A962] font-semibold text-[#0a2225]"
                       : i < step
-                      ? "text-[#0a2225]/70 hover:bg-[#0a2225]/5 hover:text-[#0a2225]"
-                      : "cursor-default text-[#6B7280]/50"
+                      ? "text-[#E5DFC6]/75 hover:bg-white/10 hover:text-[#E5DFC6]"
+                      : "cursor-default text-[#E5DFC6]/35"
                   }`}
                 >
                   {i + 1}.&nbsp;{s}
                 </button>
               ))}
+              <span className="ml-auto hidden shrink-0 pl-3 text-[12.5px] text-[#E5DFC6]/60 sm:inline">
+                Step {step + 1} of {STEPS.length}
+              </span>
             </div>
           </div>
         </div>
