@@ -37,8 +37,6 @@ type UploadedFile = { name: string; path: string; size: number; type: string };
 type CommissionModel = "percentage" | "flat_fee" | "hybrid";
 type CommissionTier = { threshold: number; pct: number };
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
-
 const STEPS = [
   "Your Pitch",
   "Scope of Services",
@@ -404,8 +402,8 @@ export default function NewProposalPage() {
               <ChevronLeft className="h-5 w-5" />
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-[9px] uppercase tracking-[0.3em] text-[#C7A962]/95">Submit a Proposal</p>
-              <p className="mt-0.5 font-secondary text-[20px] leading-tight text-[#fdfaf2] truncate">{tripData.title || "Trip Request"}</p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962]/95">Submit a Proposal</p>
+              <p className="mt-0.5 font-secondary text-[22px] leading-tight text-[#fdfaf2] truncate">{tripData.title || "Trip Request"}</p>
               <div className="flex flex-wrap gap-2 mt-2">
               {tripData.destination && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
@@ -430,21 +428,31 @@ export default function NewProposalPage() {
             </div>
           </div>
         </div>
-        {/* Step indicator — cream strip, roman numerals */}
+        {/* Step indicator — site-standard pill tabs (matches MarketplaceTabs) */}
         <div className="border-b border-[#0a2225]/10 bg-[#fdfaf2]/95 backdrop-blur-sm">
-          <div className="max-w-5xl mx-auto px-4 py-3">
-            <div className="flex gap-1.5">
+          <div className="max-w-5xl mx-auto px-4 py-2.5">
+            <div
+              className="flex items-center gap-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              style={{ fontFamily: "Inter, sans-serif" }}
+              role="tablist"
+            >
               {STEPS.map((s, i) => (
                 <button
                   key={s}
                   type="button"
+                  role="tab"
+                  aria-selected={i === step}
                   onClick={() => { if (i < step) { setStep(i); setAttempted(false); } }}
                   disabled={i > step}
-                  className={`group flex-1 flex flex-col items-center gap-1.5 ${i < step ? "cursor-pointer" : "cursor-default"}`}
+                  className={`whitespace-nowrap rounded-full px-4 py-2.5 text-center text-[13px] transition-colors ${
+                    i === step
+                      ? "bg-[#0c4d47] font-semibold text-white"
+                      : i < step
+                      ? "text-[#0a2225]/70 hover:bg-[#0a2225]/5 hover:text-[#0a2225]"
+                      : "cursor-default text-[#6B7280]/50"
+                  }`}
                 >
-                  <span className={`font-secondary text-[13px] italic leading-none ${i === step ? "text-[#8D6B2F]" : i < step ? "text-[#0c4d47]/70 group-hover:text-[#0c4d47]" : "text-[#0a2225]/25"}`}>{ROMAN[i]}.</span>
-                  <span className={`hidden text-[9.5px] uppercase tracking-[0.1em] sm:block ${i === step ? "font-semibold text-[#0a2225]" : i < step ? "text-[#0a2225]/55 group-hover:text-[#0a2225]" : "text-[#0a2225]/30"}`}>{s}</span>
-                  <span className={`h-[2px] w-full rounded-full transition-colors ${i === step ? "bg-[#C7A962]" : i < step ? "bg-[#0c4d47]/50" : "bg-[#0a2225]/8"}`} />
+                  {i + 1}.&nbsp;{s}
                 </button>
               ))}
             </div>
