@@ -3,6 +3,7 @@ import { StatsStrip } from "@/components/home/StatsStrip";
 import { HowItWorksSteps } from "@/components/home/HowItWorksSteps";
 import { DreamTripBand } from "@/components/home/DreamTripBand";
 import { EarnSection } from "@/components/home/EarnSection";
+import { OneConversationSection } from "@/components/home/OneConversationSection";
 import { TrustPlaque } from "@/components/home/TrustPlaque";
 import { FinalCTABand } from "@/components/home/FinalCTABand";
 import { useQuery } from "@tanstack/react-query";
@@ -69,6 +70,7 @@ export default function HomePage() {
     <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
       <HomeHero />
       <StatsStrip />
+      <OneConversationSection />
       <HowItWorksSteps />
       <FeaturedTripsSection />
       <DreamTripBand />
