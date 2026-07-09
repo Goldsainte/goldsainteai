@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -389,40 +390,40 @@ export const AdvancedFlightFilters = ({
       {(filters.stops.length > 0 || filters.airlines.length > 0 || filters.departureTime.length > 0) && (
         <div className="flex flex-wrap gap-2 px-4">
           {filters.stops.map((stop) => (
-            <Badge key={stop} variant="secondary" className="gap-1">
+            <FilterChip
+              key={stop}
+              removeLabel={`Remove ${stop}`}
+              onRemove={() => toggleArrayFilter('stops', stop)}
+            >
               {stop}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => toggleArrayFilter('stops', stop)}
-              />
-            </Badge>
+            </FilterChip>
           ))}
           {filters.airlines.map((airline) => (
-            <Badge key={airline} variant="secondary" className="gap-1">
+            <FilterChip
+              key={airline}
+              removeLabel={`Remove ${airline}`}
+              onRemove={() => toggleArrayFilter('airlines', airline)}
+            >
               {airline}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => toggleArrayFilter('airlines', airline)}
-              />
-            </Badge>
+            </FilterChip>
           ))}
           {filters.departureTime.map((time) => (
-            <Badge key={`dep-${time}`} variant="secondary" className="gap-1">
+            <FilterChip
+              key={`dep-${time}`}
+              removeLabel={`Remove ${time}`}
+              onRemove={() => toggleArrayFilter('departureTime', time)}
+            >
               Dep: {time}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => toggleArrayFilter('departureTime', time)}
-              />
-            </Badge>
+            </FilterChip>
           ))}
           {filters.arrivalTime.map((time) => (
-            <Badge key={`arr-${time}`} variant="secondary" className="gap-1">
+            <FilterChip
+              key={`arr-${time}`}
+              removeLabel={`Remove ${time}`}
+              onRemove={() => toggleArrayFilter('arrivalTime', time)}
+            >
               Arr: {time}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => toggleArrayFilter('arrivalTime', time)}
-              />
-            </Badge>
+            </FilterChip>
           ))}
           {filters.baggage.map((bag) => (
             <Badge key={bag} variant="secondary" className="gap-1">
