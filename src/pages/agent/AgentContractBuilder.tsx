@@ -541,6 +541,7 @@ export default function AgentContractBuilder() {
     }).length,
   }));
   const missingCount = requiredStatus.reduce((n, r) => n + r.missing, 0);
+  const incompleteSections = requiredStatus.filter((r) => r.missing > 0).length;
 
   const sendDisabled =
     saving ||
@@ -549,7 +550,7 @@ export default function AgentContractBuilder() {
     (sourceType === "template" && missingCount > 0);
   const sendHint =
     sourceType === "template" && missingCount > 0
-      ? `${missingCount} required field${missingCount === 1 ? "" : "s"} to complete`
+      ? `${incompleteSections} section${incompleteSections === 1 ? "" : "s"} to finish`
       : !agentSignature
         ? "Sign at the bottom to enable sending"
         : sourceType === "uploaded" && !uploadedPdfPath
@@ -606,7 +607,7 @@ export default function AgentContractBuilder() {
                 type="button"
                 onClick={handleSendToTraveler}
                 disabled={sendDisabled}
-                className="inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-7 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-45"
+                className="inline-flex items-center gap-2 rounded-full border border-transparent bg-[#C7A962] px-7 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:cursor-not-allowed disabled:border-[#E5DFC6]/35 disabled:bg-transparent disabled:text-[#E5DFC6]/55"
               >
                 <Send className="h-4 w-4" />
                 <span className="hidden sm:inline">Send to traveler</span>
@@ -632,8 +633,10 @@ export default function AgentContractBuilder() {
                 {requiredStatus.map((r) => (
                   <span
                     key={r.id}
-                    className={`h-[9px] w-[9px] rounded-full transition-colors ${
-                      r.missing === 0 ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"
+                    className={`h-[10px] w-[10px] rounded-full transition-colors ${
+                      r.missing === 0
+                        ? "bg-[#C7A962]"
+                        : "border border-[#E5DFC6]/45 bg-transparent"
                     }`}
                   />
                 ))}
