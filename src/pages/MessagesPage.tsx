@@ -55,9 +55,10 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col overflow-hidden bg-[#FDF9F0] h-[calc(100dvh-3.5rem)] sm:h-[calc(100dvh-4rem)] md:h-[calc(100dvh-5rem)]">
-      {/* Compact header — back button inline with the title */}
-      <div className="container mx-auto w-full max-w-6xl px-4 pt-1 pb-0 md:pt-3 md:pb-2 shrink-0">
-        {showProfileBanner && (
+      {/* IG-style full-bleed shell: no page header, no gutters — the inbox
+          IS the page. The profile nudge floats as a slim strip when needed. */}
+      {showProfileBanner && (
+      <div className="w-full px-3 pt-2 shrink-0">
           <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-[#C7B892] bg-[#FFFBF0] px-3 py-2 text-xs text-[#5a4a1a]">
             <div className="flex items-center gap-2 min-w-0">
               <UserCircle2 className="h-4 w-4 shrink-0 text-[#C7A962]" />
@@ -81,23 +82,11 @@ export default function MessagesPage() {
               </button>
             </div>
           </div>
-        )}
-
-        <div className="hidden md:flex items-center gap-1.5">
-          <BackButton className="-ml-2" />
-          <Sparkles className="hidden h-5 w-5 text-[#C7A962] sm:block" />
-          <h1 className="font-secondary text-lg font-semibold text-[#0a2225] md:text-xl">
-            Messages
-          </h1>
-          <p className="ml-2 hidden truncate text-xs text-[#5a6c6e] md:block">
-            Your conversations with creators and travel agents
-          </p>
-        </div>
       </div>
+      )}
 
-      {/* Inbox fills the rest of the viewport; pad the bottom on mobile so the
-          composer clears the fixed MobileBottomNav (lg:hidden). */}
-      <div className="container mx-auto w-full max-w-6xl flex-1 min-h-0 px-0 pb-2 md:px-4 md:pb-3">
+      {/* Inbox fills the entire viewport below the nav — edge to edge. */}
+      <div className="w-full flex-1 min-h-0">
         <DirectMessageInbox />
       </div>
     </div>
