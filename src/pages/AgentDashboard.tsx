@@ -14,7 +14,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, Clock, Shield, Plus, Hourglass } from "lucide-react";
+import { Briefcase, Clock, Shield, Plus, Hourglass, ChevronDown, ArrowRight, ExternalLink } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -50,7 +51,8 @@ export default function AgentDashboard() {
     ? (requestedTab as string)
     : searchParams.get("stripe")
     ? "guides"
-    : "available";
+    : "desk";
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [agent, setAgent] = useState<any>(null);
   const [allAgents, setAllAgents] = useState<any[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -75,13 +77,15 @@ export default function AgentDashboard() {
   const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
   const [pendingTripsCount, setPendingTripsCount] = useState(0);
   const [publishedTripsCount, setPublishedTripsCount] = useState(0);
-  const [profile, setProfile] = useState<{ email: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ email: string | null; full_name?: string | null; display_name?: string | null } | null>(null);
+  const [bookingCount, setBookingCount] = useState<number | null>(null);
+  const [contractPendingCount, setContractPendingCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("email")
+      .select("email, full_name, display_name")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
@@ -245,6 +249,26 @@ export default function AgentDashboard() {
         ]);
         setPendingTripsCount(pCount || 0);
         setPublishedTripsCount(pubCount || 0);
+
+        // Desk stats — non-fatal
+        try {
+          const [{ count: bCount }, { count: cCount }] = await Promise.all([
+            supabase
+              .from("trip_bookings")
+              .select("*", { count: "exact", head: true })
+              .eq("partner_id", user.id)
+              .in("status", ["confirmed", "paid_in_full", "deposit_pending", "payment_pending"]),
+            supabase
+              .from("trip_contracts")
+              .select("*", { count: "exact", head: true })
+              .eq("agent_id", user.id)
+              .eq("status", "pending_signatures"),
+          ]);
+          setBookingCount(bCount ?? 0);
+          setContractPendingCount(cCount ?? 0);
+        } catch (statErr) {
+          console.error("Desk stats failed (non-fatal):", statErr);
+        }
       }
 
     } catch (error: any) {
@@ -351,118 +375,265 @@ export default function AgentDashboard() {
     );
   }
 
+  const MORE_TABS = [
+    { key: "analytics", label: "Analytics" },
+    { key: "availability", label: "Availability" },
+    { key: "verification", label: "Verification" },
+    { key: "settings", label: "Settings" },
+  ];
+  const activeMore = MORE_TABS.find((t) => t.key === activeTab);
+  const tabBtn = (val: string, label: string) => (
+    <button
+      key={val}
+      type="button"
+      onClick={() => setActiveTab(val)}
+      className={`whitespace-nowrap pb-4 text-[12px] uppercase tracking-[0.22em] transition-colors ${
+        activeTab === val
+          ? "border-b-2 border-[#0a2225] text-[#0a2225]"
+          : "border-b-2 border-transparent text-[#0a2225]/50 hover:text-[#0a2225]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+  const stat = (label: string, value: number | string | null, onClick: () => void) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-2xl bg-white px-5 py-5 text-left shadow-[0_2px_16px_rgba(0,0,0,0.06)] transition hover:shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
+    >
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/50">{label}</p>
+      <p className="mt-1.5 font-secondary text-[30px] leading-none text-[#0a2225]">
+        {value ?? "—"}
+      </p>
+      <p className="mt-2 text-[12px] text-[#8D6B2F]">View →</p>
+    </button>
+  );
+
   return (
-    <div className="min-h-screen bg-[#FDF9F0] flex flex-col pb-20 lg:pb-0">
-      
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <BackButton className="mb-6" />
-        
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-secondary text-primary mb-2">Agent Dashboard</h1>
-            <p className="text-muted-foreground">{agent.agency_name} • Rating: {agent.rating}/5 ({agent.total_reviews} reviews)</p>
-            {!agent.is_verified && (
-              <Badge variant="secondary" className="mt-2">Pending Verification</Badge>
+    <div className="min-h-screen bg-[#f7f3ea] flex flex-col pb-20 lg:pb-0">
+      <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
+        {/* ── The Bureau ── */}
+        <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Bureau</p>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-xl">
+            <h1 className="font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[54px]">
+              Welcome, {profile?.display_name || profile?.full_name?.split(" ")[0] || agent.agency_name}
+            </h1>
+            <p className="mt-3 text-[16px] leading-relaxed text-[#0a2225]/55">
+              Your desk for winning briefs, designing journeys, and growing a book of clients
+              on-platform.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              {agent.is_verified ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962] px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                  ◈ Verified agent
+                </span>
+              ) : (
+                <span className="inline-flex items-center rounded-full border border-[#0a2225]/20 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#0a2225]/50">
+                  Pending verification
+                </span>
+              )}
+              {Number(agent.rating) > 0 && (
+                <span className="inline-flex items-center rounded-full border border-[#0a2225]/15 px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/60">
+                  ★ {agent.rating}/5 · {agent.total_reviews} reviews
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(`/agents/${agent.id}`)}
+              className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-6 py-3.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white"
+            >
+              <ExternalLink className="h-4 w-4" /> View public profile
+            </button>
+            {isAdmin && (
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="gap-1">
+                  <Shield className="h-3 w-3" />
+                  Admin View
+                </Badge>
+                <Select value={selectedAgentId || ''} onValueChange={handleAgentChange}>
+                  <SelectTrigger className="w-[250px] rounded-full border-[#0a2225]/20 bg-white">
+                    <SelectValue placeholder="Select agent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allAgents.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.agency_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </div>
-          
-          {isAdmin && (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1">
-                <Shield className="h-3 w-3" />
-                Admin View
-              </Badge>
-              <Select value={selectedAgentId || ''} onValueChange={handleAgentChange}>
-                <SelectTrigger className="w-[250px]">
-                  <SelectValue placeholder="Select agent" />
-                </SelectTrigger>
-                <SelectContent>
-                  {allAgents.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.agency_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
         </div>
 
-        {user && <GettingStartedChecklist userId={user.id} role="agent" />}
-        <div className="mb-4 text-right">
-          <Link to="/how-it-works/agent" className="text-xs text-[#0c4d47] hover:underline">
-            How it works →
-          </Link>
+        {/* ── Your desk today ── */}
+        <div className="mt-10 grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+          {stat("Open briefs", jobs.length, () => setActiveTab("available"))}
+          {stat("Active bids", myBids.length, () => setActiveTab("my-bids"))}
+          {stat("Active bookings", bookingCount, () => navigate("/partner-bookings"))}
+          {stat("Awaiting signature", contractPendingCount, () => navigate("/partner-bookings"))}
         </div>
 
-        {/* Quick Access Navigation */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <Button
-            onClick={() => navigate('/trip-builder')}
-            className="bg-[#0c4d47] text-[#E5DFC6] rounded-full px-6 hover:bg-[#0a3d39]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create New Trip
-          </Button>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={() => navigate('/marketplace')}
-          >
-            <Briefcase className="w-4 h-4" />
-            Job Marketplace
-          </Button>
+        <div className="mt-8">
+          {user && <GettingStartedChecklist userId={user.id} role="agent" />}
         </div>
 
         {!agent.is_verified && (
-          <Card className="mb-6 border-[#C7A962]/30 bg-[#FDF9F0]">
-            <CardContent className="py-6">
-              <div className="flex items-start gap-4">
-                <Clock className="h-6 w-6 text-[#C7A962] mt-1" />
-                <div>
-                  <h3 className="font-semibold text-[#0a2225] mb-1">Application Under Review</h3>
-                  <p className="text-sm text-[#5c5c52]">
-                    Your agent application is currently being reviewed by our admin team. 
-                    You'll be able to access the marketplace and place bids once your application is approved. 
-                    This typically takes 2-3 business days.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <StripeConnectOnboarding />
-
-        {pendingTripsCount > 0 && (
-          <div className="mb-6 rounded-2xl border border-[#C7A962]/40 bg-[#FDF9F0] px-6 py-5 flex items-start gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C7A962]/15 flex-shrink-0">
-              <Hourglass className="h-5 w-5 text-[#C7A962]" />
-            </div>
+          <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/40 bg-white px-6 py-5">
+            <Clock className="mt-1 h-6 w-6 shrink-0 text-[#C7A962]" />
             <div>
-              <h3 className="font-secondary text-lg text-[#0a2225]">Your listing is under review</h3>
-              <p className="text-sm text-[#6B7280] mt-1">
-                We typically approve new listings within 24–48 hours. You'll receive an email when it's live.
+              <h3 className="font-secondary text-[19px] text-[#0a2225]">Application under review</h3>
+              <p className="mt-1 text-[14px] leading-relaxed text-[#0a2225]/55">
+                Your agent application is being reviewed by our team. You'll be able to bid on
+                briefs once it's approved — typically 2–3 business days.
               </p>
             </div>
           </div>
         )}
 
-        <Tabs defaultValue={initialTab} className="space-y-6">
-          <div className="relative">
-            <TabsList className="w-full overflow-x-auto scrollbar-hide bg-transparent border-b border-[#E5DFC6] rounded-none h-11 justify-start gap-0 flex">
-              <TabsTrigger value="available" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Available Jobs ({jobs.length})</TabsTrigger>
-              <TabsTrigger value="my-bids" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">My Bids ({myBids.length})</TabsTrigger>
-              <TabsTrigger value="creator-collabs" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Creator Collabs ({collabRequests.length})</TabsTrigger>
-              <TabsTrigger value="guides" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Guides</TabsTrigger>
-              <TabsTrigger value="analytics" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Analytics</TabsTrigger>
-             <TabsTrigger value="performance" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Performance</TabsTrigger>
-              <TabsTrigger value="availability" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Availability</TabsTrigger>
-              <TabsTrigger value="verification" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Verification</TabsTrigger>
-              <TabsTrigger value="settings" className="rounded-none h-full border-b-2 data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] border-transparent text-[#6B7280] text-sm font-medium px-4 whitespace-nowrap flex-shrink-0">Settings</TabsTrigger>
-            </TabsList>
-            <div className="pointer-events-none absolute right-0 top-0 h-11 w-12 bg-gradient-to-l from-[#FDF9F0] to-transparent md:hidden" />
+        <StripeConnectOnboarding />
+
+        {pendingTripsCount > 0 && (
+          <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/40 bg-white px-6 py-5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#C7A962]/15">
+              <Hourglass className="h-5 w-5 text-[#C7A962]" />
+            </div>
+            <div>
+              <h3 className="font-secondary text-[19px] text-[#0a2225]">Your listing is under review</h3>
+              <p className="mt-1 text-[14px] text-[#0a2225]/55">
+                We typically approve new listings within 24–48 hours. You'll receive an email when
+                it's live.
+              </p>
+            </div>
           </div>
+        )}
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-12 space-y-10">
+          <div className="flex items-center gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {tabBtn("desk", "Desk")}
+            {tabBtn("available", `Briefs (${jobs.length})`)}
+            {tabBtn("my-bids", `Pipeline (${myBids.length})`)}
+            {tabBtn("creator-collabs", `Clients (${collabRequests.length})`)}
+            {tabBtn("guides", "Catalog")}
+            {tabBtn("performance", "Performance")}
+            <div className="ml-auto pb-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className={`inline-flex items-center gap-1.5 whitespace-nowrap pb-2 text-[12px] uppercase tracking-[0.22em] ${
+                      activeMore ? "text-[#0a2225]" : "text-[#0a2225]/50 hover:text-[#0a2225]"
+                    }`}
+                  >
+                    {activeMore ? activeMore.label : "More"} <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="!rounded-2xl !border-0 !bg-white !shadow-[0_8px_28px_rgba(10,34,37,0.22)]">
+                  {MORE_TABS.map((t) => (
+                    <DropdownMenuItem
+                      key={t.key}
+                      onClick={() => setActiveTab(t.key)}
+                      className="mx-1 cursor-pointer rounded-xl px-4 py-2.5 text-[14px] hover:bg-[#f7f3ea] focus:bg-[#f7f3ea]"
+                    >
+                      {t.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          {/* ── Desk: the Bureau overview ── */}
+          <TabsContent value="desk" className="space-y-0">
+            <div className="border-b border-[#0a2225]/10 pb-16 pt-6">
+              <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
+              <h2 className="mt-4 max-w-3xl font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[58px]">
+                Find a brief, design the trip, get&nbsp;paid.
+              </h2>
+              <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/55">
+                The marketplace is full of travelers waiting for the right specialist. Send a
+                proposal — or publish a packaged trip ready to book.
+              </p>
+              <div className="mt-9 flex flex-wrap items-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => navigate("/marketplace")}
+                  className="rounded-full bg-[#0c4d47] px-9 py-4 text-[15px] text-white transition-colors hover:bg-[#0a2225]"
+                >
+                  Browse trip requests
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/trip-builder")}
+                  className="inline-flex items-center gap-2 text-[15px] text-[#0a2225]"
+                >
+                  Or package a new trip <ArrowRight className="h-4 w-4 text-[#8D6B2F]" />
+                </button>
+              </div>
+            </div>
+
+            <div className="border-b border-[#0a2225]/10 py-16">
+              <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">
+                How Goldsainte works for agents
+              </p>
+              <h2 className="mt-3 font-secondary text-[38px] text-[#0a2225]">Two ways to earn</h2>
+              <div className="mt-10 grid gap-14 md:grid-cols-2">
+                <div>
+                  <p className="font-secondary text-[20px] text-[#8D6B2F]">01</p>
+                  <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">Answer a brief</h3>
+                  <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>Travelers post the journeys they want. Pick a brief that fits your expertise.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>Send a tailored proposal — itinerary, price, and timeline — drafted with Goldsainte AI in under a minute.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>They accept, sign the contract, and pay the deposit — all without leaving the thread.</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="font-secondary text-[20px] text-[#8D6B2F]">02</p>
+                  <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">Publish your own</h3>
+                  <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>Package a trip you know by heart — or a digital guide — in the trip builder.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>It lists on the marketplace with your name and your price.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>Travelers book it directly — no proposal needed, you wake up to bookings.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid items-center gap-10 border-b border-[#0a2225]/10 py-14 md:grid-cols-[1fr_auto]">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
+                <p className="mt-4 max-w-2xl text-[16px] leading-[1.7] text-[#0a2225]/80">
+                  You set your price — your costs and your margin are yours to build in. Travelers
+                  pay a 3.5% service fee on top; a matching 3.5% platform fee comes out of your
+                  payout. That is Goldsainte's entire take: 7% total, flat, on every booking. Every
+                  payment is held in escrow — protected by a signed contract — and releases as
+                  milestones complete.
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-secondary text-[58px] leading-none text-[#0a2225]">7%</p>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-[#0a2225]/50">
+                  Total · 3.5 + 3.5
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 py-9 text-[15px]">
+              <span>
+                <span className="text-[11px] uppercase tracking-[0.24em] text-[#8D6B2F]">New here?</span>
+                &nbsp;&nbsp;The full guide to proposals, contracts, payouts, and fees.
+              </span>
+              <Link to="/how-it-works/agent" className="text-[#0a2225] hover:text-[#8D6B2F]">
+                Read the guide →
+              </Link>
+            </div>
+          </TabsContent>
 
           <TabsContent value="guides" className="space-y-6">
             {/* Payout setup lives here for agents: guide publishing requires
