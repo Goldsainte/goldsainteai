@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadContractPdf } from "@/components/contracts/ContractStatusCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,6 +33,7 @@ import {
   MessageSquareWarning,
   ShieldCheck,
   Loader2,
+  Download,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SignaturePad from "react-signature-canvas";
@@ -490,6 +492,14 @@ export default function ContractSignPage() {
                   Both parties have signed. You can now proceed to deposit.
                 </p>
               </div>
+              <Button
+                variant="outline"
+                onClick={() => downloadContractPdf(contract.id)}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download PDF
+              </Button>
               {contract.booking_id && (
                 <Button
                   onClick={() =>
