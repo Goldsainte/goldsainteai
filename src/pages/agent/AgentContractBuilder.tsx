@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ export default function AgentContractBuilder() {
   const [tripData, setTripData] = useState<any>(null);
   const [travelerData, setTravelerData] = useState<any>(null);
   const [agentSignature, setAgentSignature] = useState<string>("");
+  const sigPadRef = useRef<any>(null);
   const [contractId, setContractId] = useState<string | null>(null);
   
   const [sections] = useState<ContractSection[]>([
@@ -432,11 +433,15 @@ export default function AgentContractBuilder() {
                   </div>
                 ) : (
                   <SignaturePad
+                    ref={sigPadRef}
                     canvasProps={{
                       className: "w-full h-32 bg-muted rounded",
                     }}
-                    onEnd={(pad: any) => {
-                      setAgentSignature(pad.toDataURL());
+                    onEnd={() => {
+                      const pad = sigPadRef.current;
+                      if (pad && !pad.isEmpty()) {
+                        setAgentSignature(pad.toDataURL());
+                      }
                     }}
                   />
                 )}
