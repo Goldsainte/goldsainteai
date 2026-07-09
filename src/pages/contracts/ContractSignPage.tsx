@@ -626,7 +626,7 @@ export default function ContractSignPage() {
                       href={uploadedPdfUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20"
+                      className="inline-flex items-center rounded-full bg-[#0c4d47] px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
                     >
                       Open in new tab
                     </a>
