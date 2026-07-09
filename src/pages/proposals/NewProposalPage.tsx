@@ -37,6 +37,8 @@ type UploadedFile = { name: string; path: string; size: number; type: string };
 type CommissionModel = "percentage" | "flat_fee" | "hybrid";
 type CommissionTier = { threshold: number; pct: number };
 
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
+
 const STEPS = [
   "Your Pitch",
   "Scope of Services",
@@ -46,6 +48,12 @@ const STEPS = [
   "Attachments",
   "Review & Submit",
 ];
+
+const labelClasses = "text-sm font-medium text-[#0a2225]";
+const inputClasses = "rounded-xl h-11 text-sm border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
+const textareaClasses = "rounded-xl border-[#E5DFC6] bg-white text-sm focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
+const selectTriggerClasses = "rounded-xl h-11 text-sm border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20";
+const eyebrowClasses = "text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]";
 
 const DEFAULT_CANCELLATION_WINDOWS: CancellationWindow[] = [
   { band: "60+", refund_pct: 90 },
@@ -69,6 +77,7 @@ export default function NewProposalPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState(0);
+  const [attempted, setAttempted] = useState(false);
   const [tripData, setTripData] = useState<TripRequestData | null>(null);
   const [proposalCount, setProposalCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -180,6 +189,10 @@ export default function NewProposalPage() {
 
     return { commission: Math.round(commission), hostFee, guestFee, agentPayout, travelerTotal };
   }, [priceFrom, commissionModel, commissionPct, commissionTiered, commissionTiers, flatFeeAmount, hybridFlatFee, hybridCommissionPct]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [step]);
 
   useEffect(() => {
     if (!tripId) return;
@@ -359,7 +372,7 @@ export default function NewProposalPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7f3ea] flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading trip details…</div>
       </div>
     );
@@ -367,7 +380,7 @@ export default function NewProposalPage() {
 
   if (!tripData) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-[#f7f3ea] flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Trip request not found.</p>
         <Button variant="outline" onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')}>Go Back</Button>
       </div>
@@ -382,47 +395,59 @@ export default function NewProposalPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#f7f3ea] text-[#0a2225] flex flex-col">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
-          <button onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')} className="text-muted-foreground hover:text-foreground transition-colors">
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">{tripData.title || "Trip Request"}</p>
-            <div className="flex flex-wrap gap-2 mt-1">
+      <header className="sticky top-0 z-50 shadow-[0_2px_14px_rgba(10,34,37,0.16)]">
+        <div className="bg-gradient-to-r from-[#0c4d47] to-[#0a2225]">
+          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
+            <button onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')} className="text-[#E5DFC6]/60 hover:text-[#E5DFC6] transition-colors">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] uppercase tracking-[0.3em] text-[#C7A962]/95">Submit a Proposal</p>
+              <p className="mt-0.5 font-secondary text-[20px] leading-tight text-[#fdfaf2] truncate">{tripData.title || "Trip Request"}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
               {tripData.destination && (
-                <span className="inline-flex items-center gap-1 text-xs bg-muted rounded-full px-2 py-0.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
                   <MapPin className="h-3 w-3" />{tripData.destination}
                 </span>
               )}
               {tripData.start_date && (
-                <span className="inline-flex items-center gap-1 text-xs bg-muted rounded-full px-2 py-0.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
                   <Calendar className="h-3 w-3" />{format(new Date(tripData.start_date), "MMM d")}
                   {tripData.end_date && ` – ${format(new Date(tripData.end_date), "MMM d")}`}
                 </span>
               )}
               {(tripData.budget_min || tripData.budget_max) && (
-                <span className="inline-flex items-center gap-1 text-xs bg-muted rounded-full px-2 py-0.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[#E5DFC6]">
                   <DollarSign className="h-3 w-3" />
                   {tripData.budget_min && `$${tripData.budget_min.toLocaleString()}`}
                   {tripData.budget_min && tripData.budget_max && " – "}
                   {tripData.budget_max && `$${tripData.budget_max.toLocaleString()}`}
                 </span>
               )}
+              </div>
             </div>
           </div>
         </div>
-        {/* Step indicator */}
-        <div className="max-w-5xl mx-auto px-4 pb-3">
-          <div className="flex gap-1">
-            {STEPS.map((s, i) => (
-              <div key={s} className="flex-1 flex flex-col items-center gap-1">
-                <div className={`h-1 w-full rounded-full transition-colors ${i <= step ? "bg-[#0c4d47]" : "bg-muted"}`} />
-                <span className={`text-[10px] font-medium hidden sm:block ${i <= step ? "text-[#0c4d47]" : "text-muted-foreground"}`}>{s}</span>
-              </div>
-            ))}
+        {/* Step indicator — cream strip, roman numerals */}
+        <div className="border-b border-[#0a2225]/10 bg-[#fdfaf2]/95 backdrop-blur-sm">
+          <div className="max-w-5xl mx-auto px-4 py-3">
+            <div className="flex gap-1.5">
+              {STEPS.map((s, i) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => { if (i < step) { setStep(i); setAttempted(false); } }}
+                  disabled={i > step}
+                  className={`group flex-1 flex flex-col items-center gap-1.5 ${i < step ? "cursor-pointer" : "cursor-default"}`}
+                >
+                  <span className={`font-secondary text-[13px] italic leading-none ${i === step ? "text-[#8D6B2F]" : i < step ? "text-[#0c4d47]/70 group-hover:text-[#0c4d47]" : "text-[#0a2225]/25"}`}>{ROMAN[i]}.</span>
+                  <span className={`hidden text-[9.5px] uppercase tracking-[0.1em] sm:block ${i === step ? "font-semibold text-[#0a2225]" : i < step ? "text-[#0a2225]/55 group-hover:text-[#0a2225]" : "text-[#0a2225]/30"}`}>{s}</span>
+                  <span className={`h-[2px] w-full rounded-full transition-colors ${i === step ? "bg-[#C7A962]" : i < step ? "bg-[#0c4d47]/50" : "bg-[#0a2225]/8"}`} />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </header>
@@ -435,25 +460,26 @@ export default function NewProposalPage() {
 
             {/* STEP 0: Pitch */}
             {step === 0 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Your Pitch</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Describe your proposed itinerary and why you're the best fit.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step One</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Your Pitch</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Describe your proposed itinerary and why you're the best fit.</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Your Role</Label>
+                    <Label className={labelClasses}>Your Role</Label>
                     <div className="flex gap-3">
                       {(["agent", "creator"] as const).map((role) => (
                         <button
                           key={role}
                           type="button"
                           onClick={() => setProposerRole(role)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
+                          className={`min-h-[40px] rounded-full px-5 text-[12px] font-medium uppercase tracking-[0.1em] transition-colors ${
                             proposerRole === role
-                              ? "border-[#0c4d47] bg-[#0c4d47]/5 text-[#0c4d47]"
-                              : "border-muted bg-background text-muted-foreground hover:border-border"
+                              ? "bg-[#0c4d47] text-[#E5DFC6]"
+                              : "border border-[#0a2225]/20 bg-white text-[#0a2225]/60 hover:border-[#C7A962]"
                           }`}
                         >
                           {role === "agent" ? "Travel Agent" : "Creator"}
@@ -463,30 +489,31 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="headline">Headline <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="headline">Headline <span className="text-destructive">*</span></Label>
                     <Input
+                      className={inputClasses}
                       id="headline"
                       placeholder="e.g. 7-Night Luxury Safari with Private Guide"
                       value={headline}
                       onChange={(e) => setHeadline(e.target.value)}
                       maxLength={120}
                     />
-                    {headline.length === 0 && (
+                    {attempted && headline.length === 0 && (
                       <p className="text-xs text-destructive">Required</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Your Proposal <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="message">Your Proposal <span className="text-destructive">*</span></Label>
                     <Textarea
                       id="message"
                       placeholder="Describe your proposed itinerary, unique experiences, and why you're the best fit for this trip…"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="min-h-[180px]"
+                      className={`${textareaClasses} min-h-[180px]`}
                     />
                     <div className="flex justify-between">
-                      {message.trim().length < 5 ? (
+                      {attempted && message.trim().length < 5 ? (
                         <p className="text-xs text-destructive">Minimum 5 characters required</p>
                       ) : (
                         <span />
@@ -496,13 +523,13 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="itinerary-summary">Itinerary Summary <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses} htmlFor="itinerary-summary">Itinerary Summary <span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <Textarea
                       id="itinerary-summary"
                       placeholder={"Day 1: Arrival & transfer to hotel\nDay 2: Guided city tour\nDay 3: Safari excursion\n..."}
                       value={itinerarySummary}
                       onChange={(e) => setItinerarySummary(e.target.value)}
-                      className="min-h-[120px]"
+                      className={`${textareaClasses} min-h-[120px]`}
                     />
                     <p className="text-xs text-muted-foreground">Brief day-by-day overview of the proposed trip structure.</p>
                   </div>
@@ -512,39 +539,40 @@ export default function NewProposalPage() {
 
             {/* STEP 1: Scope of Services */}
             {step === 1 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Scope of Services</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Define exactly what is and isn't included in your proposal.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Two</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Scope of Services</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define exactly what is and isn't included in your proposal.</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="inclusions">What's Included <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="inclusions">What's Included <span className="text-destructive">*</span></Label>
                     <Textarea
                       id="inclusions"
                       placeholder={"Airport transfers\nHotel bookings (4-star+)\n2 guided excursions\nTravel insurance coordination\nRestaurant reservations"}
                       value={inclusionsText}
                       onChange={(e) => setInclusionsText(e.target.value)}
-                      className="min-h-[140px]"
+                      className={`${textareaClasses} min-h-[140px]`}
                     />
                     <p className="text-xs text-muted-foreground">One item per line. Be specific about what the traveler will receive.</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="exclusions">What's Not Included</Label>
+                    <Label className={labelClasses} htmlFor="exclusions">What's Not Included</Label>
                     <Textarea
                       id="exclusions"
                       placeholder={"International flights\nMeals not specified in itinerary\nPersonal expenses\nVisa fees\nTravel insurance premiums"}
                       value={exclusionsText}
                       onChange={(e) => setExclusionsText(e.target.value)}
-                      className="min-h-[120px]"
+                      className={`${textareaClasses} min-h-[120px]`}
                     />
                     <p className="text-xs text-muted-foreground">One item per line. Setting clear exclusions prevents disputes.</p>
                   </div>
 
                   <div className="space-y-3">
-                    <Label>Service Level</Label>
+                    <Label className={labelClasses}>Service Level</Label>
                     <RadioGroup value={serviceLevel} onValueChange={setServiceLevel} className="space-y-2">
                       {[
                         { value: "advisory", label: "Advisory", desc: "I provide recommendations; the traveler books independently" },
@@ -564,9 +592,9 @@ export default function NewProposalPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Itinerary Revisions Included</Label>
+                      <Label className={labelClasses}>Itinerary Revisions Included</Label>
                       <Select value={revisionCount} onValueChange={setRevisionCount}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger className={selectTriggerClasses}><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="1">1 revision</SelectItem>
                           <SelectItem value="2">2 revisions</SelectItem>
@@ -577,9 +605,9 @@ export default function NewProposalPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Support Level</Label>
+                      <Label className={labelClasses}>Support Level</Label>
                       <Select value={supportLevel} onValueChange={setSupportLevel}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger className={selectTriggerClasses}><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="email">Email only</SelectItem>
                           <SelectItem value="business_hours">Business hours phone</SelectItem>
@@ -597,7 +625,7 @@ export default function NewProposalPage() {
                       className="mt-0.5"
                     />
                     <div>
-                      <Label htmlFor="supplier-payments" className="cursor-pointer font-medium">I handle payments to suppliers</Label>
+                      <Label htmlFor="supplier-payments" className={`${labelClasses} cursor-pointer font-medium`}>I handle payments to suppliers</Label>
                       <p className="text-xs text-muted-foreground mt-0.5">I will process payments to hotels, tours, and other suppliers on behalf of the traveler.</p>
                     </div>
                   </div>
@@ -607,15 +635,16 @@ export default function NewProposalPage() {
 
             {/* STEP 2: Pricing & Payment */}
             {step === 2 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Pricing & Payment</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Define your pricing structure and payment terms.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Three</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Pricing & Payment</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define your pricing structure and payment terms.</p>
                   </div>
 
                   <div className="space-y-3">
-                    <Label>Pricing Type</Label>
+                    <Label className={labelClasses}>Pricing Type</Label>
                     <RadioGroup value={pricingType} onValueChange={setPricingType} className="flex gap-3">
                       <label className={`flex-1 flex items-center gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${pricingType === "per_person" ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
                         <RadioGroupItem value="per_person" />
@@ -629,7 +658,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="price">Trip Cost ({pricingType === "per_person" ? "per person" : "total"}) <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="price">Trip Cost ({pricingType === "per_person" ? "per person" : "total"}) <span className="text-destructive">*</span></Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -637,7 +666,7 @@ export default function NewProposalPage() {
                         type="number"
                         min={0}
                         placeholder="0"
-                        className="pl-9"
+                        className={`${inputClasses} pl-9`}
                         value={priceFrom}
                         onChange={(e) => setPriceFrom(e.target.value ? Number(e.target.value) : "")}
                       />
@@ -680,7 +709,7 @@ export default function NewProposalPage() {
                       <div className="space-y-4 pl-1">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Label htmlFor="commission-pct">Commission %</Label>
+                            <Label className={labelClasses} htmlFor="commission-pct">Commission %</Label>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -715,7 +744,7 @@ export default function NewProposalPage() {
                             className="mt-0.5"
                           />
                           <div>
-                            <Label htmlFor="tiered-commission" className="cursor-pointer font-medium">Tiered commission</Label>
+                            <Label htmlFor="tiered-commission" className={`${labelClasses} cursor-pointer font-medium`}>Tiered commission</Label>
                             <p className="text-xs text-muted-foreground mt-0.5">e.g. 20% on the first $5,000 and 15% above</p>
                           </div>
                         </div>
@@ -782,7 +811,7 @@ export default function NewProposalPage() {
                       <div className="space-y-4 pl-1">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Label htmlFor="flat-fee">Fee Amount</Label>
+                            <Label className={labelClasses} htmlFor="flat-fee">Fee Amount</Label>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -801,16 +830,16 @@ export default function NewProposalPage() {
                               type="number"
                               min={0}
                               placeholder="0"
-                              className="pl-9"
+                              className={`${inputClasses} pl-9`}
                               value={flatFeeAmount}
                               onChange={(e) => setFlatFeeAmount(e.target.value ? Number(e.target.value) : "")}
                             />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label>Fee Covers</Label>
+                          <Label className={labelClasses}>Fee Covers</Label>
                           <Select value={flatFeeCovers} onValueChange={setFlatFeeCovers}>
-                            <SelectTrigger className="w-60"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className={`${selectTriggerClasses} w-60`}><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="planning">Planning only</SelectItem>
                               <SelectItem value="execution">Planning + Execution</SelectItem>
@@ -839,7 +868,7 @@ export default function NewProposalPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="hybrid-flat">Flat Fee</Label>
+                            <Label className={labelClasses} htmlFor="hybrid-flat">Flat Fee</Label>
                             <div className="relative">
                               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
@@ -847,14 +876,14 @@ export default function NewProposalPage() {
                                 type="number"
                                 min={0}
                                 placeholder="0"
-                                className="pl-9"
+                                className={`${inputClasses} pl-9`}
                                 value={hybridFlatFee}
                                 onChange={(e) => setHybridFlatFee(e.target.value ? Number(e.target.value) : "")}
                               />
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="hybrid-pct">Commission %</Label>
+                            <Label className={labelClasses} htmlFor="hybrid-pct">Commission %</Label>
                             <div className="relative">
                               <Input
                                 id="hybrid-pct"
@@ -919,15 +948,16 @@ export default function NewProposalPage() {
 
             {/* STEP 3: Cancellation Policy */}
             {step === 3 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Cancellation & Refund Policy</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Define your cancellation terms. These are binding commitments shown to the traveler.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Four</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Cancellation & Refund Policy</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define your cancellation terms. These are binding commitments shown to the traveler.</p>
                   </div>
 
                   <div className="space-y-3">
-                    <Label>Is Deposit Refundable?</Label>
+                    <Label className={labelClasses}>Is Deposit Refundable?</Label>
                     <RadioGroup value={depositRefundable} onValueChange={setDepositRefundable} className="space-y-2">
                       {[
                         { value: "fully_refundable", label: "Fully refundable" },
@@ -943,7 +973,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label>Cancellation Windows</Label>
+                    <Label className={labelClasses}>Cancellation Windows</Label>
                     <p className="text-xs text-muted-foreground">Set the refund percentage for each cancellation window relative to the departure date.</p>
                     <div className="space-y-2">
                       {cancellationWindows.map((w, i) => (
@@ -968,7 +998,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="change-fee">Change Fee After Acceptance <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses} htmlFor="change-fee">Change Fee After Acceptance <span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -976,7 +1006,7 @@ export default function NewProposalPage() {
                         type="number"
                         min={0}
                         placeholder="0"
-                        className="pl-9"
+                        className={`${inputClasses} pl-9`}
                         value={changeFee}
                         onChange={(e) => setChangeFee(e.target.value ? Number(e.target.value) : "")}
                       />
@@ -993,7 +1023,7 @@ export default function NewProposalPage() {
                         className="mt-0.5"
                       />
                       <div className="flex-1">
-                        <Label htmlFor="supplier-clause" className="cursor-pointer font-medium">Supplier-dependent cancellation clause</Label>
+                        <Label htmlFor="supplier-clause" className={`${labelClasses} cursor-pointer font-medium`}>Supplier-dependent cancellation clause</Label>
                         <p className="text-xs text-muted-foreground mt-0.5">Some components are subject to third-party supplier cancellation policies.</p>
                       </div>
                     </div>
@@ -1002,19 +1032,19 @@ export default function NewProposalPage() {
                         placeholder="Specify which components are subject to supplier policies (e.g., safari bookings, boutique hotels with non-refundable rates)…"
                         value={supplierDependentNote}
                         onChange={(e) => setSupplierDependentNote(e.target.value)}
-                        className="min-h-[80px]"
+                        className={`${textareaClasses} min-h-[80px]`}
                       />
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="custom-terms">Additional Cancellation Terms <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses} htmlFor="custom-terms">Additional Cancellation Terms <span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <Textarea
                       id="custom-terms"
                       placeholder="Any additional cancellation or refund terms not covered above…"
                       value={customCancellationTerms}
                       onChange={(e) => setCustomCancellationTerms(e.target.value)}
-                      className="min-h-[80px]"
+                      className={`${textareaClasses} min-h-[80px]`}
                     />
                   </div>
                 </CardContent>
@@ -1023,11 +1053,12 @@ export default function NewProposalPage() {
 
             {/* STEP 4: Deliverables */}
             {step === 4 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Deliverables</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Select and configure what the traveler will receive.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Five</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Deliverables</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Select and configure what the traveler will receive.</p>
                   </div>
 
                   {/* Full Itinerary PDF */}
@@ -1035,7 +1066,7 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-itinerary" checked={delItinerary} onCheckedChange={(c) => setDelItinerary(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-itinerary" className="cursor-pointer font-medium">Full Itinerary PDF</Label>
+                        <Label htmlFor="del-itinerary" className={`${labelClasses} cursor-pointer font-medium`}>Full Itinerary PDF</Label>
                         <p className="text-xs text-muted-foreground mt-0.5">Day-by-day PDF with booking confirmations, maps, and contact details.</p>
                       </div>
                     </div>
@@ -1046,7 +1077,7 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-booking" checked={delBookingMgmt} onCheckedChange={(c) => setDelBookingMgmt(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-booking" className="cursor-pointer font-medium">Booking Management</Label>
+                        <Label htmlFor="del-booking" className={`${labelClasses} cursor-pointer font-medium`}>Booking Management</Label>
                         <p className="text-xs text-muted-foreground mt-0.5">How bookings for hotels, flights, and activities are handled.</p>
                       </div>
                     </div>
@@ -1070,7 +1101,7 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-support" checked={delOnTripSupport} onCheckedChange={(c) => setDelOnTripSupport(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-support" className="cursor-pointer font-medium">On-Trip Support</Label>
+                        <Label htmlFor="del-support" className={`${labelClasses} cursor-pointer font-medium`}>On-Trip Support</Label>
                         <p className="text-xs text-muted-foreground mt-0.5">Support availability during the trip.</p>
                       </div>
                     </div>
@@ -1107,7 +1138,7 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-concierge" checked={delConcierge} onCheckedChange={(c) => setDelConcierge(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-concierge" className="cursor-pointer font-medium">Concierge Services</Label>
+                        <Label htmlFor="del-concierge" className={`${labelClasses} cursor-pointer font-medium`}>Concierge Services</Label>
                         <p className="text-xs text-muted-foreground mt-0.5">Restaurant reservations, spa bookings, event tickets, etc.</p>
                       </div>
                     </div>
@@ -1116,7 +1147,7 @@ export default function NewProposalPage() {
                         placeholder="Specify what's included (e.g., restaurant reservations, spa bookings, event tickets)"
                         value={conciergeDetails}
                         onChange={(e) => setConciergeDetails(e.target.value)}
-                        className="ml-8"
+                        className={`${inputClasses} ml-8`}
                       />
                     )}
                   </div>
@@ -1126,16 +1157,17 @@ export default function NewProposalPage() {
 
             {/* STEP 5: Attachments */}
             {step === 5 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Attachments</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Upload supporting documents or add external links to strengthen your proposal.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Six</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Attachments</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Upload supporting documents or add external links to strengthen your proposal.</p>
                   </div>
 
                   {/* File uploads */}
                   <div className="space-y-3">
-                    <Label>Upload Files <span className="text-muted-foreground font-normal">(max 5 files, 10MB each)</span></Label>
+                    <Label className={labelClasses}>Upload Files <span className="text-muted-foreground font-normal">(max 5 files, 10MB each)</span></Label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
                       className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/30 transition-colors"
@@ -1173,7 +1205,7 @@ export default function NewProposalPage() {
 
                   {/* External links */}
                   <div className="space-y-3">
-                    <Label>External Links <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses}>External Links <span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <p className="text-xs text-muted-foreground">Portfolio, sample itineraries, or any supporting URLs.</p>
                     {externalLinks.map((link, i) => (
                       <div key={i} className="flex items-center gap-2">
@@ -1206,11 +1238,12 @@ export default function NewProposalPage() {
 
             {/* STEP 6: Review & Submit */}
             {step === 6 && (
-              <Card className="border-0 shadow-md">
+              <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Review & Submit</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Review your contract proposal before submitting.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Seven</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Review & Submit</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Review your contract proposal before submitting.</p>
                   </div>
 
                   {/* Pitch Summary */}
@@ -1369,21 +1402,21 @@ export default function NewProposalPage() {
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-terms" checked={ackTerms} onCheckedChange={(c) => setAckTerms(!!c)} className="mt-0.5" />
-                      <Label htmlFor="ack-terms" className="text-sm cursor-pointer leading-relaxed">
+                      <Label htmlFor="ack-terms" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
                         I agree to Goldsainte's marketplace terms and conditions
                       </Label>
                     </div>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-deposit" checked={ackDeposit} onCheckedChange={(c) => setAckDeposit(!!c)} className="mt-0.5" />
-                      <Label htmlFor="ack-deposit" className="text-sm cursor-pointer leading-relaxed">
+                      <Label htmlFor="ack-deposit" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
                         I understand deposit handling rules and payment processing terms
                       </Label>
                     </div>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-cancel" checked={ackCancellation} onCheckedChange={(c) => setAckCancellation(!!c)} className="mt-0.5" />
-                      <Label htmlFor="ack-cancel" className="text-sm cursor-pointer leading-relaxed">
+                      <Label htmlFor="ack-cancel" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
                         I acknowledge that the cancellation policy and refund terms stated above are binding commitments
                       </Label>
                     </div>
@@ -1395,45 +1428,43 @@ export default function NewProposalPage() {
 
           {/* Right: Sidebar */}
           <div className="space-y-4">
-            <Card className="border-0 shadow-md bg-[#0c4d47]/[0.03]">
+            <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
               <CardContent className="p-5 space-y-4">
-                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Bid Context</h3>
+                <h3 className={eyebrowClasses}>Bid Context</h3>
 
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-[#0c4d47]" />
-                    <span>{proposalCount} proposal{proposalCount !== 1 ? "s" : ""} submitted</span>
+                <div className="space-y-3">
+                  <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
+                    <span className="text-[12.5px] text-[#0a2225]/55">Proposals</span>
+                    <span className="font-secondary text-[15px] text-[#0a2225]">{proposalCount}</span>
                   </div>
 
                   {(tripData.budget_min || tripData.budget_max) && (
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-[#0c4d47]" />
-                      <span>
-                        Budget: {tripData.budget_min ? `$${tripData.budget_min.toLocaleString()}` : ""}
+                    <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
+                      <span className="text-[12.5px] text-[#0a2225]/55">Budget</span>
+                      <span className="font-secondary text-[15px] text-[#0a2225]">
+                        {tripData.budget_min ? `$${tripData.budget_min.toLocaleString()}` : ""}
                         {tripData.budget_min && tripData.budget_max ? " – " : ""}
                         {tripData.budget_max ? `$${tripData.budget_max.toLocaleString()}` : ""}
                       </span>
                     </div>
                   )}
 
-                  {/* Price vs budget indicator */}
-                  {priceVsBudget && (
-                    <div className={`rounded-lg p-2 text-xs font-medium ${priceVsBudget === "within" ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
-                      {priceVsBudget === "within" ? "✓ Your price is within budget" : "⚠ Your price exceeds the stated budget"}
+                  <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
+                    <span className="text-[12.5px] text-[#0a2225]/55">Validity</span>
+                    <span className="font-secondary text-[15px] text-[#0a2225]">14 days</span>
+                  </div>
+
+                  {commissionCalc.agentPayout > 0 && (
+                    <div className="flex items-baseline justify-between pb-0.5">
+                      <span className="text-[12.5px] text-[#0a2225]/55">Est. payout</span>
+                      <span className="font-secondary text-[15px] text-[#8D6B2F]">${commissionCalc.agentPayout.toLocaleString()}</span>
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-[#0c4d47]" />
-                    <span>Proposal valid for 14 days</span>
-                  </div>
-
-                   {commissionCalc.agentPayout > 0 && (
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-[#0c4d47]" />
-                      <span className="font-medium text-[#0c4d47]">
-                        Est. payout: ${commissionCalc.agentPayout.toLocaleString()}
-                      </span>
+                  {/* Price vs budget indicator */}
+                  {priceVsBudget && (
+                    <div className={`rounded-xl px-3 py-2 text-[12px] leading-relaxed ${priceVsBudget === "within" ? "border border-[#0c4d47]/25 bg-[#0c4d47]/[0.06] text-[#0c4d47]" : "border border-[#C7A962]/40 bg-[#C7A962]/10 text-[#8D6B2F]"}`}>
+                      {priceVsBudget === "within" ? "✓ Your price is within budget" : "Your price exceeds the stated budget"}
                     </div>
                   )}
                 </div>
@@ -1441,49 +1472,58 @@ export default function NewProposalPage() {
             </Card>
 
             {/* Current step indicator */}
-            <div className="rounded-lg border border-[#0c4d47]/20 bg-[#0c4d47]/5 p-4 text-center">
-              <p className="text-xs font-semibold text-[#0c4d47] uppercase tracking-wider">
-                Step {step + 1} of {STEPS.length}: {STEPS[step]}
+            <div className="rounded-2xl bg-gradient-to-br from-[#0c4d47] to-[#0a2225] p-4 text-center">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">
+                Step {step + 1} of {STEPS.length}
               </p>
+              <p className="mt-1 font-secondary text-[17px] text-[#fdfaf2]">{STEPS[step]}</p>
             </div>
           </div>
         </div>
       </main>
 
       {/* Bottom Nav */}
-      <footer className="sticky bottom-0 border-t bg-background/95 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
+      <footer className="sticky bottom-0 border-t border-[#0a2225]/10 bg-[#fdfaf2]/95 backdrop-blur-sm pb-safe">
+        <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => { setStep((s) => Math.max(0, s - 1)); setAttempted(false); }}
             disabled={step === 0}
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[#0a2225]/60 transition-colors hover:text-[#0a2225] disabled:pointer-events-none disabled:opacity-0"
           >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Back
-          </Button>
+            <ArrowLeft className="h-3.5 w-3.5" /> Back
+          </button>
 
           <div className="flex items-center gap-3">
-            {!canAdvance() && (
+            {attempted && !canAdvance() && (
               <p className="text-xs text-destructive flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" /> Fill in required fields to continue
               </p>
             )}
             {step < 6 ? (
-              <Button
-                onClick={() => setStep((s) => s + 1)}
-                disabled={!canAdvance()}
-                className="bg-[#0c4d47] hover:bg-[#0a3f3a] text-white"
+              <button
+                type="button"
+                onClick={() => {
+                  if (!canAdvance()) { setAttempted(true); return; }
+                  setAttempted(false);
+                  setStep((s) => s + 1);
+                }}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
               >
-                Continue <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
+                Continue <ArrowRight className="h-3.5 w-3.5" />
+              </button>
             ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={submitting || !canAdvance()}
-                className="bg-[#0c4d47] hover:bg-[#0a3f3a] text-white px-8"
-                size="lg"
+              <button
+                type="button"
+                onClick={() => {
+                  if (!canAdvance()) { setAttempted(true); return; }
+                  handleSubmit();
+                }}
+                disabled={submitting}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0c4d47] px-8 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
               >
-                {submitting ? "Submitting…" : "Submit Proposal"} <Send className="h-4 w-4 ml-2" />
-              </Button>
+                {submitting ? "Submitting…" : "Submit Proposal"} <Send className="h-3.5 w-3.5" />
+              </button>
             )}
           </div>
         </div>
