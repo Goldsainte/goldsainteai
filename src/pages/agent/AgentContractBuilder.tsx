@@ -572,65 +572,80 @@ export default function AgentContractBuilder() {
 
   return (
     <div className="min-h-screen bg-[#f7f3ea]">
-      {/* Command bar — sticky, DocuSign-style */}
-      <div className="sticky top-0 z-40 border-b border-white/10 bg-gradient-to-r from-[#0c4d47] to-[#0a2225] shadow-[0_2px_16px_rgba(10,34,37,0.25)]">
-        <div className="mx-auto flex h-[68px] max-w-3xl items-center gap-3 px-4 md:px-6">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="Back"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#E5DFC6]/70 transition-colors hover:bg-white/10 hover:text-[#E5DFC6]"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <div className="min-w-0 flex-1">
-            <p className="text-[9px] uppercase tracking-[0.28em] text-[#C7A962]">
-              Trip Service Agreement
-            </p>
-            <div className="flex items-baseline gap-2.5">
-              <h1 className="truncate font-secondary text-[19px] leading-tight text-[#fdfaf2]">
+      {/* Command bar — two-tier */}
+      <div className="sticky top-0 z-40 shadow-[0_2px_16px_rgba(10,34,37,0.28)]">
+        <div className="bg-gradient-to-r from-[#0c4d47] to-[#0a2225]">
+          <div className="mx-auto flex h-[72px] max-w-3xl items-center gap-4 px-4 md:px-6">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label="Back"
+              className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#E5DFC6]/28 text-[#E5DFC6] transition-colors hover:bg-white/10"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">
+                Trip Service Agreement
+              </p>
+              <h1 className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">
                 {tripData?.title || tripData?.destination || "Contract"}
               </h1>
-              {travelerData?.full_name && (
-                <span className="hidden shrink-0 text-[12px] text-[#E5DFC6]/60 sm:inline">
-                  · {travelerData.full_name}
-                </span>
-              )}
-              {dates && (
-                <span className="hidden shrink-0 text-[12px] text-[#E5DFC6]/45 lg:inline">
-                  · {dates}
-                </span>
-              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6]/45 px-6 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#E5DFC6] transition-colors hover:bg-white/10 disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={handleSendToTraveler}
+                disabled={sendDisabled}
+                className="inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-7 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-45"
+              >
+                <Send className="h-4 w-4" />
+                <span className="hidden sm:inline">Send to traveler</span>
+                <span className="sm:hidden">Send</span>
+              </button>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2.5">
-            {sendHint ? (
-              <span className="hidden text-[11px] text-[#E5DFC6]/60 md:inline">{sendHint}</span>
-            ) : (
-              !sendDisabled && (
-                <span className="hidden items-center gap-1.5 text-[11px] font-medium text-[#C7A962] md:inline-flex">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Ready
-                </span>
-              )
+        </div>
+        <div className="border-t border-white/10 bg-[#083530]">
+          <div className="mx-auto flex h-[46px] max-w-3xl items-center gap-5 px-4 md:px-6">
+            <span className="flex items-center gap-2.5 text-[13px] text-[#E5DFC6]/78">
+              <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
+                {(travelerData?.full_name || "T").trim().charAt(0).toUpperCase()}
+              </span>
+              {travelerData?.full_name || "Traveler"}
+            </span>
+            {dates && (
+              <span className="hidden text-[13px] text-[#E5DFC6]/60 sm:inline">{dates}</span>
             )}
-            <button
-              type="button"
-              onClick={handleSaveDraft}
-              disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6]/40 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.1em] text-[#E5DFC6] transition-colors hover:bg-white/10 disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-              <span className="hidden sm:inline">Save</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleSendToTraveler}
-              disabled={sendDisabled}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#C7A962] px-5 py-2 text-[11px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-40"
-            >
-              <Send className="h-3.5 w-3.5" />
-              Send
-            </button>
+            <div className="flex-1" />
+            {sourceType === "template" && (
+              <div className="hidden items-center gap-1.5 md:flex">
+                {requiredStatus.map((r) => (
+                  <span
+                    key={r.id}
+                    className={`h-[9px] w-[9px] rounded-full transition-colors ${
+                      r.missing === 0 ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+            {sendHint ? (
+              <span className="text-[12.5px] text-[#E5DFC6]/78">{sendHint}</span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#C7A962]">
+                <CheckCircle2 className="h-4 w-4" /> Ready to send
+              </span>
+            )}
           </div>
         </div>
       </div>
