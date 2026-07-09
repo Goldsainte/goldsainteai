@@ -297,6 +297,15 @@ export const Header = () => {
                               <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
                             </DropdownMenuItem>
+                            {(isAgentAccount || isCreator || isAdmin) && (
+                              <DropdownMenuItem
+                                onClick={() => navigate('/partner-bookings')}
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                              >
+                                <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                              </DropdownMenuItem>
+                            )}
                             {showRequestTrip && (
                               <DropdownMenuItem
                                 onClick={() => navigate(postTripPath)}
@@ -651,6 +660,15 @@ export const Header = () => {
                             <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                             <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
                           </DropdownMenuItem>
+                          {(isAgentAccount || isCreator || isAdmin) && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/partner-bookings')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
+                            >
+                              <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                            </DropdownMenuItem>
+                          )}
                           {showRequestTrip && (
                             <DropdownMenuItem
                               onClick={() => navigate(postTripPath)}
