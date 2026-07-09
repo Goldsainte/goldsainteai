@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import {
   ArrowLeft, ArrowRight, Send, MapPin, Calendar, DollarSign,
-  Clock, Users, ChevronLeft, Upload, X, FileText, Plus, Trash2, AlertCircle, Info, Percent,
+  Clock, Users, ChevronLeft, Upload, X, FileText, Plus, Trash2, AlertCircle, Info, Percent, Sparkles, Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -76,6 +76,7 @@ export default function NewProposalPage() {
 
   const [step, setStep] = useState(0);
   const [attempted, setAttempted] = useState(false);
+  const [aiPolishing, setAiPolishing] = useState(false);
   const [tripData, setTripData] = useState<TripRequestData | null>(null);
   const [proposalCount, setProposalCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -212,6 +213,42 @@ export default function NewProposalPage() {
     if (step === 2) return typeof priceFrom === "number" && priceFrom > 0;
     if (step === 6) return ackTerms && ackDeposit && ackCancellation;
     return true;
+  };
+
+  const handleAiPolish = async () => {
+    if (message.trim().length < 10) {
+      toast.error("Jot down a few rough notes first — the AI refines what you give it.");
+      return;
+    }
+    setAiPolishing(true);
+    try {
+      const dates = tripData?.start_date
+        ? `${format(new Date(tripData.start_date), "MMM d")}${
+            tripData?.end_date ? ` – ${format(new Date(tripData.end_date), "MMM d, yyyy")}` : ""
+          }`
+        : undefined;
+      const { data, error } = await supabase.functions.invoke("ai-proposal-polish", {
+        body: {
+          notes: message,
+          headline,
+          destination: tripData?.destination ?? undefined,
+          dates,
+          budgetMin: tripData?.budget_min ?? undefined,
+          budgetMax: tripData?.budget_max ?? undefined,
+          role: proposerRole,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.pitch) setMessage(data.pitch);
+      if (data?.headline) setHeadline(data.headline);
+      toast.success("Refined — review it and make it yours.");
+    } catch (err: any) {
+      console.error("ai-proposal-polish failed", err);
+      toast.error("Couldn't refine right now — your notes are untouched.");
+    } finally {
+      setAiPolishing(false);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -520,6 +557,22 @@ export default function NewProposalPage() {
                       onChange={(e) => setMessage(e.target.value)}
                       className={`${textareaClasses} min-h-[180px]`}
                     />
+                    <div className="flex items-center justify-between pt-0.5">
+                      <button
+                        type="button"
+                        onClick={handleAiPolish}
+                        disabled={aiPolishing || message.trim().length < 10}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {aiPolishing ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3.5 w-3.5" />
+                        )}
+                        {aiPolishing ? "Refining…" : "Refine with Goldsainte AI"}
+                      </button>
+                      <p className="text-[11px] text-[#0a2225]/40">AI drafts — you approve every word</p>
+                    </div>
                     <div className="flex justify-between">
                       {attempted && message.trim().length < 5 ? (
                         <p className="text-xs text-destructive">Minimum 5 characters required</p>
