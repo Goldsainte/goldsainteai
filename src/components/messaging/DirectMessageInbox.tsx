@@ -425,11 +425,11 @@ export function DirectMessageInbox() {
   }
 
   return (
-    <div className="flex h-full min-h-0 overflow-hidden bg-white md:border md:border-[#E5DFC6]/60 md:rounded-2xl md:shadow-sm">
+    <div className="flex h-full min-h-0 overflow-hidden bg-white border-t border-[#E5DFC6]/60">
       {/* Left Panel - Conversation List */}
       <div
         className={cn(
-          "w-full md:w-80 min-h-0 md:border-r md:border-[#E5DFC6]/50 flex-col bg-white md:bg-[#FDFBF7]",
+          "w-full md:w-[398px] md:shrink-0 min-h-0 md:border-r md:border-[#E5DFC6]/50 flex-col bg-white md:bg-[#FDFBF7]",
           selectedConversation ? "hidden md:flex" : "flex"
         )}
       >
