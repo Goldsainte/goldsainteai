@@ -177,8 +177,8 @@ export default function AgentContractBuilder() {
     }
   }
 
-  async function handleSaveDraft() {
-    if (!tripId || !tripData || !travelerData) return;
+  async function handleSaveDraft(): Promise<string | null> {
+    if (!tripId || !tripData || !travelerData) return null;
     
     setSaving(true);
     try {
@@ -210,6 +210,7 @@ export default function AgentContractBuilder() {
         (contractData as any).booking_id = linkedBookingId;
       }
 
+      let savedId: string | null = contractId;
       if (contractId) {
         const { error } = await supabase
           .from("trip_contracts")
@@ -225,6 +226,7 @@ export default function AgentContractBuilder() {
           .single();
         
         if (error) throw error;
+        savedId = data?.id ?? null;
         if (data) setContractId(data.id);
       }
       
@@ -232,6 +234,7 @@ export default function AgentContractBuilder() {
         title: "Draft Saved",
         description: "Your contract draft has been saved",
       });
+      return savedId;
     } catch (error: any) {
       console.error("Error saving draft:", error);
       toast({
@@ -239,6 +242,7 @@ export default function AgentContractBuilder() {
         title: "Error",
         description: error.message || "Failed to save draft",
       });
+      return null;
     } finally {
       setSaving(false);
     }
@@ -254,13 +258,22 @@ export default function AgentContractBuilder() {
       return;
     }
     
-    await handleSaveDraft();
+    const savedId = await handleSaveDraft();
     
-    if (!contractId || !travelerData?.email) {
+    if (!savedId) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Cannot send contract without saving first",
+        title: "Draft didn't save",
+        description: "Fix the save error shown above, then try sending again.",
+      });
+      return;
+    }
+
+    if (!travelerData?.email) {
+      toast({
+        variant: "destructive",
+        title: "Traveler email missing",
+        description: "This traveler's profile has no email on file, so the contract can't be sent.",
       });
       return;
     }
@@ -273,14 +286,14 @@ export default function AgentContractBuilder() {
           status: "pending_signatures",
           agent_signed_at: new Date().toISOString(),
         })
-        .eq("id", contractId);
+        .eq("id", savedId);
       
       if (updateError) throw updateError;
       
       // Send notification email
       const { error: emailError } = await supabase.functions.invoke("send-contract-notification", {
         body: {
-          contractId,
+          contractId: savedId,
           tripId,
           recipientEmail: travelerData.email,
           recipientType: "traveler",
@@ -291,7 +304,7 @@ export default function AgentContractBuilder() {
 
       // Auto-DM the traveler a signing link (non-fatal if it fails)
       try {
-        const signLink = `${window.location.origin}/contract/${contractId}/sign?type=traveler`;
+        const signLink = `${window.location.origin}/contract/${savedId}/sign?type=traveler`;
         await supabase.functions.invoke("send-direct-message", {
           body: {
             recipientId: travelerData.id,
