@@ -29,6 +29,8 @@ type TripRequestData = {
   budget_min: number | null;
   budget_max: number | null;
   user_id: string;
+  description: string | null;
+  interests: string[] | null;
 };
 
 type Milestone = { name: string; percentage: number };
@@ -77,6 +79,9 @@ export default function NewProposalPage() {
   const [step, setStep] = useState(0);
   const [attempted, setAttempted] = useState(false);
   const [aiPolishing, setAiPolishing] = useState(false);
+  const [aiDrafting, setAiDrafting] = useState(false);
+  const [aiScoping, setAiScoping] = useState(false);
+  const [aiRefiningTerms, setAiRefiningTerms] = useState(false);
   const [tripData, setTripData] = useState<TripRequestData | null>(null);
   const [proposalCount, setProposalCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -198,7 +203,7 @@ export default function NewProposalPage() {
     (async () => {
       setLoading(true);
       const [{ data: trip }, { count }] = await Promise.all([
-        supabase.from("trip_requests").select("id, title, destination, start_date, end_date, budget_min, budget_max, user_id").eq("id", tripId).maybeSingle(),
+        supabase.from("trip_requests").select("id, title, destination, start_date, end_date, budget_min, budget_max, user_id, description, interests").eq("id", tripId).maybeSingle(),
         supabase.from("trip_proposals").select("id", { count: "exact", head: true }).eq("trip_request_id", tripId),
       ]);
       setTripData(trip);
@@ -248,6 +253,101 @@ export default function NewProposalPage() {
       toast.error("Couldn't refine right now — your notes are untouched.");
     } finally {
       setAiPolishing(false);
+    }
+  };
+
+  const handleAiDraftAll = async () => {
+    setAiDrafting(true);
+    try {
+      const dates = tripData?.start_date
+        ? `${format(new Date(tripData.start_date), "MMM d")}${
+            tripData?.end_date ? ` – ${format(new Date(tripData.end_date), "MMM d, yyyy")}` : ""
+          }`
+        : undefined;
+      const { data, error } = await supabase.functions.invoke("ai-proposal-polish", {
+        body: {
+          mode: "full_draft",
+          notes: message,
+          headline,
+          destination: tripData?.destination ?? undefined,
+          dates,
+          budgetMin: tripData?.budget_min ?? undefined,
+          budgetMax: tripData?.budget_max ?? undefined,
+          role: proposerRole,
+          interests: tripData?.interests ?? undefined,
+          request_description: tripData?.description ?? undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data.headline) setHeadline(data.headline);
+      if (data.pitch) setMessage(data.pitch);
+      if (data.itinerary_summary) setItinerarySummary(data.itinerary_summary);
+      if (Array.isArray(data.inclusions) && data.inclusions.length > 0) setInclusionsText(data.inclusions.join("\n"));
+      if (Array.isArray(data.exclusions) && data.exclusions.length > 0) setExclusionsText(data.exclusions.join("\n"));
+      if (typeof data.price_per_person === "number" && data.price_per_person > 0) setPriceFrom(data.price_per_person);
+      if (typeof data.deposit_percentage === "number") setDepositPct(data.deposit_percentage);
+      if (typeof data.delivery_days === "number") setDeliveryDays(data.delivery_days);
+      if (data.cancellation_terms) setCustomCancellationTerms(data.cancellation_terms);
+      setDelBookingMgmt(Boolean(data.booking_management));
+      setDelOnTripSupport(Boolean(data.on_trip_support));
+      setAttempted(false);
+      toast.success("Full proposal drafted — walk each step and make it yours.");
+    } catch (err) {
+      console.error("ai full draft failed", err);
+      toast.error("Couldn't draft right now — nothing was changed.");
+    } finally {
+      setAiDrafting(false);
+    }
+  };
+
+  const handleAiScope = async () => {
+    if (inclusionsText.trim().length < 5) {
+      toast.error("Add a few rough inclusion lines first.");
+      return;
+    }
+    setAiScoping(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-proposal-polish", {
+        body: {
+          mode: "scope_polish",
+          inclusions_raw: inclusionsText,
+          exclusions_raw: exclusionsText,
+          destination: tripData?.destination ?? undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (Array.isArray(data.inclusions) && data.inclusions.length > 0) setInclusionsText(data.inclusions.join("\n"));
+      if (Array.isArray(data.exclusions)) setExclusionsText(data.exclusions.join("\n"));
+      toast.success("Lists tidied — review each line.");
+    } catch (err) {
+      console.error("ai scope polish failed", err);
+      toast.error("Couldn't tidy right now — your lists are untouched.");
+    } finally {
+      setAiScoping(false);
+    }
+  };
+
+  const handleAiRefineTerms = async () => {
+    if (customCancellationTerms.trim().length < 10) {
+      toast.error("Jot rough terms first — the AI refines what you give it.");
+      return;
+    }
+    setAiRefiningTerms(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-proposal-polish", {
+        body: { mode: "cancel_polish", terms_raw: customCancellationTerms },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data.cancellation_terms) setCustomCancellationTerms(data.cancellation_terms);
+      toast.success("Terms refined — make sure they're exactly your policy.");
+    } catch (err) {
+      console.error("ai terms polish failed", err);
+      toast.error("Couldn't refine right now — your terms are untouched.");
+    } finally {
+      setAiRefiningTerms(false);
     }
   };
 
@@ -513,6 +613,25 @@ export default function NewProposalPage() {
                     <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Describe your proposed itinerary and why you're the best fit.</p>
                   </div>
 
+                  <div className="rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/[0.07] p-4">
+                    <button
+                      type="button"
+                      onClick={handleAiDraftAll}
+                      disabled={aiDrafting}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                    >
+                      {aiDrafting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 text-[#C7A962]" />
+                      )}
+                      {aiDrafting ? "Drafting your proposal…" : "Draft entire proposal with Goldsainte AI"}
+                    </button>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#0a2225]/55">
+                      Pre-fills every step from the trip request — pitch, scope, pricing, terms, deliverables. You review and edit each one before anything is sent. Add rough notes below first if you want them woven in.
+                    </p>
+                  </div>
+
                   <div className="space-y-2">
                     <Label className={labelClasses}>Your Role</Label>
                     <div className="flex gap-3">
@@ -630,6 +749,19 @@ export default function NewProposalPage() {
                       className={`${textareaClasses} min-h-[120px]`}
                     />
                     <p className="text-xs text-muted-foreground">One item per line. Setting clear exclusions prevents disputes.</p>
+                    <button
+                      type="button"
+                      onClick={handleAiScope}
+                      disabled={aiScoping || inclusionsText.trim().length < 5}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {aiScoping ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-3.5 w-3.5" />
+                      )}
+                      {aiScoping ? "Tidying…" : "Tidy lists with Goldsainte AI"}
+                    </button>
                   </div>
 
                   <div className="space-y-3">
@@ -1107,6 +1239,19 @@ export default function NewProposalPage() {
                       onChange={(e) => setCustomCancellationTerms(e.target.value)}
                       className={`${textareaClasses} min-h-[80px]`}
                     />
+                    <button
+                      type="button"
+                      onClick={handleAiRefineTerms}
+                      disabled={aiRefiningTerms || customCancellationTerms.trim().length < 10}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {aiRefiningTerms ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-3.5 w-3.5" />
+                      )}
+                      {aiRefiningTerms ? "Refining…" : "Refine terms with Goldsainte AI"}
+                    </button>
                   </div>
                 </CardContent>
               </Card>
