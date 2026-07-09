@@ -13,6 +13,7 @@ type BookingRow = {
   id: string;
   status: string;
   partner_role: string;
+  traveler_id: string;
   total_price: number;
   deposit_amount: number | null;
   partner_payout: number;
@@ -33,12 +34,14 @@ export default function PartnerBookingsPage() {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function load() {
       setLoading(true);
+      setLoadError(null);
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
         navigate("/auth?returnTo=/partner-bookings", { replace: true });
@@ -59,10 +62,6 @@ export default function PartnerBookingsPage() {
           currency,
           created_at,
           metadata,
-          traveler:traveler_id (
-            display_name,
-            full_name
-          ),
           trip_requests:trip_request_id (
             id,
             title,
@@ -81,9 +80,31 @@ export default function PartnerBookingsPage() {
 
       if (error) {
         console.error("Error loading partner bookings:", error);
+        setLoadError(error.message || "Unable to load bookings.");
         setBookings([]);
       } else {
-        setBookings((data ?? []) as BookingRow[]);
+        const rows = (data ?? []) as BookingRow[];
+        setBookings(rows.map((r) => ({ ...r, traveler: null })) as BookingRow[]);
+
+        // Traveler names load separately — if this fails, the page still works.
+        const ids = Array.from(
+          new Set(rows.map((r: any) => r.traveler_id).filter(Boolean))
+        );
+        if (ids.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id, display_name, full_name")
+            .in("id", ids);
+          if (profs && isMounted) {
+            const byId = new Map(profs.map((p: any) => [p.id, p]));
+            setBookings(
+              rows.map((r: any) => ({
+                ...r,
+                traveler: byId.get(r.traveler_id) ?? null,
+              })) as BookingRow[]
+            );
+          }
+        }
       }
 
       setLoading(false);
@@ -126,6 +147,11 @@ export default function PartnerBookingsPage() {
                     className="h-24 rounded-3xl bg-[#0a2225]/60 animate-pulse"
                   />
                 ))}
+              </div>
+            ) : loadError ? (
+              <div className="rounded-3xl border border-[#C7A962]/50 bg-[#C7A962]/10 px-6 py-8 text-center">
+                <h3 className="font-secondary text-xl text-[#8D6B2F] mb-1">Couldn't load your bookings</h3>
+                <p className="text-sm text-[#8D6B2F]/80 break-words">{loadError}</p>
               </div>
             ) : bookings.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-6 py-12 text-center">
