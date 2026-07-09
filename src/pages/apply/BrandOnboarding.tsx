@@ -111,12 +111,28 @@ const QUALITY_CERTS = [
   'Preferred Hotels & Resorts', 'Small Luxury Hotels', 'Design Hotels'
 ];
 
+// ── Tour-operator context: identities and credentials that actually
+//    apply to running tours, not hotel properties ──
+const OPERATOR_BRAND_TYPES = BRAND_TYPES.filter((t) =>
+  ['Tour Operator', 'Experience Brand', 'Transportation', 'Other'].includes(t.value)
+);
+
+const OPERATOR_QUALITY_CERTS = [
+  'Virtuoso Member', 'USTOA Member', 'ATTA Member',
+  'IATA Accredited', 'ABTA / ATOL Bonded', 'Licensed Tour Guide'
+];
+
+const OPERATOR_SUSTAINABILITY_CERTS = SUSTAINABILITY_CERTS.filter(
+  (c) => !['LEED Certified', 'Green Key'].includes(c)
+);
+
 const luxuryInputClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm";
 const luxurySelectTriggerClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
 export default function BrandOnboarding() {
   const navigate = useNavigate();
   const location = useLocation();
+  const isTourOperatorRoute = location.pathname.includes('tour-operator');
   useEffect(() => {
     if (location.pathname.includes("tour-operator")) {
       setFormData((prev) => (prev.brandType ? prev : { ...prev, brandType: "Tour Operator" }));
@@ -422,7 +438,7 @@ export default function BrandOnboarding() {
                   <SelectValue placeholder="Select brand type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {BRAND_TYPES.map((type) => (
+                  {(isTourOperatorRoute ? OPERATOR_BRAND_TYPES : BRAND_TYPES).map((type) => (
                     <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                   ))}
                 </SelectContent>
@@ -743,7 +759,7 @@ export default function BrandOnboarding() {
               <div>
                 <Label className="font-medium text-[#0a2225]">Sustainability</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                  {SUSTAINABILITY_CERTS.map((cert) => (
+                  {(isTourOperatorRoute ? OPERATOR_SUSTAINABILITY_CERTS : SUSTAINABILITY_CERTS).map((cert) => (
                     <div key={cert} className="flex items-center space-x-2">
                       <Checkbox
                         id={`sustain-${cert}`}
@@ -762,7 +778,7 @@ export default function BrandOnboarding() {
               <div className="mt-4">
                 <Label className="font-medium text-[#0a2225]">Quality & Memberships</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                  {QUALITY_CERTS.map((cert) => (
+                  {(isTourOperatorRoute ? OPERATOR_QUALITY_CERTS : QUALITY_CERTS).map((cert) => (
                     <div key={cert} className="flex items-center space-x-2">
                       <Checkbox
                         id={`quality-${cert}`}
