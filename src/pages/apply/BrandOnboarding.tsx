@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { GoogleCityAutocomplete } from '@/components/GoogleCityAutocomplete';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -492,14 +493,22 @@ export default function BrandOnboarding() {
               <Label className="font-medium text-[#0a2225]">Cities/Locations</Label>
               <div className="mt-2 space-y-2">
                 <div className="flex flex-col gap-2 md:flex-row">
-                  <Input
-                    value={cityInput}
-                    onChange={(e) => setCityInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCity())}
-                    className={luxuryInputClasses}
-                    placeholder="Add one city or location"
-                    aria-describedby="brand-city-help"
-                  />
+                  <div
+                    className="flex-1"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCity();
+                      }
+                    }}
+                  >
+                    <GoogleCityAutocomplete
+                      value={cityInput}
+                      onChange={setCityInput}
+                      placeholder="Add one city or location"
+                      inputClassName={luxuryInputClasses}
+                    />
+                  </div>
                   <Button
                     type="button"
                     onClick={addCity}
