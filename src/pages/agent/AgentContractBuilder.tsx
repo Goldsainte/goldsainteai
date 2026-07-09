@@ -454,20 +454,28 @@ export default function AgentContractBuilder() {
         .eq("id", savedId);
       if (updateError) throw updateError;
 
-      const { error: emailError } = await supabase.functions.invoke(
-        "send-contract-notification",
-        {
-          body: {
-            contractId: savedId,
-            tripId,
-            recipientEmail: travelerData.email,
-            recipientType: "traveler",
+      // Email the signing link (best-effort — the DM below is the reliable channel)
+      let emailOk = false;
+      try {
+        const { data: emailData, error: emailError } = await supabase.functions.invoke(
+          "send-contract-notification",
+          {
+            body: {
+              contractId: savedId,
+              tripId,
+              recipientEmail: travelerData.email,
+              recipientType: "traveler",
+            },
           },
-        },
-      );
-      if (emailError) throw emailError;
+        );
+        if (emailError) throw emailError;
+        emailOk = emailData?.emailDelivered !== false;
+      } catch (emailErr) {
+        console.error("Contract email failed (non-fatal):", emailErr);
+      }
 
-      // Auto-DM the signing link (non-fatal)
+      // Auto-DM the signing link
+      let dmOk = false;
       try {
         const signLink = `${window.location.origin}/contract/${savedId}/sign?type=traveler`;
         await supabase.functions.invoke("send-direct-message", {
@@ -479,13 +487,22 @@ export default function AgentContractBuilder() {
             tripTitle: tripData?.title || tripData?.destination || "Trip contract",
           },
         });
+        dmOk = true;
       } catch (dmErr) {
         console.error("Contract DM failed (non-fatal):", dmErr);
       }
 
+      if (!emailOk && !dmOk) {
+        throw new Error(
+          "Couldn't reach the traveler by email or message — check the edge function logs.",
+        );
+      }
+
       toast({
         title: "Contract sent",
-        description: "Your traveler has the signing link by email and message.",
+        description: `Signing link delivered${
+          emailOk && dmOk ? " by email and message" : emailOk ? " by email" : " by message"
+        }.`,
       });
       navigate("/partner-bookings");
     } catch (error: any) {
