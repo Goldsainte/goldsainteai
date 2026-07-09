@@ -202,7 +202,8 @@ function PartnerBookingRowCard({
     e.stopPropagation();
     const ok = await confirmDialog({
       title: "Release the deposit?",
-      description: "This will mark the trip as completed and transfer the deposit. This action cannot be undone.",
+      description:
+        "This will mark the trip as completed and transfer the deposit. This action cannot be undone.",
       confirmText: "Release deposit",
     });
     if (!ok) return;
@@ -236,14 +237,33 @@ function PartnerBookingRowCard({
   const payoutLabel =
     booking.partner_payout && booking.partner_payout > 0
       ? "Your payout"
-      : "Est. payout (96.5%)";
+      : "Est. payout";
   const payout = `$${payoutValue.toFixed(2)}`;
+
+  const title =
+    trip?.title ||
+    (booking.metadata as any)?.trip_title ||
+    trip?.destination ||
+    "Goldsainte Trip";
+  const travelerName =
+    booking.traveler?.display_name || booking.traveler?.full_name || null;
+  const initial = (travelerName || "T").trim().charAt(0).toUpperCase();
+
+  const fmt = (d?: string | null) =>
+    d
+      ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      : null;
+  const dates =
+    trip?.start_date && trip?.end_date
+      ? `${fmt(trip.start_date)} – ${fmt(trip.end_date)}`
+      : fmt(trip?.start_date) || null;
 
   return (
     <Link
       to={`/booking/${booking.id}`}
-      className="flex flex-col gap-2 rounded-3xl bg-[#f6f3ea]/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
+      className="block rounded-2xl bg-white p-5 shadow-[0_2px_16px_rgba(0,0,0,0.07)] ring-1 ring-transparent transition hover:ring-[#C7A962]/60 md:p-6"
     >
+      {/* Identity + status */}
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-[0.22em] text-[#8D6B2F]">
@@ -253,52 +273,49 @@ function PartnerBookingRowCard({
               day: "numeric",
             })}
           </p>
-          <h2 className="mt-1.5 font-secondary text-xl leading-tight text-[#0a2225]">
-            {trip?.title ||
-              (booking.metadata as any)?.trip_title ||
-              trip?.destination ||
-              "Goldsainte Trip"}
+          <h2 className="mt-1.5 truncate font-secondary text-[22px] leading-tight text-[#0a2225]">
+            {title}
           </h2>
-          {(booking.traveler?.display_name || booking.traveler?.full_name) && (
-            <p className="mt-1 text-[13px] text-[#0a2225]/55">
-              Traveler:{" "}
-              {booking.traveler?.display_name || booking.traveler?.full_name}
-            </p>
-          )}
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <span className="flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47] text-[11px] font-medium text-[#E5DFC6]">
+                {initial}
+              </span>
+              <span className="text-[13.5px] text-[#0a2225]/75">
+                {travelerName || "Traveler"}
+              </span>
+            </span>
+            {dates && (
+              <span className="text-[13px] text-[#0a2225]/50">· {dates}</span>
+            )}
+            {travelers > 0 && (
+              <span className="text-[13px] text-[#0a2225]/50">
+                · {travelers} traveler{travelers === 1 ? "" : "s"}
+              </span>
+            )}
+          </div>
         </div>
-        <span className="shrink-0 rounded-full bg-[#0c4d47] px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+        <span className="shrink-0 rounded-full bg-[#0c4d47] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {booking.status.replace(/_/g, " ")}
         </span>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#4a4a4a]">
-        <div className="flex items-center gap-3">
-          {trip?.destination && (
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3 w-3 text-[#8D8D8D]" />
-              {trip.destination}
-            </span>
-          )}
-          {travelers > 0 && (
-            <span className="inline-flex items-center gap-1">
-              <Users className="h-3 w-3 text-[#8D8D8D]" />
-              {travelers} travelers
-            </span>
-          )}
+      {/* Money */}
+      <div className="mt-5 grid max-w-md grid-cols-2 gap-4 rounded-xl bg-[#fdfaf2] px-4 py-3.5">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45">
+            Trip total
+          </p>
+          <p className="mt-0.5 font-secondary text-[19px] text-[#0a2225]">{total}</p>
         </div>
-        <div className="flex flex-col items-end gap-0.5 text-right">
-          <span className="text-[13px] text-[#0a2225]/60">
-            Total{" "}
-            <span className="ml-1 font-secondary text-[16px] text-[#0a2225]">
-              {total}
-            </span>
-          </span>
-          <span className="text-[12px] text-[#0a2225]/55">
-            {payoutLabel}{" "}
-            <span className="ml-1 font-secondary text-[15px] text-[#0c4d47]">
-              {payout}
-            </span>
-          </span>
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45">
+            {payoutLabel}
+          </p>
+          <p className="mt-0.5 font-secondary text-[19px] text-[#0c4d47]">{payout}</p>
+          <p className="text-[10.5px] text-[#0a2225]/40">
+            96.5% after Goldsainte's 3.5%
+          </p>
         </div>
       </div>
 
@@ -313,18 +330,22 @@ function PartnerBookingRowCard({
         endDate={(booking as any).trip_requests?.end_date ?? null}
       />
 
-      {booking.status === "confirmed" && (
-        <div className="mt-1 flex justify-end">
-          <Button
-            size="sm"
+      {/* Actions */}
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
+        <span className="rounded-full border border-[#0a2225]/15 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors group-hover:border-[#C7A962]">
+          View details
+        </span>
+        {booking.status === "confirmed" && (
+          <button
+            type="button"
             onClick={handleRelease}
             disabled={releasing}
-            className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] hover:bg-[#0a2225]"
+            className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
           >
             {releasing ? "Releasing…" : "Release deposit"}
-          </Button>
-        </div>
-      )}
+          </button>
+        )}
+      </div>
     </Link>
   );
 }
