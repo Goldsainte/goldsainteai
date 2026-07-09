@@ -620,11 +620,23 @@ export default function ContractSignPage() {
             </CardHeader>
             <CardContent>
               {uploadedPdfUrl ? (
-                <iframe
-                  src={uploadedPdfUrl}
-                  title="Contract document"
-                  className="h-[720px] w-full rounded-lg border"
-                />
+                <>
+                  <div className="mb-3 flex justify-end">
+                    <a
+                      href={uploadedPdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20"
+                    >
+                      Open in new tab
+                    </a>
+                  </div>
+                  <iframe
+                    src={uploadedPdfUrl}
+                    title="Contract document"
+                    className="h-[720px] w-full rounded-lg border"
+                  />
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground">Loading document…</p>
               )}
