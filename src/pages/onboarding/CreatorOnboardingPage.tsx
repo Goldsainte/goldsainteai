@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 import { normalizeHandle } from "@/lib/socialHandles";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -528,6 +529,14 @@ export default function CreatorOnboardingPage() {
                       placeholder="What makes your content unique?"
                       className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl min-h-[100px]"
                     />
+                    <div className="mt-2 flex justify-end">
+                      <AIRewriteButton
+                        value={bio}
+                        onRewrite={setBio}
+                        fieldLabel="Creator bio / tagline"
+                        persona="a travel content creator joining Goldsainte"
+                      />
+                    </div>
                   </div>
 
                   <div>
