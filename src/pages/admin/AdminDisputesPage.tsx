@@ -40,8 +40,8 @@ export default function AdminDisputesPage() {
         const [bookingRows, profileRows] = await Promise.all([
           bookingIds.length
             ? supabase
-                .from("bookings")
-                .select("id, payout_status, total_amount, currency")
+                .from("trip_bookings")
+                .select("id, status, payout_paid_at, total_price, currency")
                 .in("id", bookingIds)
             : Promise.resolve({ data: [] }),
           userIds.length
@@ -68,8 +68,11 @@ export default function AdminDisputesPage() {
               status: row.status,
               createdAt: row.created_at,
               summary: row.resolution || "",
-              escrowStatus: booking.payout_status || null,
-              totalPriceCents: booking.total_amount || null,
+              escrowStatus: booking.payout_paid_at
+                ? "released"
+                : (booking.status ? `held · ${String(booking.status).replace(/_/g, " ")}` : null),
+              // total_price is stored in dollars; keep cents internally
+              totalPriceCents: booking.total_price != null ? Math.round(booking.total_price * 100) : null,
               currency: booking.currency || "USD",
             };
           })
@@ -109,17 +112,9 @@ export default function AdminDisputesPage() {
 
       if (updateError) throw updateError;
 
-      if (nextStatus === "RESOLVED") {
-        await supabase
-          .from("bookings")
-          .update({ payout_status: "released" })
-          .eq("id", dispute.bookingId);
-      } else if (nextStatus === "UNDER_REVIEW") {
-        await supabase
-          .from("bookings")
-          .update({ payout_status: "on_hold" })
-          .eq("id", dispute.bookingId);
-      }
+      // Deliberately no money side-effects here: payouts release ONLY via the
+      // explicit Release action on the booking (release-trip-deposit). Dispute
+      // resolution changes the dispute's status, nothing else.
 
       setDisputes((prev) => prev.map((item) => (item.id === dispute.id ? { ...item, status: nextStatus } : item)));
     } catch (err: any) {
@@ -136,7 +131,8 @@ export default function AdminDisputesPage() {
         <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Commerce</p>
         <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">Disputes</h1>
         <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
-          Open and historical disputes. Funds stay held in escrow until these are resolved.
+          Open and historical disputes. Resolving updates the dispute only — payouts
+          release explicitly from the booking, never from this page.
         </p>
         {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
       </section>
