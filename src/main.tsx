@@ -15,6 +15,9 @@ import App from "./App";
 import "./index.css";
 import { captureGclidFromUrl } from "@/lib/analytics/gclid";
 import { initAnalytics } from "@/lib/analytics/init";
+// Compress oversized images in the browser before ANY storage upload
+// (single choke point for all ~30 upload sites — see the module header).
+import "@/lib/storageImageCompressionGuard";
 
 // Capture Google Ads click identifier (gclid) on landing so we can attribute
 // downstream conversions even after navigation.
