@@ -117,7 +117,6 @@ export default function AdminHomePage() {
       try {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const today = new Date().toISOString().split("T")[0];
 
         const [agentApps, brandApps, disputes, upcoming, revenueRows, dlq, inquiries] =
           await Promise.all([
@@ -134,14 +133,14 @@ export default function AdminHomePage() {
               .select("id", { count: "exact", head: true })
               .in("status", ["OPEN", "UNDER_REVIEW"]),
             supabase
-              .from("bookings")
-              .select("id, status, trips!inner (start_date)")
-              .eq("status", "confirmed")
-              .gte("trips.start_date", today),
+              .from("trip_bookings")
+              .select("id", { count: "exact", head: true })
+              .not("status", "in", "(pending,cancelled)"),
             supabase
-              .from("bookings")
-              .select("platform_fee, created_at")
-              .gte("created_at", thirtyDaysAgo.toISOString()),
+              .from("trip_bookings")
+              .select("platform_commission, created_at, status")
+              .gte("created_at", thirtyDaysAgo.toISOString())
+              .not("status", "in", "(pending,cancelled)"),
             supabase.from("email_dlq").select("id", { count: "exact", head: true }),
             supabase
               .from("brand_inquiries")
@@ -151,8 +150,9 @@ export default function AdminHomePage() {
 
         if (cancelled) return;
 
+        // trip_bookings amounts are stored in dollars; keep cents internally
         const revenueCents = (revenueRows.data || []).reduce(
-          (sum, row) => sum + (row.platform_fee ?? 0),
+          (sum, row) => sum + Math.round((row.platform_commission ?? 0) * 100),
           0,
         );
 
@@ -160,7 +160,7 @@ export default function AdminHomePage() {
           applications:
             countOf(agentApps, "agent applications") + countOf(brandApps, "brand applications"),
           disputes: countOf(disputes, "disputes"),
-          upcomingTrips: upcoming.data?.length || 0,
+          upcomingTrips: countOf(upcoming, "active bookings"),
           revenueCents,
           emailDlq: countOf(dlq, "email dlq"),
           inquiries: countOf(inquiries, "inquiries"),
@@ -216,7 +216,7 @@ export default function AdminHomePage() {
           {[
             { k: "Pending applications", v: fmt(counts.applications), d: "auto-approval fallback", to: "/admin/applications" },
             { k: "Open disputes", v: fmt(counts.disputes), d: counts.disputes === 0 && !loading ? "nothing needs you" : "require intervention", to: "/admin/disputes" },
-            { k: "Upcoming trips", v: fmt(counts.upcomingTrips), d: "confirmed, dates ahead", to: "/admin/bookings" },
+            { k: "Active bookings", v: fmt(counts.upcomingTrips), d: "paid or in escrow", to: "/admin/bookings" },
             { k: "Revenue (30d)", v: revenue, d: "platform fees collected", to: "/admin/bookings" },
           ].map((s) => (
             <Link
