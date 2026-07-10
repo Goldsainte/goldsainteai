@@ -303,6 +303,13 @@ export default function BrandConsolePage() {
                       >
                         Or view your storefront <ArrowRight className="h-4 w-4 text-[#8D6B2F]" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate("/profile/media")}
+                        className="inline-flex items-center gap-2 text-[15px] text-[#0a2225]"
+                      >
+                        Add photos & video <ArrowRight className="h-4 w-4 text-[#8D6B2F]" />
+                      </button>
                     </div>
                   </div>
 
