@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Search, ShieldCheck, ShieldOff, ArrowLeft } from "lucide-react";
+import { Download, Search, ShieldCheck, ShieldOff } from "lucide-react";
 
 type Role = "admin" | "agent" | "brand" | "moderator" | "user";
 type AccountType = "traveler" | "creator" | "agent" | "brand";
@@ -190,20 +189,18 @@ export default function AdminUsersPage() {
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] px-6 py-10">
       <section className="mx-auto max-w-7xl space-y-6">
-        <Link to="/admin" className="inline-flex items-center gap-1 text-xs text-[#4a4a4a] hover:text-[#0c4d47]">
-          <ArrowLeft className="h-3 w-3" /> Back to admin
-        </Link>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-display text-[28px] leading-tight">All users</h1>
-            <p className="text-sm text-[#4a4a4a] mt-1">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">People</p>
+            <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">Users</h1>
+            <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
               Manage access, change account types, and export the user list.
             </p>
           </div>
           <button
             type="button"
             onClick={exportCsv}
-            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2 text-sm text-white hover:bg-[#0c4d47]/90"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
           >
             <Download className="h-4 w-4" /> Export CSV ({filtered.length})
           </button>
@@ -218,9 +215,9 @@ export default function AdminUsersPage() {
             { label: "Brands", value: stats.brands },
             { label: "Admins", value: stats.admins },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-[#E5DFC6] bg-white/90 p-4">
-              <p className="text-[11px] uppercase tracking-wide text-[#4a4a4a]">{s.label}</p>
-              <p className="font-display text-[22px] mt-1">{s.value}</p>
+            <div key={s.label} className="rounded-2xl bg-white p-4 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#8D6B2F]">{s.label}</p>
+              <p className="mt-1 font-secondary text-[22px]">{s.value}</p>
             </div>
           ))}
         </div>
@@ -232,7 +229,7 @@ export default function AdminUsersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by email, name, username, or ID…"
-              className="w-full rounded-full border border-[#E5DFC6] bg-white pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/30"
+              className="w-full rounded-full border border-[#E5DFC6] bg-white pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50"
             />
           </div>
           <select
@@ -249,10 +246,10 @@ export default function AdminUsersPage() {
           </select>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white/90">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-[#F1EBDA] text-[11px] uppercase tracking-wide text-[#4a4a4a]">
+              <thead className="bg-[#fdfaf2] text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
                 <tr>
                   <th className="px-4 py-3 text-left">User</th>
                   <th className="px-4 py-3 text-left">Account type</th>
@@ -317,10 +314,10 @@ export default function AdminUsersPage() {
                             type="button"
                             disabled={busy}
                             onClick={() => toggleAdmin(u)}
-                            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs ${
+                            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors ${
                               isAdmin
-                                ? "bg-red-50 text-red-700 hover:bg-red-100"
-                                : "bg-[#0c4d47] text-white hover:bg-[#0c4d47]/90"
+                                ? "border border-[#0a2225]/20 text-[#0a2225]/60 hover:bg-[#f7f3ea]"
+                                : "bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#0a2225]"
                             }`}
                           >
                             {isAdmin ? <ShieldOff className="h-3 w-3" /> : <ShieldCheck className="h-3 w-3" />}
