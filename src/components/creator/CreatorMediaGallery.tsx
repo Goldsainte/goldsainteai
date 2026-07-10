@@ -71,7 +71,7 @@ export function CreatorMediaGallery({
           {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
           <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-8 text-center">
             <Instagram className="h-6 w-6 text-[#C7A962] mx-auto mb-3" />
-            <p className="text-sm text-[#0a2225] mb-1">Add your content</p>
+            <p className="text-sm text-[#0a2225] mb-1">Add trip highlights</p>
             <p className="text-xs text-[#6B7280] mb-4">
               Upload photos, videos, or link your Instagram and TikTok reels.
             </p>
