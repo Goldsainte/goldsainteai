@@ -83,26 +83,6 @@ export default function Marketplace() {
   const [tourSearchDraft, setTourSearchDraft] = useState("");
   const [tourQuery, setTourQuery] = useState("");
 
-  // Live inventory counts for the segmented tabs — exact head counts, no
-  // estimates. Rendered only after they load.
-  const { data: tabCounts } = useQuery({
-    queryKey: ["marketplace-tab-counts"],
-    queryFn: async () => {
-      const [trips, tours, guides, requests] = await Promise.all([
-        supabase.from("packaged_trips").select("id", { count: "exact", head: true }).eq("status", "published").eq("listing_type", "trip"),
-        supabase.from("packaged_trips").select("id", { count: "exact", head: true }).eq("status", "published").eq("listing_type", "tour"),
-        supabase.from("itinerary_products").select("id", { count: "exact", head: true }).eq("status", "published"),
-        supabase.from("trip_requests").select("id", { count: "exact", head: true }).eq("status", "open"),
-      ]);
-      return {
-        trips: trips.count ?? undefined,
-        tours: tours.count ?? undefined,
-        "itinerary-guides": guides.count ?? undefined,
-        "trip-requests": requests.count ?? undefined,
-      } as Record<string, number | undefined>;
-    },
-    staleTime: 60_000,
-  });
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
 
@@ -487,17 +467,6 @@ export default function Marketplace() {
     return sorted;
   }, [tours, toursLocation, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
 
-  // Results count + removable filter chips (GetYourGuide-style feedback).
-  const activeResultCount =
-    activeTab === "itinerary-guides" ? filteredGuides.length
-    : activeTab === "trips" ? filteredLiveTrips.length
-    : activeTab === "trip-requests" ? (tripRequests?.length ?? 0)
-    : filteredTours.length + (partnerTourCount ?? 0);
-  const resultNoun =
-    activeTab === "itinerary-guides" ? "guide"
-    : activeTab === "trips" ? "trip"
-    : activeTab === "trip-requests" ? "trip request"
-    : "tour";
   const priceChipActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
 
   const handleDeleteRequest = async (id: string) => {
@@ -750,21 +719,7 @@ export default function Marketplace() {
               big unverifiable numbers eroded trust faster than empty space. ── */}
         <div className="sticky top-14 sm:top-16 md:top-20 z-30 border-b border-[#E5DFC6] bg-[#FDF9F0]/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
-            <MarketplaceTabs
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-              counts={
-                tabCounts
-                  ? {
-                      ...tabCounts,
-                      tours:
-                        partnerTourCount === null && (tabCounts.tours ?? 0) === 0
-                          ? undefined // don't flash "Tours 0" while Viator loads
-                          : (tabCounts.tours ?? 0) + (partnerTourCount ?? 0),
-                    }
-                  : tabCounts
-              }
-            />
+            <MarketplaceTabs activeTab={activeTab} onTabChange={handleTabChange} />
             <MarketplaceFilters
               filters={filters}
               onFilterChange={setFilters}
@@ -784,12 +739,8 @@ export default function Marketplace() {
             !filters.startDate &&
             !filters.endDate && <ForYouRow />}
 
-          {/* Result count + removable refinement chips */}
+          {/* Removable refinement chips (inventory counts deliberately not shown) */}
           <div className="mb-5 flex flex-wrap items-center gap-2">
-            <p className="text-sm text-[#6B7280]">
-              <span className="font-semibold text-[#0a2225]">{activeResultCount}</span>{" "}
-              {resultNoun}{activeResultCount === 1 ? "" : "s"}
-            </p>
             {priceChipActive && (
               <FilterChip
                 removeLabel="Remove price filter"
@@ -836,9 +787,6 @@ export default function Marketplace() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/60 via-transparent to-transparent" />
                     <div className="absolute bottom-3 left-3">
-                      <p className="font-sans text-[10px] text-white/85" style={{ fontFamily: "Inter, sans-serif" }}>
-                        {d.count} journey{d.count === 1 ? "" : "s"}
-                      </p>
                       <p className="font-secondary text-[17px] text-white drop-shadow">{d.city}</p>
                     </div>
                   </button>
