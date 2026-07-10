@@ -37,16 +37,18 @@ export default function AdminCreatorsPage() {
         const bookingStats = new Map<string, { count: number; earnings: number }>();
         if (ids.length) {
           const { data: bookings } = await supabase
-            .from("bookings")
-            .select("id, creator_id, creator_earnings")
-            .in("creator_id", ids);
+            .from("trip_bookings")
+            .select("id, partner_id, partner_payout")
+            .eq("partner_role", "creator")
+            .in("partner_id", ids);
 
           (bookings || []).forEach((row) => {
-            if (!row.creator_id) return;
-            const current = bookingStats.get(row.creator_id) || { count: 0, earnings: 0 };
-            bookingStats.set(row.creator_id, {
+            if (!row.partner_id) return;
+            const current = bookingStats.get(row.partner_id) || { count: 0, earnings: 0 };
+            bookingStats.set(row.partner_id, {
               count: current.count + 1,
-              earnings: current.earnings + ((row.creator_earnings || 0) * 100),
+              // partner_payout is stored in dollars; keep cents internally
+              earnings: current.earnings + Math.round((row.partner_payout || 0) * 100),
             });
           });
         }
