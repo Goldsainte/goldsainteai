@@ -690,6 +690,27 @@ async function provisionBrandAccountFromApplication(
       .eq("id", application.id);
     if (approveError) throw approveError;
 
+    // Post-auth routing reads profiles.account_type + is_profile_complete to
+    // decide the login landing. Without this, a provisioned operator keeps
+    // their signup-era account_type (often "traveler") and lands on the
+    // marketplace instead of the Maison. Best-effort: never fail provisioning
+    // over a routing field.
+    const { error: profileRouteError } = await supabaseClient
+      .from("profiles")
+      .update({
+        account_type: "brand",
+        is_profile_complete: true,
+        onboarding_completed: true,
+      })
+      .eq("id", userId);
+    if (profileRouteError) {
+      console.warn(
+        "Brand profile routing fields not updated:",
+        userId,
+        profileRouteError.message,
+      );
+    }
+
     return { success: true, alreadyExists: Boolean(existing) };
   } catch (e: any) {
     return { success: false, error: e?.message || String(e) };
