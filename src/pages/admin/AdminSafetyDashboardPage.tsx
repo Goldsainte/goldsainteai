@@ -1,14 +1,13 @@
 // src/pages/admin/AdminSafetyDashboardPage.tsx
+// Reskinned Jul 10 into the Registry house style (Registry phase two).
+// All data loading, columns, and helpers preserved from the original.
 import { useEffect, useState } from "react";
-import { Shield, AlertTriangle } from "lucide-react";
 import {
   getRecentReports,
   getRecentSafetyEvents,
   AdminReport,
   AdminSafetyEvent,
 } from "@/services/adminSafetyService";
-
-const BG = "bg-[#0a2225]";
 
 function AdminSafetyDashboardContent() {
   const [reports, setReports] = useState<AdminReport[]>([]);
@@ -44,93 +43,75 @@ function AdminSafetyDashboardContent() {
     };
   }, []);
 
+  const th = "text-left pr-4 pb-2 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/40 font-medium";
+  const td = "align-top pr-4 py-2.5 text-[12.5px] text-[#0a2225]/75 border-t border-[#F1EBDA]";
+
   return (
-    <main className={`${BG} min-h-screen text-[#E5DFC6]`}>
-      <section className="mx-auto max-w-6xl px-4 pt-8 pb-4 md:pt-10 md:pb-6">
-        <header className="space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#061215] px-3 py-1 text-[11px] border border-[#31434a]">
-            <Shield className="h-3 w-3 text-[#BFAD72]" />
-            <span className="tracking-[0.16em] uppercase text-[#8D8D8D]">
-              Admin · Trust & Safety
-            </span>
-          </div>
-          <h1 className="font-display text-[22px] md:text-[24px] leading-snug">
-            Goldsainte safety overview
-          </h1>
-          <p className="text-[11px] text-[#c6d0d4] max-w-xl">
-            A quick view of user reports and automated chat flags. Use this to
-            spot off-platform behavior, payment risks and accounts that may need
-            closer review.
-          </p>
-        </header>
+    <main className="min-h-screen bg-[#f7f3ea] px-5 py-10 text-[#0a2225] md:px-6">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+          Trust &amp; systems
+        </p>
+        <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">
+          Safety overview
+        </h1>
+        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
+          User reports and automated chat flags — for spotting off-platform behavior,
+          payment risks, and accounts that may need closer review.
+        </p>
+        {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
 
-        {error && (
-          <p className="mt-3 text-[11px] text-red-300">{error}</p>
-        )}
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-14 md:pb-20 space-y-5">
-        {/* Reports */}
-        <div className="rounded-3xl bg-[#061215] border border-[#31434a] p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[11px] font-semibold flex items-center gap-2">
-              <AlertTriangle className="h-3 w-3 text-[#BFAD72]" />
-              User reports
-            </p>
-            <p className="text-[10px] text-[#8D8D8D]">
-              Showing most recent {reports.length} reports
+        {/* ── User reports ── */}
+        <section className="mt-8 rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-secondary text-[15px] italic text-[#C7A962]">i.</p>
+              <h2 className="mt-0.5 font-secondary text-[19px]">User reports</h2>
+            </div>
+            <p className="text-[11px] text-[#0a2225]/40">
+              Most recent {reports.length}
             </p>
           </div>
           {loading ? (
-            <p className="text-[11px] text-[#8D8D8D]">Loading reports…</p>
+            <p className="mt-4 text-[13px] text-[#0a2225]/45">Loading reports…</p>
           ) : reports.length === 0 ? (
-            <p className="text-[11px] text-[#8D8D8D]">No reports yet.</p>
+            <p className="mt-4 text-[13px] text-[#0a2225]/45">
+              No reports yet — the house is quiet.
+            </p>
           ) : (
-            <div className="overflow-x-auto text-[11px]">
-              <table className="min-w-full border-separate border-spacing-y-2">
-                <thead className="text-[10px] text-[#8D8D8D]">
+            <div className="mt-4 overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
                   <tr>
-                    <th className="text-left pr-3">When</th>
-                    <th className="text-left pr-3">Type</th>
-                    <th className="text-left pr-3">Reporter</th>
-                    <th className="text-left pr-3">Reported</th>
-                    <th className="text-left pr-3">Context</th>
-                    <th className="text-left">Status</th>
+                    <th className={th}>When</th>
+                    <th className={th}>Type</th>
+                    <th className={th}>Reporter</th>
+                    <th className={th}>Reported</th>
+                    <th className={th}>Context</th>
+                    <th className={th}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {reports.map((r) => (
                     <tr key={r.id}>
-                      <td className="align-top pr-3 text-[#c6d0d4]">
-                        {new Date(r.created_at).toLocaleString()}
-                      </td>
-                      <td className="align-top pr-3">
-                        {formatReportType(r.report_type)}
-                      </td>
-                      <td className="align-top pr-3">
-                        {shortId(r.reporter_id)}
-                      </td>
-                      <td className="align-top pr-3">
+                      <td className={td}>{new Date(r.created_at).toLocaleString()}</td>
+                      <td className={td}>{formatReportType(r.report_type)}</td>
+                      <td className={td}>{shortId(r.reporter_id)}</td>
+                      <td className={td}>
                         {r.reported_user_id ? shortId(r.reported_user_id) : "—"}
                       </td>
-                      <td className="align-top pr-3 text-[#8D8D8D] max-w-xs">
+                      <td className={`${td} max-w-xs`}>
                         <div className="space-y-1">
-                          <p>
-                            {r.conversation_id && (
-                              <span>Conv: {shortId(r.conversation_id)} </span>
-                            )}
-                            {r.booking_id && (
-                              <span>· Booking: {shortId(r.booking_id)}</span>
-                            )}
+                          <p className="text-[11.5px] text-[#0a2225]/50">
+                            {r.conversation_id && <span>Conv: {shortId(r.conversation_id)} </span>}
+                            {r.booking_id && <span>· Booking: {shortId(r.booking_id)}</span>}
                           </p>
                           {r.description && (
-                            <p className="text-[10px] line-clamp-2">
-                              {r.description}
-                            </p>
+                            <p className="line-clamp-2 text-[12px]">{r.description}</p>
                           )}
                         </div>
                       </td>
-                      <td className="align-top text-[10px]">
+                      <td className={td}>
                         <StatusPill status={r.status} />
                       </td>
                     </tr>
@@ -139,56 +120,48 @@ function AdminSafetyDashboardContent() {
               </table>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Safety events */}
-        <div className="rounded-3xl bg-[#061215] border border-[#31434a] p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[11px] font-semibold flex items-center gap-2">
-              <AlertTriangle className="h-3 w-3 text-[#d4c58d]" />
-              Automated chat flags
-            </p>
-            <p className="text-[10px] text-[#8D8D8D]">
-              Showing most recent {events.length} events
+        {/* ── Automated chat flags ── */}
+        <section className="mt-4 rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-secondary text-[15px] italic text-[#C7A962]">ii.</p>
+              <h2 className="mt-0.5 font-secondary text-[19px]">Automated chat flags</h2>
+            </div>
+            <p className="text-[11px] text-[#0a2225]/40">
+              Most recent {events.length}
             </p>
           </div>
           {loading ? (
-            <p className="text-[11px] text-[#8D8D8D]">Loading safety events…</p>
+            <p className="mt-4 text-[13px] text-[#0a2225]/45">Loading safety events…</p>
           ) : events.length === 0 ? (
-            <p className="text-[11px] text-[#8D8D8D]">
+            <p className="mt-4 text-[13px] text-[#0a2225]/45">
               No safety events have been logged yet.
             </p>
           ) : (
-            <div className="overflow-x-auto text-[11px]">
-              <table className="min-w-full border-separate border-spacing-y-2">
-                <thead className="text-[10px] text-[#8D8D8D]">
+            <div className="mt-4 overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
                   <tr>
-                    <th className="text-left pr-3">When</th>
-                    <th className="text-left pr-3">Event</th>
-                    <th className="text-left pr-3">Sender</th>
-                    <th className="text-left pr-3">Conversation</th>
-                    <th className="text-left">Snippet</th>
+                    <th className={th}>When</th>
+                    <th className={th}>Event</th>
+                    <th className={th}>Sender</th>
+                    <th className={th}>Conversation</th>
+                    <th className={th}>Snippet</th>
                   </tr>
                 </thead>
                 <tbody>
                   {events.map((e) => (
                     <tr key={e.id}>
-                      <td className="align-top pr-3 text-[#c6d0d4]">
-                        {new Date(e.created_at).toLocaleString()}
-                      </td>
-                      <td className="align-top pr-3">
-                        {formatEventType(e.event_type)}
-                      </td>
-                      <td className="align-top pr-3">
-                        {shortId(e.sender_id)}
-                      </td>
-                      <td className="align-top pr-3">
-                        {shortId(e.conversation_id)}
-                      </td>
-                      <td className="align-top text-[#8D8D8D] max-w-xs">
+                      <td className={td}>{new Date(e.created_at).toLocaleString()}</td>
+                      <td className={td}>{formatEventType(e.event_type)}</td>
+                      <td className={td}>{shortId(e.sender_id)}</td>
+                      <td className={td}>{shortId(e.conversation_id)}</td>
+                      <td className={`${td} max-w-xs`}>
                         {truncate(e.original_text, 120)}
                         {e.reasons && e.reasons.length > 0 && (
-                          <p className="text-[10px] text-[#d4c58d] mt-1">
+                          <p className="mt-1 text-[11px] text-[#8D6B2F]">
                             {e.reasons.join(" · ")}
                           </p>
                         )}
@@ -199,8 +172,8 @@ function AdminSafetyDashboardContent() {
               </table>
             </div>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
@@ -233,22 +206,16 @@ function formatEventType(type: string) {
 
 function StatusPill({ status }: { status: string }) {
   const normalized = status.toLowerCase();
-  let bg = "#31434a";
-  const text = "#E5DFC6";
-
+  let cls = "border-[#E5DFC6] bg-[#fdfaf2] text-[#0a2225]/70";
   if (normalized === "open") {
-    bg = "#783d3d";
+    cls = "border-[#8D6B2F]/40 bg-[#C7A962]/15 text-[#8D6B2F]";
   } else if (normalized === "under_review") {
-    bg = "#725827";
+    cls = "border-[#E5DFC6] bg-[#E5DFC6]/40 text-[#0a2225]/70";
   } else if (normalized === "closed") {
-    bg = "#244a3c";
+    cls = "border-[#0c4d47]/25 bg-[#0c4d47]/10 text-[#0c4d47]";
   }
-
   return (
-    <span
-      className="inline-flex rounded-full px-2 py-0.5 text-[10px]"
-      style={{ backgroundColor: bg, color: text }}
-    >
+    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10.5px] ${cls}`}>
       {status}
     </span>
   );
