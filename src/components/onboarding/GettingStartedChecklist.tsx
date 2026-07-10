@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 type Role = "traveler" | "creator" | "agent";
 
 interface ChecklistData {
+  partnerMediaCount?: number;
   profile?: any;
   tripRequests?: number;
   savedTrips?: number;
@@ -82,6 +83,13 @@ const TRAVELER_ITEMS: ChecklistItem[] = [
 
 const CREATOR_ITEMS: ChecklistItem[] = [
   {
+    id: "add-media",
+    label: "Add photos & video to your profile",
+    description: "Show travelers who you are — imagery is what gets you chosen.",
+    cta: { label: "Add media", to: "/profile/media" },
+    isComplete: (d) => (d.partnerMediaCount || 0) > 0,
+  },
+  {
     id: "complete-onboarding",
     label: "Complete your creator profile",
     description: "Add a photo, bio, and your niches so travelers can discover you.",
@@ -139,6 +147,13 @@ const CREATOR_ITEMS: ChecklistItem[] = [
 ];
 
 const AGENT_ITEMS: ChecklistItem[] = [
+  {
+    id: "add-media",
+    label: "Add photos & video to your profile",
+    description: "Show travelers who you are — imagery is what gets you chosen.",
+    cta: { label: "Add media", to: "/profile/media" },
+    isComplete: (d) => (d.partnerMediaCount || 0) > 0,
+  },
   {
     id: "verify-identity",
     label: "Verify your identity",
@@ -248,6 +263,15 @@ export function GettingStartedChecklist({ userId, role }: Props) {
           ]);
           stats.publishedTrips = ptCount || 0;
           stats.proposalsSent = pCount || 0;
+        }
+        if (role === "creator" || role === "agent") {
+          try {
+            const { count: mCount } = await client
+              .from("partner_media")
+              .select("user_id", { count: "exact", head: true })
+              .eq("user_id", userId);
+            stats.partnerMediaCount = mCount || 0;
+          } catch (_) { /* table ships with partner-media.sql */ }
         }
         setData(stats);
       } catch (err) {
