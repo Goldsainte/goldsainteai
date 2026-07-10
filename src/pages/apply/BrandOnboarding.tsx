@@ -694,8 +694,8 @@ export default function BrandOnboarding() {
             </div>
 
             <p className="text-[13.5px] leading-relaxed text-[#0a2225]/50">
-              Once you're verified, our team reviews your application — typically within 2–3
-              business days. You'll hear from us the moment your house is approved.
+              The moment Stripe confirms your identity, your house is approved automatically —
+              no waiting on a review. You'll land in your console ready to set up your storefront.
             </p>
           </div>
         );
