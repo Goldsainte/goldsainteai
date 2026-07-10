@@ -83,6 +83,7 @@ const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingDetailPage = lazy(() => import('@/pages/bookings/BookingDetailPage'));
 const PartnerBookingDetailPage = lazy(() => import('@/pages/PartnerBookingDetailPage'));
+const ProfileMediaPage = lazy(() => import('@/pages/ProfileMediaPage'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
@@ -451,6 +452,7 @@ export const AppRoutes = () => (
       <Route path="/partner-bookings" element={<RequireAuth><PartnerBookingsPage /></RequireAuth>} />
       <Route path="/bookings/:bookingId" element={<RequireAuth><BookingDetailPage /></RequireAuth>} />
       <Route path="/booking/:id" element={<RequireAuth><PartnerBookingDetailPage /></RequireAuth>} />
+      <Route path="/profile/media" element={<RequireAuth><ProfileMediaPage /></RequireAuth>} />
       <Route path="/book/:id" element={<RequireAuth><BookTripPage /></RequireAuth>} />
       {/* Duplicate /traveler route removed - consolidated to line 331 */}
       <Route path="/partner" element={<Navigate to="/marketplace" replace />} />
