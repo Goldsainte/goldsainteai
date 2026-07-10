@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { RegistryBar } from "@/components/admin/RegistryBar";
 
 type AdminGuardProps = {
   children: ReactNode;
@@ -52,5 +53,11 @@ export function AdminGuard({ children }: AdminGuardProps) {
     return <Navigate to={`/login?redirect=${redirect}`} replace />;
   }
 
-  return <>{children}</>;
+  // Every admin page inherits the Registry chrome — one mount, twenty rooms.
+  return (
+    <>
+      <RegistryBar />
+      {children}
+    </>
+  );
 }
