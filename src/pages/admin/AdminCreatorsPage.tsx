@@ -60,7 +60,7 @@ export default function AdminCreatorsPage() {
             return {
               id: row.id,
               name: row.full_name || row.username || "Goldsainte creator",
-              handle: null,
+              handle: row.username || null,
               avgRating: 0,
               ratingCount: 0,
               totalBookings: stats.count,
