@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
+import { compressImageFile } from "@/lib/imageCompression";
 import { ChevronLeft, Loader2, Upload, X } from "lucide-react";
  
 const MAX_MB = 15;
@@ -84,9 +85,12 @@ export default function ProfileMediaPage() {
     }
     setUploading(true);
     let added: string[] = [];
-    for (const file of selected) {
+    for (const original of selected) {
+      // Shrink first, THEN apply the size bouncer — a 30 MB phone photo
+      // compresses to well under the cap and should succeed, not bounce.
+      const file = await compressImageFile(original);
       if (file.size > MAX_MB * 1024 * 1024) {
-        toast.error(`${file.name} is ${(file.size / 1048576).toFixed(1)} MB — the limit is ${MAX_MB} MB. Skipped.`);
+        toast.error(`${file.name} is ${(file.size / 1048576).toFixed(1)} MB even after compression — the limit is ${MAX_MB} MB. Skipped.`);
         continue;
       }
       try {
