@@ -50,15 +50,16 @@ export default function AdminAgentsPage() {
         const bookingCounts = new Map<string, number>();
         if (ids.length) {
           const { data: bookings } = await supabase
-            .from("bookings")
-            .select("id, agent_id")
-            .in("agent_id", ids);
+            .from("trip_bookings")
+            .select("id, partner_id")
+            .eq("partner_role", "agent")
+            .in("partner_id", ids);
 
           (bookings || []).forEach((row) => {
-            if (row.agent_id) {
+            if (row.partner_id) {
               bookingCounts.set(
-                row.agent_id,
-                (bookingCounts.get(row.agent_id) || 0) + 1
+                row.partner_id,
+                (bookingCounts.get(row.partner_id) || 0) + 1
               );
             }
           });
