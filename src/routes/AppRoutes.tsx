@@ -530,31 +530,31 @@ export const AppRoutes = () => (
         </AdminGuard>
       )}
     >
-      <Route path="/admin" element={<AdminGuard><AdminHomePage /></AdminGuard>} />
-      <Route path="/admin/applications" element={<AdminGuard><ApplicationReviewDashboard /></AdminGuard>} />
-      <Route path="/admin/safety" element={<AdminGuard><AdminSafetyDashboardPage /></AdminGuard>} />
-      <Route path="/admin/agents" element={<AdminGuard><AdminAgentsPage /></AdminGuard>} />
-      <Route path="/admin/creators" element={<AdminGuard><AdminCreatorsPage /></AdminGuard>} />
-      <Route path="/admin/users" element={<AdminGuard><AdminUsersPage /></AdminGuard>} />
-      <Route path="/admin/bookings" element={<AdminGuard><AdminBookingsPage /></AdminGuard>} />
-      <Route path="/admin/disputes" element={<AdminGuard><AdminDisputesPage /></AdminGuard>} />
-      <Route path="/admin/trips" element={<AdminGuard><AdminTripsPage /></AdminGuard>} />
-      <Route path="/admin/guides" element={<AdminGuard><AdminGuidesPage /></AdminGuard>} />
-      <Route path="/admin/waitlist" element={<AdminGuard><AdminWaitlistPage /></AdminGuard>} />
-      <Route path="/admin/email-dlq" element={<AdminGuard><AdminEmailDLQPage /></AdminGuard>} />
-      <Route path="/admin/newsroom" element={<AdminGuard><AdminNewsroomList /></AdminGuard>} />
-      <Route path="/admin/newsroom/new" element={<AdminGuard><AdminArticleEditor /></AdminGuard>} />
-      <Route path="/admin/newsroom/authors" element={<AdminGuard><AdminNewsroomAuthors /></AdminGuard>} />
-      <Route path="/admin/newsroom/:id/edit" element={<AdminGuard><AdminArticleEditor /></AdminGuard>} />
+      <Route path="/admin" element={<AdminHomePage />} />
+      <Route path="/admin/applications" element={<ApplicationReviewDashboard />} />
+      <Route path="/admin/safety" element={<AdminSafetyDashboardPage />} />
+      <Route path="/admin/agents" element={<AdminAgentsPage />} />
+      <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+      <Route path="/admin/users" element={<AdminUsersPage />} />
+      <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+      <Route path="/admin/disputes" element={<AdminDisputesPage />} />
+      <Route path="/admin/trips" element={<AdminTripsPage />} />
+      <Route path="/admin/guides" element={<AdminGuidesPage />} />
+      <Route path="/admin/waitlist" element={<AdminWaitlistPage />} />
+      <Route path="/admin/email-dlq" element={<AdminEmailDLQPage />} />
+      <Route path="/admin/newsroom" element={<AdminNewsroomList />} />
+      <Route path="/admin/newsroom/new" element={<AdminArticleEditor />} />
+      <Route path="/admin/newsroom/authors" element={<AdminNewsroomAuthors />} />
+      <Route path="/admin/newsroom/:id/edit" element={<AdminArticleEditor />} />
       <Route path="/admin/marketplace" element={<Navigate to="/admin" replace />} />
-      <Route path="/admin/escrow" element={<AdminGuard><OpsEscrowDashboardPage /></AdminGuard>} />
-      <Route path="/admin/cancellations" element={<AdminGuard><AdminCancellations /></AdminGuard>} />
-      <Route path="/admin/analytics/cancellations" element={<AdminGuard><AdminCancellationAnalytics /></AdminGuard>} />
-      <Route path="/admin/customer-verifications" element={<AdminGuard><AdminCustomerVerifications /></AdminGuard>} />
-      <Route path="/admin/inquiries" element={<AdminGuard><AdminInquiries /></AdminGuard>} />
-      <Route path="/admin/platform-analytics" element={<AdminGuard><PlatformAnalyticsDashboard /></AdminGuard>} />
-      <Route path="/admin/trust-safety" element={<AdminGuard><AdminTrustSafety /></AdminGuard>} />
-      <Route path="/system-health" element={<AdminGuard><SystemHealth /></AdminGuard>} />
+      <Route path="/admin/escrow" element={<OpsEscrowDashboardPage />} />
+      <Route path="/admin/cancellations" element={<AdminCancellations />} />
+      <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
+      <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
+      <Route path="/admin/inquiries" element={<AdminInquiries />} />
+      <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
+      <Route path="/admin/trust-safety" element={<AdminTrustSafety />} />
+      <Route path="/system-health" element={<SystemHealth />} />
     </Route>
 
     <Route path="/r" element={<Redirect />} />
