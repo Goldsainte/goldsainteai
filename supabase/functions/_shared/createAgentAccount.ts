@@ -198,8 +198,11 @@ export async function createAgentAccountFromApplication(
         is_verified: true,
         email_verified: true,
         identity_verified: true,
-        is_profile_complete: false,
-        onboarding_completed: false,
+        // An auto-approved application IS the completed profile. Leaving this
+        // false made post-auth routing bounce approved agents back to
+        // /apply/agent instead of the Bureau.
+        is_profile_complete: true,
+        onboarding_completed: true,
         agent_verification_status: "verified",
         created_at: nowIso,
       },
