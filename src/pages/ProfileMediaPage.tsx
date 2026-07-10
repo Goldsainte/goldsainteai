@@ -218,6 +218,15 @@ export default function ProfileMediaPage() {
           The imagery travelers and specialists see when they find you.
           {isBrand ? " Changes here update your public storefront." : ""}
         </p>
+        {isCreator && (
+          <button
+            type="button"
+            onClick={() => navigate("/creator-dashboard?tab=portfolio")}
+            className="mt-2 inline-flex items-center gap-1.5 text-[13.5px] text-[#8D6B2F] transition-colors hover:text-[#0a2225]"
+          >
+            Looking for your Trip Highlights (reels & featured content)? Portfolio tab →
+          </button>
+        )}
  
         <div className="mt-8 space-y-6">
           {isBrand && (
