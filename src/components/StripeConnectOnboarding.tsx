@@ -22,31 +22,37 @@ export const StripeConnectOnboarding = () => {
   const [onboarding, setOnboarding] = useState(false);
 
   useEffect(() => {
-    checkStatus();
-    
-    // Check for onboarding completion in URL
+    // Stripe redirects back whenever the user EXITS onboarding — completed or
+    // not — so the URL param alone never proves success. Verify first.
     const params = new URLSearchParams(window.location.search);
-    if (params.get('onboarding') === 'complete') {
-      toast.success('Stripe Connect onboarding completed!');
-      checkStatus();
-      // Clean up URL
-      window.history.replaceState({}, '', '/agent-dashboard');
-    } else if (params.get('refresh') === 'true') {
-      checkStatus();
+    const returnedFromStripe = params.get('onboarding') === 'complete';
+    if (returnedFromStripe || params.get('refresh') === 'true') {
       window.history.replaceState({}, '', '/agent-dashboard');
     }
+
+    (async () => {
+      const fresh = await checkStatus();
+      if (!returnedFromStripe) return;
+      if (fresh?.onboarding_complete) {
+        toast.success('Stripe Connect onboarding completed!');
+      } else {
+        toast.info('Stripe setup isn\'t finished yet — click "Continue Setup" to pick up where you left off.');
+      }
+    })();
   }, []);
 
-  const checkStatus = async () => {
+  const checkStatus = async (): Promise<StripeConnectStatus | null> => {
     try {
       setLoading(true);
       const { data, error } = await supabase.functions.invoke('check-stripe-connect-status');
       
       if (error) throw error;
       setStatus(data);
+      return data as StripeConnectStatus;
     } catch (error: any) {
       console.error('Error checking Stripe Connect status:', error);
       toast.error('Failed to check payment account status');
+      return null;
     } finally {
       setLoading(false);
     }
