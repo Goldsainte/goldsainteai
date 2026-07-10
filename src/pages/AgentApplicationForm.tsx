@@ -346,8 +346,6 @@ function AgentApplicationFormInner() {
       return true;
     }
     if (currentStep === 3) {
-      if (!formData.annualSalesVolume) return missing("Annual sales volume");
-      if (!formData.averageTripValue) return missing("Average trip value");
       if (formData.primaryFocus.length === 0) {
         toast({ title: "Select at least one primary focus", variant: "destructive" });
         return false;
@@ -370,8 +368,8 @@ function AgentApplicationFormInner() {
     setStep(target);
   };
 
-  const totalSteps = 6;
-  const stepLabels = ["You & Your Business", "Credentials", "Sales & Presence", "Insurance & Legal", "Documents", "Verification"];
+  const totalSteps = 5;
+  const stepLabels = ["You & Your Business", "Credentials", "Insurance & Legal", "Documents", "Verification"];
 
   const specializationOptions = [
     "Luxury Travel", "Adventure Travel", "Honeymoons & Romance", "Family Travel",
@@ -435,19 +433,19 @@ function AgentApplicationFormInner() {
       const { data: sessionData } = await supabase.auth.getSession();
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!sessionData?.session?.access_token || !authUser?.id) {
-        setStep(5);
+        setStep(4);
         const msg = "Your session isn't ready yet. Please sign in again and retry.";
         setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
         throw new Error(msg);
       }
       if (!authUser.email_confirmed_at) {
-        setStep(5);
+        setStep(4);
         const msg = "Please confirm your email before uploading documents, then retry.";
         setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
         throw new Error(msg);
       }
       if ((authUser.email ?? '').toLowerCase() !== (formData.email ?? '').toLowerCase()) {
-        setStep(5);
+        setStep(4);
         const msg = "The application email doesn't match your signed-in account. Please sign in with the matching email.";
         setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
         throw new Error(msg);
@@ -462,7 +460,7 @@ function AgentApplicationFormInner() {
       ];
       const missing = requiredDocs.find((d) => !d.file);
       if (missing) {
-        setStep(5);
+        setStep(4);
         throw new Error(`${missing.label} is required. Please upload it before continuing.`);
       }
 
@@ -472,7 +470,7 @@ function AgentApplicationFormInner() {
         businessLicensePath = await handleFileUpload(formData.businessLicenseFile!, 'business_license', authUser.id, formData.email);
         insuranceCertPath = await handleFileUpload(formData.insuranceCertificateFile!, 'insurance_certificate', authUser.id, formData.email);
       } catch (uploadErr: any) {
-        setStep(5);
+        setStep(4);
         const msg = uploadErr?.message || 'Document upload failed. Please try again.';
         setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
         throw new Error(msg);
@@ -564,7 +562,7 @@ function AgentApplicationFormInner() {
       setApplicationId(clientId);
       localStorage.setItem('agent_application_email', formData.email);
       localStorage.setItem('agent_application_id', clientId);
-      setStep(6);
+      setStep(5);
 
       // Send confirmation email (non-blocking) via the unified transactional
       // email system so styling matches the rest of the app's emails and the
@@ -711,75 +709,6 @@ function AgentApplicationFormInner() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-2">
-                <Label className="text-sm font-medium text-[#0a2225]">Business Address</Label>
-                <Input
-                  value={formData.businessAddress}
-                  onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
-                  className={luxuryInputClasses}
-                  autoComplete="street-address"
-                  name="street-address"
-                  placeholder="123 Main St"
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">City</Label>
-                <Input
-                  value={formData.businessCity}
-                  onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })}
-                  className={luxuryInputClasses}
-                  autoComplete="address-level2"
-                  name="city"
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">State</Label>
-                <Select
-                  value={formData.businessState}
-                  onValueChange={(value) => setFormData({ ...formData, businessState: value })}
-                >
-                  <SelectTrigger className={luxurySelectClasses} aria-label="State">
-                    <SelectValue placeholder="Select state" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {US_STATES.map((s) => (
-                      <SelectItem key={s.code} value={s.code}>
-                        {s.name} ({s.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {/* Hidden input so browser autofill of "address-level1" can still populate the value */}
-                <input
-                  type="text"
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  autoComplete="address-level1"
-                  name="state"
-                  value={formData.businessState}
-                  onChange={(e) => {
-                    const v = e.target.value.trim();
-                    if (!v) return;
-                    // Accept either "CA" or "California" from autofill
-                    const match = US_STATES.find(
-                      (s) => s.code.toLowerCase() === v.toLowerCase() || s.name.toLowerCase() === v.toLowerCase(),
-                    );
-                    if (match) setFormData({ ...formData, businessState: match.code });
-                  }}
-                  style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }}
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">ZIP Code</Label>
-                <Input
-                  value={formData.businessZip}
-                  onChange={(e) => setFormData({ ...formData, businessZip: e.target.value })}
-                  className={luxuryInputClasses}
-                  autoComplete="postal-code"
-                  name="postal-code"
-                  placeholder="10001"
-                />
-              </div>
               <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
                 <Select
@@ -859,118 +788,11 @@ function AgentApplicationFormInner() {
               </div>
             </div>
 
-            <div>
-              <Label className="text-sm font-medium text-[#0a2225]">Preferred Destinations</Label>
-              {/* Same Google Places autocomplete as creator onboarding.
-                  (The OSM-based CityAutocomplete is blocked by our CSP
-                  connect-src in production — google maps is allowlisted.) */}
-              <GoogleCityAutocomplete
-                value={formData.preferredDestinations}
-                onChange={(value) => setFormData({ ...formData, preferredDestinations: value })}
-                placeholder="e.g. Maldives, Italy, Japan"
-                inputClassName={luxuryInputClasses}
-              />
-            </div>
-
             <NavButtons onBack={() => setStep(1)} onNext={() => goToStep(3)} />
           </div>
         );
 
       case 3:
-        return (
-          <div className="space-y-8">
-            <SectionHeader title="Sales & Presence" />
-            <p className="text-sm text-[#6B7280] -mt-4">Help us understand your business volume and online presence.</p>
-            <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Annual Sales Volume</Label>
-                <Select value={formData.annualSalesVolume} onValueChange={(value) => setFormData({ ...formData, annualSalesVolume: value })}>
-                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select range" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="under_250k">Under $250K</SelectItem>
-                    <SelectItem value="250k_500k">$250K - $500K</SelectItem>
-                    <SelectItem value="500k_1m">$500K - $1M</SelectItem>
-                    <SelectItem value="1m_5m">$1M - $5M</SelectItem>
-                    <SelectItem value="over_5m">Over $5M</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Average Trip Value</Label>
-                <Select value={formData.averageTripValue} onValueChange={(value) => setFormData({ ...formData, averageTripValue: value })}>
-                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select range" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="under_5k">Under $5,000</SelectItem>
-                    <SelectItem value="5k_10k">$5,000 - $10,000</SelectItem>
-                    <SelectItem value="10k_25k">$10,000 - $25,000</SelectItem>
-                    <SelectItem value="25k_50k">$25,000 - $50,000</SelectItem>
-                    <SelectItem value="over_50k">Over $50,000</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Monthly Bookings</Label>
-                <Input value={formData.monthlyBookings} onChange={(e) => setFormData({ ...formData, monthlyBookings: e.target.value })} className={luxuryInputClasses} placeholder="e.g. 10-20" />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-sm font-medium text-[#0a2225]">Primary Focus</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                {primaryFocusOptions.map((focus) => (
-                  <div key={focus} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`focus-${focus}`}
-                      checked={formData.primaryFocus.includes(focus)}
-                      onCheckedChange={(checked) => {
-                        setFormData({
-                          ...formData,
-                          primaryFocus: checked
-                            ? [...formData.primaryFocus, focus]
-                            : formData.primaryFocus.filter(f => f !== focus)
-                        });
-                      }}
-                      className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
-                    />
-                    <label htmlFor={`focus-${focus}`} className="text-sm cursor-pointer text-[#0a2225]">{focus}</label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-3">
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Instagram</Label>
-                <Input value={formData.instagramHandle} onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })} className={luxuryInputClasses} placeholder="@handle" />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">TikTok</Label>
-                <Input value={formData.tiktokHandle} onChange={(e) => setFormData({ ...formData, tiktokHandle: e.target.value })} className={luxuryInputClasses} placeholder="@handle" />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">LinkedIn</Label>
-                <Input value={formData.linkedinProfileUrl} onChange={(e) => setFormData({ ...formData, linkedinProfileUrl: e.target.value })} className={luxuryInputClasses} placeholder="URL" />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-sm font-medium text-[#0a2225]">Why Goldsainte?</Label>
-              <Textarea value={formData.whyGoldsainte} onChange={(e) => setFormData({ ...formData, whyGoldsainte: e.target.value })} className={`${luxuryInputClasses} min-h-[100px]`} placeholder="What excites you about partnering with Goldsainte?" />
-              <div className="mt-2 flex justify-end">
-                <AIRewriteButton
-                  value={formData.whyGoldsainte}
-                  onRewrite={(t) => setFormData({ ...formData, whyGoldsainte: t })}
-                  fieldLabel="Why Goldsainte?"
-                  persona="a travel agent applying to join Goldsainte"
-                />
-              </div>
-            </div>
-
-            <NavButtons onBack={() => setStep(2)} onNext={() => goToStep(4)} />
-          </div>
-        );
-
-      case 4:
         return (
           <div className="space-y-8">
             <SectionHeader title="Insurance & Legal" />
@@ -991,10 +813,6 @@ function AgentApplicationFormInner() {
                   <div>
                     <Label className="text-sm text-[#0a2225]">Insurance Provider</Label>
                     <Input value={formData.insuranceProvider} onChange={(e) => setFormData({ ...formData, insuranceProvider: e.target.value })} className={luxuryInputClasses} />
-                  </div>
-                  <div>
-                    <Label className="text-sm text-[#0a2225]">Policy Number</Label>
-                    <Input value={formData.insurancePolicyNumber} onChange={(e) => setFormData({ ...formData, insurancePolicyNumber: e.target.value })} className={luxuryInputClasses} />
                   </div>
                   <div>
                     <Label className="text-sm text-[#0a2225]">Coverage Amount ($)</Label>
@@ -1031,10 +849,23 @@ function AgentApplicationFormInner() {
             </div>
 
             <NavButtons
-              onBack={() => setStep(3)}
-              onNext={() => goToStep(5)}
+              onBack={() => setStep(2)}
+              onNext={() => goToStep(4)}
               nextLabel="Continue to Documents"
               nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
+            />
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-8">
+            <Step10Documents formData={formData} setFormData={setFormData} />
+
+            <NavButtons
+              onBack={() => setStep(3)}
+              onNext={saveDraftApplication}
+              nextLabel="Continue to Verification"
             />
           </div>
         );
@@ -1042,40 +873,23 @@ function AgentApplicationFormInner() {
       case 5:
         return (
           <div className="space-y-8">
-            <Step10Documents formData={formData} setFormData={setFormData} />
-
-            <NavButtons
-              onBack={() => setStep(4)}
-              onNext={saveDraftApplication}
-              nextLabel="Continue to Verification"
-            />
-          </div>
-        );
-
-      case 6:
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDF9F0] border border-[#C7A962]/30">
-                <Shield className="h-10 w-10 text-[#C7A962]" />
-              </div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-[#8a7136]">Final step</p>
-              <h3 className="mb-3 font-secondary text-[28px] font-semibold text-[#0a2225]">Verify Your Identity</h3>
-              <p className="text-base text-[#6B7280] max-w-md mx-auto">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Final step</p>
+              <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">Verify your identity</h3>
+              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
                 Completing Stripe Identity verification activates your advisor account
                 <strong className="text-[#0a2225]"> immediately</strong> — there is no waiting period
                 or admin review. Takes 2–3 minutes.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-              <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.2em] text-[#8a7136]">Before you begin</p>
-              <h4 className="mb-3 font-secondary text-lg text-[#0a2225]">What you'll need</h4>
-              <ul className="space-y-2 text-sm text-[#6B7280]">
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Government-issued photo ID</li>
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />Device with camera for selfie verification</li>
-                <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-[#C7A962]" />2-3 minutes to complete</li>
-              </ul>
+            <div className="border-y border-[#0a2225]/10 py-7">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Have ready</p>
+              <div className="mt-4 space-y-3.5 text-[15.5px] leading-relaxed text-[#0a2225]/80">
+                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>A government-issued photo ID — passport or driver's license.</p>
+                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>A device with a camera, for a quick selfie match.</p>
+                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>About two minutes of your time.</p>
+              </div>
             </div>
 
             <Button
@@ -1085,7 +899,7 @@ function AgentApplicationFormInner() {
               className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full min-h-[52px] text-base"
               size="lg"
             >
-              {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Setting up verification...</> : <><Shield className="mr-2 h-5 w-5" />Start Identity Verification</>}
+              {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Setting up verification...</> : <>Start identity verification</>}
             </Button>
 
             <p className="text-center text-xs text-[#9A9079]">
