@@ -9,7 +9,7 @@ const MAX_MB = 15;
  
 export default function ProfileMediaPage() {
   const navigate = useNavigate();
-  const { isBrand, loading: roleLoading } = useUserRole();
+  const { isBrand, isAgent, isCreator, loading: roleLoading } = useUserRole();
  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -129,6 +129,7 @@ export default function ProfileMediaPage() {
           .eq("id", brandProfileId);
         if (error) throw error;
         toast.success("Saved — your storefront is updated.");
+        navigate(`/brands/${brandProfileId}`);
       } else {
         const { error } = await supabase.from("partner_media").upsert({
           user_id: userId,
@@ -138,7 +139,9 @@ export default function ProfileMediaPage() {
           updated_at: new Date().toISOString(),
         });
         if (error) throw error;
-        toast.success("Saved — your media is on file.");
+        toast.success("Saved — your profile is updated.");
+        if (isAgent) navigate(`/agents/${userId}`);
+        else if (isCreator) navigate(`/creators/${userId}`);
       }
     } catch (e: any) {
       console.error("Save failed:", e);
@@ -289,4 +292,3 @@ export default function ProfileMediaPage() {
     </div>
   );
 }
- 
