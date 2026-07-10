@@ -614,6 +614,89 @@ async function updateAgentApplication(
 }
 
 /**
+ * Auto-provision a live brand account after successful identity verification.
+ * Mirrors approve-application's brand core; idempotent; failures are logged
+ * to application_audit_log so an admin can re-run approve-application.
+ */
+async function provisionBrandAccountFromApplication(
+  supabaseClient: any,
+  application: any,
+): Promise<{ success: boolean; error?: string; alreadyExists?: boolean }> {
+  try {
+    // Resolve the applicant's auth user
+    let userId: string | null = application.user_id ?? null;
+    if (!userId && application.primary_contact_email) {
+      const { data: prof } = await supabaseClient
+        .from("profiles")
+        .select("id")
+        .eq("email", String(application.primary_contact_email).toLowerCase())
+        .maybeSingle();
+      userId = prof?.id ?? null;
+    }
+    if (!userId) {
+      return {
+        success: false,
+        error: "No auth user found for applicant (user_id missing and email lookup failed)",
+      };
+    }
+
+    // Idempotency: an existing brand profile means provisioning already ran
+    const { data: existing } = await supabaseClient
+      .from("brand_profiles")
+      .select("id")
+      .eq("owner_user_id", userId)
+      .maybeSingle();
+
+    if (!existing) {
+      const { error: brandError } = await supabaseClient.from("brand_profiles").insert({
+        owner_user_id: userId,
+        brand_name: application.brand_name,
+        brand_type: application.brand_type,
+        bio: application.bio,
+        website: application.website,
+        regions: application.regions,
+        cities: application.cities,
+        style_tags: application.style_tags,
+        logo_url: application.logo_url,
+        cover_image_url: application.cover_image_url,
+        gallery_urls: application.gallery_urls,
+        status: "active",
+        is_featured: false,
+        created_at: new Date().toISOString(),
+      });
+      if (brandError) throw brandError;
+    }
+
+    const { data: existingRole } = await supabaseClient
+      .from("user_roles")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("role", "brand")
+      .maybeSingle();
+    if (!existingRole) {
+      const { error: roleError } = await supabaseClient
+        .from("user_roles")
+        .insert({ user_id: userId, role: "brand" });
+      if (roleError) throw roleError;
+    }
+
+    const { error: approveError } = await supabaseClient
+      .from("brand_applications")
+      .update({
+        status: "approved",
+        approved_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", application.id);
+    if (approveError) throw approveError;
+
+    return { success: true, alreadyExists: Boolean(existing) };
+  } catch (e: any) {
+    return { success: false, error: e?.message || String(e) };
+  }
+}
+
+/**
  * Update brand application status after verification
  */
 async function updateBrandApplication(
@@ -777,6 +860,41 @@ async function updateBrandApplication(
       "identity_verified",
       verificationReport
     );
+
+    // Auto-provision the live brand account. No admin in the loop.
+    // Failures land in application_audit_log (account_provision_failed)
+    // so an admin can re-run approve-application to retry.
+    const brandProvision = await provisionBrandAccountFromApplication(
+      supabaseClient,
+      application,
+    );
+    if (!brandProvision.success) {
+      logger.error("Brand auto-provisioning failed after verification", {
+        applicationId: application.id,
+        error: brandProvision.error,
+      });
+      await logAuditEvent(application.id, "brand", "account_provision_failed", {
+        error: brandProvision.error,
+      });
+    } else {
+      logger.info("Brand account auto-provisioned", {
+        applicationId: application.id,
+        alreadyExists: brandProvision.alreadyExists,
+      });
+      try {
+        await sendApplicantNotification(
+          application.primary_contact_email,
+          application.brand_name,
+          "verified",
+          "brand",
+          "Your house is approved and live on Goldsainte. Sign in to set up your storefront.",
+        );
+      } catch (notifyErr) {
+        logger.error("Brand approval notification failed (non-fatal)", {
+          error: String(notifyErr),
+        });
+      }
+    }
 
     // Send notifications
     await sendApplicantNotification(
