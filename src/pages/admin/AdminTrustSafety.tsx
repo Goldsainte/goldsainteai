@@ -1,13 +1,12 @@
+// src/pages/admin/AdminTrustSafety.tsx
+// Reskinned Jul 10 into the Registry house style (Registry phase two).
+// All queries, handlers, and gating logic preserved from the original;
+// the per-page BackButton is gone — the RegistryBar carries navigation now.
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { BackButton } from "@/components/ui/BackButton";
 
 interface UserReport {
   id: string;
@@ -23,6 +22,13 @@ interface UserReport {
   resolved_by?: string;
   resolved_at?: string;
 }
+
+const STATUS_PILL: Record<string, string> = {
+  pending: "border-[#8D6B2F]/40 bg-[#C7A962]/15 text-[#8D6B2F]",
+  under_review: "border-[#E5DFC6] bg-[#E5DFC6]/40 text-[#0a2225]/70",
+  resolved: "border-[#0c4d47]/25 bg-[#0c4d47]/10 text-[#0c4d47]",
+  dismissed: "border-[#E5DFC6] bg-[#fdfaf2] text-[#0a2225]/45",
+};
 
 export default function AdminTrustSafety() {
   const [reports, setReports] = useState<UserReport[]>([]);
@@ -65,9 +71,9 @@ export default function AdminTrustSafety() {
 
       if (error) throw error;
       setReports(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading reports:", error);
-      toast.error("Failed to load reports");
+      toast.error(`Failed to load reports: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -94,106 +100,92 @@ export default function AdminTrustSafety() {
       setSelectedReport(null);
       setResolutionNotes("");
       loadReports();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating report:", error);
-      toast.error("Failed to update report");
+      toast.error(`Failed to update report: ${error.message}`);
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, any> = {
-      pending: { variant: "secondary", icon: AlertTriangle },
-      under_review: { variant: "default", icon: Shield },
-      resolved: { variant: "default", icon: CheckCircle },
-      dismissed: { variant: "outline", icon: XCircle },
-    };
-    const config = variants[status] || variants.pending;
-    const Icon = config.icon;
-    return (
-      <Badge variant={config.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {status.replace("_", " ")}
-      </Badge>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="container py-8">
-        <div className="animate-pulse space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="h-6 bg-muted rounded w-1/3" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-20 bg-muted rounded" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const pill = (label: string, key: string) => (
+    <span
+      className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10.5px] ${STATUS_PILL[key] || STATUS_PILL.pending}`}
+    >
+      {label}
+    </span>
+  );
 
   return (
-    <div className="container py-8 max-w-6xl">
-      <BackButton className="mb-6" />
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Shield className="h-8 w-8" />
-          Trust & Safety
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Review and manage user reports
+    <main className="min-h-screen bg-[#f7f3ea] px-5 py-10 text-[#0a2225] md:px-6">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+          Trust &amp; systems
         </p>
-      </div>
+        <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">
+          Trust &amp; safety
+        </h1>
+        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
+          Review and resolve user reports.
+        </p>
 
-      <div className="space-y-4">
-        {reports.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No reports to review</p>
-            </CardContent>
-          </Card>
-        ) : (
-          reports.map((report) => (
-            <Card key={report.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
+        <div className="mt-8 space-y-4">
+          {loading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="animate-pulse rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]"
+                >
+                  <div className="h-5 w-1/3 rounded bg-[#f7f3ea]" />
+                  <div className="mt-4 h-16 rounded bg-[#f7f3ea]" />
+                </div>
+              ))}
+            </div>
+          ) : reports.length === 0 ? (
+            <div className="rounded-2xl bg-white px-6 py-14 text-center shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+              <p className="font-secondary text-[15px] italic text-[#C7A962]">i.</p>
+              <p className="mt-2 text-[14px] text-[#0a2225]/55">
+                No reports to review — the house is quiet.
+              </p>
+            </div>
+          ) : (
+            reports.map((report) => (
+              <div
+                key={report.id}
+                className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <CardTitle className="text-lg">
-                      {report.report_type.replace("_", " ")} - {report.report_category.replace("_", " ")}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Severity: <Badge variant="outline">{report.severity}</Badge>
+                    <h2 className="font-secondary text-[18px] capitalize">
+                      {report.report_type.replace("_", " ")} — {report.report_category.replace("_", " ")}
+                    </h2>
+                    <p className="mt-1.5 text-[12px] text-[#0a2225]/50">
+                      Severity:{" "}
+                      <span className="rounded-full border border-[#E5DFC6] px-2 py-0.5 text-[10.5px] text-[#0a2225]/70">
+                        {report.severity}
+                      </span>
+                      <span className="ml-3">
+                        {new Date(report.created_at).toLocaleDateString()}
+                      </span>
                     </p>
                   </div>
-                  {getStatusBadge(report.status)}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="font-medium mb-1">Description:</p>
-                  <p className="text-sm text-muted-foreground">
-                    {report.description}
-                  </p>
+                  {pill(report.status.replace("_", " "), report.status)}
                 </div>
 
-                <div className="text-xs text-muted-foreground">
-                  Reported on: {new Date(report.created_at).toLocaleDateString()}
-                </div>
+                <p className="mt-4 text-[13.5px] leading-relaxed text-[#0a2225]/75">
+                  {report.description}
+                </p>
 
                 {report.admin_notes && (
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <p className="font-medium text-sm mb-1">Admin Notes:</p>
-                    <p className="text-sm">{report.admin_notes}</p>
+                  <div className="mt-4 rounded-xl border border-[#E5DFC6] bg-[#fdfaf2] p-4">
+                    <p className="text-[10px] uppercase tracking-[0.24em] text-[#8D6B2F]">
+                      Admin notes
+                    </p>
+                    <p className="mt-1.5 text-[13px] text-[#0a2225]/75">{report.admin_notes}</p>
                   </div>
                 )}
 
                 {report.status === "pending" && (
-                  <div className="space-y-3 border-t pt-4">
+                  <div className="mt-5 space-y-3 border-t border-[#F1EBDA] pt-5">
                     <Textarea
                       placeholder="Add resolution notes..."
                       value={selectedReport === report.id ? resolutionNotes : ""}
@@ -202,36 +194,38 @@ export default function AdminTrustSafety() {
                         setResolutionNotes(e.target.value);
                       }}
                       rows={3}
+                      className="rounded-xl border-[#E5DFC6] bg-white text-[13.5px] focus-visible:ring-[#C7A962]"
                     />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleUpdateStatus(report.id, "under_review")}
-                      >
-                        Mark Under Review
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => handleUpdateStatus(report.id, "resolved")}
-                      >
-                        Resolve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
+                    <div className="flex flex-wrap justify-end gap-2.5">
+                      <button
+                        type="button"
                         onClick={() => handleUpdateStatus(report.id, "dismissed")}
+                        className="rounded-full border border-[#0a2225]/20 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/70 transition-colors hover:bg-[#f7f3ea]"
                       >
                         Dismiss
-                      </Button>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStatus(report.id, "under_review")}
+                        className="rounded-full border border-[#C7A962]/50 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/10"
+                      >
+                        Mark under review
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStatus(report.id, "resolved")}
+                        className="rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                      >
+                        Resolve
+                      </button>
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          ))
-        )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
