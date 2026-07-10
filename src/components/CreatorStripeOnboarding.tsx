@@ -23,23 +23,36 @@ export const CreatorStripeOnboarding = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    checkStatus({ silent: true });
-    
-    // Check URL params for onboarding completion.
-    // stripe-connect-link returns to ?stripe=success / ?stripe=refresh;
-    // older links may still use ?onboarding=complete / ?refresh=true.
+    // Stripe redirects to the return URL whenever the user EXITS onboarding —
+    // completed or not — so the URL param alone never proves success.
+    // Verify with a live status check before claiming anything.
+    // (stripe-connect-link returns to ?stripe=success / ?stripe=refresh;
+    // older links may still use ?onboarding=complete / ?refresh=true.)
     const params = new URLSearchParams(window.location.search);
-    if (params.get('onboarding') === 'complete' || params.get('stripe') === 'success') {
-      toast({
-        title: "Setup Complete!",
-        description: "Your payout account has been configured successfully.",
-      });
-      checkStatus({ silent: true });
-      window.history.replaceState({}, '', window.location.pathname);
-    } else if (params.get('refresh') === 'true' || params.get('stripe') === 'refresh') {
-      checkStatus({ silent: true });
+    const returnedFromStripe =
+      params.get('onboarding') === 'complete' || params.get('stripe') === 'success';
+    const refreshOnly =
+      params.get('refresh') === 'true' || params.get('stripe') === 'refresh';
+    if (returnedFromStripe || refreshOnly) {
       window.history.replaceState({}, '', window.location.pathname);
     }
+
+    (async () => {
+      const fresh = await checkStatus({ silent: true });
+      if (!returnedFromStripe) return;
+      if (fresh?.onboarding_complete) {
+        toast({
+          title: "Setup Complete!",
+          description: "Your payout account has been configured successfully.",
+        });
+      } else {
+        toast({
+          title: "Stripe setup isn't finished",
+          description:
+            'It looks like you left Stripe before completing setup. Click "Continue Setup" to pick up where you left off.',
+        });
+      }
+    })();
   }, []);
 
   // Listen for global "start-stripe-onboarding" trigger from checklist CTAs
@@ -54,7 +67,7 @@ export const CreatorStripeOnboarding = () => {
     return () => window.removeEventListener('start-stripe-onboarding', handler);
   }, []);
 
-  const checkStatus = async (opts?: { silent?: boolean }) => {
+  const checkStatus = async (opts?: { silent?: boolean }): Promise<StripeStatus | null> => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -67,6 +80,7 @@ export const CreatorStripeOnboarding = () => {
 
       if (error) throw error;
       setStatus(data);
+      return data as StripeStatus;
     } catch (error: any) {
       console.error('Error checking status:', error);
       if (!opts?.silent) {
@@ -76,6 +90,7 @@ export const CreatorStripeOnboarding = () => {
           variant: "destructive",
         });
       }
+      return null;
     } finally {
       setLoading(false);
     }
