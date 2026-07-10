@@ -484,6 +484,14 @@ export default function AgentDashboard() {
           {user && <GettingStartedChecklist userId={user.id} role="agent" />}
         </div>
 
+        <button
+          type="button"
+          onClick={() => navigate("/profile/media")}
+          className="mt-4 inline-flex items-center gap-2 text-[15px] text-[#0a2225]"
+        >
+          Add photos & video <ArrowRight className="h-4 w-4 text-[#8D6B2F]" />
+        </button>
+
         {!agent.is_verified && (
           <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/40 bg-white px-6 py-5">
             <Clock className="mt-1 h-6 w-6 shrink-0 text-[#C7A962]" />
