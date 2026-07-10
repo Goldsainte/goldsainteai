@@ -517,6 +517,12 @@ export default function CreatorPublicProfilePage() {
               isOwnProfile={effIsOwn}
             />
           </div>
+
+          {id && (
+            <div className="mx-auto max-w-5xl px-4 pb-8 md:pb-12">
+              <PartnerMediaGallery userId={id} />
+            </div>
+          )}
         </div>
 
         {/* ─── Empty portfolio state (owner only, nothing published yet) ─── */}
@@ -772,8 +778,6 @@ export default function CreatorPublicProfilePage() {
             </div>
           </div>
         )}
-
-        {id && <PartnerMediaGallery userId={id} />}
 
       </div>
 
