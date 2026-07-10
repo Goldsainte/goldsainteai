@@ -275,7 +275,7 @@ export default function AdminHomePage() {
                     <Link
                       key={link.label + link.to}
                       to={link.to}
-                      className="rounded-full border border-[#E5DFC6] px-3.5 py-1.5 text-[12px] text-[#0a2225] transition-colors hover:border-[#C7A962] hover:bg-[#fdfaf2]"
+                      className="whitespace-nowrap rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[13px] text-[#6B7280] transition-colors hover:border-[#C7A962] hover:text-[#0a2225]"
                     >
                       {link.label}
                       {typeof n === "number" && n > 0 && (
