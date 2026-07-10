@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, PenLine, LogIn, Settings, Plus, ArrowRight, MoreHorizontal, Link2, Eye, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -771,6 +772,8 @@ export default function CreatorPublicProfilePage() {
             </div>
           </div>
         )}
+
+        {id && <PartnerMediaGallery userId={id} />}
 
       </div>
 
