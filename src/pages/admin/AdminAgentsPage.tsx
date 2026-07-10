@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle } from "lucide-react";
 import AdminAccountActions from "@/components/admin/AdminAccountActions";
 
 interface AgentRow {
@@ -124,18 +124,13 @@ export default function AdminAgentsPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] px-6 py-10">
-      <section className="mx-auto max-w-6xl space-y-4">
-        <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-4 py-1 text-[11px]">
-          <ShieldCheck className="h-3 w-3 text-[#0c4d47]" />
-          Travel agents
-        </div>
-        <div className="space-y-2">
-          <h1 className="font-display text-[24px] leading-tight">Verification &amp; performance</h1>
-          <p className="text-sm max-w-3xl text-[#4a4a4a]">
-            Review license details, KYC status, and booking performance. Only verified agents should be able to take bookings.
-          </p>
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+      <section className="mx-auto max-w-6xl">
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">People</p>
+        <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">Agents</h1>
+        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
+          License details, KYC status, and booking performance. Only verified agents can take bookings.
+        </p>
+        {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
       </section>
 
       <section className="mx-auto max-w-6xl mt-8">
@@ -144,7 +139,7 @@ export default function AdminAgentsPage() {
         ) : sortedAgents.length === 0 ? (
           <p className="text-sm text-[#4a4a4a]">No agents found.</p>
         ) : (
-          <div className="overflow-x-auto rounded-3xl border border-[#E5DFC6] bg-white/95">
+          <div className="overflow-x-auto rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left text-[12px] text-[#4a4a4a] uppercase tracking-[0.12em]">
@@ -203,7 +198,7 @@ export default function AdminAgentsPage() {
                            type="button"
                            onClick={() => handleStatusChange(agent.id, "rejected")}
                            disabled={updatingId === agent.id}
-                           className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1 text-[12px] font-semibold text-red-600 hover:bg-red-50"
+                           className="inline-flex items-center gap-1 rounded-full border border-[#0a2225]/20 px-3 py-1 text-[12px] font-medium text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea]"
                          >
                            <XCircle className="h-3 w-3" />
                            Reject
@@ -238,9 +233,12 @@ type StatusBadgeProps = {
 function StatusBadge({ label, tone = "kyc" }: StatusBadgeProps) {
   const normalized = label?.toLowerCase?.() || "none";
   const text = STATUS_LABELS[normalized] || normalized;
-  const color = tone === "verification" ? "bg-[#E3F2EF] text-[#0c4d47]" : "bg-[#F1EBDA] text-[#4a4a4a]";
+  const color =
+    tone === "verification"
+      ? "border border-[#0c4d47]/25 bg-[#0c4d47]/10 text-[#0c4d47]"
+      : "border border-[#E5DFC6] bg-[#fdfaf2] text-[#0a2225]/60";
   return (
-    <span className={`inline-flex rounded-full px-3 py-1 text-[12px] font-semibold ${color}`}>
+    <span className={`inline-flex rounded-full px-3 py-1 text-[11.5px] font-medium ${color}`}>
       {text}
     </span>
   );
