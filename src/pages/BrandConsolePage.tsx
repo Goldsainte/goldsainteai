@@ -54,6 +54,30 @@ export default function BrandConsolePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"house" | "collections" | "inquiries" | "performance">("house");
   const [inquiries, setInquiries] = useState<any[]>([]);
+  const [draftingId, setDraftingId] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+
+  const draftReply = async (inq: any) => {
+    setDraftingId(inq.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-proposal-polish", {
+        body: {
+          mode: "inquiry_reply",
+          inquiry_message: inq.message,
+          sender_name: inq.sender_name || "the traveler",
+          brand_name: profile?.name || "our house",
+          brand_bio: (profile as any)?.bio || "",
+        },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.reply) throw new Error(data?.error || "Draft came back empty");
+      setDrafts((d) => ({ ...d, [inq.id]: String(data.reply) }));
+    } catch (e: any) {
+      toast.error(`Couldn't draft a reply: ${e.message}`);
+    } finally {
+      setDraftingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -400,7 +424,31 @@ export default function BrandConsolePage() {
                           )}
                         </div>
                         <p className="mt-4 text-[14.5px] leading-relaxed text-[#0a2225]/80">{inq.message}</p>
+                        {drafts[inq.id] && (
+                          <div className="mt-4 rounded-xl border border-[#E5DFC6] bg-[#fdfaf2] p-4">
+                            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Suggested reply</p>
+                            <p className="mt-2 whitespace-pre-wrap text-[14px] leading-relaxed text-[#0a2225]/80">{drafts[inq.id]}</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(drafts[inq.id]);
+                                toast.success("Reply copied — paste it in Messages.");
+                              }}
+                              className="mt-3 rounded-full bg-[#0c4d47] px-4 py-1.5 text-[10.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                            >
+                              Copy reply
+                            </button>
+                          </div>
+                        )}
                         <div className="mt-4 flex flex-wrap justify-end gap-2.5">
+                          <button
+                            type="button"
+                            disabled={draftingId === inq.id}
+                            onClick={() => draftReply(inq)}
+                            className="rounded-full border border-[#C7A962]/50 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/10 disabled:opacity-50"
+                          >
+                            {draftingId === inq.id ? "Drafting…" : "Draft reply with AI"}
+                          </button>
                           <button
                             type="button"
                             onClick={() => navigate("/messages")}
