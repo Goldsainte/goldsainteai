@@ -3,7 +3,8 @@ import { Map, Ticket, BookOpen, PenLine } from "lucide-react";
 interface MarketplaceTabsProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  /** Live inventory counts per tab — rendered only when loaded (no fake numbers). */
+  /** DEPRECATED Jul 10 — accepted for compatibility but never rendered.
+   *  Inventory counts are deliberately not shown on the marketplace. */
   counts?: Partial<Record<"trips" | "tours" | "itinerary-guides" | "trip-requests", number>>;
 }
 
@@ -28,7 +29,6 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
       >
         {tabs.map(({ id, shortLabel, Icon }) => {
           const active = activeTab === id;
-          const n = counts?.[id];
           return (
             <button
               key={id}
@@ -44,7 +44,6 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
               <Icon className={`h-5 w-5 ${active ? "text-[#0c4d47]" : "text-[#8D8D8D]"}`} strokeWidth={active ? 2.2 : 1.8} />
               <span className={`whitespace-nowrap text-[12px] ${active ? "font-semibold" : "font-medium"}`}>
                 {shortLabel}
-                {typeof n === "number" && <span className={active ? " text-[#0c4d47]/60" : " text-[#9CA3AF]"}> {n}</span>}
               </span>
             </button>
           );
@@ -59,7 +58,6 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
       >
         {tabs.map(({ id, label }) => {
           const active = activeTab === id;
-          const n = counts?.[id];
           return (
             <button
               key={id}
@@ -71,9 +69,6 @@ export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceT
               }`}
             >
               {label}
-              {typeof n === "number" && (
-                <span className={active ? "ml-1.5 text-white/70" : "ml-1.5 text-[#9CA3AF]"}>· {n}</span>
-              )}
             </button>
           );
         })}
