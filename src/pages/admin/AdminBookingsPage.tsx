@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { HandCoins } from "lucide-react";
 
 interface BookingRow {
   id: string;
@@ -90,18 +89,15 @@ export default function AdminBookingsPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] px-6 py-10">
-      <section className="mx-auto max-w-6xl space-y-4">
-        <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-4 py-1 text-[11px]">
-          <HandCoins className="h-3 w-3 text-[#0c4d47]" />
+      <section className="mx-auto max-w-6xl">
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Commerce</p>
+        <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">
           Bookings &amp; commissions
-        </div>
-        <div className="space-y-2">
-          <h1 className="font-display text-[24px] leading-tight">Track revenue and partner earnings</h1>
-          <p className="text-sm max-w-3xl text-[#4a4a4a]">
-            See how each trip translates into platform revenue and payouts for creators or travel agents.
-          </p>
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        </h1>
+        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
+          How each trip translates into platform revenue and payouts for creators and agents.
+        </p>
+        {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
       </section>
 
       <section className="mx-auto max-w-6xl mt-8">
@@ -110,7 +106,7 @@ export default function AdminBookingsPage() {
         ) : bookings.length === 0 ? (
           <p className="text-sm text-[#4a4a4a]">No bookings found.</p>
         ) : (
-          <div className="overflow-x-auto rounded-3xl border border-[#E5DFC6] bg-white/95">
+          <div className="overflow-x-auto rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left text-[12px] text-[#4a4a4a] uppercase tracking-[0.12em]">
