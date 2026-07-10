@@ -28,6 +28,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Enforcement: suspended/banned accounts cannot hold a session ──
+  // The admin Suspend dialog promises "the user won't be able to log in";
+  // this makes that promise true, on every path a session can arrive
+  // through (sign-in, restore, refresh). Fail-open: if the check itself
+  // errors, the session stands — we never lock everyone out over a hiccup.
+  const enforcedUserIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!user) {
+      enforcedUserIdRef.current = null;
+      return;
+    }
+    if (enforcedUserIdRef.current === user.id) return;
+    enforcedUserIdRef.current = user.id;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('account_status')
+          .eq('id', user.id)
+          .maybeSingle();
+        const status = (data?.account_status || '').toLowerCase();
+        if (status === 'suspended' || status === 'banned') {
+          await supabase.auth.signOut();
+          toast({
+            title: status === 'banned' ? 'Account banned' : 'Account suspended',
+            description: `This account has been ${status}. Contact support if you believe this is an error.`,
+            variant: 'destructive',
+          });
+          navigate('/', { replace: true });
+        }
+      } catch (e) {
+        console.warn('Account status check skipped (fail-open):', e);
+      }
+    })();
+  }, [user]);
   const INACTIVITY_LIMIT = 60 * 60 * 1000; // 1 hour in milliseconds
   const sessionBootstrapFailures = useRef(0);
   const MAX_SESSION_FAILURES = 3;
