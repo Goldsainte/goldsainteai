@@ -183,8 +183,8 @@ export default function BrandOnboarding() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cityInput, setCityInput] = useState('');
 
-  const totalSteps = 5;
-  const stepLabels = ['Your Brand', 'Details & Location', 'Media & Features', 'Documents & Legal', 'Verification'];
+  const totalSteps = 4;
+  const stepLabels = ['Your Brand', 'Operations & Credentials', 'Documents & Legal', 'Verification'];
 
   const validateEmail = (email: string) => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
   const validatePhone = (phone: string) => /^\+?[1-9]\d{1,14}$/.test(phone);
@@ -204,16 +204,12 @@ export default function BrandOnboarding() {
         else if (formData.bio.length < 100) newErrors.bio = 'Bio must be at least 100 characters';
         break;
       case 2:
-        if (!formData.businessAddress.trim()) newErrors.businessAddress = 'Address is required';
         if (!formData.businessCountry.trim()) newErrors.businessCountry = 'Country is required';
         if (formData.regions.length === 0) newErrors.regions = 'Select at least one region';
         if (formData.styleTags.length === 0) newErrors.styleTags = 'Select at least one style tag';
         if (!formData.priceRange) newErrors.priceRange = 'Select a price range';
         break;
       case 3:
-        // Media is encouraged but not strictly required for streamlined flow
-        break;
-      case 4:
         if (!formData.acceptedTerms) newErrors.acceptedTerms = 'Required';
         if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'Required';
         if (!formData.acceptedVendor) newErrors.acceptedVendor = 'Required';
@@ -320,7 +316,7 @@ export default function BrandOnboarding() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(4)) return;
+    if (!validateStep(3)) return;
     setIsSubmitting(true);
     try {
       // Create Stripe Identity session
@@ -488,33 +484,12 @@ export default function BrandOnboarding() {
       case 2: // Details & Location (Business Details + Geographic/Style merged)
         return (
           <div className="space-y-6">
-            <SectionHeader title="Details & Location" />
+            <SectionHeader title="Operations & Credentials" />
 
-            <div>
-              <Label className="font-medium text-[#0a2225]">Business Address *</Label>
-              <Input value={formData.businessAddress} onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })} className={`${luxuryInputClasses} ${errors.businessAddress ? 'border-red-500' : ''}`} placeholder="123 Main Street" />
-              {errors.businessAddress && <p className="text-sm text-red-500 mt-1">{errors.businessAddress}</p>}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label className="font-medium text-[#0a2225]">City</Label>
-                <Input value={formData.businessCity} onChange={(e) => setFormData({ ...formData, businessCity: e.target.value })} className={luxuryInputClasses} />
-              </div>
-              <div>
-                <Label className="font-medium text-[#0a2225]">State/Province</Label>
-                <Input value={formData.businessState} onChange={(e) => setFormData({ ...formData, businessState: e.target.value })} className={luxuryInputClasses} />
-              </div>
-              <div>
-                <Label className="font-medium text-[#0a2225]">Country *</Label>
-                <Input value={formData.businessCountry} onChange={(e) => setFormData({ ...formData, businessCountry: e.target.value })} className={`${luxuryInputClasses} ${errors.businessCountry ? 'border-red-500' : ''}`} placeholder="United States" />
-                {errors.businessCountry && <p className="text-sm text-red-500 mt-1">{errors.businessCountry}</p>}
-              </div>
-            </div>
-
-            <div>
-              <Label className="font-medium text-[#0a2225]">Tax ID / EIN</Label>
-              <Input value={formData.taxId} onChange={(e) => setFormData({ ...formData, taxId: e.target.value })} className={luxuryInputClasses} placeholder="XX-XXXXXXX" />
+            <div className="max-w-md">
+              <Label className="font-medium text-[#0a2225]">Country *</Label>
+              <Input value={formData.businessCountry} onChange={(e) => setFormData({ ...formData, businessCountry: e.target.value })} className={`${luxuryInputClasses} ${errors.businessCountry ? 'border-red-500' : ''}`} placeholder="United States" />
+              {errors.businessCountry && <p className="text-sm text-red-500 mt-1">{errors.businessCountry}</p>}
             </div>
 
             <div>
@@ -536,61 +511,6 @@ export default function BrandOnboarding() {
                 ))}
               </div>
               {errors.regions && <p className="text-sm text-red-500 mt-1">{errors.regions}</p>}
-            </div>
-
-            <div>
-              <Label className="font-medium text-[#0a2225]">Cities/Locations</Label>
-              <div className="mt-2 space-y-2">
-                <div className="flex flex-col gap-2 md:flex-row">
-                  <div
-                    className="flex-1"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addCity();
-                      }
-                    }}
-                  >
-                    <GoogleCityAutocomplete
-                      value={cityInput}
-                      onChange={setCityInput}
-                      placeholder="Add one city or location"
-                      inputClassName={`${luxuryInputClasses} h-12 min-h-0 rounded-xl`}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={addCity}
-                    variant="outline"
-                    className="h-12 min-w-[120px] rounded-xl border-[#E5DFC6] px-5 text-[#0a2225] hover:bg-[#E5DFC6]/20"
-                  >
-                    Add city
-                  </Button>
-                </div>
-                <p id="brand-city-help" className="text-sm text-[#7A7151]">
-                  Press Enter after each city or click Add city.
-                </p>
-              </div>
-              {formData.cities.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {formData.cities.map((city) => (
-                    <div
-                      key={city}
-                      className="inline-flex items-center gap-2 rounded-md border border-[#E5DFC6] bg-[#F8F4EA] px-3.5 py-2 text-sm text-[#0a2225]"
-                    >
-                      <span className="font-medium leading-none">{city}</span>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, cities: prev.cities.filter(c => c !== city) }))}
-                        className="text-[#7A7151] transition-colors hover:text-[#0a2225]"
-                        aria-label={`Remove ${city}`}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>
@@ -628,199 +548,30 @@ export default function BrandOnboarding() {
               </Select>
               {errors.priceRange && <p className="text-sm text-red-500 mt-1">{errors.priceRange}</p>}
             </div>
-          </div>
-        );
 
-      case 3: // Media & Features (Media + Amenities + Certifications + Social merged)
-        return (
-          <div className="space-y-6">
-            <SectionHeader title="Media & Features" />
-
-            {/* Logo */}
             <div>
-              <Label className="font-medium text-[#0a2225]">Brand Logo (Square format)</Label>
-              <div className="mt-2">
-                {formData.logoUrl ? (
-                  <div className="relative w-32 h-32 border border-[#E5DFC6] rounded-xl overflow-hidden">
-                    <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain" loading="lazy"/>
-                    <button type="button" onClick={() => setFormData({ ...formData, logoUrl: '' })} className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2225]/70 text-[#E5DFC6] backdrop-blur-sm transition-colors hover:bg-[#0a2225]"><X className="h-4 w-4" /></button>
-                  </div>
-                ) : (
-                  <label className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
-                    <div className="text-center"><Upload className="mx-auto h-8 w-8 text-[#C7A962]" /><p className="mt-1 text-sm text-[#6B7280]">Upload logo</p></div>
-                    <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg,image/webp" onChange={(e) => handleImageUpload(e, 'logo')} />
-                  </label>
-                )}
-              </div>
-            </div>
-
-            {/* Cover */}
-            <div>
-              <Label className="font-medium text-[#0a2225]">Cover Image (16:9)</Label>
-              <div className="mt-2">
-                {formData.coverImageUrl ? (
-                  <div className="relative w-full h-48 border border-[#E5DFC6] rounded-xl overflow-hidden">
-                    <img src={formData.coverImageUrl} alt="Cover" className="w-full h-full object-cover" loading="lazy"/>
-                    <button type="button" onClick={() => setFormData({ ...formData, coverImageUrl: '' })} className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2225]/70 text-[#E5DFC6] backdrop-blur-sm transition-colors hover:bg-[#0a2225]"><X className="h-4 w-4" /></button>
-                  </div>
-                ) : (
-                  <label className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
-                    <div className="text-center"><Upload className="mx-auto h-8 w-8 text-[#C7A962]" /><p className="mt-1 text-sm text-[#6B7280]">Upload cover image</p></div>
-                    <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg,image/webp" onChange={(e) => handleImageUpload(e, 'cover')} />
-                  </label>
-                )}
-              </div>
-            </div>
-
-            {/* Gallery */}
-            <div>
-              <Label className="font-medium text-[#0a2225]">Gallery Images (Up to 12)</Label>
-              <div className="mt-2 grid grid-cols-3 gap-4">
-                {formData.galleryUrls.map((url, index) => (
-                  <div key={index} className="relative aspect-square border border-[#E5DFC6] rounded-xl overflow-hidden">
-                    <img src={url} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" loading="lazy"/>
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, galleryUrls: prev.galleryUrls.filter((_, i) => i !== index) }))} className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2225]/70 text-[#E5DFC6] backdrop-blur-sm transition-colors hover:bg-[#0a2225]"><X className="h-3 w-3" /></button>
+              <Label className="font-medium text-[#0a2225]">Quality & Memberships</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                {(isTourOperatorRoute ? OPERATOR_QUALITY_CERTS : QUALITY_CERTS).map((cert) => (
+                  <div key={cert} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`quality-${cert}`}
+                      checked={formData.qualityCertifications.includes(cert)}
+                      onCheckedChange={(checked) => setFormData(prev => ({
+                        ...prev,
+                        qualityCertifications: checked ? [...prev.qualityCertifications, cert] : prev.qualityCertifications.filter(c => c !== cert)
+                      }))}
+                      className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
+                    />
+                    <label htmlFor={`quality-${cert}`} className="text-sm cursor-pointer text-[#0a2225]">{cert}</label>
                   </div>
                 ))}
-                {formData.galleryUrls.length < 12 && (
-                  <label className="flex items-center justify-center aspect-square border-2 border-dashed border-[#E5DFC6] rounded-xl cursor-pointer hover:bg-[#F5EFE1]/50 transition-colors">
-                    <div className="text-center"><Upload className="mx-auto h-6 w-6 text-[#C7A962]" /><p className="mt-1 text-xs text-[#6B7280]">Add</p></div>
-                    <input type="file" className="hidden" accept="image/jpeg,image/png,image/jpg,image/webp" multiple onChange={(e) => handleImageUpload(e, 'gallery')} />
-                  </label>
-                )}
-              </div>
-              <p className="text-sm text-[#6B7280] mt-2">{formData.galleryUrls.length}/12 images</p>
-            </div>
-
-            {/* Social Media */}
-            <div>
-              <Label className="font-medium text-[#0a2225]">Social Media</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                <div>
-                  <Label className="text-sm text-[#6B7280]">Instagram</Label>
-                  <Input value={formData.instagramHandle} onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })} className={luxuryInputClasses} placeholder="@yourbrand" />
-                </div>
-                <div>
-                  <Label className="text-sm text-[#6B7280]">TikTok</Label>
-                  <Input value={formData.tiktokHandle} onChange={(e) => setFormData({ ...formData, tiktokHandle: e.target.value })} className={luxuryInputClasses} placeholder="@yourbrand" />
-                </div>
-                <div>
-                  <Label className="text-sm text-[#6B7280]">Facebook</Label>
-                  <Input value={formData.facebookUrl} onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })} className={luxuryInputClasses} placeholder="https://facebook.com/yourbrand" />
-                </div>
-                <div>
-                  <Label className="text-sm text-[#6B7280]">LinkedIn</Label>
-                  <Input value={formData.linkedinUrl} onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })} className={luxuryInputClasses} placeholder="https://linkedin.com/company/yourbrand" />
-                </div>
-              </div>
-            </div>
-
-            {/* Tour operations (conditional for tour operators) */}
-            {formData.brandType === 'Tour Operator' && (
-              <div className="border-t border-[#E5DFC6] pt-6">
-                <Label className="font-medium text-[#0a2225]">Tour operations</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                  <div>
-                    <Label htmlFor="capacityMin" className="text-sm text-[#4a4a4a]">Typical group size — minimum</Label>
-                    <Input
-                      id="capacityMin"
-                      type="number"
-                      min={1}
-                      value={formData.capacityMin}
-                      onChange={(e) => setFormData(prev => ({ ...prev, capacityMin: e.target.value }))}
-                      placeholder="e.g. 2"
-                      className="mt-1 border-[#E5DFC6]"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="capacityMax" className="text-sm text-[#4a4a4a]">Typical group size — maximum</Label>
-                    <Input
-                      id="capacityMax"
-                      type="number"
-                      min={1}
-                      value={formData.capacityMax}
-                      onChange={(e) => setFormData(prev => ({ ...prev, capacityMax: e.target.value }))}
-                      placeholder="e.g. 12"
-                      className="mt-1 border-[#E5DFC6]"
-                    />
-                  </div>
-                </div>
-                <p className="mt-2 text-xs text-[#9CA3AF]">
-                  Licenses and insurance documents can be attached in the documents step — approved
-                  operators can publish bookable tours directly to the marketplace.
-                </p>
-              </div>
-            )}
-
-            {/* Amenities (conditional for accommodations) */}
-            {['Hotel', 'Resort', 'Villa / Home', 'Boutique Stay'].includes(formData.brandType) && (
-              <div className="border-t border-[#E5DFC6] pt-6">
-                <Label className="font-medium text-[#0a2225]">Amenities</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
-                  {AMENITIES.map((amenity) => (
-                    <div key={amenity} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`amenity-${amenity}`}
-                        checked={formData.amenities.includes(amenity)}
-                        onCheckedChange={(checked) => setFormData(prev => ({
-                          ...prev,
-                          amenities: checked ? [...prev.amenities, amenity] : prev.amenities.filter(a => a !== amenity)
-                        }))}
-                        className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
-                      />
-                      <label htmlFor={`amenity-${amenity}`} className="text-sm cursor-pointer text-[#0a2225]">{amenity}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications */}
-            <div className="border-t border-[#E5DFC6] pt-6">
-              <h4 className="font-secondary text-lg text-[#0a2225] mb-4">Certifications</h4>
-              <div>
-                <Label className="font-medium text-[#0a2225]">Sustainability</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                  {(isTourOperatorRoute ? OPERATOR_SUSTAINABILITY_CERTS : SUSTAINABILITY_CERTS).map((cert) => (
-                    <div key={cert} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`sustain-${cert}`}
-                        checked={formData.sustainabilityCertifications.includes(cert)}
-                        onCheckedChange={(checked) => setFormData(prev => ({
-                          ...prev,
-                          sustainabilityCertifications: checked ? [...prev.sustainabilityCertifications, cert] : prev.sustainabilityCertifications.filter(c => c !== cert)
-                        }))}
-                        className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
-                      />
-                      <label htmlFor={`sustain-${cert}`} className="text-sm cursor-pointer text-[#0a2225]">{cert}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-4">
-                <Label className="font-medium text-[#0a2225]">Quality & Memberships</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                  {(isTourOperatorRoute ? OPERATOR_QUALITY_CERTS : QUALITY_CERTS).map((cert) => (
-                    <div key={cert} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`quality-${cert}`}
-                        checked={formData.qualityCertifications.includes(cert)}
-                        onCheckedChange={(checked) => setFormData(prev => ({
-                          ...prev,
-                          qualityCertifications: checked ? [...prev.qualityCertifications, cert] : prev.qualityCertifications.filter(c => c !== cert)
-                        }))}
-                        className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
-                      />
-                      <label htmlFor={`quality-${cert}`} className="text-sm cursor-pointer text-[#0a2225]">{cert}</label>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
         );
 
-      case 4: // Documents & Legal
+      case 3: // Documents & Legal
         return (
           <div className="space-y-6">
             <SectionHeader title="Documents & Legal" />
@@ -905,7 +656,7 @@ export default function BrandOnboarding() {
           </div>
         );
 
-      case 5: // Identity Verification
+      case 4: // Identity Verification
         return (
           <div className="space-y-10">
             <div>
@@ -1006,13 +757,13 @@ export default function BrandOnboarding() {
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
 
-              {currentStep < 4 ? (
+              {currentStep < 3 ? (
                 <Button onClick={handleNext} disabled={isSubmitting} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">
                   Next <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              ) : currentStep === 4 ? (
+              ) : currentStep === 3 ? (
                 <Button
-                  onClick={() => { if (validateStep(4)) setCurrentStep(5); }}
+                  onClick={() => { if (validateStep(3)) setCurrentStep(4); }}
                   disabled={isSubmitting || !formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
                   className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8"
                 >
