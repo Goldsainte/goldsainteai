@@ -165,10 +165,17 @@ export function CreatorPortfolioTab() {
     <div className="space-y-8">
       {/* Media Gallery */}
       <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
-        <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">Photos, Videos & Reels</h3>
-        <p className="text-sm text-[#6B7280] mb-4">
-          Showcase your best travel content. Upload photos and videos, or paste Instagram and TikTok Reel links. Set any photo as your cover image.
+        <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">Trip Highlights</h3>
+        <p className="text-sm text-[#6B7280] mb-2">
+          Featured content shown at the top of your public profile — photos, videos, and Instagram or TikTok reels. Set any photo as your cover image.
         </p>
+        <button
+          type="button"
+          onClick={() => (window.location.href = "/profile/media")}
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-[#8D6B2F] transition-colors hover:text-[#0a2225]"
+        >
+          Managing your main gallery? Photos & video →
+        </button>
         <CreatorMediaUploader
           userId={user?.id || ""}
           media={media}
