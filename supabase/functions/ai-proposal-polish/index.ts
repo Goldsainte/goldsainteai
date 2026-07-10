@@ -1,9 +1,15 @@
-// ai-proposal-polish v2 — Goldsainte AI proposal writer.
+// ai-proposal-polish v3 — Goldsainte AI writer (Jul 10).
 // Modes:
-//   "polish"       (default) rough notes -> polished pitch + headline
-//   "full_draft"   trip request context -> pre-fills the ENTIRE wizard
-//   "scope_polish" rough inclusion/exclusion lines -> clean lists
-//   "cancel_polish" rough terms -> polished cancellation paragraph
+//   "polish"          (default) rough notes -> polished pitch + headline
+//   "full_draft"      trip request context -> pre-fills the ENTIRE wizard
+//   "scope_polish"    rough inclusion/exclusion lines -> clean lists
+//   "cancel_polish"   rough terms -> polished cancellation paragraph
+//   "contract_draft"  fills the template contract's prose fields
+//   "field_polish"    rewrites any application/profile field
+//   "brief_sharpen"   traveler's rough trip request -> structured brief + gaps
+//   "inquiry_reply"   traveler inquiry -> suggested operator reply
+//   "contract_summary" plain-English summary, generated ONCE per contract then cached
+// Rate limited: 20 AI actions per user per day (ai_usage_log; fail-open if absent).
 // Self-contained (no _shared imports) for dashboard-paste deploys.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -119,6 +125,43 @@ serve(async (req) => {
 
     const body = await req.json();
     const mode = String(body.mode ?? "polish");
+
+    // ── Rate limit: 20 AI actions per user per day ──
+    // Best-effort: if the log table or service key is unavailable, we fail
+    // open (the feature keeps working) and note it in the logs.
+    const userId = String((claims.claims as Record<string, unknown>)?.sub ?? "");
+    const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const DAILY_LIMIT = 20;
+    let admin: ReturnType<typeof createClient> | null = null;
+    if (SERVICE_ROLE_KEY) {
+      admin = createClient(Deno.env.get("SUPABASE_URL")!, SERVICE_ROLE_KEY, {
+        auth: { persistSession: false },
+      });
+    }
+    if (admin && userId) {
+      try {
+        const since = new Date();
+        since.setUTCHours(0, 0, 0, 0);
+        const { count, error: cntErr } = await admin
+          .from("ai_usage_log")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .gte("created_at", since.toISOString());
+        if (!cntErr && (count ?? 0) >= DAILY_LIMIT) {
+          return jsonResponse(
+            req,
+            { error: `Daily Goldsainte AI limit reached (${DAILY_LIMIT} actions). It resets at midnight UTC.` },
+            429,
+          );
+        }
+        const { error: logErr } = await admin
+          .from("ai_usage_log")
+          .insert({ user_id: userId, mode });
+        if (logErr) console.warn("AI usage log unavailable (fail-open):", logErr.message);
+      } catch (e) {
+        console.warn("AI rate limiter unavailable (fail-open):", e);
+      }
+    }
 
     const notes = String(body.notes ?? "").slice(0, 2400).trim();
     const currentHeadline = String(body.headline ?? "").slice(0, 120).trim();
@@ -356,6 +399,115 @@ serve(async (req) => {
         return jsonResponse(req, { error: "Rewrite came back empty — try again." }, 502);
       }
       return jsonResponse(req, { text: polished });
+    }
+
+    // ── MODE: brief_sharpen — traveler's rough request -> structured brief ──
+    if (mode === "brief_sharpen") {
+      if (notes.length < 15) {
+        return jsonResponse(
+          req,
+          { error: "Describe your trip in a sentence or two first." },
+          400,
+        );
+      }
+      const system = [
+        "You help travelers on Goldsainte, a luxury travel marketplace, turn a rough trip idea into a brief that specialists can bid on well.",
+        VOICE,
+        "Rewrite their request in first person, 80-180 words, keeping EVERY fact they gave (places, dates, party size, budget, occasions, preferences) and adding nothing they didn't say.",
+        "Then list what a specialist would still need to know, as short questions (max 4). Only ask about genuinely missing essentials: dates, party size, budget, pace/style, occasion.",
+        'Output strict JSON: { "description": string, "missing": string[] }.',
+      ].join(" ");
+      const user = [
+        destination ? `Destination (if stated): ${destination}` : "",
+        dates ? `Dates (if stated): ${dates}` : "",
+        budget ? `Budget (if stated): ${budget}` : "",
+        "",
+        "Their rough request:",
+        `"""${notes}"""`,
+      ].filter((l) => l !== "").join("\n");
+      const out = await callOpenAI(system, user, 450);
+      const description = String(out.description ?? "").slice(0, 1600).trim();
+      if (!description) throw new Error("Empty brief returned");
+      return jsonResponse(req, {
+        description,
+        missing: cleanLines(out.missing, 4),
+      });
+    }
+
+    // ── MODE: inquiry_reply — draft an operator's reply to a storefront inquiry ──
+    if (mode === "inquiry_reply") {
+      const inquiryMessage = String(body.inquiry_message ?? "").slice(0, 2000).trim();
+      const senderName = String(body.sender_name ?? "the traveler").slice(0, 80).trim();
+      const brandName = String(body.brand_name ?? "our house").slice(0, 120).trim();
+      const brandBio = String(body.brand_bio ?? "").slice(0, 1200).trim();
+      if (inquiryMessage.length < 5) {
+        return jsonResponse(req, { error: "No inquiry text to reply to." }, 400);
+      }
+      const system = [
+        `You draft replies for ${brandName}, a travel operator on Goldsainte, a luxury travel marketplace.`,
+        VOICE,
+        "60-140 words. Thank them by name, engage the SPECIFICS of what they asked, and invite the next step (a conversation in Messages). NEVER invent availability, prices, dates, or offerings — if they asked about specifics you can't know, promise to confirm details in the conversation.",
+        'Output strict JSON: { "reply": string }.',
+      ].join(" ");
+      const user = [
+        brandBio ? `About the operator, in their words:\n"""${brandBio}"""` : "",
+        `Inquiry from ${senderName}:`,
+        `"""${inquiryMessage}"""`,
+        "",
+        "Draft the reply.",
+      ].filter((l) => l !== "").join("\n");
+      const out = await callOpenAI(system, user, 320);
+      const reply = String(out.reply ?? "").slice(0, 1200).trim();
+      if (!reply) throw new Error("Empty reply returned");
+      return jsonResponse(req, { reply });
+    }
+
+    // ── MODE: contract_summary — plain-English summary, cached per contract ──
+    if (mode === "contract_summary") {
+      const contractId = String(body.contract_id ?? "").trim();
+      if (!contractId) {
+        return jsonResponse(req, { error: "Missing contract_id" }, 400);
+      }
+      // Read as the CALLER — RLS proves they are a party to this contract.
+      const { data: contract, error: cErr } = await supabase
+        .from("trip_contracts")
+        .select("id, source_type, plain_summary, field_values")
+        .eq("id", contractId)
+        .single();
+      if (cErr || !contract) {
+        return jsonResponse(req, { error: "Contract not found or not yours to view." }, 404);
+      }
+      if (contract.plain_summary) {
+        return jsonResponse(req, { summary: contract.plain_summary, cached: true });
+      }
+      if (contract.source_type === "uploaded") {
+        return jsonResponse(req, { summary: null, reason: "uploaded" });
+      }
+      const fv = (contract.field_values ?? {}) as Record<string, unknown>;
+      const contractText = Object.entries(fv)
+        .map(([k, v]) => `${k}: ${String(v ?? "")}`)
+        .join("\n")
+        .slice(0, 6000);
+      if (contractText.length < 40) {
+        return jsonResponse(req, { summary: null, reason: "empty" });
+      }
+      const system = [
+        "You summarize a travel services agreement for the person about to sign it on Goldsainte, a luxury travel marketplace.",
+        "Write 4-6 plain sentences, one paragraph, second person ('you'). Cover: what services are being provided, what it costs and the deposit, the cancellation rules, and any duties the traveler has. Use ONLY facts present in the contract fields — quote every amount and percentage exactly. No legal advice, no reassurance, no markdown.",
+        'Output strict JSON: { "summary": string }.',
+      ].join(" ");
+      const out = await callOpenAI(system, `Contract fields:\n${contractText}\n\nSummarize.`, 350);
+      const summary = String(out.summary ?? "").slice(0, 1500).trim();
+      if (!summary) throw new Error("Empty summary returned");
+      // Cache via service role (parties can read contracts but not update them).
+      if (admin) {
+        const { error: upErr } = await admin
+          .from("trip_contracts")
+          .update({ plain_summary: summary })
+          .eq("id", contractId);
+        if (upErr) console.warn("Summary cache write failed (serving uncached):", upErr.message);
+      }
+      return jsonResponse(req, { summary, cached: false });
     }
 
     return jsonResponse(req, { error: "unknown mode" }, 400);
