@@ -271,6 +271,8 @@ export default function AgentPublicProfilePage() {
                 </section>
               )}
 
+              {id && <PartnerMediaGallery userId={id} />}
+
               {/* Trips */}
               <ProfileTripsGrid creatorId={agent.id} creatorType="agent" />
 
@@ -326,7 +328,6 @@ export default function AgentPublicProfilePage() {
             </div>
           </div>
 
-          {id && <PartnerMediaGallery userId={id} />}
         </div>
       </div>
     </>
