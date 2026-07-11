@@ -1,10 +1,10 @@
-actions/checkout@v5name: Playwright E2E Tests
+name: Playwright E2E Tests
 
+# Parked on manual trigger (Jul 11): this suite needs a running site
+# (PLAYWRIGHT_BASE_URL secret) and currently fails against the default
+# localhost. Re-enable push triggers once a staging URL exists — see
+# handoff §4A item 4. Run manually from the Actions tab meanwhile.
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
   workflow_dispatch:
 
 jobs:
