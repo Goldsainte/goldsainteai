@@ -39,6 +39,7 @@ serve(async (req) => {
 
     if (profileError) throw profileError;
 
+    if (!profile?.stripe_account_id) {
       return new Response(
         JSON.stringify({ 
           connected: false,
