@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { ImageIcon, Loader2, Save, CheckCircle2 } from "lucide-react";
+import { Loader2, Save, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 
 type Trip = {
   id: string;
@@ -35,7 +34,7 @@ export default function AdminTripsPage() {
         .order("created_at", { ascending: false });
       if (cancelled) return;
       if (error) {
-        toast.error("Failed to load trips");
+        toast.error(`Failed to load trips: ${error.message}`);
       } else {
         setTrips((data ?? []) as Trip[]);
       }
@@ -142,19 +141,16 @@ export default function AdminTripsPage() {
       </Helmet>
       <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225] px-6 py-10">
         <div className="mx-auto max-w-6xl space-y-6">
-          <header className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white/80 px-4 py-1 text-[11px]">
-              <ImageIcon className="h-3 w-3 text-[#0c4d47]" />
-              Marketplace trip photos
-            </div>
-            <h1 className="font-secondary text-2xl md:text-3xl">Edit trip cover photos</h1>
-            <p className="text-sm text-[#4a4a4a] max-w-2xl">
-              Update the cover image for any marketplace trip. Paste an image URL or upload a new file.
+          <header>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Marketplace</p>
+            <h1 className="mt-2 font-secondary text-[28px] leading-tight md:text-[30px]">Trips</h1>
+            <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
+              Approve pending trips and manage cover photos — paste an image URL or upload a file.
             </p>
           </header>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs uppercase tracking-wider text-[#6B7280]">Filter by status</span>
+            <span className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Filter by status</span>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[200px] h-9 rounded-full border-[#E5DFC6] bg-white text-sm">
                 <SelectValue />
@@ -181,7 +177,7 @@ export default function AdminTripsPage() {
                 return (
                   <li
                     key={trip.id}
-                    className="flex flex-col gap-4 rounded-3xl border border-[#E5DFC6] bg-white/90 p-4 md:flex-row md:items-center"
+                    className="flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:flex-row md:items-center"
                   >
                     <div className="h-28 w-40 flex-shrink-0 overflow-hidden rounded-2xl bg-[#F6F0E4]">
                       {trip.cover_image_url ? (
@@ -201,9 +197,9 @@ export default function AdminTripsPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-semibold">{trip.title || "Untitled trip"}</p>
                           {status === "pending_review" && (
-                            <Badge className="bg-[#C7A962]/20 text-[#7a5e1f] border border-[#C7A962]/40 rounded-full text-[10px] uppercase tracking-wider">
-                              Pending Review
-                            </Badge>
+                            <span className="inline-flex rounded-full border border-[#8D6B2F]/40 bg-[#C7A962]/15 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#8D6B2F]">
+                              Pending review
+                            </span>
                           )}
                         </div>
                         <p className="text-xs text-[#8D8D8D]">
@@ -215,7 +211,7 @@ export default function AdminTripsPage() {
                           onClick={() => approveTrip(trip)}
                           disabled={approvingId === trip.id}
                           size="sm"
-                          className="bg-[#0c4d47] text-white hover:bg-[#0a3d38] rounded-full"
+                          className="rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#0a2225]"
                         >
                           {approvingId === trip.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -259,12 +255,12 @@ export default function AdminTripsPage() {
                           value={draft}
                           onChange={(e) => updateDraft(trip.id, e.target.value)}
                           placeholder="Image URL"
-                          className="flex-1"
+                          className="flex-1 rounded-xl border-[#E5DFC6] bg-white focus-visible:ring-[#C7A962]"
                         />
                         <Button
                           onClick={() => saveCover(trip)}
                           disabled={savingId === trip.id}
-                          className="bg-[#0c4d47] text-white hover:bg-[#0a3d38]"
+                          className="rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#0a2225]"
                         >
                           {savingId === trip.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -273,7 +269,7 @@ export default function AdminTripsPage() {
                           )}
                           <span className="ml-2">Save</span>
                         </Button>
-                        <label className="inline-flex cursor-pointer items-center justify-center rounded-md border border-[#E5DFC6] bg-white px-3 py-2 text-sm hover:bg-[#F6F0E4]">
+                        <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-sm transition-colors hover:bg-[#fdfaf2]">
                           {uploadingId === trip.id ? "Uploading…" : "Upload"}
                           <input
                             type="file"
