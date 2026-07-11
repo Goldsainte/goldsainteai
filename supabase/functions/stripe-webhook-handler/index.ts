@@ -106,9 +106,44 @@ async function handleCheckoutCompleted(session: any) {
   
   // Handle different checkout types based on metadata
   if (metadata.type === 'trip_booking' && metadata.trip_booking_id) {
+    // Milestone escrow (Jul 11) needs to know how much has been COLLECTED,
+    // not just that "a" payment happened — the deposit checkout and the
+    // balance checkout both land here. Accumulate the fee-stripped amount
+    // (charges include the traveler-side 3.5% fee on top, hence /1.035) in
+    // booking metadata and flip to paid_in_full once the trip total is
+    // covered. release-trip-deposit's final-release guard reads this status.
+    let newStatus = 'confirmed';
+    let mergedMetadata: Record<string, unknown> | null = null;
+    try {
+      const { data: tb } = await supabaseClient
+        .from('trip_bookings')
+        .select('total_price, metadata')
+        .eq('id', metadata.trip_booking_id)
+        .single();
+      if (tb) {
+        const prevMeta = (tb.metadata as Record<string, unknown>) ?? {};
+        const collectedBefore = Number((prevMeta as any).amount_collected ?? 0) || 0;
+        const thisPayment =
+          Math.round(((session.amount_total ?? 0) / 100 / 1.035) * 100) / 100;
+        const collected = Math.round((collectedBefore + thisPayment) * 100) / 100;
+        const total = Number(tb.total_price ?? 0);
+        if (total > 0 && collected >= total - 0.01) {
+          newStatus = 'paid_in_full';
+        }
+        mergedMetadata = { ...prevMeta, amount_collected: collected };
+      }
+    } catch (e) {
+      // Never lose a payment over bookkeeping — fall back to plain confirm.
+      console.error('amount_collected tracking failed', e);
+    }
+
     await supabaseClient
       .from('trip_bookings')
-      .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+      .update({
+        status: newStatus,
+        updated_at: new Date().toISOString(),
+        ...(mergedMetadata ? { metadata: mergedMetadata } : {}),
+      })
       .eq('id', metadata.trip_booking_id);
 
     await notifyAndEmailOnBookingConfirmed(metadata.trip_booking_id, session);
