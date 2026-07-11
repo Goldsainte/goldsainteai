@@ -25,7 +25,6 @@ const ROOM_TITLES: Array<[prefix: string, title: string]> = [
   ["/admin/newsroom/new", "Newsroom · New article"],
   ["/admin/newsroom", "Newsroom"],
   ["/admin/escrow", "Escrow"],
-  ["/admin/analytics/cancellations", "Cancellation analytics"],
   ["/admin/cancellations", "Cancellations"],
   ["/admin/customer-verifications", "Customer verifications"],
   ["/admin/inquiries", "Inquiries"],
