@@ -56,7 +56,19 @@ jobs:
         run: supabase db push
 
       - name: Deploy edge functions
-        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+        # esm.sh (the CDN functions import from) occasionally times out
+        # mid-bundle (HTTP 522). That's transient — retry up to 3 times
+        # before declaring a real failure.
+        run: |
+          for attempt in 1 2 3; do
+            if supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"; then
+              exit 0
+            fi
+            echo "::warning::Deploy attempt $attempt failed — retrying in 45s (transient CDN errors are common)"
+            sleep 45
+          done
+          echo "::error::Deploy failed 3 times — this is likely a real problem, not a flake"
+          exit 1
 
       - name: Summary
         run: |
