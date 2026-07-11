@@ -18,12 +18,12 @@
     <!-- CSP Policy -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://maps.googleapis.com https://js.stripe.com https://www.tiktok.com https://*.tiktokcdn.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://browser.sentry-cdn.com https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://maps.googleapis.com https://js.stripe.com https://www.tiktok.com https://*.tiktokcdn.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' data: https://fonts.gstatic.com;
       img-src 'self' data: blob: https: http:;
       media-src 'self' blob: https: http:;
-      connect-src 'self' https://*.google-analytics.com https://www.google.com https://*.clarity.ms https://maps.googleapis.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321 https://api.stripe.com https://www.tiktok.com https://*.tiktokcdn.com https://noembed.com;
+      connect-src 'self' https://*.sentry.io https://*.google-analytics.com https://www.google.com https://*.clarity.ms https://maps.googleapis.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321 https://api.stripe.com https://www.tiktok.com https://*.tiktokcdn.com https://noembed.com;
       frame-src 'self' blob: https://*.supabase.co https://js.stripe.com https://hooks.stripe.com https://www.tiktok.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;
       worker-src 'self' blob:;
       child-src 'self' blob:;
@@ -74,6 +74,41 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'AW-17180504737');
+    </script>
+
+    <!-- ═══ ERROR MONITORING (Sentry) ═══════════════════════════════════
+         To activate: 1) free account at sentry.io → Create Project →
+         platform "React". 2) Copy the DSN (looks like
+         https://abc123@o456.ingest.us.sentry.io/789). 3) Paste it between
+         the quotes below and commit. Empty DSN = monitoring off; nothing
+         loads, nothing breaks. Captures crashes AND console.error calls —
+         which is where every honest-error catch block reports. -->
+    <script>
+      window.SENTRY_DSN = "https://b73681350acd8c3385e51ac291cc6978@o4510355065864192.ingest.us.sentry.io/4511717333532672";
+      (function () {
+        if (!window.SENTRY_DSN) return;
+        function load(src, onload) {
+          var s = document.createElement("script");
+          s.src = src; s.crossOrigin = "anonymous"; s.onload = onload;
+          document.head.appendChild(s);
+        }
+        load("https://browser.sentry-cdn.com/8.55.0/bundle.min.js", function () {
+          load("https://browser.sentry-cdn.com/8.55.0/captureconsole.min.js", init);
+          // If the pluggable bundle ever fails, still init with defaults.
+          setTimeout(init, 4000);
+        });
+        var done = false;
+        function init() {
+          if (done || !window.Sentry) return; done = true;
+          window.Sentry.init({
+            dsn: window.SENTRY_DSN,
+            integrations: window.Sentry.captureConsoleIntegration
+              ? [window.Sentry.captureConsoleIntegration({ levels: ["error"] })]
+              : [],
+            sampleRate: 1.0,
+          });
+        }
+      })();
     </script>
   </head>
 
