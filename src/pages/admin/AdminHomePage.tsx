@@ -61,7 +61,6 @@ const DIRECTORY: DirectoryGroup[] = [
       { label: "Trips", to: "/admin/trips" },
       { label: "Disputes", to: "/admin/disputes", countKey: "disputes" },
       { label: "Cancellations", to: "/admin/cancellations" },
-      { label: "Cancellation analytics", to: "/admin/analytics/cancellations" },
     ],
   },
   {
