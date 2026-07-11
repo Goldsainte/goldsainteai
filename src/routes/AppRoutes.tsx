@@ -23,7 +23,6 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const BrandApplyPage = lazy(() => import('@/pages/apply/BrandOnboarding'));
 const BrandConsolePage = lazy(() => import('@/pages/BrandConsolePage'));
 const BrandCollectionDetailPage = lazy(() => import('@/pages/BrandCollectionDetailPage'));
-const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const AdminSafetyDashboardPage = lazy(() => import('@/pages/admin/AdminSafetyDashboardPage'));
 const AdminAgentsPage = lazy(() => import('@/pages/admin/AdminAgentsPage'));
 const AdminCreatorsPage = lazy(() => import('@/pages/admin/AdminCreatorsPage'));
@@ -119,7 +118,6 @@ const CustomerVerification = lazy(() => import('@/pages/CustomerVerification'));
 const EmergencyContacts = lazy(() => import('@/pages/EmergencyContacts'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const AdminCancellations = lazy(() => import('@/pages/AdminCancellations'));
-const AdminCancellationAnalytics = lazy(() => import('@/pages/AdminCancellationAnalytics'));
 const AdminCustomerVerifications = lazy(() => import('@/pages/AdminCustomerVerifications'));
 const AdminInquiries = lazy(() => import('@/pages/AdminInquiries'));
 const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnalyticsDashboard'));
@@ -549,7 +547,6 @@ export const AppRoutes = () => (
       <Route path="/admin/marketplace" element={<Navigate to="/admin" replace />} />
       <Route path="/admin/escrow" element={<OpsEscrowDashboardPage />} />
       <Route path="/admin/cancellations" element={<AdminCancellations />} />
-      <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
       <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
       <Route path="/admin/inquiries" element={<AdminInquiries />} />
       <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
