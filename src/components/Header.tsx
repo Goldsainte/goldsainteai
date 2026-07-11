@@ -21,61 +21,6 @@ import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { NotificationInbox } from "@/components/NotificationInbox";
 
-/* ── Goldsainte brand nav icons — original artwork ── */
-const GsTravelIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true">
-    <defs>
-      <linearGradient id="gsTrvL" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E9CE8C"/><stop offset="100%" stopColor="#B08A38"/></linearGradient>
-      <linearGradient id="gsTrvS" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#11655a"/><stop offset="100%" stopColor="#083a34"/></linearGradient>
-    </defs>
-    <rect x="17.5" y="7" width="13" height="9" rx="3.5" fill="none" stroke="#8a6a28" strokeWidth="3"/>
-    <rect x="6" y="13" width="36" height="27" rx="4.5" fill="url(#gsTrvL)"/>
-    <rect x="13" y="13" width="5.5" height="27" fill="url(#gsTrvS)"/>
-    <rect x="29.5" y="13" width="5.5" height="27" fill="url(#gsTrvS)"/>
-    <rect x="12.2" y="24" width="7.1" height="5" rx="1" fill="url(#gsTrvL)" stroke="#8a6a28" strokeWidth="0.8"/>
-    <rect x="28.7" y="24" width="7.1" height="5" rx="1" fill="url(#gsTrvL)" stroke="#8a6a28" strokeWidth="0.8"/>
-    <circle cx="24" cy="21" r="3.4" fill="#fdfaf2" opacity="0.95"/>
-    <path d="M22.6 21l1 1 1.8-2" stroke="#0c4d47" strokeWidth="1.2" fill="none"/>
-    <rect x="6" y="16.5" width="36" height="1.6" fill="#ffffff" opacity="0.25"/>
-  </svg>
-);
-
-const GsCreatorsIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true">
-    <defs>
-      <linearGradient id="gsCamB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fdfaf2"/><stop offset="100%" stopColor="#e8e0cd"/></linearGradient>
-      <radialGradient id="gsCamL" cx="40%" cy="35%" r="70%"><stop offset="0%" stopColor="#2b8577"/><stop offset="70%" stopColor="#0c4d47"/><stop offset="100%" stopColor="#082f2b"/></radialGradient>
-      <linearGradient id="gsCamG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E3C57E"/><stop offset="100%" stopColor="#A9812F"/></linearGradient>
-    </defs>
-    <rect x="7" y="14" width="34" height="24" rx="5" fill="url(#gsCamB)"/>
-    <rect x="7" y="14" width="34" height="7" rx="5" fill="#0c4d47"/>
-    <rect x="16" y="9.5" width="12" height="7" rx="2.5" fill="#0c4d47"/>
-    <circle cx="24" cy="27.5" r="8.6" fill="url(#gsCamG)"/>
-    <circle cx="24" cy="27.5" r="6.2" fill="url(#gsCamL)"/>
-    <circle cx="21.6" cy="25.2" r="1.8" fill="#ffffff" opacity="0.5"/>
-    <circle cx="36" cy="18" r="1.7" fill="#E3C57E"/>
-    <rect x="10.5" y="24" width="4" height="9" rx="2" fill="#C7A962" opacity="0.55"/>
-  </svg>
-);
-
-const GsPartnerIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true">
-    <defs>
-      <linearGradient id="gsParP" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fffdf6"/><stop offset="100%" stopColor="#eee4cb"/></linearGradient>
-      <radialGradient id="gsParW" cx="38%" cy="32%" r="75%"><stop offset="0%" stopColor="#E9CE8C"/><stop offset="60%" stopColor="#C7A962"/><stop offset="100%" stopColor="#96762C"/></radialGradient>
-    </defs>
-    <rect x="7" y="12" width="34" height="25" rx="3" fill="url(#gsParP)"/>
-    <path d="M7 14.5 L24 27 L41 14.5" fill="none" stroke="#0c4d47" strokeWidth="1.4" opacity="0.55"/>
-    <path d="M7 12 h34 v3 L24 27.5 7 15 Z" fill="#f6efdb"/>
-    <rect x="12" y="30" width="14" height="1.7" rx="0.8" fill="#0c4d47" opacity="0.35"/>
-    <rect x="12" y="33" width="9" height="1.7" rx="0.8" fill="#0c4d47" opacity="0.25"/>
-    <circle cx="33" cy="30" r="7.2" fill="url(#gsParW)"/>
-    <circle cx="33" cy="30" r="4.9" fill="none" stroke="#8a6a28" strokeWidth="0.9" opacity="0.8"/>
-    <path d="M33 26.8 l1 2 2.1.3-1.5 1.5.3 2.1-1.9-1-1.9 1 .3-2.1-1.5-1.5 2.1-.3z" fill="#0c4d47" opacity="0.85"/>
-    <ellipse cx="30.6" cy="27.4" rx="2" ry="1.2" fill="#ffffff" opacity="0.4"/>
-  </svg>
-);
-
 const GsAgentPromoArt = () => (
   <svg width="54" height="54" viewBox="0 0 60 60" aria-hidden="true">
     <defs><linearGradient id="gsBagG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E3C57E"/><stop offset="100%" stopColor="#A9812F"/></linearGradient></defs>
@@ -523,9 +468,8 @@ export const Header = () => {
                       type="button"
                       className="group flex flex-col items-center pt-1 focus:outline-none"
                     >
-                      <span className="flex items-center gap-2 pb-1.5">
-                        <GsTravelIcon />
-                        <span className={`text-[15px] font-medium transition-colors ${travelActive ? 'text-[#fdfaf2]' : 'text-[#fdfaf2]/80 group-hover:text-[#fdfaf2]'}`}>Travel</span>
+                      <span className="flex items-center pb-1.5">
+                        <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${travelActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Travel</span>
                       </span>
                       <span className={`h-[2.5px] w-full rounded-full transition-colors ${travelActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25 group-data-[state=open]:bg-[#fdfaf2]/40'}`} />
                     </button>
@@ -563,9 +507,8 @@ export const Header = () => {
                   onClick={() => navigate('/creators')}
                   className="group flex flex-col items-center pt-1 focus:outline-none"
                 >
-                  <span className="flex items-center gap-2 pb-1.5">
-                    <GsCreatorsIcon />
-                    <span className={`text-[15px] font-medium transition-colors ${creatorsActive ? 'text-[#fdfaf2]' : 'text-[#fdfaf2]/80 group-hover:text-[#fdfaf2]'}`}>Creators</span>
+                  <span className="flex items-center pb-1.5">
+                    <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${creatorsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Creators</span>
                   </span>
                   <span className={`h-[2.5px] w-full rounded-full transition-colors ${creatorsActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25'}`} />
                 </button>
@@ -576,9 +519,8 @@ export const Header = () => {
                       type="button"
                       className="group flex flex-col items-center pt-1 focus:outline-none"
                     >
-                      <span className="flex items-center gap-2 pb-1.5">
-                        <GsPartnerIcon />
-                        <span className={`text-[15px] font-medium transition-colors ${partnerActive ? 'text-[#fdfaf2]' : 'text-[#fdfaf2]/80 group-hover:text-[#fdfaf2]'}`}>Partner</span>
+                      <span className="flex items-center pb-1.5">
+                        <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${partnerActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Partner</span>
                       </span>
                       <span className={`h-[2.5px] w-full rounded-full transition-colors ${partnerActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25 group-data-[state=open]:bg-[#fdfaf2]/40'}`} />
                     </button>
