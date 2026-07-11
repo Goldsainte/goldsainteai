@@ -147,8 +147,9 @@ export default function PartnerBookingsPage() {
             </h1>
             <p className="mt-4 text-[15px] leading-relaxed text-[#0a2225]/60">
               Every trip a traveler has confirmed with you — payments held in
-              escrow until you release them, with Goldsainte's flat 3.5% on
-              each side.
+              escrow and released on milestones: your deposit as working
+              capital once reservations are confirmed, the balance when your
+              traveler confirms the trip. Goldsainte's flat 3.5% on each side.
             </p>
           </header>
 
@@ -215,24 +216,23 @@ function PartnerBookingRowCard({
     e.preventDefault();
     e.stopPropagation();
     const ok = await confirmDialog({
-      title: "Release the deposit?",
+      title: "Request payment release?",
       description:
-        "This will mark the trip as completed and transfer the deposit. This action cannot be undone.",
-      confirmText: "Release deposit",
+        "Goldsainte holds trip funds in escrow. This notifies your traveler and Goldsainte that you're ready — share your confirmed reservations with them in Messages and they release your deposit as working capital; when the trip is complete they confirm it to release the final payment.",
+      confirmText: "Send request",
     });
     if (!ok) return;
     setReleasing(true);
     try {
       const { data, error } = await supabase.functions.invoke(
         "release-trip-deposit",
-        { body: { tripBookingId: booking.id } }
+        { body: { tripBookingId: booking.id, action: "request_release" } }
       );
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
-      onStatusChange?.(booking.id, "completed");
-      toast.success("Deposit released. Booking completed.");
+      toast.success("Request sent — your traveler and Goldsainte have been notified.");
     } catch (err: any) {
-      toast.error(err?.message || "Failed to release deposit");
+      toast.error(err?.message || "Failed to send the release request");
     } finally {
       setReleasing(false);
     }
@@ -363,14 +363,14 @@ function PartnerBookingRowCard({
         <span className="rounded-full border border-[#0a2225]/15 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors group-hover:border-[#C7A962]">
           View details
         </span>
-        {booking.status === "confirmed" && (
+        {["confirmed", "paid_in_full"].includes(booking.status) && (
           <button
             type="button"
             onClick={handleRelease}
             disabled={releasing}
             className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
           >
-            {releasing ? "Releasing…" : "Release deposit"}
+            {releasing ? "Sending…" : "Request release"}
           </button>
         )}
       </div>
