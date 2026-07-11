@@ -112,24 +112,23 @@ export default function PartnerBookingDetailPage() {
   async function handleRelease() {
     if (!booking) return;
     const ok = await confirmDialog({
-      title: "Release the deposit?",
+      title: "Request payment release?",
       description:
-        "This will mark the trip as completed and transfer the deposit. This action cannot be undone.",
-      confirmText: "Release deposit",
+        "Goldsainte holds trip funds in escrow. This notifies your traveler and Goldsainte that you're ready — share your confirmed reservations with them in Messages and they release your deposit as working capital; when the trip is complete they confirm it to release the final payment.",
+      confirmText: "Send request",
     });
     if (!ok) return;
     setReleasing(true);
     try {
       const { data, error } = await supabase.functions.invoke(
         "release-trip-deposit",
-        { body: { tripBookingId: booking.id } }
+        { body: { tripBookingId: booking.id, action: "request_release" } }
       );
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
-      setBooking({ ...booking, status: "completed" });
-      toast.success("Deposit released. Booking completed.");
+      toast.success("Request sent — your traveler and Goldsainte have been notified.");
     } catch (err: any) {
-      toast.error(err?.message || "Failed to release deposit");
+      toast.error(err?.message || "Failed to send the release request");
     } finally {
       setReleasing(false);
     }
@@ -211,7 +210,7 @@ export default function PartnerBookingDetailPage() {
                 {title}
               </h1>
             </div>
-            {booking.status === "confirmed" ? (
+            {["confirmed", "paid_in_full"].includes(booking.status) ? (
               <button
                 type="button"
                 onClick={handleRelease}
@@ -219,7 +218,7 @@ export default function PartnerBookingDetailPage() {
                 className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#C7A962] px-6 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-50"
               >
                 {releasing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {releasing ? "Releasing…" : "Release deposit"}
+                {releasing ? "Sending…" : "Request release"}
               </button>
             ) : (
               <span className="shrink-0 rounded-full border border-[#E5DFC6]/35 px-4 py-2 text-[10.5px] uppercase tracking-[0.16em] text-[#E5DFC6]">
@@ -310,8 +309,9 @@ export default function PartnerBookingDetailPage() {
             </div>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-[#0a2225]/45">
-            Traveler funds are held in escrow and released to you on completion, with
-            Goldsainte's flat 3.5% on each side.
+            Traveler funds are held in escrow and released on milestones — your traveler
+            releases your deposit as working capital once you share confirmed reservations,
+            and the balance when they confirm the trip. Flat 3.5% on each side.
           </p>
         </div>
 
