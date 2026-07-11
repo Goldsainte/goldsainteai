@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { Loader2, Calendar, DollarSign, User, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { Loader2, Calendar, DollarSign, User, Clock, CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 
 interface CancellationWithDetails {
@@ -39,16 +33,24 @@ interface CancellationWithDetails {
   };
 }
 
+const STATUS_PILL: Record<string, { label: string; classes: string }> = {
+  pending: { label: "Pending review", classes: "border-[#8D6B2F]/40 bg-[#C7A962]/15 text-[#8D6B2F]" },
+  approved: { label: "Approved", classes: "border-[#E5DFC6] bg-[#E5DFC6]/40 text-[#0a2225]/70" },
+  completed: { label: "Refund processed", classes: "border-[#0c4d47]/25 bg-[#0c4d47]/10 text-[#0c4d47]" },
+  rejected: { label: "Rejected", classes: "border-[#E5DFC6] bg-[#fdfaf2] text-[#0a2225]/45" },
+};
+
 export default function AdminCancellations() {
-  const { toast } = useToast();
   const [cancellations, setCancellations] = useState<CancellationWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedCancellation, setSelectedCancellation] = useState<CancellationWithDetails | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
   const [customRefundPercentage, setCustomRefundPercentage] = useState<number | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [activeTab, setActiveTab] = useState<"pending" | "approved" | "processed" | "rejected">("pending");
 
   useEffect(() => {
     loadCancellations();
@@ -56,6 +58,7 @@ export default function AdminCancellations() {
 
   const loadCancellations = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const { data, error } = await supabase
         .from("booking_cancellations")
@@ -79,11 +82,8 @@ export default function AdminCancellations() {
       setCancellations(data as any || []);
     } catch (error: any) {
       console.error("Error loading cancellations:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load cancellations",
-        variant: "destructive",
-      });
+      setLoadError(error.message);
+      toast.error(`Failed to load cancellations: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -113,42 +113,16 @@ export default function AdminCancellations() {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: data.message,
-      });
+      toast.success(data.message);
 
       setDialogOpen(false);
       loadCancellations();
     } catch (error: any) {
       console.error("Error processing cancellation:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to process cancellation",
-        variant: "destructive",
-      });
+      toast.error(`Failed to process cancellation: ${error.message}`);
     } finally {
       setProcessing(false);
     }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any; icon: any }> = {
-      pending: { label: "Pending Review", variant: "secondary", icon: Clock },
-      approved: { label: "Approved", variant: "default", icon: CheckCircle },
-      rejected: { label: "Rejected", variant: "destructive", icon: XCircle },
-      completed: { label: "Refund Processed", variant: "outline", icon: CheckCircle },
-    };
-
-    const item = config[status] || { label: status, variant: "outline", icon: AlertCircle };
-    const Icon = item.icon;
-
-    return (
-      <Badge variant={item.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {item.label}
-      </Badge>
-    );
   };
 
   const calculateRefundPreview = () => {
@@ -162,195 +136,185 @@ export default function AdminCancellations() {
   const processedCancellations = cancellations.filter((c) => c.status === "completed");
   const rejectedCancellations = cancellations.filter((c) => c.status === "rejected");
 
+  const TABS: { key: typeof activeTab; label: string; rows: CancellationWithDetails[]; empty: string }[] = [
+    { key: "pending", label: "Pending review", rows: pendingCancellations, empty: "No pending cancellation requests" },
+    { key: "approved", label: "Approved", rows: approvedCancellations, empty: "No approved cancellations" },
+    { key: "processed", label: "Refund processed", rows: processedCancellations, empty: "No processed refunds" },
+    { key: "rejected", label: "Rejected", rows: rejectedCancellations, empty: "No rejected cancellations" },
+  ];
+
+  const visible = TABS.find((t) => t.key === activeTab)!;
+
+  const StatusPill = ({ status }: { status: string }) => {
+    const pill = STATUS_PILL[status] ?? { label: status, classes: STATUS_PILL.rejected.classes };
+    return (
+      <span className={`inline-flex items-center whitespace-nowrap rounded-full border px-3 py-1 text-[11px] font-medium ${pill.classes}`}>
+        {pill.label}
+      </span>
+    );
+  };
+
   const CancellationCard = ({ cancellation }: { cancellation: CancellationWithDetails }) => (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg">
-              {cancellation.bookings.booking_type} - {cancellation.bookings.destination}
-            </CardTitle>
-            <CardDescription>
-              Booking #{cancellation.bookings.booking_reference}
-            </CardDescription>
-          </div>
-          {getStatusBadge(cancellation.status)}
+    <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <h3 className="font-secondary text-[17px] text-[#0a2225]">
+            {cancellation.bookings.booking_type} — {cancellation.bookings.destination}
+          </h3>
+          <p className="mt-0.5 text-sm text-[#0a2225]/55">
+            Booking #{cancellation.bookings.booking_reference}
+          </p>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-3 text-sm">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-muted-foreground" />
-            <span>{cancellation.profiles?.username || "Unknown User"}</span>
-            <span className="text-muted-foreground">({cancellation.profiles?.email})</span>
-          </div>
+        <StatusPill status={cancellation.status} />
+      </div>
 
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span>
-              {format(new Date(cancellation.bookings.check_in_date), "MMM dd, yyyy")}
-              {cancellation.bookings.check_out_date &&
-                ` - ${format(new Date(cancellation.bookings.check_out_date), "MMM dd, yyyy")}`}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-            <span>
-              Original: {cancellation.currency} {cancellation.original_amount.toFixed(2)}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-            <span className="font-semibold">
-              Refund ({cancellation.refund_percentage}%): {cancellation.currency}{" "}
-              {cancellation.refund_amount.toFixed(2)}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>Requested: {format(new Date(cancellation.cancellation_date), "MMM dd, yyyy HH:mm")}</span>
-          </div>
+      <div className="grid gap-2.5 text-sm text-[#0a2225]/80">
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-[#0a2225]/40" />
+          <span>{cancellation.profiles?.username || "Unknown user"}</span>
+          <span className="text-[#0a2225]/45">({cancellation.profiles?.email})</span>
         </div>
 
-        {cancellation.cancellation_reason && (
-          <div className="border-t pt-3">
-            <p className="text-sm font-medium mb-1">Reason:</p>
-            <p className="text-sm text-muted-foreground">{cancellation.cancellation_reason}</p>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-[#0a2225]/40" />
+          <span>
+            {format(new Date(cancellation.bookings.check_in_date), "MMM dd, yyyy")}
+            {cancellation.bookings.check_out_date &&
+              ` – ${format(new Date(cancellation.bookings.check_out_date), "MMM dd, yyyy")}`}
+          </span>
+        </div>
 
-        {cancellation.admin_notes && (
-          <div className="border-t pt-3">
-            <p className="text-sm font-medium mb-1">Admin Notes:</p>
-            <p className="text-sm text-muted-foreground">{cancellation.admin_notes}</p>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-[#0a2225]/40" />
+          <span>
+            Original: {cancellation.currency} {cancellation.original_amount.toFixed(2)}
+          </span>
+        </div>
 
-        {cancellation.status === "pending" && (
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="default"
-              onClick={() => handleOpenDialog(cancellation, "approve")}
-              className="flex-1"
-            >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Approve
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => handleOpenDialog(cancellation, "reject")}
-              className="flex-1"
-            >
-              <XCircle className="mr-2 h-4 w-4" />
-              Reject
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-[#0a2225]/40" />
+          <span className="font-semibold text-[#0a2225]">
+            Refund ({cancellation.refund_percentage}%): {cancellation.currency}{" "}
+            {cancellation.refund_amount.toFixed(2)}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-[#0a2225]/40" />
+          <span>Requested {format(new Date(cancellation.cancellation_date), "MMM dd, yyyy HH:mm")}</span>
+        </div>
+      </div>
+
+      {cancellation.cancellation_reason && (
+        <div className="mt-4 border-t border-[#F1EBDA] pt-3">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Traveler's reason</p>
+          <p className="mt-1 text-sm text-[#0a2225]/70">{cancellation.cancellation_reason}</p>
+        </div>
+      )}
+
+      {cancellation.admin_notes && (
+        <div className="mt-4 border-t border-[#F1EBDA] pt-3">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Admin notes</p>
+          <p className="mt-1 text-sm text-[#0a2225]/70">{cancellation.admin_notes}</p>
+        </div>
+      )}
+
+      {cancellation.status === "pending" && (
+        <div className="mt-5 flex gap-3">
+          <button
+            onClick={() => handleOpenDialog(cancellation, "approve")}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Approve
+          </button>
+          <button
+            onClick={() => handleOpenDialog(cancellation, "reject")}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-[#0a2225]/20 px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea]"
+          >
+            <XCircle className="h-4 w-4" />
+            Reject
+          </button>
+        </div>
+      )}
+    </div>
   );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <div className="container max-w-6xl py-8">
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Cancellation Management</h1>
-          <p className="text-muted-foreground">Review and process booking cancellation requests</p>
+    <div className="min-h-screen bg-[#f7f3ea]">
+      <div className="mx-auto max-w-5xl px-6 py-10">
+        <div className="mb-6">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Commerce</p>
+          <h1 className="mt-2 font-secondary text-[28px] leading-tight text-[#0a2225] md:text-[30px]">
+            Cancellations
+          </h1>
+          <p className="mt-2 max-w-xl text-[14px] text-[#0a2225]/55">
+            Review cancellation requests and set the refund before it's processed.
+          </p>
+          {loadError && (
+            <p className="mt-3 text-sm text-red-700">Failed to load cancellations: {loadError}</p>
+          )}
         </div>
 
-        <Tabs defaultValue="pending" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="pending">
-              Pending Review ({pendingCancellations.length})
-            </TabsTrigger>
-            <TabsTrigger value="approved">
-              Approved ({approvedCancellations.length})
-            </TabsTrigger>
-            <TabsTrigger value="processed">
-              Refund Processed ({processedCancellations.length})
-            </TabsTrigger>
-            <TabsTrigger value="rejected">
-              Rejected ({rejectedCancellations.length})
-            </TabsTrigger>
-          </TabsList>
+        {/* Honest-pages notice: the whole cancellation subsystem (request →
+            review → refund) still runs on the legacy bookings river. Live
+            trip bookings have no cancellation-request flow yet, so nothing
+            can appear here from real bookings. Remove this band when the
+            rewire ships. */}
+        <div className="mb-8 rounded-2xl border border-[#8D6B2F]/40 bg-[#C7A962]/15 p-5">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[#8D6B2F]">Not yet on the live river</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-[#0a2225]/70">
+            Cancellation requests aren't wired to live trip bookings yet — travelers currently
+            have no in-app way to request one, so this room only sees the legacy flow. Until the
+            rewire ships, handle any live-booking cancellation manually (refund in Stripe, then
+            update the booking).
+          </p>
+        </div>
 
-          <TabsContent value="pending" className="space-y-4">
-            {pendingCancellations.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center py-12">
-                  <p className="text-muted-foreground">No pending cancellations</p>
-                </CardContent>
-              </Card>
+        <div className="mb-8 flex flex-wrap gap-2">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={
+                activeTab === t.key
+                  ? "rounded-full border border-[#0c4d47] bg-[#0c4d47] px-4 py-2.5 text-[13px] text-white transition-colors"
+                  : "rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[13px] text-[#6B7280] transition-colors hover:border-[#C7A962] hover:text-[#0a2225]"
+              }
+            >
+              {t.label}
+              <span className={activeTab === t.key ? "ml-1.5 font-semibold text-white/80" : "ml-1.5 font-semibold text-[#8D6B2F]"}>
+                {t.rows.length}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <p className="text-sm text-[#0a2225]/55">Loading cancellations…</p>
+        ) : (
+          <div className="space-y-5">
+            {visible.rows.length === 0 ? (
+              <div className="rounded-2xl bg-white p-12 text-center shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+                <p className="text-sm text-[#0a2225]/55">{visible.empty}</p>
+              </div>
             ) : (
-              pendingCancellations.map((cancellation) => (
+              visible.rows.map((cancellation) => (
                 <CancellationCard key={cancellation.id} cancellation={cancellation} />
               ))
             )}
-          </TabsContent>
-
-          <TabsContent value="approved" className="space-y-4">
-            {approvedCancellations.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center py-12">
-                  <p className="text-muted-foreground">No approved cancellations</p>
-                </CardContent>
-              </Card>
-            ) : (
-              approvedCancellations.map((cancellation) => (
-                <CancellationCard key={cancellation.id} cancellation={cancellation} />
-              ))
-            )}
-          </TabsContent>
-
-          <TabsContent value="processed" className="space-y-4">
-            {processedCancellations.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center py-12">
-                  <p className="text-muted-foreground">No processed refunds</p>
-                </CardContent>
-              </Card>
-            ) : (
-              processedCancellations.map((cancellation) => (
-                <CancellationCard key={cancellation.id} cancellation={cancellation} />
-              ))
-            )}
-          </TabsContent>
-
-          <TabsContent value="rejected" className="space-y-4">
-            {rejectedCancellations.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center py-12">
-                  <p className="text-muted-foreground">No rejected cancellations</p>
-                </CardContent>
-              </Card>
-            ) : (
-              rejectedCancellations.map((cancellation) => (
-                <CancellationCard key={cancellation.id} cancellation={cancellation} />
-              ))
-            )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
 
       {/* Approval/Rejection Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="max-w-lg rounded-2xl border border-[#E5DFC6] bg-white">
           <DialogHeader>
-            <DialogTitle>
-              {action === "approve" ? "Approve Cancellation" : "Reject Cancellation"}
+            <DialogTitle className="font-secondary text-[20px] text-[#0a2225]">
+              {action === "approve" ? "Approve cancellation" : "Reject cancellation"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-[#0a2225]/55">
               {action === "approve"
                 ? "Review and adjust the refund amount if necessary"
                 : "Provide a reason for rejecting this cancellation request"}
@@ -359,37 +323,41 @@ export default function AdminCancellations() {
 
           {selectedCancellation && (
             <div className="space-y-4">
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  <p className="font-medium">Booking Details:</p>
-                  <p className="text-sm mt-1">
-                    {selectedCancellation.bookings.booking_type} - {selectedCancellation.bookings.destination}
-                  </p>
-                  <p className="text-sm">Original Amount: {selectedCancellation.currency} {selectedCancellation.original_amount.toFixed(2)}</p>
-                </AlertDescription>
-              </Alert>
+              <div className="rounded-xl border border-[#F1EBDA] bg-[#fdfaf2] p-4">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Booking details</p>
+                <p className="mt-1.5 text-sm text-[#0a2225]/80">
+                  {selectedCancellation.bookings.booking_type} — {selectedCancellation.bookings.destination}
+                </p>
+                <p className="text-sm text-[#0a2225]/80">
+                  Original amount: {selectedCancellation.currency} {selectedCancellation.original_amount.toFixed(2)}
+                </p>
+              </div>
 
               {action === "approve" && (
-                <div className="space-y-2">
-                  <Label>Refund Percentage (%)</Label>
+                <div>
+                  <label className="mb-2 block text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
+                    Refund percentage (%)
+                  </label>
                   <Input
                     type="number"
                     min="0"
                     max="100"
                     value={customRefundPercentage ?? ""}
                     onChange={(e) => setCustomRefundPercentage(parseFloat(e.target.value) || 0)}
+                    className="rounded-xl border-[#E5DFC6] bg-white focus-visible:ring-[#C7A962]"
                   />
                   {customRefundPercentage !== null && (
-                    <p className="text-sm text-muted-foreground">
-                      Refund Amount: {selectedCancellation.currency} {calculateRefundPreview()}
+                    <p className="mt-2 text-sm text-[#0a2225]/55">
+                      Refund amount: {selectedCancellation.currency} {calculateRefundPreview()}
                     </p>
                   )}
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label>Admin Notes {action === "reject" && "*"}</Label>
+              <div>
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
+                  Admin notes{action === "reject" && " (required)"}
+                </label>
                 <Textarea
                   placeholder={
                     action === "approve"
@@ -399,23 +367,32 @@ export default function AdminCancellations() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={4}
+                  className="rounded-xl border-[#E5DFC6] bg-white focus-visible:ring-[#C7A962]"
                 />
               </div>
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={processing}>
+          <DialogFooter className="gap-2">
+            <button
+              onClick={() => setDialogOpen(false)}
+              disabled={processing}
+              className="rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[13px] text-[#6B7280] transition-colors hover:border-[#C7A962] hover:text-[#0a2225] disabled:opacity-40"
+            >
               Cancel
-            </Button>
-            <Button
-              variant={action === "approve" ? "default" : "destructive"}
+            </button>
+            <button
               onClick={handleProcessCancellation}
               disabled={processing || (action === "reject" && !adminNotes.trim())}
+              className={
+                action === "approve"
+                  ? "inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-40"
+                  : "inline-flex items-center gap-2 rounded-full border border-[#0a2225]/20 px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea] disabled:cursor-not-allowed disabled:opacity-40"
+              }
             >
-              {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {action === "approve" ? "Approve & Process" : "Reject Request"}
-            </Button>
+              {processing && <Loader2 className="h-4 w-4 animate-spin" />}
+              {action === "approve" ? "Approve & process" : "Reject request"}
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
