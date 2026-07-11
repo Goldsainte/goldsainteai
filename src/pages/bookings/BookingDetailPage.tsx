@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShieldAlert, CalendarX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
@@ -117,6 +118,11 @@ export default function BookingDetailPage() {
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [cancelRequestError, setCancelRequestError] = useState<string | null>(null);
 
+  // Trip-complete confirmation (releases the final payout to the specialist)
+  const [releasingFinal, setReleasingFinal] = useState(false);
+  const [releaseError, setReleaseError] = useState<string | null>(null);
+  const [depositReleased, setDepositReleased] = useState(false);
+
   // Specialist (partner) profile for the sidebar card
   const [partnerProfile, setPartnerProfile] = useState<{
     display_name?: string | null;
@@ -188,6 +194,20 @@ export default function BookingDetailPage() {
           cancellationRows = [];
         }
 
+        // Released milestones (drives the escrow card; best-effort).
+        let depositMilestoneReleased = false;
+        try {
+          const { data: payouts } = await supabase
+            .from("trip_payouts")
+            .select("milestone")
+            .eq("trip_booking_id", bookingId);
+          depositMilestoneReleased = (payouts ?? []).some(
+            (p: any) => p.milestone === "deposit"
+          );
+        } catch {
+          depositMilestoneReleased = false;
+        }
+
         // Specialist profile (best-effort; platform bookings may have none)
         let partnerRow: any = null;
         if (bookingRow.partner_id) {
@@ -204,6 +224,7 @@ export default function BookingDetailPage() {
           setTrip(tripRow);
           setDisputes(disputeRows);
           setCancellations(cancellationRows);
+          setDepositReleased(depositMilestoneReleased);
           setPartnerProfile(partnerRow);
         }
       } catch (err: any) {
@@ -270,6 +291,53 @@ export default function BookingDetailPage() {
     (d) => d.status === "open" || d.status === "under_review"
   );
 
+  async function handleReleaseMilestone(action: "release_deposit" | "release_final") {
+    if (!booking || releasingFinal) return;
+    const isDeposit = action === "release_deposit";
+    const ok = await confirmDialog({
+      title: isDeposit
+        ? "Release your specialist's working capital?"
+        : "Confirm your trip is complete?",
+      description: isDeposit
+        ? "Only do this after your specialist has shown you confirmed reservations (check your booking Messages). It releases 96.5% of your deposit to them so they can secure your trip. This can't be undone."
+        : "This releases the remaining payment to your specialist. Only confirm once your trip has happened and you're satisfied. This can't be undone.",
+      confirmText: isDeposit ? "Release working capital" : "Confirm & release payment",
+    });
+    if (!ok) return;
+    setReleasingFinal(true);
+    setReleaseError(null);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "release-trip-deposit",
+        { body: { tripBookingId: booking.id, action } }
+      );
+      if (fnError) {
+        // Non-2xx bodies arrive via error.context — surface the real reason.
+        let message = fnError.message;
+        try {
+          const resp = (fnError as any)?.context;
+          if (resp && typeof resp.json === "function") {
+            const bodyJson = await resp.json();
+            if (bodyJson?.error) message = bodyJson.error;
+          }
+        } catch {
+          /* keep original message */
+        }
+        throw new Error(message);
+      }
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (isDeposit) {
+        setDepositReleased(true);
+      } else {
+        setBooking((prev) => (prev ? { ...prev, status: "completed" } : prev));
+      }
+    } catch (err: any) {
+      setReleaseError(err.message || "Could not release the payment. Please try again.");
+    } finally {
+      setReleasingFinal(false);
+    }
+  }
+
   const activeCancellation = cancellations.find((c) =>
     ["pending", "approved", "refunded"].includes(c.status)
   );
@@ -277,6 +345,29 @@ export default function BookingDetailPage() {
     !!booking &&
     !["cancelled", "completed"].includes(booking.status) &&
     !activeCancellation;
+
+  // Traveler consent gate for the final release — mirrors the server's
+  // guard so the button never shows when the function would refuse:
+  // balance must be collected (paid_in_full, or confirmed with no balance).
+  const canConfirmComplete =
+    !!booking &&
+    !!booking.partner_id &&
+    !activeCancellation &&
+    (booking.status === "paid_in_full" ||
+      (booking.status === "confirmed" &&
+        (booking.total_price ?? 0) - (booking.deposit_amount ?? 0) <= 0));
+
+  // Traveler consent gate for the DEPOSIT release — the working-capital
+  // moment. Shows once the deposit is paid, while a balance remains, until
+  // it's released. The traveler judges the specialist's reservation proof.
+  const canReleaseDeposit =
+    !!booking &&
+    !!booking.partner_id &&
+    !activeCancellation &&
+    !depositReleased &&
+    booking.status === "confirmed" &&
+    (booking.deposit_amount ?? 0) > 0 &&
+    (booking.total_price ?? 0) - (booking.deposit_amount ?? 0) > 0;
 
   const [payingBalance, setPayingBalance] = useState(false);
   const [contractGate, setContractGate] = useState<{ contractId: string | null } | null>(null);
@@ -553,6 +644,82 @@ export default function BookingDetailPage() {
                 </div>
 
                 <ContractStatusCard variant="traveler" bookingId={booking.id} />
+
+                {(canReleaseDeposit ||
+                  canConfirmComplete ||
+                  booking.status === "completed" ||
+                  (depositReleased && booking.status !== "cancelled")) && (
+                  <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                      Your escrow
+                    </p>
+                    {booking.status === "completed" ? (
+                      <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
+                        Payment has been released to your specialist. Thank you
+                        for traveling with Goldsainte — we hope it was
+                        unforgettable.
+                      </p>
+                    ) : canConfirmComplete ? (
+                      <>
+                        <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
+                          Trip complete? Confirming releases the remaining
+                          payment from escrow to your specialist — like
+                          accepting a finished job.
+                        </p>
+                        {releaseError && (
+                          <p className="mt-3 text-sm text-red-700">{releaseError}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleReleaseMilestone("release_final")}
+                          disabled={releasingFinal}
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        >
+                          {releasingFinal
+                            ? "Releasing payment…"
+                            : "Confirm trip complete"}
+                        </button>
+                        <p className="mt-2.5 text-[11px] leading-relaxed text-[#0a2225]/45">
+                          If something went wrong, don't confirm — file a claim
+                          below and Goldsainte holds the funds while we review.
+                        </p>
+                      </>
+                    ) : canReleaseDeposit ? (
+                      <>
+                        <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
+                          Once your specialist shares your confirmed
+                          reservations in Messages, release their working
+                          capital — 96.5% of your deposit — so they can secure
+                          your trip.
+                        </p>
+                        {releaseError && (
+                          <p className="mt-3 text-sm text-red-700">{releaseError}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleReleaseMilestone("release_deposit")}
+                          disabled={releasingFinal}
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        >
+                          {releasingFinal
+                            ? "Releasing…"
+                            : "Release working capital"}
+                        </button>
+                        <p className="mt-2.5 text-[11px] leading-relaxed text-[#0a2225]/45">
+                          Only release after you've seen your confirmations.
+                          The remaining balance stays in escrow until your
+                          trip is complete.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
+                        Working capital released — your specialist is securing
+                        your reservations. The rest of your payment stays in
+                        escrow until you confirm the trip is complete.
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <div className="rounded-2xl bg-[#0c4d47] px-6 py-5">
                   <div className="flex items-center gap-3">
