@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
 
@@ -22,7 +21,7 @@ export default function AdminWaitlistPage() {
         .select("id, email, source, created_at")
         .order("created_at", { ascending: false });
       if (error) {
-        toast.error("Failed to load waitlist");
+        toast.error(`Failed to load waitlist: ${error.message}`);
       } else {
         setRows((data ?? []) as WaitlistRow[]);
       }
@@ -50,27 +49,30 @@ export default function AdminWaitlistPage() {
   };
 
   return (
+    <div className="min-h-screen bg-[#f7f3ea]">
     <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="flex items-end justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-secondary text-3xl text-[#0a2225]">Waitlist</h1>
-          <p className="mt-2 text-sm text-[#0a2225]/70">
-            Total signups: <span className="font-semibold">{rows.length}</span>
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">People</p>
+          <h1 className="mt-2 font-secondary text-[28px] leading-tight text-[#0a2225] md:text-[30px]">Waitlist</h1>
+          <p className="mt-2 text-sm text-[#0a2225]/55">
+            Total signups: <span className="font-semibold text-[#0a2225]">{rows.length}</span>
           </p>
         </div>
-        <Button
+        <button
+          type="button"
           onClick={exportCsv}
           disabled={rows.length === 0}
-          className="bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331]"
+          className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
         >
-          <Download className="w-4 h-4 mr-2" />
+          <Download className="h-4 w-4" />
           Export CSV
-        </Button>
+        </button>
       </div>
 
-      <div className="rounded-lg border border-[#E5DFC6] bg-white overflow-hidden">
+      <div className="overflow-hidden rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
         <table className="w-full text-sm">
-          <thead className="bg-[#f7f3ea] text-[#0a2225]/70 uppercase text-xs tracking-wider">
+          <thead className="bg-[#fdfaf2] text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
             <tr>
               <th className="text-left px-4 py-3">Email</th>
               <th className="text-left px-4 py-3">Signup Date</th>
@@ -83,7 +85,7 @@ export default function AdminWaitlistPage() {
               <tr><td colSpan={2} className="px-4 py-8 text-center text-[#0a2225]/60">No signups yet.</td></tr>
             ) : (
               rows.map((r) => (
-                <tr key={r.id} className="border-t border-[#E5DFC6]">
+                <tr key={r.id} className="border-t border-[#F1EBDA]">
                   <td className="px-4 py-3 text-[#0a2225]">{r.email}</td>
                   <td className="px-4 py-3 text-[#0a2225]/70">
                     {new Date(r.created_at).toLocaleString()}
@@ -94,6 +96,7 @@ export default function AdminWaitlistPage() {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 }
