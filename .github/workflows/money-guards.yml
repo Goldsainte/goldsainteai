@@ -1,0 +1,33 @@
+name: Money Guards
+
+# Runs the money-system invariant tests on EVERY push and pull request.
+# Fast (<30s), zero dependencies. A red X on a commit means a money
+# invariant was violated — most often because an OLD version of a file
+# was pasted over the current one. Read the failing test's message; it
+# names the bug it prevents. Never delete a test to get green.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  guards:
+    name: Money invariants
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run money guards
+        run: deno test --allow-read tests/money-guards/
+
+      - name: Summary
+        if: success()
+        run: echo "## ✅ All money invariants hold" >> $GITHUB_STEP_SUMMARY
