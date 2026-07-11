@@ -407,8 +407,12 @@ async function approveBrandApplication(
       is_verified: true,
       email_verified: true,
       identity_verified: true,
-      is_profile_complete: false,
-      onboarding_completed: false,
+      // Post-auth routing reads these two flags: they must be TRUE here or the
+      // approved brand's first login bounces back to the application flow
+      // instead of landing in the Maison. Mirrors the stripe-identity-webhook
+      // auto-provisioning path, which stamps the same fields true.
+      is_profile_complete: true,
+      onboarding_completed: true,
       created_at: new Date().toISOString(),
     }, { onConflict: 'id' });
 
