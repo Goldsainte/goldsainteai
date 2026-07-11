@@ -1,14 +1,10 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { DocumentViewer } from "@/components/admin/DocumentViewer";
-import { VerificationChecklist } from "@/components/admin/VerificationChecklist";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 import { Eye, CheckCircle, XCircle, FileText, User } from "lucide-react";
 
 const REJECTION_REASONS = [
@@ -21,8 +17,20 @@ const REJECTION_REASONS = [
   "Custom reason"
 ];
 
+const STATUS_FILTERS = [
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "rejected", label: "Rejected" },
+  { value: "all", label: "All" }
+];
+
+const STATUS_PILL_CLASSES: Record<string, string> = {
+  pending: "border-[#8D6B2F]/40 bg-[#C7A962]/15 text-[#8D6B2F]",
+  approved: "border-[#0c4d47]/25 bg-[#0c4d47]/10 text-[#0c4d47]",
+  rejected: "border-[#E5DFC6] bg-[#fdfaf2] text-[#0a2225]/45"
+};
+
 export default function AdminCustomerVerifications() {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedVerification, setSelectedVerification] = useState<any>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -39,7 +47,7 @@ export default function AdminCustomerVerifications() {
   ]);
 
   // Fetch customer verifications
-  const { data: verifications, isLoading } = useQuery({
+  const { data: verifications, isLoading, error: loadError } = useQuery({
     queryKey: ['admin-customer-verifications', statusFilter],
     queryFn: async () => {
       let query = supabase
@@ -66,6 +74,24 @@ export default function AdminCustomerVerifications() {
       return data;
     }
   });
+
+  // Best-effort email notification. Honest: approval/rejection already
+  // succeeded by the time this runs, so a mail failure is a warning, not
+  // a false error — and never a silent swallow.
+  const sendVerificationEmail = async (status: 'approved' | 'rejected', reason: string | null) => {
+    try {
+      const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
+        body: {
+          user_id: selectedVerification.user_id,
+          status,
+          rejection_reason: reason
+        }
+      });
+      if (emailError) throw emailError;
+    } catch (err: any) {
+      toast.warning(`Saved — but the notification email didn't send: ${err?.message ?? 'unknown error'}`);
+    }
+  };
 
   // Approve verification mutation
   const approveMutation = useMutation({
@@ -95,33 +121,13 @@ export default function AdminCustomerVerifications() {
       });
     },
     onSuccess: async () => {
-      toast({
-        title: "Verification Approved",
-        description: "Customer has been notified of their approved verification."
-      });
-      
-      // Send email notification
-      try {
-        await supabase.functions.invoke('send-verification-email', {
-          body: {
-            user_id: selectedVerification.user_id,
-            status: 'approved',
-            rejection_reason: null
-          }
-        });
-      } catch (error) {
-        console.error('Failed to send email:', error);
-      }
-      
+      toast.success("Verification approved.");
+      await sendVerificationEmail('approved', null);
       queryClient.invalidateQueries({ queryKey: ['admin-customer-verifications'] });
       resetForm();
     },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to approve verification. Please try again.",
-        variant: "destructive"
-      });
+    onError: (error: any) => {
+      toast.error(`Failed to approve verification: ${error?.message ?? 'unknown error'}`);
       console.error(error);
     }
   });
@@ -155,39 +161,19 @@ export default function AdminCustomerVerifications() {
       });
     },
     onSuccess: async () => {
-      toast({
-        title: "Verification Rejected",
-        description: "Customer has been notified of the rejection."
-      });
-      
-      // Send email notification
-      try {
-        await supabase.functions.invoke('send-verification-email', {
-          body: {
-            user_id: selectedVerification.user_id,
-            status: 'rejected',
-            rejection_reason: rejectionReason
-          }
-        });
-      } catch (error) {
-        console.error('Failed to send email:', error);
-      }
-      
+      toast.success("Verification rejected.");
+      await sendVerificationEmail('rejected', rejectionReason);
       queryClient.invalidateQueries({ queryKey: ['admin-customer-verifications'] });
       resetForm();
     },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to reject verification. Please try again.",
-        variant: "destructive"
-      });
+    onError: (error: any) => {
+      toast.error(`Failed to reject verification: ${error?.message ?? 'unknown error'}`);
       console.error(error);
     }
   });
 
   const handleChecklistChange = (id: string, checked: boolean) => {
-    setChecklist(prev => prev.map(item => 
+    setChecklist(prev => prev.map(item =>
       item.id === id ? { ...item, checked } : item
     ));
   };
@@ -206,204 +192,240 @@ export default function AdminCustomerVerifications() {
 
   const canApprove = checklist.every(item => item.checked);
 
-  if (isLoading) {
-    return <div className="p-8">Loading verifications...</div>;
-  }
-
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#f7f3ea]">
+      <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="mb-8">
-          <h1 className="font-secondary text-3xl font-bold mb-2">Customer Verifications</h1>
-          <p className="text-muted-foreground">Review and approve customer identity verifications</p>
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">People</p>
+          <h1 className="mt-2 font-secondary text-[28px] leading-tight text-[#0a2225] md:text-[30px]">
+            Customer verifications
+          </h1>
+          <p className="mt-2 max-w-xl text-[14px] text-[#0a2225]/55">
+            Review traveler identity documents. Approve only when every check on the
+            checklist passes; rejections always carry a stated reason.
+          </p>
+          {loadError && (
+            <p className="mt-3 text-sm text-red-700">
+              Failed to load verifications: {(loadError as any)?.message ?? 'unknown error'}
+            </p>
+          )}
         </div>
 
-        <Tabs value={statusFilter} onValueChange={setStatusFilter} className="mb-8">
-          <TabsList>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
-          </TabsList>
+        <div className="mb-8 flex flex-wrap gap-2">
+          {STATUS_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setStatusFilter(f.value)}
+              className={
+                statusFilter === f.value
+                  ? "rounded-full border border-[#0c4d47] bg-[#0c4d47] px-4 py-2.5 text-[13px] text-white transition-colors"
+                  : "rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[13px] text-[#6B7280] transition-colors hover:border-[#C7A962] hover:text-[#0a2225]"
+              }
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
 
-          <TabsContent value={statusFilter} className="mt-6">
-            <div className="grid gap-6">
-              {verifications?.map((verification) => (
-                <div key={verification.id} className="bg-card border rounded-lg p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      {(verification as any).profiles?.avatar_url ? (
-                        <img 
-                          src={(verification as any).profiles.avatar_url} 
-                          alt="User" 
-                          className="w-12 h-12 rounded-full object-cover"
-                        loading="lazy"/>
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="h-6 w-6 text-primary" />
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="font-semibold">
-                          {(verification as any).profiles?.first_name} {(verification as any).profiles?.last_name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">@{(verification as any).profiles?.username}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Submitted: {new Date(verification.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge variant={
-                      verification.status === 'approved' ? 'default' :
-                      verification.status === 'rejected' ? 'destructive' :
-                      'secondary'
-                    }>
-                      {verification.status}
-                    </Badge>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        Government ID
-                      </p>
-                      {verification.document_url ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDocument(verification.document_url, 'Government ID')}
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Document
-                        </Button>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">Not uploaded</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Selfie Photo
-                      </p>
-                      {(verification.metadata as any)?.selfie_url ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDocument((verification.metadata as any).selfie_url, 'Selfie Photo')}
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Selfie
-                        </Button>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">Not uploaded</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {verification.status === 'pending' && selectedVerification?.id === verification.id && (
-                    <div className="mt-6 space-y-4 border-t pt-6">
-                      <VerificationChecklist
-                        items={checklist}
-                        onItemChange={handleChecklistChange}
+        {isLoading ? (
+          <p className="text-sm text-[#0a2225]/55">Loading verifications…</p>
+        ) : (
+          <div className="grid gap-6">
+            {verifications?.map((verification) => (
+              <div
+                key={verification.id}
+                className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]"
+              >
+                <div className="mb-5 flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    {(verification as any).profiles?.avatar_url ? (
+                      <img
+                        src={(verification as any).profiles.avatar_url}
+                        alt="User"
+                        className="h-12 w-12 rounded-full object-cover"
+                        loading="lazy"
                       />
-
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Admin Notes (Optional)</label>
-                        <Textarea
-                          value={adminNotes}
-                          onChange={(e) => setAdminNotes(e.target.value)}
-                          placeholder="Add any notes about this verification..."
-                          rows={3}
-                        />
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0c4d47]/10">
+                        <User className="h-6 w-6 text-[#0c4d47]" />
                       </div>
+                    )}
+                    <div>
+                      <h3 className="font-secondary text-[17px] text-[#0a2225]">
+                        {(verification as any).profiles?.first_name} {(verification as any).profiles?.last_name}
+                      </h3>
+                      <p className="text-sm text-[#0a2225]/55">@{(verification as any).profiles?.username}</p>
+                      <p className="mt-1 text-xs text-[#0a2225]/45">
+                        Submitted {new Date(verification.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium capitalize ${
+                      STATUS_PILL_CLASSES[verification.status] ?? STATUS_PILL_CLASSES.rejected
+                    }`}
+                  >
+                    {verification.status}
+                  </span>
+                </div>
 
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                          <Button
-                            onClick={() => approveMutation.mutate(verification.id)}
-                            disabled={!canApprove || approveMutation.isPending}
-                            className="w-full"
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Approve Verification
-                          </Button>
-                          {!canApprove && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Complete all checklist items to approve
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex-1 space-y-2">
-                          <Select value={rejectionReason} onValueChange={setRejectionReason}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select rejection reason..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {REJECTION_REASONS.map((reason) => (
-                                <SelectItem key={reason} value={reason}>
-                                  {reason}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            onClick={() => rejectMutation.mutate(verification.id)}
-                            disabled={!rejectionReason || rejectMutation.isPending}
-                            variant="destructive"
-                            className="w-full"
-                          >
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Reject Verification
-                          </Button>
-                        </div>
-                      </div>
-
-                      <Button
-                        variant="outline"
-                        onClick={resetForm}
-                        className="w-full"
+                <div className="mb-2 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
+                      <FileText className="h-3.5 w-3.5" />
+                      Government ID
+                    </p>
+                    {verification.document_url ? (
+                      <button
+                        onClick={() => handleViewDocument(verification.document_url, 'Government ID')}
+                        className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-[13px] text-[#6B7280] transition-colors hover:border-[#C7A962] hover:text-[#0a2225]"
                       >
-                        Cancel Review
-                      </Button>
-                    </div>
-                  )}
+                        <Eye className="h-4 w-4" />
+                        View document
+                      </button>
+                    ) : (
+                      <p className="text-sm text-[#0a2225]/45">Not uploaded</p>
+                    )}
+                  </div>
 
-                  {verification.status === 'pending' && selectedVerification?.id !== verification.id && (
-                    <Button
-                      onClick={() => setSelectedVerification(verification)}
-                      className="mt-4"
+                  <div>
+                    <p className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
+                      <User className="h-3.5 w-3.5" />
+                      Selfie photo
+                    </p>
+                    {(verification.metadata as any)?.selfie_url ? (
+                      <button
+                        onClick={() => handleViewDocument((verification.metadata as any).selfie_url, 'Selfie Photo')}
+                        className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6] bg-white px-4 py-2 text-[13px] text-[#6B7280] transition-colors hover:border-[#C7A962] hover:text-[#0a2225]"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View selfie
+                      </button>
+                    ) : (
+                      <p className="text-sm text-[#0a2225]/45">Not uploaded</p>
+                    )}
+                  </div>
+                </div>
+
+                {verification.status === 'pending' && selectedVerification?.id === verification.id && (
+                  <div className="mt-6 space-y-5 border-t border-[#F1EBDA] pt-6">
+                    <div className="rounded-2xl border border-[#F1EBDA] bg-[#fdfaf2] p-5">
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
+                        Verification checklist
+                      </p>
+                      <div className="mt-3 space-y-3">
+                        {checklist.map((item) => (
+                          <label
+                            key={item.id}
+                            className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-[#0a2225]/80"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={item.checked}
+                              onChange={(e) => handleChecklistChange(item.id, e.target.checked)}
+                              className="mt-0.5 h-4 w-4 rounded border-[#E5DFC6] accent-[#0c4d47]"
+                            />
+                            {item.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">
+                        Admin notes (optional)
+                      </label>
+                      <Textarea
+                        value={adminNotes}
+                        onChange={(e) => setAdminNotes(e.target.value)}
+                        placeholder="Add any notes about this verification..."
+                        rows={3}
+                        className="rounded-xl border-[#E5DFC6] bg-white focus-visible:ring-[#C7A962]"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-4 md:flex-row">
+                      <div className="flex-1">
+                        <button
+                          onClick={() => approveMutation.mutate(verification.id)}
+                          disabled={!canApprove || approveMutation.isPending}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                          {approveMutation.isPending ? "Approving…" : "Approve verification"}
+                        </button>
+                        {!canApprove && (
+                          <p className="mt-2 text-xs text-[#0a2225]/45">
+                            Complete all checklist items to approve
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-2">
+                        <Select value={rejectionReason} onValueChange={setRejectionReason}>
+                          <SelectTrigger className="h-10 rounded-full border-[#E5DFC6] bg-white text-sm">
+                            <SelectValue placeholder="Select rejection reason..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border-[#E5DFC6] bg-white">
+                            {REJECTION_REASONS.map((reason) => (
+                              <SelectItem key={reason} value={reason}>
+                                {reason}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <button
+                          onClick={() => rejectMutation.mutate(verification.id)}
+                          disabled={!rejectionReason || rejectMutation.isPending}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#0a2225]/20 px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <XCircle className="h-4 w-4" />
+                          {rejectMutation.isPending ? "Rejecting…" : "Reject verification"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={resetForm}
+                      className="w-full text-center text-[13px] text-[#0a2225]/45 transition-colors hover:text-[#0a2225]"
                     >
-                      Start Review
-                    </Button>
-                  )}
+                      Cancel review
+                    </button>
+                  </div>
+                )}
 
-                  {verification.status !== 'pending' && (verification.metadata as any)?.admin_notes && (
-                    <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm font-medium mb-1">Admin Notes:</p>
-                      <p className="text-sm text-muted-foreground">{(verification.metadata as any).admin_notes}</p>
-                      {verification.rejection_reason && (
-                        <p className="text-sm text-destructive mt-2">
-                          Reason: {verification.rejection_reason}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                {verification.status === 'pending' && selectedVerification?.id !== verification.id && (
+                  <button
+                    onClick={() => setSelectedVerification(verification)}
+                    className="mt-4 rounded-full border border-[#C7A962]/50 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/10"
+                  >
+                    Start review
+                  </button>
+                )}
 
-              {verifications?.length === 0 && (
-                <div className="text-center py-12 bg-card rounded-lg border">
-                  <p className="text-muted-foreground">
-                    No {statusFilter !== 'all' ? statusFilter : ''} verifications found
-                  </p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+                {verification.status !== 'pending' && (verification.metadata as any)?.admin_notes && (
+                  <div className="mt-4 rounded-xl border border-[#F1EBDA] bg-[#fdfaf2] p-4">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Admin notes</p>
+                    <p className="mt-1 text-sm text-[#0a2225]/70">{(verification.metadata as any).admin_notes}</p>
+                    {verification.rejection_reason && (
+                      <p className="mt-2 text-sm text-[#8D6B2F]">
+                        Reason: {verification.rejection_reason}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {verifications?.length === 0 && (
+              <div className="rounded-2xl bg-white p-12 text-center shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+                <p className="text-sm text-[#0a2225]/55">
+                  No {statusFilter !== 'all' ? statusFilter : ''} verifications found
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {currentDocument && (
