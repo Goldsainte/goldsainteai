@@ -1,23 +1,33 @@
 // ============================================================================
-// release-trip-deposit v3
+// release-trip-deposit v4 — MILESTONE ESCROW
 // ============================================================================
-// The explicit "pay the partner" click. Money sits in Goldsainte's Stripe
-// balance (escrow) until a partner or admin presses Release; then the
-// partner's 96.5% share is transferred to their connected Stripe account,
-// the booking is stamped completed + payout_paid_at, and the traveler is
-// asked for a review.
+// The combined model (decided Jul 11): traveler money sits with Goldsainte
+// and is released in up to two milestones, each paying 96.5% of its slice
+// (partner-side fee 3.5%; the traveler-side 3.5% was charged on top at
+// checkout — 7% platform total):
 //
-// v3 fixes over v2 (all found in read-through, Jul 11):
-//   1. Split was 85/15 — the platform promise (and the partner UI) says
-//      96.5% payout / 3.5% partner-side fee. Now 96.5, cents-precise.
-//      (The traveler-side 3.5% was already collected ON TOP at checkout.)
-//   2. Stripe transfer amount was sent in DOLLARS — Stripe wants CENTS.
-//      A $1,000 payout would have arrived as $8.50.
-//   3. json() referenced `req` out of scope — every response path threw,
-//      so even a successful release would surface as an error.
-//   4. The booking update REPLACED metadata, wiping trip_id/trip_title
-//      that the traveler booking page and admin rooms display. Now merges.
-//   5. Guards against a missing/zero total_price before doing any math.
+//   release_deposit  — TRAVELER (owner) or ADMIN fallback. The partner's
+//                      working capital, released by the traveler once the
+//                      partner has shown them confirmed reservations.
+//   release_final    — TRAVELER (owner) or ADMIN. Fiverr-style consent:
+//                      the traveler confirms the trip is complete, the
+//                      remainder releases, booking stamps completed.
+//   request_release  — PARTNER. Moves no money. Bells the traveler and
+//                      stamps release_requested_* on the booking so the
+//                      admin Bookings room shows the request.
+//
+// Every release writes a row to trip_payouts (unique per booking+milestone,
+// so double-release is impossible) and updates the booking's cumulative
+// partner_payout / platform_commission. payout_paid_at + status 'completed'
+// are stamped only by the FINAL release.
+//
+// v4 also hardens v3's honesty: if the partner has no connected Stripe
+// account, or the transfer fails, the release FAILS with a real message —
+// v2/v3 would stamp the booking released while no money had moved.
+//
+// Legacy safety: a request body without an `action` (a stale partner page)
+// is treated as request_release when the caller is the partner — it can
+// never move money.
 // ============================================================================
 
 import "../_shared/resend-guard.ts";
@@ -41,8 +51,11 @@ function json(req: Request, payload: unknown, status = 200) {
   });
 }
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
 interface RequestBody {
   tripBookingId: string;
+  action?: "release_deposit" | "release_final" | "request_release";
 }
 
 Deno.serve(async (req) => {
@@ -70,10 +83,10 @@ Deno.serve(async (req) => {
 
     const admin = createClient(supabaseUrl, serviceKey);
 
-    // Load booking (metadata included so we can MERGE it later, not clobber it)
+    // Load booking (metadata included so updates MERGE it, never clobber)
     const { data: booking, error: bookingError } = await admin
       .from("trip_bookings")
-      .select("id, partner_id, total_price, currency, stripe_payment_intent_id, status, metadata")
+      .select("id, traveler_id, partner_id, total_price, deposit_amount, currency, stripe_payment_intent_id, status, metadata")
       .eq("id", body.tripBookingId)
       .single();
 
@@ -81,32 +94,164 @@ Deno.serve(async (req) => {
       return json(req, { error: "Booking not found" }, 404);
     }
 
-    // Authorize: admin OR booking partner
+    // Who is calling?
     const { data: isAdminData } = await admin.rpc("has_role", {
       _user_id: user.id,
       _role: "admin",
     });
     const isAdmin = !!isAdminData;
-    const isPartner = booking.partner_id && booking.partner_id === user.id;
-    if (!isAdmin && !isPartner) {
+    const isPartner = !!booking.partner_id && booking.partner_id === user.id;
+    const isTraveler = booking.traveler_id === user.id;
+    if (!isAdmin && !isPartner && !isTraveler) {
       return json(req, { error: "Forbidden" }, 403);
     }
 
-    if (!booking.stripe_payment_intent_id) {
-      return json(req, { error: "No payment intent on this booking" }, 400);
+    // Legacy safety: no action from a partner = request, never a release.
+    const action: RequestBody["action"] =
+      body.action ?? (isPartner ? "request_release" : undefined);
+    if (!action || !["release_deposit", "release_final", "request_release"].includes(action)) {
+      return json(req, { error: "action required: release_deposit | release_final | request_release" }, 400);
     }
 
     const total = Number(booking.total_price);
+    const deposit = Number(booking.deposit_amount ?? 0);
+    const currency = (booking.currency || "usd").toLowerCase();
+    const meta = (booking.metadata as Record<string, unknown>) ?? {};
+    const tripTitle = (meta as any)?.trip_title || "the trip";
+
+    const bell = async (userId: string, title: string, message: string, actionUrl: string) => {
+      try {
+        const { error } = await admin.from("notifications").insert({
+          user_id: userId,
+          type: "system_announcement",
+          title,
+          message,
+          action_url: actionUrl,
+          entity_type: "trip_booking",
+          entity_id: booking.id,
+        });
+        if (error) console.error("Notification insert failed:", error.message);
+      } catch (e) {
+        console.error("Notification insert threw:", e);
+      }
+    };
+
+    // ── PARTNER: request a release (no money moves) ──
+    if (action === "request_release") {
+      if (!isPartner && !isAdmin) {
+        return json(req, { error: "Only the booking's partner can request a release" }, 403);
+      }
+      const { error: metaError } = await admin
+        .from("trip_bookings")
+        .update({
+          updated_at: new Date().toISOString(),
+          metadata: {
+            ...meta,
+            release_requested_at: new Date().toISOString(),
+            release_requested_by: user.id,
+          },
+        })
+        .eq("id", booking.id);
+      if (metaError) {
+        return json(req, { error: `Could not record the request: ${metaError.message}` }, 500);
+      }
+      await bell(
+        booking.traveler_id,
+        "Your specialist requested payment release",
+        `Your specialist has asked to release payment for ${tripTitle}. Once they've shared confirmed reservations you can release their working capital from your booking page — and confirm the trip there when it's complete.`,
+        `/bookings/${booking.id}`
+      );
+      return json(req, {
+        success: true,
+        message: "Request sent — the traveler and Goldsainte have been notified.",
+      });
+    }
+
+    // ── Releases below: money moves. Authorize per milestone. ──
+    if (action === "release_deposit" && !isAdmin && !isTraveler) {
+      return json(req, { error: "Only the traveler or Goldsainte can release the deposit milestone" }, 403);
+    }
+    if (action === "release_final" && !isAdmin && !isTraveler) {
+      return json(req, { error: "Only the traveler or Goldsainte can release the final payment" }, 403);
+    }
+
     if (!Number.isFinite(total) || total <= 0) {
       return json(req, { error: "Booking has no valid total_price — cannot compute payout" }, 400);
+    }
+    if (!booking.stripe_payment_intent_id) {
+      return json(req, { error: "No payment intent on this booking" }, 400);
+    }
+    if (!booking.partner_id) {
+      return json(req, { error: "This booking has no partner to pay" }, 400);
+    }
+
+    // Existing ledger for this booking
+    const { data: ledger, error: ledgerError } = await admin
+      .from("trip_payouts")
+      .select("milestone, base_amount, payout_amount, platform_fee")
+      .eq("trip_booking_id", booking.id);
+    if (ledgerError) {
+      return json(req, { error: `Could not read the payout ledger: ${ledgerError.message}` }, 500);
+    }
+    const depositRow = (ledger ?? []).find((r) => r.milestone === "deposit");
+    const finalRow = (ledger ?? []).find((r) => r.milestone === "final");
+    if (finalRow) {
+      return json(req, { error: "This booking is already fully released" }, 400);
+    }
+
+    // Milestone math — the two milestones sum EXACTLY to 96.5% of total.
+    const totalPayout = round2(total * 96.5 / 100);
+    let base: number;
+    let payout: number;
+    if (action === "release_deposit") {
+      if (depositRow) {
+        return json(req, { error: "The deposit milestone was already released" }, 400);
+      }
+      if (!(deposit > 0)) {
+        return json(req, { error: "This booking has no deposit amount — release the final payment instead" }, 400);
+      }
+      if (!["confirmed", "paid_in_full"].includes(booking.status)) {
+        return json(req, { error: `Deposit can be released once the deposit is paid (booking status: ${booking.status})` }, 400);
+      }
+      base = round2(Math.min(deposit, total));
+      payout = round2(base * 96.5 / 100);
+    } else {
+      // release_final
+      const balance = round2(total - deposit);
+      const balanceCollected =
+        booking.status === "paid_in_full" ||
+        (booking.status === "confirmed" && balance <= 0) ||
+        booking.status === "completed";
+      if (!balanceCollected) {
+        return json(req, { error: `The trip balance hasn't been paid yet (booking status: ${booking.status}) — collect it before releasing` }, 400);
+      }
+      base = round2(total - Number(depositRow?.base_amount ?? 0));
+      payout = round2(totalPayout - Number(depositRow?.payout_amount ?? 0));
+      if (payout <= 0) {
+        return json(req, { error: "Nothing left to release on this booking" }, 400);
+      }
+    }
+    const fee = round2(base - payout);
+
+    // Partner must have a connected Stripe account — otherwise the release
+    // would stamp paid while no money moved. Fail honestly instead.
+    const { data: partnerProfile } = await admin
+      .from("profiles")
+      .select("stripe_account_id, stripe_connect_account_id")
+      .eq("id", booking.partner_id)
+      .maybeSingle();
+    const connectAccountId =
+      partnerProfile?.stripe_account_id || partnerProfile?.stripe_connect_account_id;
+    if (!connectAccountId) {
+      return json(req, { error: "The partner has no connected Stripe account yet — they need to connect one before payouts can be released" }, 400);
     }
 
     const stripeSecret = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeSecret) return json(req, { error: "STRIPE_SECRET_KEY not configured" }, 500);
     const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
 
-    // The stored stripe_payment_intent_id from trip-checkout-create is actually a session id.
-    // Resolve it to the real payment intent if necessary.
+    // The stored stripe_payment_intent_id from trip-checkout-create is
+    // actually a session id — resolve to the real payment intent if needed.
     let paymentIntentId = booking.stripe_payment_intent_id;
     if (paymentIntentId.startsWith("cs_")) {
       const session = await stripe.checkout.sessions.retrieve(paymentIntentId);
@@ -116,94 +261,134 @@ Deno.serve(async (req) => {
       paymentIntentId = session.payment_intent;
     }
 
-    // Capture (release escrow)
-    let capturedAmountCents: number | null = null;
+    // Ensure the charge is captured (checkout normally auto-captures)
     try {
-      const captured = await stripe.paymentIntents.capture(paymentIntentId);
-      capturedAmountCents = captured.amount_received ?? null;
+      await stripe.paymentIntents.capture(paymentIntentId);
     } catch (e: any) {
-      // If already captured, continue
       if (!String(e?.message || "").toLowerCase().includes("already")) {
         console.error("Capture failed", e);
         return json(req, { error: `Capture failed: ${e.message}` }, 500);
       }
     }
 
-    // Platform standard: partner keeps 96.5% of the trip price; Goldsainte's
-    // partner-side fee is 3.5%. (The traveler-side 3.5% was charged on top
-    // at checkout and never touches these columns.) Dollars, cents-precise.
-    const partnerPayout = Math.round(total * 96.5) / 100;
-    const platformCommission = Math.round((total - partnerPayout) * 100) / 100;
-
-    // Optional: Stripe Connect transfer to partner
-    let transferId: string | null = null;
-    if (booking.partner_id) {
-      const { data: partnerProfile } = await admin
-        .from("profiles")
-        .select("stripe_account_id, stripe_connect_account_id")
-        .eq("id", booking.partner_id)
-        .maybeSingle();
-
-      const connectAccountId =
-        partnerProfile?.stripe_account_id || partnerProfile?.stripe_connect_account_id;
-
-      if (connectAccountId) {
-        try {
-          const transfer = await stripe.transfers.create({
-            // Stripe amounts are in CENTS; partnerPayout is in dollars.
-            amount: Math.round(partnerPayout * 100),
-            currency: (booking.currency || "usd").toLowerCase(),
-            destination: connectAccountId,
-            metadata: {
-              trip_booking_id: booking.id,
-              partner_id: booking.partner_id,
-              type: "trip_booking_payout",
-            },
-          });
-          transferId = transfer.id;
-        } catch (e: any) {
-          console.error("Transfer failed", e);
-          // Non-fatal: capture succeeded; surface as warning
-        }
-      }
+    // Transfer the milestone payout — Stripe amounts are in CENTS.
+    let transferId: string;
+    try {
+      const transfer = await stripe.transfers.create({
+        amount: Math.round(payout * 100),
+        currency,
+        destination: connectAccountId,
+        metadata: {
+          trip_booking_id: booking.id,
+          partner_id: booking.partner_id,
+          milestone: action === "release_deposit" ? "deposit" : "final",
+          type: "trip_booking_payout",
+        },
+      });
+      transferId = transfer.id;
+    } catch (e: any) {
+      console.error("Transfer failed", e);
+      return json(req, { error: `Stripe transfer failed — nothing was released: ${e.message}` }, 500);
     }
 
-    // Update booking — merge metadata so trip_id / trip_title survive.
+    // Record the milestone in the ledger (unique index blocks double release)
+    const milestone = action === "release_deposit" ? "deposit" : "final";
+    const releasedVia = isAdmin ? "admin" : "traveler_confirmation";
+    const { error: insertError } = await admin.from("trip_payouts").insert({
+      trip_booking_id: booking.id,
+      milestone,
+      base_amount: base,
+      payout_amount: payout,
+      platform_fee: fee,
+      stripe_transfer_id: transferId,
+      released_by: user.id,
+      released_via: releasedVia,
+    });
+    if (insertError) {
+      // Money moved but the ledger write failed — say exactly that.
+      return json(req, { error: `Transfer ${transferId} succeeded but recording it failed: ${insertError.message}. Do NOT retry — reconcile in Stripe.` }, 500);
+    }
+
+    // Update the booking's cumulative money facts
+    const cumulativePayout = round2(Number(depositRow?.payout_amount ?? 0) + payout);
+    const cumulativeFee = round2(Number(depositRow?.platform_fee ?? 0) + fee);
+    const bookingUpdate: Record<string, unknown> =
+      milestone === "final"
+        ? {
+            status: "completed",
+            partner_payout: cumulativePayout,
+            platform_commission: cumulativeFee,
+            payout_paid_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            metadata: {
+              ...meta,
+              released_by: user.id,
+              released_at: new Date().toISOString(),
+              stripe_transfer_id: transferId,
+            },
+          }
+        : {
+            partner_payout: cumulativePayout,
+            platform_commission: cumulativeFee,
+            updated_at: new Date().toISOString(),
+            metadata: {
+              ...meta,
+              deposit_released_at: new Date().toISOString(),
+              deposit_released_by: user.id,
+              deposit_stripe_transfer_id: transferId,
+            },
+          };
+
     const { error: updateError } = await admin
       .from("trip_bookings")
-      .update({
-        status: "completed",
-        partner_payout: partnerPayout,
-        platform_commission: platformCommission,
-        payout_paid_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        metadata: {
-          ...((booking.metadata as Record<string, unknown>) ?? {}),
-          released_by: user.id,
-          released_at: new Date().toISOString(),
-          stripe_transfer_id: transferId,
-        },
-      })
+      .update(bookingUpdate)
       .eq("id", booking.id);
-
     if (updateError) {
-      return json(req, { error: `DB update failed: ${updateError.message}` }, 500);
+      return json(req, { error: `Released and recorded, but the booking update failed: ${updateError.message}` }, 500);
     }
 
-    // Fire-and-forget: ask the traveler to leave a review.
-    try {
-      await sendReviewRequestEmail(admin, booking.id);
-    } catch (e) {
-      console.error("review request email failed", e);
+    // Bells
+    const displayCur = currency.toUpperCase();
+    if (milestone === "deposit") {
+      await bell(
+        booking.partner_id,
+        "Working capital released",
+        `Your deposit payout of ${displayCur} ${payout.toFixed(2)} for ${tripTitle} has been released so you can secure the reservations.`,
+        `/booking/${booking.id}`
+      );
+    } else {
+      await bell(
+        booking.partner_id,
+        "Final payout released",
+        `Your final payout of ${displayCur} ${payout.toFixed(2)} for ${tripTitle} has been released. Total received: ${displayCur} ${cumulativePayout.toFixed(2)}.`,
+        `/booking/${booking.id}`
+      );
+      if (isAdmin) {
+        await bell(
+          booking.traveler_id,
+          "Trip payment released",
+          `Payment for ${tripTitle} has been released to your specialist. We hope it was wonderful.`,
+          `/bookings/${booking.id}`
+        );
+      }
+      // Fire-and-forget: ask the traveler to leave a review.
+      try {
+        await sendReviewRequestEmail(admin, booking.id);
+      } catch (e) {
+        console.error("review request email failed", e);
+      }
     }
 
     return json(req, {
       success: true,
-      bookingId: booking.id,
-      capturedAmountCents,
-      partnerPayout,
-      platformCommission,
+      milestone,
+      payoutAmount: payout,
+      cumulativePayout,
       transferId,
+      message:
+        milestone === "deposit"
+          ? `Deposit milestone released — ${displayCur} ${payout.toFixed(2)} sent to the partner.`
+          : `Final milestone released — ${displayCur} ${payout.toFixed(2)} sent. Booking complete.`,
     });
   } catch (err: any) {
     console.error("release-trip-deposit error", err);
