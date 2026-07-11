@@ -25,6 +25,7 @@ const WEBHOOK = "supabase/functions/stripe-webhook-handler/index.ts";
 const CANCEL_FN = "supabase/functions/admin-process-cancellation/index.ts";
 const PAYOUTS_SQL = "supabase/manual/trip-payouts.sql";
 const CANCEL_SQL = "supabase/manual/trip-cancellations.sql";
+const MATH = "supabase/functions/_shared/payoutMath.ts";
 const TRAVELER_PAGE = "src/pages/bookings/BookingDetailPage.tsx";
 const PARTNER_LIST = "src/pages/PartnerBookingsPage.tsx";
 const PARTNER_DETAIL = "src/pages/PartnerBookingDetailPage.tsx";
@@ -55,15 +56,17 @@ function count(path: string, needle: string): number {
 // ─────────────────────────────────────────────────────────────────────────────
 
 Deno.test("partners are paid 96.5%, never 85% (Jul 11 bug: 11.5-point silent underpayment)", () => {
-  assertContains(RELEASE, "96.5", "The platform promise is a 96.5% partner payout.");
+  assertContains(MATH, "96.5", "The platform promise is a 96.5% partner payout.");
+  assertNotContains(MATH, "0.85", "An 85/15 split shipped once and underpaid every partner.");
   assertNotContains(RELEASE, "0.85", "An 85/15 split shipped once and underpaid every partner.");
+  assertContains(RELEASE, '"../_shared/payoutMath.ts"', "All money math must come from the tested module.");
 });
 
 Deno.test("Stripe transfers are sent in CENTS (Jul 11 bug: $1,000 payout arrived as $8.50)", () => {
   assertContains(
     RELEASE,
-    "amount: Math.round(payout * 100)",
-    "trip_bookings stores dollars; Stripe wants cents. Without *100 every payout is 100x too small."
+    "amount: toCents(payout)",
+    "trip_bookings stores dollars; Stripe wants cents. toCents is behaviorally tested."
   );
 });
 
@@ -158,15 +161,17 @@ Deno.test("the webhook can tell deposit-paid from paid-in-full (Jul 11 gap: paid
 });
 
 Deno.test("collected amounts strip the traveler-side 3.5% fee", () => {
+  assertContains(MATH, "1.035", "The fee multiplier lives in the tested module.");
   assertContains(
     WEBHOOK,
-    "/ 100 / 1.035",
-    "Charges include the traveler fee ON TOP; comparing raw charges to total_price would over-count."
+    "accumulateCollected(",
+    "Charges include the traveler fee ON TOP; the webhook must use the tested accumulator."
   );
 });
 
 Deno.test("full payment is detected with penny tolerance", () => {
-  assertContains(WEBHOOK, "collected >= total - 0.01", "Rounding must not strand a fully-paid booking at 'confirmed'.");
+  assertContains(MATH, "total - 0.01", "Rounding must not strand a fully-paid booking at 'confirmed'.");
+  assertContains(WEBHOOK, "isFullyPaid(collected, total)", "The webhook must use the tested predicate.");
 });
 
 Deno.test("a payment is never lost to bookkeeping failure", () => {
