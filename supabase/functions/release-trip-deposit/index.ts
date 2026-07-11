@@ -34,6 +34,13 @@ import "../_shared/resend-guard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
+import {
+  round2,
+  toCents,
+  totalPartnerPayout,
+  depositMilestone,
+  finalMilestone,
+} from "../_shared/payoutMath.ts";
 
 function corsHeaders(req?: Request): Record<string, string> {
   return {
@@ -50,8 +57,6 @@ function json(req: Request, payload: unknown, status = 200) {
     headers: { ...corsHeaders(req), "Content-Type": "application/json" },
   });
 }
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
 
 interface RequestBody {
   tripBookingId: string;
@@ -199,8 +204,9 @@ Deno.serve(async (req) => {
       return json(req, { error: "This booking is already fully released" }, 400);
     }
 
-    // Milestone math — the two milestones sum EXACTLY to 96.5% of total.
-    const totalPayout = round2(total * 96.5 / 100);
+    // Milestone math — payoutMath guarantees the two milestones sum
+    // EXACTLY to 96.5% of total (behavioral tests prove it).
+    const totalPayout = totalPartnerPayout(total);
     let base: number;
     let payout: number;
     if (action === "release_deposit") {
@@ -213,8 +219,9 @@ Deno.serve(async (req) => {
       if (!["confirmed", "paid_in_full"].includes(booking.status)) {
         return json(req, { error: `Deposit can be released once the deposit is paid (booking status: ${booking.status})` }, 400);
       }
-      base = round2(Math.min(deposit, total));
-      payout = round2(base * 96.5 / 100);
+      const m = depositMilestone(total, deposit);
+      base = m.base;
+      payout = m.payout;
     } else {
       // release_final
       const balance = round2(total - deposit);
@@ -225,8 +232,13 @@ Deno.serve(async (req) => {
       if (!balanceCollected) {
         return json(req, { error: `The trip balance hasn't been paid yet (booking status: ${booking.status}) — collect it before releasing` }, 400);
       }
-      base = round2(total - Number(depositRow?.base_amount ?? 0));
-      payout = round2(totalPayout - Number(depositRow?.payout_amount ?? 0));
+      const m = finalMilestone(
+        total,
+        Number(depositRow?.base_amount ?? 0),
+        Number(depositRow?.payout_amount ?? 0)
+      );
+      base = m.base;
+      payout = m.payout;
       if (payout <= 0) {
         return json(req, { error: "Nothing left to release on this booking" }, 400);
       }
@@ -275,7 +287,7 @@ Deno.serve(async (req) => {
     let transferId: string;
     try {
       const transfer = await stripe.transfers.create({
-        amount: Math.round(payout * 100),
+        amount: toCents(payout),
         currency,
         destination: connectAccountId,
         metadata: {
