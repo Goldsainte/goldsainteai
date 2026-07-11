@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { RefreshCw, RotateCcw, X } from "lucide-react";
 
@@ -74,25 +72,32 @@ export default function AdminEmailDLQPage() {
   };
 
   return (
-    <div className="container max-w-6xl py-10">
-      <div className="flex items-center justify-between mb-6">
+    <main className="min-h-screen bg-[#f7f3ea] px-5 py-10 md:px-6">
+    <div className="mx-auto max-w-6xl">
+      <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl text-foreground">Email Dead Letter Queue</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Emails that failed after all retries. Retry to re-send, or dismiss to discard.
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trust &amp; systems</p>
+          <h1 className="mt-2 font-secondary text-[28px] leading-tight text-[#0a2225] md:text-[30px]">Email queue</h1>
+          <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/55">
+            Emails that failed after all retries — retry to re-send, or dismiss to discard.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-          <RefreshCw className="mr-2 h-4 w-4" />
+        <button
+          type="button"
+          onClick={load}
+          disabled={loading}
+          className="inline-flex items-center gap-2 rounded-full border border-[#C7A962]/50 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/10 disabled:opacity-50"
+        >
+          <RefreshCw className="h-4 w-4" />
           Refresh
-        </Button>
+        </button>
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <p className="text-sm text-[#0a2225]/45">Loading…</p>
       ) : rows.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card p-12 text-center">
-          <p className="text-muted-foreground">No failed emails. Inbox is clean.</p>
+        <div className="rounded-2xl bg-white p-12 text-center shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+          <p className="text-[14px] text-[#0a2225]/55">No failed emails — every message found its way.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -111,44 +116,45 @@ export default function AdminEmailDLQPage() {
             return (
               <div
                 key={key}
-                className="rounded-lg border border-border bg-card p-4 flex items-start justify-between gap-4"
+                className="flex items-start justify-between gap-4 rounded-2xl bg-white p-5 shadow-[0_2px_16px_rgba(0,0,0,0.07)]"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="secondary">{row.queue_name}</Badge>
-                    <span className="text-sm font-medium text-foreground truncate">{template}</span>
+                    <span className="inline-flex rounded-full border border-[#E5DFC6] bg-[#fdfaf2] px-2.5 py-0.5 text-[10.5px] text-[#0a2225]/60">{row.queue_name}</span>
+                    <span className="truncate text-sm font-medium text-[#0a2225]">{template}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    To: <span className="text-foreground">{String(recipient)}</span>
+                  <div className="text-sm text-[#0a2225]/55">
+                    To: <span className="text-[#0a2225]">{String(recipient)}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">
+                  <div className="mt-1 text-xs text-[#0a2225]/45">
                     Failed {new Date(row.enqueued_at).toLocaleString()} · {row.read_ct} attempts
                   </div>
                   <details className="mt-2">
-                    <summary className="text-xs text-muted-foreground cursor-pointer">Payload</summary>
-                    <pre className="mt-2 text-xs bg-muted/40 p-2 rounded overflow-auto max-h-48">
+                    <summary className="cursor-pointer text-xs text-[#8D6B2F]">Payload</summary>
+                    <pre className="mt-2 max-h-48 overflow-auto rounded-lg border border-[#E5DFC6] bg-[#fdfaf2] p-2 text-xs">
                       {JSON.stringify(row.message, null, 2)}
                     </pre>
                   </details>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
-                  <Button
-                    size="sm"
+                  <button
+                    type="button"
                     onClick={() => retry(row)}
                     disabled={busyId === key}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
                   >
-                    <RotateCcw className="mr-2 h-3 w-3" />
+                    <RotateCcw className="h-3 w-3" />
                     Retry
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => dismiss(row)}
                     disabled={busyId === key}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#0a2225]/20 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea] disabled:opacity-50"
                   >
-                    <X className="mr-2 h-3 w-3" />
+                    <X className="h-3 w-3" />
                     Dismiss
-                  </Button>
+                  </button>
                 </div>
               </div>
             );
@@ -156,5 +162,6 @@ export default function AdminEmailDLQPage() {
         </div>
       )}
     </div>
+    </main>
   );
 }
