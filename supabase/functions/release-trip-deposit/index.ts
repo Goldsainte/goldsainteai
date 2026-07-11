@@ -1,3 +1,25 @@
+// ============================================================================
+// release-trip-deposit v3
+// ============================================================================
+// The explicit "pay the partner" click. Money sits in Goldsainte's Stripe
+// balance (escrow) until a partner or admin presses Release; then the
+// partner's 96.5% share is transferred to their connected Stripe account,
+// the booking is stamped completed + payout_paid_at, and the traveler is
+// asked for a review.
+//
+// v3 fixes over v2 (all found in read-through, Jul 11):
+//   1. Split was 85/15 — the platform promise (and the partner UI) says
+//      96.5% payout / 3.5% partner-side fee. Now 96.5, cents-precise.
+//      (The traveler-side 3.5% was already collected ON TOP at checkout.)
+//   2. Stripe transfer amount was sent in DOLLARS — Stripe wants CENTS.
+//      A $1,000 payout would have arrived as $8.50.
+//   3. json() referenced `req` out of scope — every response path threw,
+//      so even a successful release would surface as an error.
+//   4. The booking update REPLACED metadata, wiping trip_id/trip_title
+//      that the traveler booking page and admin rooms display. Now merges.
+//   5. Guards against a missing/zero total_price before doing any math.
+// ============================================================================
+
 import "../_shared/resend-guard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
@@ -12,6 +34,13 @@ function corsHeaders(req?: Request): Record<string, string> {
 };
 }
 
+function json(req: Request, payload: unknown, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
+  });
+}
+
 interface RequestBody {
   tripBookingId: string;
 }
@@ -24,7 +53,7 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return json({ error: "Unauthorized" }, 401);
+      return json(req, { error: "Unauthorized" }, 401);
     }
     const token = authHeader.replace("Bearer ", "");
 
@@ -34,22 +63,22 @@ Deno.serve(async (req) => {
 
     const userClient = createClient(supabaseUrl, anonKey);
     const { data: { user }, error: authError } = await userClient.auth.getUser(token);
-    if (authError || !user) return json({ error: "Unauthorized" }, 401);
+    if (authError || !user) return json(req, { error: "Unauthorized" }, 401);
 
     const body = (await req.json()) as RequestBody;
-    if (!body?.tripBookingId) return json({ error: "tripBookingId required" }, 400);
+    if (!body?.tripBookingId) return json(req, { error: "tripBookingId required" }, 400);
 
     const admin = createClient(supabaseUrl, serviceKey);
 
-    // Load booking
+    // Load booking (metadata included so we can MERGE it later, not clobber it)
     const { data: booking, error: bookingError } = await admin
       .from("trip_bookings")
-      .select("id, partner_id, total_price, currency, stripe_payment_intent_id, status")
+      .select("id, partner_id, total_price, currency, stripe_payment_intent_id, status, metadata")
       .eq("id", body.tripBookingId)
       .single();
 
     if (bookingError || !booking) {
-      return json({ error: "Booking not found" }, 404);
+      return json(req, { error: "Booking not found" }, 404);
     }
 
     // Authorize: admin OR booking partner
@@ -60,15 +89,20 @@ Deno.serve(async (req) => {
     const isAdmin = !!isAdminData;
     const isPartner = booking.partner_id && booking.partner_id === user.id;
     if (!isAdmin && !isPartner) {
-      return json({ error: "Forbidden" }, 403);
+      return json(req, { error: "Forbidden" }, 403);
     }
 
     if (!booking.stripe_payment_intent_id) {
-      return json({ error: "No payment intent on this booking" }, 400);
+      return json(req, { error: "No payment intent on this booking" }, 400);
+    }
+
+    const total = Number(booking.total_price);
+    if (!Number.isFinite(total) || total <= 0) {
+      return json(req, { error: "Booking has no valid total_price — cannot compute payout" }, 400);
     }
 
     const stripeSecret = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeSecret) return json({ error: "STRIPE_SECRET_KEY not configured" }, 500);
+    if (!stripeSecret) return json(req, { error: "STRIPE_SECRET_KEY not configured" }, 500);
     const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
 
     // The stored stripe_payment_intent_id from trip-checkout-create is actually a session id.
@@ -77,27 +111,29 @@ Deno.serve(async (req) => {
     if (paymentIntentId.startsWith("cs_")) {
       const session = await stripe.checkout.sessions.retrieve(paymentIntentId);
       if (!session.payment_intent || typeof session.payment_intent !== "string") {
-        return json({ error: "Could not resolve payment intent from session" }, 500);
+        return json(req, { error: "Could not resolve payment intent from session" }, 500);
       }
       paymentIntentId = session.payment_intent;
     }
 
     // Capture (release escrow)
-    let capturedAmount = booking.total_price;
+    let capturedAmountCents: number | null = null;
     try {
       const captured = await stripe.paymentIntents.capture(paymentIntentId);
-      capturedAmount = captured.amount_received ?? booking.total_price;
+      capturedAmountCents = captured.amount_received ?? null;
     } catch (e: any) {
       // If already captured, continue
       if (!String(e?.message || "").toLowerCase().includes("already")) {
         console.error("Capture failed", e);
-        return json({ error: `Capture failed: ${e.message}` }, 500);
+        return json(req, { error: `Capture failed: ${e.message}` }, 500);
       }
     }
 
-    const total = booking.total_price;
-    const partnerPayout = Math.round(total * 0.85);
-    const platformCommission = total - partnerPayout;
+    // Platform standard: partner keeps 96.5% of the trip price; Goldsainte's
+    // partner-side fee is 3.5%. (The traveler-side 3.5% was charged on top
+    // at checkout and never touches these columns.) Dollars, cents-precise.
+    const partnerPayout = Math.round(total * 96.5) / 100;
+    const platformCommission = Math.round((total - partnerPayout) * 100) / 100;
 
     // Optional: Stripe Connect transfer to partner
     let transferId: string | null = null;
@@ -114,7 +150,8 @@ Deno.serve(async (req) => {
       if (connectAccountId) {
         try {
           const transfer = await stripe.transfers.create({
-            amount: partnerPayout,
+            // Stripe amounts are in CENTS; partnerPayout is in dollars.
+            amount: Math.round(partnerPayout * 100),
             currency: (booking.currency || "usd").toLowerCase(),
             destination: connectAccountId,
             metadata: {
@@ -131,7 +168,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Update booking
+    // Update booking — merge metadata so trip_id / trip_title survive.
     const { error: updateError } = await admin
       .from("trip_bookings")
       .update({
@@ -141,6 +178,7 @@ Deno.serve(async (req) => {
         payout_paid_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         metadata: {
+          ...((booking.metadata as Record<string, unknown>) ?? {}),
           released_by: user.id,
           released_at: new Date().toISOString(),
           stripe_transfer_id: transferId,
@@ -149,7 +187,7 @@ Deno.serve(async (req) => {
       .eq("id", booking.id);
 
     if (updateError) {
-      return json({ error: `DB update failed: ${updateError.message}` }, 500);
+      return json(req, { error: `DB update failed: ${updateError.message}` }, 500);
     }
 
     // Fire-and-forget: ask the traveler to leave a review.
@@ -159,26 +197,19 @@ Deno.serve(async (req) => {
       console.error("review request email failed", e);
     }
 
-    return json({
+    return json(req, {
       success: true,
       bookingId: booking.id,
-      capturedAmount,
+      capturedAmountCents,
       partnerPayout,
       platformCommission,
       transferId,
     });
   } catch (err: any) {
     console.error("release-trip-deposit error", err);
-    return json({ error: err?.message || "Internal error" }, 500);
+    return json(req, { error: err?.message || "Internal error" }, 500);
   }
 });
-
-function json(payload: unknown, status = 200) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: { ...corsHeaders(req), "Content-Type": "application/json" },
-  });
-}
 
 async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bookingId: string) {
   const resendKey = Deno.env.get("RESEND_API_KEY");
