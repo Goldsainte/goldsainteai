@@ -1,7 +1,7 @@
 // src/pages/bookings/BookingDetailPage.tsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ShieldAlert, CalendarX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { BookingConversation } from "@/components/chat/BookingConversation";
@@ -14,6 +14,15 @@ type DisputeRow = {
   booking_id: string;
   reason: string;
   status: string;
+  created_at: string;
+};
+
+type CancellationRow = {
+  id: string;
+  status: string;
+  reason: string;
+  refund_amount: number | null;
+  currency: string | null;
   created_at: string;
 };
 
@@ -71,6 +80,21 @@ function humanBookingStatus(status: string) {
   }
 }
 
+function humanCancellationStatus(status: string) {
+  switch (status) {
+    case "pending":
+      return "Under review";
+    case "approved":
+      return "Approved — refund on the way";
+    case "refunded":
+      return "Refund issued";
+    case "rejected":
+      return "Declined";
+    default:
+      return status.replace(/_/g, " ");
+  }
+}
+
 export default function BookingDetailPage() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
@@ -85,6 +109,13 @@ export default function BookingDetailPage() {
   const [claimReason, setClaimReason] = useState("");
   const [claimSubmitting, setClaimSubmitting] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
+
+  // Cancellation request state
+  const [cancellations, setCancellations] = useState<CancellationRow[]>([]);
+  const [showCancelForm, setShowCancelForm] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [cancelRequestError, setCancelRequestError] = useState<string | null>(null);
 
   // Specialist (partner) profile for the sidebar card
   const [partnerProfile, setPartnerProfile] = useState<{
@@ -143,6 +174,20 @@ export default function BookingDetailPage() {
           disputeRows = [];
         }
 
+        // Existing cancellation requests (RLS limits results to the
+        // traveler's own rows; best-effort like disputes).
+        let cancellationRows: CancellationRow[] = [];
+        try {
+          const { data: c } = await supabase
+            .from("trip_cancellations")
+            .select("id, status, reason, refund_amount, currency, created_at")
+            .eq("trip_booking_id", bookingId)
+            .order("created_at", { ascending: false });
+          cancellationRows = (c ?? []) as CancellationRow[];
+        } catch {
+          cancellationRows = [];
+        }
+
         // Specialist profile (best-effort; platform bookings may have none)
         let partnerRow: any = null;
         if (bookingRow.partner_id) {
@@ -158,6 +203,7 @@ export default function BookingDetailPage() {
           setBooking(bookingRow as BookingRow);
           setTrip(tripRow);
           setDisputes(disputeRows);
+          setCancellations(cancellationRows);
           setPartnerProfile(partnerRow);
         }
       } catch (err: any) {
@@ -191,9 +237,46 @@ export default function BookingDetailPage() {
     }
   }
 
+  async function handleRequestCancellation(e: React.FormEvent) {
+    e.preventDefault();
+    if (!cancelReason.trim() || !booking) return;
+    setCancelSubmitting(true);
+    setCancelRequestError(null);
+    try {
+      const { data, error: insertError } = await supabase
+        .from("trip_cancellations")
+        .insert({
+          trip_booking_id: booking.id,
+          traveler_id: booking.traveler_id,
+          reason: cancelReason.trim(),
+          currency: booking.currency,
+        })
+        .select("id, status, reason, refund_amount, currency, created_at")
+        .single();
+      if (insertError) throw insertError;
+      setCancellations((prev) => [data as CancellationRow, ...prev]);
+      setCancelReason("");
+      setShowCancelForm(false);
+    } catch (err: any) {
+      setCancelRequestError(
+        err.message || "Could not submit your cancellation request. Please try again."
+      );
+    } finally {
+      setCancelSubmitting(false);
+    }
+  }
+
   const hasOpenClaim = disputes.some(
     (d) => d.status === "open" || d.status === "under_review"
   );
+
+  const activeCancellation = cancellations.find((c) =>
+    ["pending", "approved", "refunded"].includes(c.status)
+  );
+  const canRequestCancellation =
+    !!booking &&
+    !["cancelled", "completed"].includes(booking.status) &&
+    !activeCancellation;
 
   const [payingBalance, setPayingBalance] = useState(false);
   const [contractGate, setContractGate] = useState<{ contractId: string | null } | null>(null);
@@ -624,6 +707,129 @@ export default function BookingDetailPage() {
                     File a claim
                   </button>
                 </div>
+              )}
+            </section>
+
+            {/* ── Cancellation ── */}
+            <section className="mt-14 border-t border-[#E5DFC6] pt-8 md:px-3">
+              <header className="mb-6 flex items-baseline justify-between">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                  Change of plans?
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
+                  Request a cancellation
+                </p>
+              </header>
+
+              {cancellations.length > 0 && (
+                <ul className="mb-6 space-y-3">
+                  {cancellations.map((c) => (
+                    <li
+                      key={c.id}
+                      className="rounded-2xl border border-[#E5DFC6] bg-white p-4"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] text-[#8D6B2F]">
+                          <CalendarX className="h-3.5 w-3.5" />
+                          Cancellation ·{" "}
+                          {new Date(c.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]">
+                          {humanCancellationStatus(c.status)}
+                        </span>
+                      </div>
+                      <p className="mt-2 break-words text-sm leading-relaxed text-[#0a2225]/80">
+                        {c.reason}
+                      </p>
+                      {(c.status === "approved" || c.status === "refunded") &&
+                        (c.refund_amount ?? 0) > 0 && (
+                          <p className="mt-2 text-sm text-[#0a2225]/60">
+                            Refund: {formatMoney(c.refund_amount, c.currency || currency)}
+                          </p>
+                        )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {activeCancellation ? (
+                activeCancellation.status === "pending" ? (
+                  <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                    Your cancellation request is with our team. We'll confirm
+                    the outcome here and in your notifications.
+                  </p>
+                ) : null
+              ) : showCancelForm ? (
+                <form onSubmit={handleRequestCancellation} className="space-y-4">
+                  <label
+                    htmlFor="cancel-reason"
+                    className="block text-sm text-[#0a2225]/70"
+                  >
+                    Tell us why you need to cancel. Refunds are reviewed case
+                    by case against your trip's policies.
+                  </label>
+                  <textarea
+                    id="cancel-reason"
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    rows={5}
+                    maxLength={2000}
+                    placeholder="Describe why you're cancelling…"
+                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-sm leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
+                  />
+                  {cancelRequestError && (
+                    <p className="text-sm text-red-700">{cancelRequestError}</p>
+                  )}
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={cancelSubmitting || !cancelReason.trim()}
+                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {cancelSubmitting ? "Submitting…" : "Submit request"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowCancelForm(false);
+                        setCancelReason("");
+                        setCancelRequestError(null);
+                      }}
+                      className="text-sm text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
+                    >
+                      Never mind
+                    </button>
+                  </div>
+                </form>
+              ) : canRequestCancellation ? (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="max-w-xl text-sm leading-relaxed text-[#0a2225]/60">
+                    Plans change. Request a cancellation and our team will
+                    review it against your trip's policies — refunds are
+                    decided case by case.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowCancelForm(true)}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
+                  >
+                    <CalendarX className="h-4 w-4" />
+                    Request cancellation
+                  </button>
+                </div>
+              ) : booking.status === "cancelled" ? (
+                <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                  This booking has been cancelled.
+                </p>
+              ) : (
+                <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                  This trip is completed, so cancellation no longer applies. If
+                  something went wrong, you can file a claim above.
+                </p>
               )}
             </section>
           </article>
