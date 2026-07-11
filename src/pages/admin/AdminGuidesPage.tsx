@@ -10,9 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Eye, CheckCircle2, Undo2, BookOpen } from "lucide-react";
+import { Loader2, Eye, CheckCircle2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
-import { BackButton } from "@/components/ui/BackButton";
 
 /**
  * Admin review queue for itinerary guides.
@@ -94,15 +93,12 @@ export default function AdminGuidesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FDF9F0] px-4 sm:px-6 py-10">
+    <main className="min-h-screen bg-[#f7f3ea] px-4 sm:px-6 py-10">
       <div className="mx-auto max-w-4xl">
-        <BackButton to="/admin" />
-        <div className="mt-4 flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#C7A962] font-medium flex items-center gap-2">
-              <BookOpen className="h-3.5 w-3.5" /> Admin
-            </p>
-            <h1 className="font-secondary text-2xl text-[#0a2225] mt-1">Guide Review</h1>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Marketplace</p>
+            <h1 className="mt-2 font-secondary text-[28px] leading-tight text-[#0a2225] md:text-[30px]">Guides</h1>
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-44 bg-white border-[#E5DFC6]">
@@ -153,7 +149,7 @@ export default function AdminGuidesPage() {
                       size="sm"
                       onClick={() => setStatus(g.id, "published")}
                       disabled={actingOn === g.id}
-                      className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d39] text-white"
+                      className="rounded-full bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#0a2225]"
                     >
                       {actingOn === g.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-1.5" />}
                       Approve
