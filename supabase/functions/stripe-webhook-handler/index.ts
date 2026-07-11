@@ -1,4 +1,5 @@
 import "../_shared/resend-guard.ts";
+import { accumulateCollected, isFullyPaid } from '../_shared/payoutMath.ts';
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
@@ -122,12 +123,12 @@ async function handleCheckoutCompleted(session: any) {
         .single();
       if (tb) {
         const prevMeta = (tb.metadata as Record<string, unknown>) ?? {};
-        const collectedBefore = Number((prevMeta as any).amount_collected ?? 0) || 0;
-        const thisPayment =
-          Math.round(((session.amount_total ?? 0) / 100 / 1.035) * 100) / 100;
-        const collected = Math.round((collectedBefore + thisPayment) * 100) / 100;
+        const collected = accumulateCollected(
+          Number((prevMeta as any).amount_collected ?? 0),
+          session.amount_total ?? 0
+        );
         const total = Number(tb.total_price ?? 0);
-        if (total > 0 && collected >= total - 0.01) {
+        if (isFullyPaid(collected, total)) {
           newStatus = 'paid_in_full';
         }
         mergedMetadata = { ...prevMeta, amount_collected: collected };
