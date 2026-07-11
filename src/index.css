@@ -1106,3 +1106,27 @@ All colors MUST be HSL.
   min-height: 0 !important;
   min-width: 0 !important;
 }
+
+/* ---------------------------------------------------------------------------
+   iOS Safari gives date/time inputs an intrinsic width that ignores w-full
+   and overflows narrow screens (seen live on the trip-request wizard,
+   Jul 10 — the Start/End date fields ran off the right edge on iPhone).
+   Stripping the native appearance makes them size and align like every
+   other input, app-wide: one rule, every current and future date field.
+--------------------------------------------------------------------------- */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Keep the value aligned like a text input once appearance is stripped */
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
+}
