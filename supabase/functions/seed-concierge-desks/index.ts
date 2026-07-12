@@ -38,7 +38,7 @@ interface DeskConfig {
 
 const DESKS: DeskConfig[] = [
   {
-    slug: "concierge.southeastasia",
+    slug: "gs.bangkok",
     region: "Southeast Asia",
     hub: "Bangkok, Thailand",
     country: "Thailand",
@@ -47,7 +47,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "thailand temple tropical",
   },
   {
-    slug: "concierge.mediterranean",
+    slug: "gs.santorini",
     region: "Mediterranean Europe",
     hub: "Santorini, Greece",
     country: "Greece",
@@ -56,7 +56,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "santorini mediterranean coast",
   },
   {
-    slug: "concierge.eastafrica",
+    slug: "gs.nairobi",
     region: "East Africa Safari",
     hub: "Nairobi, Kenya",
     country: "Kenya",
@@ -65,7 +65,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "kenya safari savanna",
   },
   {
-    slug: "concierge.andean",
+    slug: "gs.cusco",
     region: "Andean South America",
     hub: "Cusco, Peru",
     country: "Peru",
@@ -74,7 +74,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "machu picchu andes peru",
   },
   {
-    slug: "concierge.japankorea",
+    slug: "gs.kyoto",
     region: "Japan & Korea",
     hub: "Kyoto, Japan",
     country: "Japan",
@@ -83,7 +83,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "kyoto japan temple autumn",
   },
   {
-    slug: "concierge.nordic",
+    slug: "gs.reykjavik",
     region: "Nordic & Iceland",
     hub: "Reykjavik, Iceland",
     country: "Iceland",
@@ -92,7 +92,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "iceland glacier northern lights",
   },
   {
-    slug: "concierge.mena",
+    slug: "gs.marrakech",
     region: "Middle East & North Africa",
     hub: "Marrakech, Morocco",
     country: "Morocco",
@@ -101,7 +101,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "morocco desert marrakech",
   },
   {
-    slug: "concierge.caribbean",
+    slug: "gs.nassau",
     region: "Caribbean",
     hub: "Nassau, Bahamas",
     country: "Bahamas",
@@ -110,7 +110,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "caribbean beach turquoise",
   },
   {
-    slug: "concierge.centralamerica",
+    slug: "gs.costarica",
     region: "Central America",
     hub: "San José, Costa Rica",
     country: "Costa Rica",
@@ -119,7 +119,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "costa rica rainforest jungle",
   },
   {
-    slug: "concierge.oceania",
+    slug: "gs.queenstown",
     region: "Oceania",
     hub: "Queenstown, New Zealand",
     country: "New Zealand",
@@ -215,8 +215,11 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        const email = `a.powell+${desk.slug}@cornellfacilities.com`;
-        const displayName = `Goldsainte Concierge — ${desk.region}`;
+        const email = `a.powell+${desk.slug.replace(".", "-")}@cornellfacilities.com`;
+        // Brand + place ("Goldsainte Santorini"), the house naming scheme —
+        // region taxonomy reads corporate, places read luxury. The slug is
+        // gs.<place>; derive the display name from it via the hub city.
+        const displayName = `Goldsainte ${desk.hub.split(",")[0] === "San José" ? "Costa Rica" : desk.hub.split(",")[0]}`;
 
         const photo = await fetchDeskPhoto(desk.unsplashQuery, unsplashAccessKey);
 
