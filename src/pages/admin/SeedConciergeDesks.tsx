@@ -12,7 +12,7 @@ export default function SeedConciergeDesks() {
     setLoading(true);
     setResult(null);
     try {
-      const { data, error } = await supabase.functions.invoke("smooth-service");
+      const { data, error } = await supabase.functions.invoke("seed-concierge-desks");
       if (error) throw error;
       setResult(data);
       toast.success(data?.message || "Done");
@@ -29,7 +29,8 @@ export default function SeedConciergeDesks() {
         Create Goldsainte Concierge Desks
       </h1>
       <p className="text-sm text-[#6B7280] mb-6 leading-relaxed">
-        Creates 10 regional Goldsainte Concierge creator profiles — each honestly labeled as
+        Creates the 10 Goldsainte desks — brand + place names ("Goldsainte Kyoto",
+        @gs.kyoto) — each honestly labeled as
         "Run by the Goldsainte team" in its own bio, with a real destination photo (not a
         fabricated face) and no invented follower or engagement numbers. Every account's login
         email is a plus-addressed variant of a.powell@cornellfacilities.com, so traveler messages
