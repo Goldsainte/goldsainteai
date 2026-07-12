@@ -38,7 +38,7 @@ interface DeskConfig {
 
 const DESKS: DeskConfig[] = [
   {
-    slug: "gs.bangkok",
+    slug: "gs-bangkok",
     region: "Southeast Asia",
     hub: "Bangkok, Thailand",
     country: "Thailand",
@@ -47,7 +47,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "thailand temple tropical",
   },
   {
-    slug: "gs.santorini",
+    slug: "gs-santorini",
     region: "Mediterranean Europe",
     hub: "Santorini, Greece",
     country: "Greece",
@@ -56,7 +56,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "santorini mediterranean coast",
   },
   {
-    slug: "gs.nairobi",
+    slug: "gs-nairobi",
     region: "East Africa Safari",
     hub: "Nairobi, Kenya",
     country: "Kenya",
@@ -65,7 +65,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "kenya safari savanna",
   },
   {
-    slug: "gs.cusco",
+    slug: "gs-cusco",
     region: "Andean South America",
     hub: "Cusco, Peru",
     country: "Peru",
@@ -74,7 +74,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "machu picchu andes peru",
   },
   {
-    slug: "gs.kyoto",
+    slug: "gs-kyoto",
     region: "Japan & Korea",
     hub: "Kyoto, Japan",
     country: "Japan",
@@ -83,7 +83,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "kyoto japan temple autumn",
   },
   {
-    slug: "gs.reykjavik",
+    slug: "gs-reykjavik",
     region: "Nordic & Iceland",
     hub: "Reykjavik, Iceland",
     country: "Iceland",
@@ -92,7 +92,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "iceland glacier northern lights",
   },
   {
-    slug: "gs.marrakech",
+    slug: "gs-marrakech",
     region: "Middle East & North Africa",
     hub: "Marrakech, Morocco",
     country: "Morocco",
@@ -101,7 +101,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "morocco desert marrakech",
   },
   {
-    slug: "gs.nassau",
+    slug: "gs-nassau",
     region: "Caribbean",
     hub: "Nassau, Bahamas",
     country: "Bahamas",
@@ -110,7 +110,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "caribbean beach turquoise",
   },
   {
-    slug: "gs.costarica",
+    slug: "gs-costarica",
     region: "Central America",
     hub: "San José, Costa Rica",
     country: "Costa Rica",
@@ -119,7 +119,7 @@ const DESKS: DeskConfig[] = [
     unsplashQuery: "costa rica rainforest jungle",
   },
   {
-    slug: "gs.queenstown",
+    slug: "gs-queenstown",
     region: "Oceania",
     hub: "Queenstown, New Zealand",
     country: "New Zealand",
