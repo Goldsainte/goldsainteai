@@ -1016,7 +1016,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 disabled={saving || !isValid}
                 className="rounded-full px-6 sm:px-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white">
                 {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-                Submit for review
+                Publish trip
               </Button>
             </div>
           )}
