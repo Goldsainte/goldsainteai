@@ -198,7 +198,7 @@ export const StripeConnectOnboarding = () => {
 
         <Alert>
           <AlertDescription className="text-xs">
-            <strong>How it works:</strong> When a job is completed and approved, you receive 85% of your quoted price directly to your bank account within 1-2 business days (daily automatic payouts). Goldsainte keeps 15% as a success fee. Customers pay your quoted price + 3% service fee.
+            <strong>How it works:</strong> You keep 96.5% of your quoted price — Goldsainte's fee is a flat 3.5% on your side (travelers pay their own 3.5% on top). Funds are held in escrow and released in milestones: your deposit as working capital once you share confirmed reservations with your traveler, and the balance when they confirm the trip is complete. Released payouts land in your bank account via Stripe, typically within 1–2 business days.
           </AlertDescription>
         </Alert>
       </CardContent>
