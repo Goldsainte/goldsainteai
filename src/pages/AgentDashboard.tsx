@@ -214,24 +214,30 @@ export default function AgentDashboard() {
       if (bidsError) throw bidsError;
       setMyBids(bidsData || []);
 
-      // Fetch collaboration requests
-      const { data: collabsData, error: collabsError } = await supabase
-        .from('creator_collab_requests')
-        .select(`
-          *,
-          creator:profiles!creator_collab_requests_creator_id_fkey(
-            username,
-            avatar_url,
-            tiktok_username
-          ),
-          trip_story:trip_stories(id, title, tiktok_post_id),
-          package:packaged_trips(id, title, status)
-        `)
-        .eq('agent_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (collabsError) throw collabsError;
-      setCollabRequests(collabsData || []);
+      // Fetch collaboration requests — NON-FATAL: this belongs to the
+      // collabs feature (hidden for launch); its fancy joins must never be
+      // able to take down the whole Bureau ("Failed to load dashboard").
+      try {
+        const { data: collabsData, error: collabsError } = await supabase
+          .from('creator_collab_requests')
+          .select(`
+            *,
+            creator:profiles!creator_collab_requests_creator_id_fkey(
+              username,
+              avatar_url,
+              tiktok_username
+            ),
+            trip_story:trip_stories(id, title, tiktok_post_id),
+            package:packaged_trips(id, title, status)
+          `)
+          .eq('agent_id', user?.id)
+          .order('created_at', { ascending: false });
+        if (collabsError) throw collabsError;
+        setCollabRequests(collabsData || []);
+      } catch (collabErr) {
+        console.error('Collab requests fetch failed (non-fatal, feature hidden):', collabErr);
+        setCollabRequests([]);
+      }
 
       // Fetch agent trip status counts (use auth user id as agent_id on packaged_trips)
       if (user?.id) {
