@@ -24,11 +24,14 @@ serve(async (req) => {
 
     const { q, location } = await req.json();
     
-    // Build request body with only defined values
+    // Freetext search body — /partner/search/freetext accepts a searchTerm;
+    // /partner/products/search does NOT (it requires a filtering object with
+    // destination IDs, which is why it returned 400 "Missing filtering").
     const body: any = {
-      topX: "1-20",
-      sortOrder: "REVIEW_AVG_RATING_D",
-      currency: "USD"
+      currency: "USD",
+      searchTypes: [
+        { searchType: "PRODUCTS", pagination: { start: 1, count: 20 } },
+      ],
     };
 
     // Include search term if provided
@@ -54,8 +57,8 @@ serve(async (req) => {
       );
     }
 
-    // Viator API v2 search endpoint
-    const viatorUrl = "https://api.viator.com/partner/products/search";
+    // Viator freetext search — matches the searchTerm-based body above.
+    const viatorUrl = "https://api.viator.com/partner/search/freetext";
 
     const response = await fetch(viatorUrl, {
       method: "POST",
@@ -88,17 +91,22 @@ serve(async (req) => {
 
     const data = await response.json();
 
-    // Normalize Viator response with enriched fields
-    const results = (data?.data || data?.products || []).map((p: any) => ({
+    // Normalize — freetext nests products under products.results; keep the
+    // old field fallbacks so either response shape maps cleanly.
+    const rawProducts =
+      data?.products?.results || data?.data || data?.products || [];
+    const results = (Array.isArray(rawProducts) ? rawProducts : []).map((p: any) => ({
       productCode: p.productCode,
       title: p.title,
-      shortDescription: p.shortDescription,
-      thumbnailURL: p.thumbnailURL || p.defaultImage?.url,
-      destination: p.destination || p.primaryDestination?.name,
-      rating: p.reviewsStats?.avgRating,
-      reviewCount: p.reviewsStats?.numReviews,
-      fromPrice: p.pricingInfo?.fromPrice || p.pricingInfo?.fromPriceFrom,
-      currency: p.pricingInfo?.currencyCode || "USD",
+      shortDescription: p.shortDescription || p.summary || null,
+      thumbnailURL:
+        p.images?.[0]?.variants?.[p.images?.[0]?.variants?.length - 1]?.url ||
+        p.thumbnailURL || p.defaultImage?.url || null,
+      destination: p.destinations?.[0]?.name || p.destination || p.primaryDestination?.name || null,
+      rating: p.reviews?.combinedAverageRating ?? p.reviewsStats?.avgRating ?? null,
+      reviewCount: p.reviews?.totalReviews ?? p.reviewsStats?.numReviews ?? null,
+      fromPrice: p.pricing?.summary?.fromPrice ?? p.pricingInfo?.fromPrice ?? p.pricingInfo?.fromPriceFrom ?? null,
+      currency: p.pricing?.currency || p.pricingInfo?.currencyCode || "USD",
       productUrl: p.productUrl || null,
     }));
 
