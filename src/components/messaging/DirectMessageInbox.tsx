@@ -47,6 +47,8 @@ import { ProposalComposer } from "./ProposalComposer";
 import { VoiceMessageRecorder } from "@/components/VoiceMessageRecorder";
 import { ProposalMessageCard } from "./ProposalMessageCard";
 import { supabase } from "@/integrations/supabase/client";
+import { Paperclip as PaperclipIcon, FileText as FileTextIcon, X as RemoveAttachmentIcon, Loader2 as UploadSpinnerIcon } from "lucide-react";
+import type { MessageAttachment } from "@/hooks/useDirectMessages";
 import { MentionAutocomplete, type MentionSuggestion } from "./MentionAutocomplete";
 import { extractMentions, renderTextWithMentions } from "@/lib/mentionHelpers";
 
@@ -59,6 +61,49 @@ export function DirectMessageInbox() {
   const [inboxQuery, setInboxQuery] = useState("");
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [pendingAttachments, setPendingAttachments] = useState<MessageAttachment[]>([]);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const attachmentInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleAttachmentPick = async (files: FileList | null) => {
+    if (!files || !files.length || !user) return;
+    setUploadingAttachment(true);
+    for (const file of Array.from(files)) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "File too large", description: `${file.name} is over 10 MB.`, variant: "destructive" });
+        continue;
+      }
+      const cleanName = file.name.replace(/[^\w.\- ]+/g, "_");
+      const path = `${user.id}/${Date.now()}_${cleanName}`;
+      const { error } = await supabase.storage.from("message-attachments").upload(path, file);
+      if (error) {
+        toast({ title: "Upload failed", description: `${file.name}: ${error.message}`, variant: "destructive" });
+        continue;
+      }
+      setPendingAttachments((prev) => [
+        ...prev,
+        { path, name: file.name, type: file.type || "application/octet-stream", size: file.size },
+      ]);
+    }
+    setUploadingAttachment(false);
+    if (attachmentInputRef.current) attachmentInputRef.current.value = "";
+  };
+
+  const removePendingAttachment = async (path: string) => {
+    await supabase.storage.from("message-attachments").remove([path]).catch(() => {});
+    setPendingAttachments((prev) => prev.filter((a) => a.path !== path));
+  };
+
+  const openAttachment = async (att: MessageAttachment) => {
+    const { data, error } = await supabase.storage
+      .from("message-attachments")
+      .createSignedUrl(att.path, 3600);
+    if (error || !data?.signedUrl) {
+      toast({ title: "Couldn't open attachment", description: error?.message ?? "Please try again.", variant: "destructive" });
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener");
+  };
   const [sending, setSending] = useState(false);
   const [acceptingRequest, setAcceptingRequest] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -205,9 +250,9 @@ export function DirectMessageInbox() {
   };
 
   const handleSend = async () => {
-    if (!newMessage.trim() || !selectedConversation) return;
+    if ((!newMessage.trim() && pendingAttachments.length === 0) || !selectedConversation) return;
 
-    const trimmed = newMessage.trim();
+    const trimmed = newMessage.trim() || "Sent an attachment";
     if (trimmed.length < 1 || trimmed.length > 2000) {
       toast({
         title: "Invalid message",
@@ -222,9 +267,11 @@ export function DirectMessageInbox() {
       await sendMessage(
         selectedConversation.otherParticipant.id,
         trimmed,
-        selectedConversation.id
+        selectedConversation.id,
+        pendingAttachments
       );
       setNewMessage("");
+      setPendingAttachments([]);
       setMentionQuery(null);
       setMentionStart(null);
 
@@ -748,6 +795,7 @@ export function DirectMessageInbox() {
                               onDelete={handleDeleteMessage}
                               currentUserId={user?.id || ""}
                               onMentionClick={(username) => navigate(`/@${username}`)}
+                              onOpenAttachment={openAttachment}
                             />
                           )
                         ))}
@@ -803,6 +851,27 @@ export function DirectMessageInbox() {
                     </button>
                   </div>
                 )}
+                {pendingAttachments.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {pendingAttachments.map((att) => (
+                      <span
+                        key={att.path}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FDFBF7] px-3 py-1.5 text-xs text-[#0a2225]"
+                      >
+                        <FileTextIcon className="h-3.5 w-3.5 text-[#C7A962]" />
+                        <span className="max-w-[160px] truncate">{att.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removePendingAttachment(att.path)}
+                          className="text-[#9CA3AF] hover:text-[#0a2225]"
+                          title="Remove attachment"
+                        >
+                          <RemoveAttachmentIcon className="h-3.5 w-3.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -810,6 +879,28 @@ export function DirectMessageInbox() {
                   }}
                   className="flex gap-2 relative"
                 >
+                  <input
+                    ref={attachmentInputRef}
+                    type="file"
+                    multiple
+                    accept="application/pdf,image/png,image/jpeg,image/webp,image/heic"
+                    className="hidden"
+                    onChange={(e) => handleAttachmentPick(e.target.files)}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => attachmentInputRef.current?.click()}
+                    disabled={uploadingAttachment || sending}
+                    className="border-[#E5DFC6] text-[#0a2225] rounded-full h-11 w-11 p-0"
+                    title="Attach a document (PDF or image)"
+                  >
+                    {uploadingAttachment ? (
+                      <UploadSpinnerIcon className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <PaperclipIcon className="h-4 w-4" />
+                    )}
+                  </Button>
                   {mentionQuery !== null && (
                     <MentionAutocomplete
                       query={mentionQuery}
@@ -852,7 +943,7 @@ export function DirectMessageInbox() {
                   />
                   <Button 
                     type="submit" 
-                    disabled={!newMessage.trim() || sending}
+                    disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
                     className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6 h-11"
                   >
                     <Send className="h-4 w-4" />
@@ -974,12 +1065,14 @@ function MessageBubble({
   onDelete,
   currentUserId,
   onMentionClick,
+  onOpenAttachment,
 }: {
   message: { id: string; body: string; created_at: string; is_read: boolean };
   isSelf: boolean;
   onDelete?: (id: string) => void;
   currentUserId: string;
   onMentionClick?: (username: string) => void;
+  onOpenAttachment?: (att: MessageAttachment) => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
@@ -1100,6 +1193,25 @@ function MessageBubble({
             )
           )}
         </p>
+        {Array.isArray((message as any).attachments) && (message as any).attachments.length > 0 && (
+          <div className="mt-1.5 flex flex-col gap-1">
+            {((message as any).attachments as MessageAttachment[]).map((att) => (
+              <button
+                key={att.path}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenAttachment?.(att);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#C7A962]/40 bg-white/60 px-2.5 py-1.5 text-left text-[13px] text-[#0c4d47] hover:bg-white"
+                title={`Open ${att.name}`}
+              >
+                <FileTextIcon className="h-4 w-4 shrink-0 text-[#C7A962]" />
+                <span className="truncate max-w-[220px] underline-offset-2 hover:underline">{att.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <div className={`flex items-center gap-1 mt-0.5 ${isSelf ? "justify-end" : "justify-start"}`}>
           <span
             className="text-[#9CA3AF]"
