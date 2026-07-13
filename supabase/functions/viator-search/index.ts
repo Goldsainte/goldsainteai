@@ -118,7 +118,8 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ 
-        results 
+        results,
+        totalCount: data?.products?.totalCount ?? results.length,
       }),
       { 
         status: 200, 
