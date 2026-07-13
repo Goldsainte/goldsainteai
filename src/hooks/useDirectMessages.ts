@@ -21,6 +21,13 @@ export interface Conversation {
   createdAt: string;
 }
 
+export interface MessageAttachment {
+  path: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 export interface Message {
   id: string;
   conversation_id: string;
@@ -29,6 +36,7 @@ export interface Message {
   is_read: boolean;
   read_at: string | null;
   created_at: string;
+  attachments?: MessageAttachment[] | null;
 }
 
 export interface ConversationsData {
@@ -80,7 +88,12 @@ export function useDirectMessages() {
   }, [user]);
 
   const sendMessage = useCallback(
-    async (recipientId: string, message: string, conversationId?: string) => {
+    async (
+      recipientId: string,
+      message: string,
+      conversationId?: string,
+      attachments?: MessageAttachment[],
+    ) => {
       if (!user) throw new Error("Not authenticated");
 
       const { data: session } = await supabase.auth.getSession();
@@ -90,7 +103,12 @@ export function useDirectMessages() {
         headers: {
           Authorization: `Bearer ${session.session.access_token}`,
         },
-        body: { recipientId, message, conversationId },
+        body: {
+          recipientId,
+          message,
+          conversationId,
+          attachments: attachments && attachments.length ? attachments : undefined,
+        },
       });
 
       if (error) throw error;
