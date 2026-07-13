@@ -894,78 +894,17 @@ function ResponderProposalForm({
           </p>
         </div>
 
-        {/* Collaboration + commission split */}
-        <div className="space-y-3 rounded-2xl border border-[#BFAD72]/30 bg-black/20 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-[11px] font-semibold text-[#E5DFC6]">
-                Partnering with another pro?
-              </p>
-              <p className="text-[10px] text-[#E5DFC6]/70">
-                Collaborations drop Goldsainte's fee to 15% and require a clear
-                creator + agent split.
-              </p>
-            </div>
-            <Checkbox
-              checked={proposal.collaborating}
-              onCheckedChange={(checked) => ((checked) => onChange("collaborating", checked))(checked === true)}
-            />
-          </div>
-
-          {proposal.collaborating ? (
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-[10px] font-medium text-[#E5DFC6]">
-                  Collaborator ID
-                </label>
-                <Input
-                  value={proposal.collaboratorId}
-                  onChange={(e) => onChange("collaboratorId", e.target.value)}
-                  placeholder={`Enter your ${proposal.proposerRole === "agent" ? "creator" : "agent"}'s Goldsainte ID`}
-                  className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
-                />
-              </div>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-[#E5DFC6]">
-                    Creator share (% of traveler payment)
-                  </label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={85}
-                    step="0.5"
-                    value={proposal.creatorShare}
-                    onChange={(e) => onChange("creatorShare", e.target.value)}
-                    className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-[#E5DFC6]">
-                    Agent share (% of traveler payment)
-                  </label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={85}
-                    step="0.5"
-                    value={proposal.agentShare}
-                    onChange={(e) => onChange("agentShare", e.target.value)}
-                    className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
-                  />
-                </div>
-              </div>
-              <p className="text-[10px] text-[#E5DFC6]/70">
-                Goldsainte keeps 15% in co-owned trips. Creator + agent shares must
-                total 85%.
-              </p>
-            </div>
-          ) : (
-            <p className="text-[10px] text-[#E5DFC6]/70">
-              Flying solo? Goldsainte holds a 20% platform fee and sends the
-              remaining 80% to you when funds clear escrow.
-            </p>
-          )}
+        {/* Payout terms — milestone escrow, the real numbers.
+            (Creator collaborations are hidden for launch; their economics are
+            undecided — see handoff. proposal.collaborating stays false.) */}
+        <div className="space-y-1 rounded-2xl border border-[#BFAD72]/30 bg-black/20 p-3">
+          <p className="text-[11px] font-semibold text-[#E5DFC6]">Your payout</p>
+          <p className="text-[10px] text-[#E5DFC6]/70">
+            You keep 96.5% of your quoted price — Goldsainte's flat fee is 3.5%
+            on your side. Funds sit in escrow and release in milestones: your
+            deposit as working capital once you share confirmed reservations,
+            the balance when your traveler confirms the trip.
+          </p>
         </div>
 
         {/* Errors & success */}
