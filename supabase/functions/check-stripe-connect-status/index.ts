@@ -41,16 +41,27 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { data: agentData, error: agentError } = await admin
+    // v3 (Jul 13): the Connect account id's ONE home is profiles — the
+    // live travel_agents table never had a stripe_account_id column (the
+    // schema export lied; verified against the live DB the hard way).
+    const { data: profileRow, error: profileError } = await admin
+      .from("profiles")
+      .select("stripe_account_id, stripe_connect_account_id")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (profileError) {
+      return json(req, { error: `Could not read profile: ${profileError.message}` }, 500);
+    }
+    const accountId =
+      profileRow?.stripe_account_id || profileRow?.stripe_connect_account_id;
+
+    const { data: agentData } = await admin
       .from("travel_agents")
-      .select("stripe_account_id, payout_schedule")
+      .select("payout_schedule")
       .eq("user_id", user.id)
       .maybeSingle();
-    if (agentError) {
-      return json(req, { error: `Could not read agent record: ${agentError.message}` }, 500);
-    }
 
-    if (!agentData?.stripe_account_id) {
+    if (!accountId) {
       return json(req, {
         connected: false,
         onboarding_complete: false,
@@ -63,7 +74,7 @@ serve(async (req) => {
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2024-06-20",
     });
-    const account = await stripe.accounts.retrieve(agentData.stripe_account_id);
+    const account = await stripe.accounts.retrieve(accountId);
 
     await admin
       .from("travel_agents")
