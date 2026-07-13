@@ -31,19 +31,19 @@ serve(async (req) => {
         <head>
           <meta charset="utf-8">
           <style>
-            body { font-family: 'Gupter', Arial, sans-serif; margin: 0; padding: 0; background-color: #E5DFC6; }
+            body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f7f3ea; color: #0a2225; }
             .container { max-width: 640px; margin: 0 auto; background: #ffffff; }
             .header { background: transparent; padding: 24px; text-align: center; }
             .logo { max-width: 280px; height: auto; }
             .content { padding: 32px 24px; }
-            h1 { font-family: 'Chiffon', serif; font-size: 32px; color: #0c4d47; margin: 0 0 16px 0; }
-            p { font-size: 16px; line-height: 24px; color: #333333; margin: 16px 0; }
+            h1 { font-family: 'Playfair Display', Georgia, serif; font-weight: 400; font-size: 32px; color: #0a2225; margin: 0 0 16px 0; }
+            p { font-size: 15px; line-height: 24px; color: #0a2225; margin: 16px 0; }
             .info-box { border: 1px solid #e7e7e7; border-radius: 4px; padding: 16px; margin: 16px 0; }
             .info-row { padding: 8px 0; }
             .label { color: #595959; font-size: 14px; }
             .value { color: #333333; font-weight: 600; font-size: 16px; }
             .refund-box { background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px; padding: 16px; margin: 24px 0; }
-            .footer { background: #BFAD72; text-align: center; padding: 24px; color: #0A2225; font-size: 12px; }
+            .footer { background: #FDF9F0; border-top: 1px solid #E5DFC6; text-align: center; padding: 24px; color: #0a2225; font-size: 12px; }
           </style>
         </head>
         <body>
