@@ -337,6 +337,16 @@ Deno.serve(async (req) => {
       transferId = transfer.id;
     } catch (e: any) {
       console.error("Transfer failed", e);
+      // Translate Stripe's internal "insufficient funds" (settlement lag on a
+      // new platform) into an honest, calm message — a traveler should never
+      // read what looks like an overdraft notice.
+      const raw = String(e?.message || "");
+      if (e?.code === "balance_insufficient" || raw.toLowerCase().includes("insufficient funds")) {
+        return json(req, {
+          error:
+            "Nothing was released — the funds from this booking are still settling with our payment processor. Recent card payments take up to 2 business days to clear for release. Everything remains safely in escrow; please try again after settlement.",
+        }, 500);
+      }
       return json(req, { error: `Stripe transfer failed — nothing was released: ${e.message}` }, 500);
     }
 
