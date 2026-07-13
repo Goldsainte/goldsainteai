@@ -57,7 +57,13 @@ serve(async (req) => {
       apiVersion: "2024-06-20",
     });
 
-    let accountId = agentData.stripe_account_id;
+    // v3 (Jul 13): the Connect account id's ONE home is profiles.
+    const { data: profileRow } = await supabaseClient
+      .from('profiles')
+      .select('stripe_account_id, stripe_connect_account_id')
+      .eq('id', user.id)
+      .maybeSingle();
+    let accountId = profileRow?.stripe_account_id || profileRow?.stripe_connect_account_id;
 
     // Create Stripe Connect account if doesn't exist
     if (!accountId) {
@@ -82,14 +88,24 @@ serve(async (req) => {
       
       accountId = account.id;
 
-      // Update agent with Stripe account ID
+      // Save to profiles — and CHECK the write. The old version wrote to a
+      // column that didn't exist and never checked the error, silently
+      // orphaning completed Stripe accounts. Never again: if we can't
+      // record the account, we don't send the user to onboard it.
+      const { error: saveError } = await supabaseClient
+        .from('profiles')
+        .update({ stripe_account_id: accountId })
+        .eq('id', user.id);
+      if (saveError) {
+        return new Response(
+          JSON.stringify({ error: `Created the Stripe account but couldn't save it: ${saveError.message}. Not proceeding — contact support.` }),
+          { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 500 }
+        );
+      }
+      // Best-effort status note on travel_agents (columns added Jul 13).
       await supabaseClient
         .from('travel_agents')
-        .update({ 
-          stripe_account_id: accountId,
-          stripe_account_status: 'pending',
-          payout_schedule: 'daily'
-        })
+        .update({ stripe_account_status: 'pending', payout_schedule: 'daily' })
         .eq('user_id', user.id);
     }
 
