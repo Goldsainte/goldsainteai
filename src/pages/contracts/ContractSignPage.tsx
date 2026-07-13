@@ -588,14 +588,14 @@ export default function ContractSignPage() {
         </div>
         <div className="border-t border-white/10 bg-[#083530]">
           <div className="mx-auto flex h-[46px] max-w-4xl items-center gap-6 px-4 md:px-6">
-            <span className="flex items-center gap-2 text-[13px] text-[#E5DFC6]/78">
+            <span className="flex items-center gap-2 text-[13px] text-[#fdfaf2]">
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
                 {String((contract.field_values as any)?.agentName || "A").trim().charAt(0).toUpperCase()}
               </span>
               <span className="hidden sm:inline">{(contract.field_values as any)?.agentName || "Agent"}</span>
               <span className={`h-[9px] w-[9px] rounded-full ${contract.agent_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
             </span>
-            <span className="flex items-center gap-2 text-[13px] text-[#E5DFC6]/78">
+            <span className="flex items-center gap-2 text-[13px] text-[#fdfaf2]">
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
                 {String(contract.traveler_info?.firstName || "T").trim().charAt(0).toUpperCase()}
               </span>
@@ -605,7 +605,7 @@ export default function ContractSignPage() {
               <span className={`h-[9px] w-[9px] rounded-full ${contract.traveler_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
             </span>
             {contract.creator_id && (
-              <span className="flex items-center gap-2 text-[13px] text-[#E5DFC6]/78">
+              <span className="flex items-center gap-2 text-[13px] text-[#fdfaf2]">
                 <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">C</span>
                 <span className="hidden sm:inline">Creator</span>
                 <span className={`h-[9px] w-[9px] rounded-full ${contract.creator_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
@@ -617,9 +617,9 @@ export default function ContractSignPage() {
                 <CheckCircle2 className="h-4 w-4" /> Fully executed
               </span>
             ) : hasSigned ? (
-              <span className="text-[12.5px] text-[#E5DFC6]/78">Waiting for the other party</span>
+              <span className="text-[12.5px] text-[#fdfaf2]">Waiting for the other party</span>
             ) : (
-              <span className="text-[12.5px] text-[#E5DFC6]/78">Awaiting your signature</span>
+              <span className="text-[12.5px] text-[#fdfaf2]">Awaiting your signature</span>
             )}
           </div>
         </div>
