@@ -629,34 +629,38 @@ export default function ContractSignPage() {
         {/* Fully executed banner */}
         {contract.status === "fully_executed" && (
           <Card className="mb-6 border-green-200 bg-green-50">
-            <CardContent className="flex items-center gap-3 py-4">
-              <ShieldCheck className="h-6 w-6 text-green-700 shrink-0" />
-              <div className="flex-1">
-                <p className="font-medium text-green-900">
-                  This contract is fully executed.
-                </p>
-                <p className="text-sm text-green-800">
-                  Both parties have signed. You can now proceed to deposit.
-                </p>
+            <CardContent className="flex flex-col sm:flex-row sm:items-center gap-4 py-4">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <ShieldCheck className="h-6 w-6 text-green-700 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="font-medium text-green-900">
+                    This contract is fully executed.
+                  </p>
+                  <p className="text-sm text-green-800">
+                    Both parties have signed. You can now proceed to deposit.
+                  </p>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                onClick={() => downloadContractPdf(contract.id)}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Download PDF
-              </Button>
-              {contract.booking_id && (
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
                 <Button
-                  onClick={() =>
-                    navigate(`/bookings/${contract.booking_id}`)
-                  }
-                  className="gap-2"
+                  variant="outline"
+                  onClick={() => downloadContractPdf(contract.id)}
+                  className="gap-2 w-full sm:w-auto"
                 >
-                  Continue to deposit
+                  <Download className="h-4 w-4" />
+                  Download PDF
                 </Button>
-              )}
+                {contract.booking_id && (
+                  <Button
+                    onClick={() =>
+                      navigate(`/bookings/${contract.booking_id}`)
+                    }
+                    className="gap-2 w-full sm:w-auto"
+                  >
+                    Continue to deposit
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
