@@ -97,9 +97,9 @@ Deno.serve(async (req) => {
     const attachmentLine = attachmentCount > 0
       ? `<p style="margin:12px 0 0 0;font-size:13px;color:#0c4d47;">&#128206; Includes ${attachmentCount} attachment${attachmentCount === 1 ? "" : "s"} &mdash; open the conversation to view.</p>`
       : "";
-    const tripLine = conv.trip_title
-      ? `<p style="margin:0 0 16px 0;font-size:13px;color:#7A7151;">Re: ${String(conv.trip_title).replace(/[<>]/g, "")}</p>`
-      : "";
+    // Conversation trip label removed intentionally — conversations are
+    // per-pair, not per-trip, so the birth-trip title misleads.
+    const tripLine = "";
 
     const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
