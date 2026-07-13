@@ -30,6 +30,28 @@ export default function NotificationsPage() {
     return () => { cancelled = true; };
   }, []);
 
+  // Stored notification links may be absolute URLs (e.g.
+  // "https://goldsainte.ai/contract/<id>/sign"). react-router treats absolute
+  // URLs as relative segments and mangles them into /notifications/https:/...
+  // — so same-origin links are converted to their path before navigating, and
+  // genuinely external links leave via the browser instead of the router.
+  const openNotificationLink = (raw: string) => {
+    try {
+      if (/^https?:\/\//i.test(raw)) {
+        const url = new URL(raw);
+        if (url.origin === window.location.origin) {
+          navigate(url.pathname + url.search + url.hash);
+        } else {
+          window.location.assign(raw);
+        }
+        return;
+      }
+      navigate(raw.startsWith("/") ? raw : `/${raw}`);
+    } catch {
+      /* malformed link — stay put rather than 404 */
+    }
+  };
+
   const handleClick = async (n: Notification) => {
     try {
       if (!n.is_read) {
@@ -38,7 +60,7 @@ export default function NotificationsPage() {
           prev.map((x) => (x.id === n.id ? { ...x, is_read: true } : x))
         );
       }
-      if (n.link) navigate(n.link);
+      if (n.link) openNotificationLink(n.link);
     } catch {
       // ignore
     }
