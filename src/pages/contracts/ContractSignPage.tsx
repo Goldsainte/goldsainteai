@@ -162,7 +162,7 @@ export default function ContractSignPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth/login?redirect=" + window.location.pathname);
+        navigate("/auth?redirect=" + window.location.pathname);
         return;
       }
       setCurrentUserId(user.id);
