@@ -8,6 +8,7 @@ import { FilterChip } from "@/components/ui/FilterChip";
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
 import { MarketplaceTabs } from "@/components/marketplace/MarketplaceTabs";
 import { PartnerToursSection } from "@/components/marketplace/PartnerToursSection";
+import { TourDestinationBrowse } from "@/components/marketplace/TourDestinationBrowse";
 import { LiveTripGrid } from "@/components/marketplace/LiveTripGrid";
 import { TripRequestGrid } from "@/components/marketplace/TripRequestGrid";
 import { EmptyState } from "@/components/marketplace/EmptyState";
@@ -670,6 +671,14 @@ export default function Marketplace() {
               <LiveTripGrid trips={filteredTours as any} />
             </div>
           ) : null}
+          {!toursLocation && (
+            <TourDestinationBrowse
+              onSelect={(name) => {
+                setTourSearchDraft(name);
+                setTourQuery(name);
+              }}
+            />
+          )}
           <PartnerToursSection
             destination={toursLocation}
             minPrice={filters.minPrice}
