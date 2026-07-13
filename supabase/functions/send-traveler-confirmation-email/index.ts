@@ -51,13 +51,13 @@ Deno.serve(async (req) => {
       <html>
       <head>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #0a2225; background: #f7f3ea; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-          .section { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #667eea; }
-          .highlight { background: #f0f4ff; padding: 15px; border-radius: 6px; margin: 15px 0; }
-          .button { display: inline-block; background: #667eea; color: white !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+          .header { background: #0c4d47; color: #f7f3ea; padding: 30px; text-align: center; border-radius: 2px 2px 0 0; }
+          .content { background: #ffffff; padding: 30px; border-radius: 0 0 2px 2px; border: 1px solid #E5DFC6; border-top: 0; }
+          .section { background: #FDF9F0; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #C7A962; }
+          .highlight { background: #F6F0E4; padding: 15px; border-radius: 6px; margin: 15px 0; }
+          .button { display: inline-block; background: #0c4d47; color: #f7f3ea !important; padding: 18px 40px; text-decoration: none; border-radius: 2px; margin: 20px 0; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; }
           .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }
           .check { color: #10b981; font-size: 18px; }
         </style>
@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
           </div>
           <div class="content">
             <div class="section">
-              <h2 style="margin-top: 0; color: #667eea;">Your Request Details</h2>
+              <h2 style="margin-top: 0; color: #0c4d47;">Your Request Details</h2>
               <p><strong>Destination:</strong> ${job.destination}</p>
               ${travelDetails.departureDate ? `<p><strong>Departure:</strong> ${travelDetails.departureDate}</p>` : ''}
               ${travelDetails.returnDate ? `<p><strong>Return:</strong> ${travelDetails.returnDate}</p>` : ''}
