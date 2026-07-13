@@ -20,6 +20,7 @@ export const StripeConnectOnboarding = () => {
   const [status, setStatus] = useState<StripeConnectStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [onboarding, setOnboarding] = useState(false);
+  const [statusCheckFailed, setStatusCheckFailed] = useState(false);
 
   useEffect(() => {
     // Stripe redirects back whenever the user EXITS onboarding — completed or
@@ -48,10 +49,15 @@ export const StripeConnectOnboarding = () => {
       
       if (error) throw error;
       setStatus(data);
+      setStatusCheckFailed(false);
       return data as StripeConnectStatus;
     } catch (error: any) {
+      // Background poll failure: report to Sentry via console.error (nothing
+      // hidden), reflect honestly in the card via statusCheckFailed — but no
+      // global red toast; a passive check failing is not an agent's emergency.
+      // User-initiated actions below still toast loudly on failure.
       console.error('Error checking Stripe Connect status:', error);
-      toast.error('Failed to check payment account status');
+      setStatusCheckFailed(true);
       return null;
     } finally {
       setLoading(false);
@@ -101,7 +107,9 @@ export const StripeConnectOnboarding = () => {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              You need to set up your payment account before you can receive payments for completed jobs.
+              {statusCheckFailed
+                ? "We couldn't confirm your payout account status just now — it retries automatically, and Set Up below is safe to use either way."
+                : "You need to set up your payment account before you can receive payments for completed jobs."}
             </AlertDescription>
           </Alert>
         )}
