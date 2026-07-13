@@ -145,7 +145,12 @@ export default function AgentDashboard() {
         }
         
         if (!agentToLoad) {
-          toast.error('No agent profiles found in system');
+          // Only a real absence deserves a toast — during the first render
+          // pass auth hasn't hydrated yet and user?.id is undefined, which
+          // used to fire a spurious "No agent profiles found" on every load.
+          if (user?.id) {
+            toast.error('No agent profiles found in system');
+          }
           setLoading(false);
           return;
         }
