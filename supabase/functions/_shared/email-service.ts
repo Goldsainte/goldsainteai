@@ -63,8 +63,8 @@ const getBaseTemplate = (content: string): string => {
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      color: #333333;
-      background-color: #f5f5f5;
+      color: #0a2225;
+      background-color: #f7f3ea;
     }
     
     .email-wrapper {
@@ -74,20 +74,26 @@ const getBaseTemplate = (content: string): string => {
     }
     
     .email-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #0c4d47;
       padding: 40px 30px;
       text-align: center;
     }
     
     .email-logo {
-      font-size: 32px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 1px;
+      font-size: 22px;
+      font-weight: 500;
+      color: #f7f3ea;
+      letter-spacing: 0.35em;
     }
     
     .email-content {
       padding: 40px 30px;
+    }
+    
+    .email-content h1, .email-content h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 400;
+      color: #0a2225;
     }
     
     .email-footer {
@@ -99,14 +105,16 @@ const getBaseTemplate = (content: string): string => {
     
     .button {
       display: inline-block;
-      padding: 14px 32px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #ffffff;
+      padding: 18px 40px;
+      background: #0c4d47;
+      color: #f7f3ea;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
+      border-radius: 2px;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
       margin: 20px 0;
-      transition: opacity 0.2s;
     }
     
     .button:hover {
@@ -155,7 +163,7 @@ const getBaseTemplate = (content: string): string => {
     
     .credentials-box {
       background-color: #ffffff;
-      border: 2px solid #667eea;
+      border: 2px solid #0c4d47;
       border-radius: 8px;
       padding: 20px;
       margin: 20px 0;
@@ -191,7 +199,7 @@ const getBaseTemplate = (content: string): string => {
     .social-links a {
       display: inline-block;
       margin: 0 8px;
-      color: #667eea;
+      color: #0c4d47;
       text-decoration: none;
     }
     
@@ -220,7 +228,7 @@ const getBaseTemplate = (content: string): string => {
     }
     
     a {
-      color: #667eea;
+      color: #0c4d47;
       text-decoration: none;
     }
     
@@ -309,7 +317,7 @@ export const EmailTemplates = {
       </div>
       
       <div class="credentials-box">
-        <h3 style="margin-top: 0; color: #667eea;">Your Login Credentials</h3>
+        <h3 style="margin-top: 0; color: #0c4d47;">Your Login Credentials</h3>
         
         <div class="credential-item">
           <div class="credential-label">Email</div>
@@ -413,7 +421,7 @@ The Goldsainte Team
       </div>
       
       <div class="credentials-box">
-        <h3 style="margin-top: 0; color: #667eea;">Your Login Credentials</h3>
+        <h3 style="margin-top: 0; color: #0c4d47;">Your Login Credentials</h3>
         
         <div class="credential-item">
           <div class="credential-label">Email</div>
