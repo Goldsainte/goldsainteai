@@ -107,7 +107,7 @@ serve(async (req) => {
       );
     }
 
-    let { recipientId, message, conversationId, tripId, tripTitle } = await req.json();
+    let { recipientId, message, conversationId, tripId, tripTitle, attachments } = await req.json();
 
     if (!message) {
       return new Response(
@@ -235,6 +235,42 @@ serve(async (req) => {
       ? { safe: message, flagged: false, reason: undefined as string | undefined }
       : filterMessage(message);
 
+    // Attachments: reservation documents etc. Only allowed once the parties
+    // have a paid booking together (same rule as unfiltered text -- before
+    // that, files could carry the contact info the filter exists to catch).
+    let safeAttachments: { path: string; name: string; type: string; size: number }[] | null = null;
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      if (!hasActiveBooking) {
+        return new Response(
+          JSON.stringify({ error: "Attachments are available once a booking exists between you and this contact." }),
+          { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+        );
+      }
+      if (attachments.length > 5) {
+        return new Response(
+          JSON.stringify({ error: "You can attach up to 5 files per message." }),
+          { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+        );
+      }
+      safeAttachments = [];
+      for (const a of attachments) {
+        const path = typeof a?.path === "string" ? a.path : "";
+        // Senders may only reference files they uploaded to their own folder.
+        if (!path.startsWith(user.id + "/") || path.includes("..")) {
+          return new Response(
+            JSON.stringify({ error: "Invalid attachment reference." }),
+            { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } },
+          );
+        }
+        safeAttachments.push({
+          path,
+          name: typeof a?.name === "string" ? a.name.slice(0, 200) : "Attachment",
+          type: typeof a?.type === "string" ? a.type.slice(0, 100) : "application/octet-stream",
+          size: Number.isFinite(a?.size) ? Number(a.size) : 0,
+        });
+      }
+    }
+
     let targetConversationId = conversationId;
     let isNewConversation = false;
 
@@ -298,6 +334,7 @@ serve(async (req) => {
         conversation_id: targetConversationId,
         sender_id: user.id,
         body: filteredMessage,
+        attachments: safeAttachments,
         filtered_content: flagged ? message : null,
         flagged_for_review: flagged,
         flagged_reason: reason || null,
