@@ -30,7 +30,7 @@ function corsHeaders(req?: Request): Record<string, string> {
 }
 
 type PartyRole = "traveler" | "agent" | "creator";
-type LifecycleEvent = "sent" | "signed" | "executed" | "revision_proposed";
+type LifecycleEvent = "sent" | "signed" | "executed" | "revision_proposed" | "revision_accepted" | "revision_rejected";
 
 interface Party {
   role: PartyRole;
@@ -127,6 +127,9 @@ serve(async (req) => {
     const contractId: string | undefined = body.contractId;
     const event: LifecycleEvent = body.event ?? "sent";
     const actorRole: PartyRole | undefined = body.actorRole;
+    // Optional free-text note (e.g. the rejection message) — escaped before use in HTML.
+    const rawNote: string = typeof body.note === "string" ? body.note : "";
+    const note = rawNote.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").trim();
     const recipientEmailOverride: string | undefined = body.recipientEmail;
     const recipientType: PartyRole = body.recipientType ?? "traveler";
 
@@ -245,6 +248,26 @@ serve(async (req) => {
         emailHeading = "Changes have been proposed";
         emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;"><strong>${actorName}</strong> has proposed changes to the contract for <strong>${destination}</strong>. Open the contract to review, accept, or reject them.</p>`;
         ctaLabel = "Review proposed changes";
+        break;
+      }
+      case "revision_accepted": {
+        recipients = parties.filter((p) => p.role !== actorRole);
+        title = "Proposed changes accepted";
+        message = `${actorName} accepted the proposed changes to the contract for ${destination}. The contract text has been updated — every party needs to sign again.`;
+        emailSubject = `Changes accepted — your ${destination} contract`;
+        emailHeading = "Your proposed changes were accepted";
+        emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;"><strong>${actorName}</strong> accepted the proposed changes to the contract for <strong>${destination}</strong>. The contract text has been updated, so every party needs to sign the revised version.</p>`;
+        ctaLabel = "Review and sign";
+        break;
+      }
+      case "revision_rejected": {
+        recipients = parties.filter((p) => p.role !== actorRole);
+        title = "Proposed changes declined";
+        message = `${actorName} declined the proposed changes to the contract for ${destination}.${note ? ` Note: "${note}"` : ""} The current contract text stands.`;
+        emailSubject = `Changes declined — your ${destination} contract`;
+        emailHeading = "Proposed changes were declined";
+        emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;"><strong>${actorName}</strong> declined the proposed changes to the contract for <strong>${destination}</strong>.${note ? ` They added a note: &ldquo;${note}&rdquo;.` : ""} The current contract text stands — you can review it or propose different changes.</p>`;
+        ctaLabel = "View the contract";
         break;
       }
       default:
