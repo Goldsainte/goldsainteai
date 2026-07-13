@@ -95,27 +95,38 @@ export default function TripBuilderPage() {
     try {
       setSaving(true);
 
-      // Allow editing of pending/live trips — but resubmit goes back to pending_review
-      let resubmitNotice: string | null = null;
-      if (status === "published" && tripData?.status === "pending_review") {
-        resubmitNotice = "Your trip is already in review — we'll update the submission.";
-      }
-
-      // No Stripe gate on submission: a "publish" action maps to `pending_review`
-      // (admin review, below) — the trip does NOT go live here, so Stripe is not
-      // required to submit. Payout setup is enforced at go-live / first payout
-      // instead; creators are nudged via the Earnings tab + Getting-Started checklist.
-      // (This also avoids the stale-`stripe_charges_enabled` mismatch where the
-      // profile showed Stripe connected but submission said "not linked".)
-
       const slug = formData.slug || generateSlug(formData.title);
 
-      // Map "published" submissions to "pending_review" — admin approves to go live.
-      // Edits to a live trip also re-enter review while the existing listing stays live.
-      let persistedStatus: "draft" | "pending_review" = status === "published" ? "pending_review" : "draft";
-      if (status === "published" && tripData?.status === "published") {
-        persistedStatus = "pending_review";
-        resubmitNotice = "Your updates have been submitted for review. The current listing stays live until approved.";
+      // Publishing is immediate — there is no review queue (and there never was
+      // an approval surface for one). The only gate is a connected Stripe payout
+      // account, so a live trip can always pay out. Connect ids have ONE home:
+      // profiles.stripe_account_id (fallback read: stripe_connect_account_id).
+      let persistedStatus: "draft" | "published" = status;
+      let publishBlocked = false;
+
+      // Draft saves (autosave / preview) must NEVER demote a live trip.
+      if (status === "draft" && tripData?.status === "published") {
+        persistedStatus = "published";
+      }
+
+      if (status === "published") {
+        const { data: prof, error: profErr } = await supabase
+          .from("profiles")
+          .select("stripe_account_id, stripe_connect_account_id")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (profErr) {
+          console.error("Stripe payout check failed on publish:", profErr);
+          persistedStatus = tripData?.status === "published" ? "published" : "draft";
+          if (persistedStatus === "draft") {
+            publishBlocked = true;
+            toast.error("We couldn't verify your payout account just now — your trip was saved as a draft. Please try publishing again.");
+          }
+        } else if (!prof?.stripe_account_id && !prof?.stripe_connect_account_id) {
+          persistedStatus = tripData?.status === "published" ? "published" : "draft";
+          publishBlocked = true;
+          toast.error("Connect your Stripe payout account before publishing — we saved your trip as a draft.");
+        }
       }
 
       // Pull itinerary days off the form payload — they live in their own table
@@ -136,6 +147,9 @@ export default function TripBuilderPage() {
       };
       if (isBrand) tripPayload.listing_type = "tour";
       if (isAgent && !isCreator) tripPayload.listing_type = "trip";
+      if (persistedStatus === "published") {
+        tripPayload.published_at = tripData?.published_at ?? new Date().toISOString();
+      }
 
       let tripId = editId;
       let savedSlug = slug;
@@ -189,31 +203,17 @@ export default function TripBuilderPage() {
         }
       }
 
-      // Notify admins on first transition into pending_review
-      if (persistedStatus === "pending_review" && tripId) {
-        const { error: notifyErr } = await supabase.rpc("notify_admins_trip_pending_review", {
-          _trip_id: tripId,
-          _trip_title: formData.title || "Untitled trip",
-        });
-        if (notifyErr) console.error("Admin notification failed:", notifyErr);
-      }
-
-      if (persistedStatus === "pending_review") {
-        toast.success(resubmitNotice ?? "Your trip has been submitted for review. We typically review listings within 24 hours and will notify you when it's live.");
-        // Send agent confirmation email (best-effort, non-blocking)
-        if (user?.email) {
-          supabase.functions.invoke("send-agent-submission-email", {
-            body: {
-              agentEmail: user.email,
-              agentName: (user as any)?.user_metadata?.full_name || "there",
-              tripTitle: formData?.title || "Your trip",
-              tripId,
-            },
-          }).catch((e) => console.error("submission email failed:", e));
-        }
-      } else {
+      if (status === "published" && persistedStatus === "published") {
+        toast.success(
+          tripData?.status === "published"
+            ? "Your changes are live."
+            : "Your trip is live in the marketplace."
+        );
+      } else if (!publishBlocked && status === "draft" && persistedStatus === "draft") {
         toast.success("Draft saved");
       }
+      // publishBlocked → the error toast above already explained what happened.
+      // Draft-saves of an already-live trip stay silent: nothing changed for the user.
 
       if (!editId && tripId) {
         navigate(`/trip-builder?edit=${tripId}`, { replace: true });
@@ -281,9 +281,9 @@ export default function TripBuilderPage() {
         <div className="mb-3">
           <BackButton to={isAgent ? "/agent-dashboard" : "/creator-dashboard"} />
           <div className="mt-4 rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 py-3 text-sm text-[#0a2225] leading-relaxed">
-            <span className="font-medium">How publishing works:</span> trips are reviewed by
-            Goldsainte before going live — typically within 24 hours — and Stripe payout
-            verification must be complete before a trip can be approved. Drafts save anytime.
+            <span className="font-medium">How publishing works:</span> your trip goes live in
+            the marketplace the moment you publish it. A connected Stripe payout account is
+            required to publish. Drafts save anytime.
           </div>
         </div>
 
