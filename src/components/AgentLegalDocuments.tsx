@@ -220,9 +220,9 @@ export const VendorDialog = ({ children }: { children: React.ReactNode }) => (
             <h3 className="font-semibold text-base mb-2">4. Commission Structure</h3>
             <p>Goldsainte earns a commission on all completed bookings:</p>
             <ul className="list-disc pl-5 space-y-1 mt-2">
-              <li>Standard rate: 10-15% depending on service category</li>
-              <li>Premium agents with verified credentials may negotiate lower rates</li>
+              <li>Flat rate: 3.5% of the booking value on the advisor side (travelers pay a separate 3.5% service fee)</li>
               <li>Commission is calculated on the total booking value excluding taxes</li>
+              <li>Payouts are released from escrow in milestones per the platform's release process</li>
               <li>Rates may be adjusted with 30 days advance notice</li>
             </ul>
           </section>
