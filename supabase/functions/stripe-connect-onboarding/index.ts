@@ -16,15 +16,22 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders(req) });
   }
 
-  const supabaseClient = createClient(
+  // v2 (Jul 12): v1 queried travel_agents with the anon client after token
+  // validation — RLS returned zero rows and .single() threw for everyone.
+  // Anon client verifies the token; service-role client does the data work.
+  const userClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+  );
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
   );
 
   try {
     const authHeader = req.headers.get('Authorization')!;
     const token = authHeader.replace('Bearer ', '');
-    const { data } = await supabaseClient.auth.getUser(token);
+    const { data } = await userClient.auth.getUser(token);
     const user = data.user;
 
     if (!user?.email) {
@@ -36,9 +43,15 @@ serve(async (req) => {
       .from('travel_agents')
       .select('*')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (agentError) throw agentError;
+    if (!agentData) {
+      return new Response(
+        JSON.stringify({ error: "This account isn't provisioned as an agent yet — no agent record found." }),
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: "2024-06-20",
