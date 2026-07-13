@@ -527,7 +527,7 @@ export default function AgentDashboard() {
             {tabBtn("desk", "Desk")}
             {tabBtn("available", `Briefs (${jobs.length})`)}
             {tabBtn("my-bids", `Pipeline (${myBids.length})`)}
-            {tabBtn("creator-collabs", `Clients (${collabRequests.length})`)}
+            {/* creator-collabs tab hidden for launch — unfinished feature, undecided economics (see handoff) */}
             {tabBtn("guides", "Catalog")}
             {tabBtn("performance", "Performance")}
             <div className="ml-auto pb-2">
@@ -681,16 +681,6 @@ export default function AgentDashboard() {
               }}
             />
           </TabsContent>
-
-            <TabsContent value="creator-collabs">
-              {agent && (
-                <AgentCreatorCollabs 
-                  collabRequests={collabRequests} 
-                  agentId={user?.id || ''} 
-                  onRefresh={fetchData} 
-                />
-              )}
-            </TabsContent>
 
             <TabsContent value="availability">
               {agent && (
