@@ -131,7 +131,14 @@ async function handleCheckoutCompleted(session: any) {
         if (isFullyPaid(collected, total)) {
           newStatus = 'paid_in_full';
         }
-        mergedMetadata = { ...prevMeta, amount_collected: collected };
+        // Track every payment's intent id so releases can anchor transfers
+        // to the right charge (source_transaction).
+        const prevPis = Array.isArray((prevMeta as any).payment_intents)
+          ? ((prevMeta as any).payment_intents as string[])
+          : [];
+        const thisPi = typeof session.payment_intent === "string" ? session.payment_intent : null;
+        const paymentIntents = thisPi && !prevPis.includes(thisPi) ? [...prevPis, thisPi] : prevPis;
+        mergedMetadata = { ...prevMeta, amount_collected: collected, payment_intents: paymentIntents };
       }
     } catch (e) {
       // Never lose a payment over bookkeeping — fall back to plain confirm.
