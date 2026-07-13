@@ -310,6 +310,16 @@ export default function ContractSignPage() {
         .eq("id", revisionId);
       if (error) throw error;
 
+      if (contract) {
+        try {
+          await supabase.functions.invoke("send-contract-notification", {
+            body: { contractId: contract.id, event: "revision_accepted", actorRole: userRole },
+          });
+        } catch (nErr) {
+          console.error("Accept notify failed (non-fatal):", nErr);
+        }
+      }
+
       toast({
         title: "Changes accepted",
         description:
@@ -342,6 +352,21 @@ export default function ContractSignPage() {
         })
         .eq("id", revisionToReject);
       if (error) throw error;
+
+      if (contract) {
+        try {
+          await supabase.functions.invoke("send-contract-notification", {
+            body: {
+              contractId: contract.id,
+              event: "revision_rejected",
+              actorRole: userRole,
+              note: rejectMessage.trim() || undefined,
+            },
+          });
+        } catch (nErr) {
+          console.error("Reject notify failed (non-fatal):", nErr);
+        }
+      }
 
       toast({
         title: "Changes rejected",
