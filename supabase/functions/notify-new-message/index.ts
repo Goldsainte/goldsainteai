@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     // Load message
     const { data: msg, error: msgErr } = await supabase
       .from("direct_messages")
-      .select("id, conversation_id, sender_id, body, created_at, is_deleted")
+      .select("id, conversation_id, sender_id, body, created_at, is_deleted, attachments")
       .eq("id", messageId)
       .maybeSingle();
     if (msgErr || !msg) return json({ error: "Message not found" }, 404);
@@ -91,6 +91,12 @@ Deno.serve(async (req) => {
       .replace(/>/g, "&gt;");
     const safeSender = senderName.replace(/[<>]/g, "");
     const link = `https://goldsainte.ai/messages?conversation=${conv.id}`;
+    const attachmentCount = Array.isArray((msg as any).attachments)
+      ? (msg as any).attachments.length
+      : 0;
+    const attachmentLine = attachmentCount > 0
+      ? `<p style="margin:12px 0 0 0;font-size:13px;color:#0c4d47;">&#128206; Includes ${attachmentCount} attachment${attachmentCount === 1 ? "" : "s"} &mdash; open the conversation to view.</p>`
+      : "";
     const tripLine = conv.trip_title
       ? `<p style="margin:0 0 16px 0;font-size:13px;color:#7A7151;">Re: ${String(conv.trip_title).replace(/[<>]/g, "")}</p>`
       : "";
@@ -110,6 +116,7 @@ Deno.serve(async (req) => {
       ${tripLine}
       <div style="background:#ffffff;border:1px solid #E5DFC6;border-radius:12px;padding:18px;margin:16px 0 28px;font-size:14px;line-height:1.5;color:#0a2225;">
         ${escaped || "<em>(empty message)</em>"}
+        ${attachmentLine}
       </div>
       <div style="text-align:center;margin:0 0 28px;">
         <a href="${link}" style="display:inline-block;background:#0c4d47;color:#f7f3ea !important;text-decoration:none;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;padding:18px 40px;border-radius:2px;font-weight:500;">Open conversation</a>
