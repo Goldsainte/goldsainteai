@@ -46,33 +46,33 @@ const APP_URL = Deno.env.get("APP_URL") || "https://goldsainte.ai";
 // Branded email shell (best-effort; failures are logged, never thrown)
 // ---------------------------------------------------------------------------
 function emailShell(heading: string, bodyHtml: string, ctaLabel: string, ctaUrl: string): string {
+  // Matches the approved Goldsainte layout (_shared/email-templates/_layout.tsx):
+  // cream background, wordmark, Playfair serif headline, dark-green uppercase
+  // CTA, fallback link, help footer.
+  const logoUrl =
+    "https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png";
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${heading}</title></head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
-  <div style="max-width:600px;margin:0 auto;background-color:#ffffff;">
-    <div style="background:linear-gradient(135deg,#0a2225 0%,#0c4d47 100%);padding:40px 20px;text-align:center;">
-      <div style="font-family:Georgia,serif;font-size:32px;font-weight:600;color:#BFAD72;margin-bottom:10px;">G</div>
-      <h1 style="color:#E5DFC6;font-size:24px;margin:0;font-weight:400;">Goldsainte</h1>
-    </div>
-    <div style="padding:40px 30px;">
-      <h2 style="color:#0a2225;font-family:Georgia,serif;font-size:26px;margin-bottom:20px;">${heading}</h2>
-      ${bodyHtml}
-      <div style="text-align:center;margin:40px 0;">
-        <a href="${ctaUrl}" style="display:inline-block;background:linear-gradient(135deg,#0c4d47 0%,#BFAD72 100%);color:white;padding:16px 40px;text-decoration:none;border-radius:30px;font-weight:500;font-size:16px;">${ctaLabel} &rarr;</a>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap');</style>
+</head>
+<body style="margin:0;padding:0;background:#f7f3ea;font-family:'Helvetica Neue',Arial,sans-serif;color:#0a2225;">
+  <div style="width:100%;background:#f7f3ea;padding:48px 16px;">
+    <div style="max-width:560px;margin:0 auto;background:#f7f3ea;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr>
+        <td align="center" style="padding:8px 0 28px;"><img src="${logoUrl}" alt="Goldsainte" style="height:22px;width:auto;max-width:240px;display:block;margin:0 auto;"/></td>
+      </tr></tbody></table>
+      <hr style="border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 28px;"/>
+      <h1 style="font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:#0a2225;margin:0 0 14px;text-align:center;letter-spacing:-0.01em;">${heading}</h1>
+      <div style="font-size:15px;line-height:1.6;color:#0a2225;opacity:0.85;margin:0 0 32px;text-align:center;">${bodyHtml}</div>
+      <div style="text-align:center;margin:0 0 28px;">
+        <a href="${ctaUrl}" style="display:inline-block;background:#0c4d47;color:#f7f3ea !important;text-decoration:none;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;padding:18px 40px;border-radius:2px;font-weight:500;">${ctaLabel}</a>
       </div>
-      <p style="color:#8D8D8D;font-size:13px;line-height:1.6;margin-top:30px;">
-        Your electronic signature is legally binding and equivalent to a handwritten signature.
-        If you have questions, reply to your counterparty through the Goldsainte platform.
-      </p>
-    </div>
-    <div style="background:#f7f3ea;padding:30px;text-align:center;border-top:1px solid #E5DFC6;">
-      <p style="color:#8D8D8D;font-size:12px;margin:0 0 10px 0;"><strong style="color:#0a2225;">Goldsainte AI</strong><br>Luxury Travel, Beautifully Orchestrated</p>
-      <p style="color:#8D8D8D;font-size:11px;margin:0;">&copy; ${new Date().getFullYear()} Goldsainte. All rights reserved.</p>
+      <p style="font-size:12px;line-height:1.6;color:#0a2225;opacity:0.55;text-align:center;margin:0 0 48px;">Or paste this link into your browser:<br/><a href="${ctaUrl}" style="color:#0c4d47;word-break:break-all;text-decoration:underline;">${ctaUrl}</a></p>
+      <p style="font-size:13px;line-height:1.7;color:#0a2225;opacity:0.8;text-align:center;margin:36px 0 0;">If you have any questions, concerns, or require assistance, please contact <a href="mailto:support@goldsainte.com" style="color:#0c4d47;">Goldsainte Support</a>.</p>
+      <p style="font-size:10px;letter-spacing:0.1em;color:#0a2225;opacity:0.45;text-align:center;text-transform:uppercase;padding:8px 0 0;">This is an automated message from Goldsainte</p>
     </div>
   </div>
-</body>
-</html>`;
+</body></html>`;
 }
 
 async function sendBrandedEmail(
@@ -199,6 +199,9 @@ serve(async (req) => {
     const agentName = parties.find((p) => p.role === "agent")?.name ?? "Your travel agent";
     const actor = actorRole ? parties.find((p) => p.role === actorRole) : undefined;
     const actorName = actor?.name ?? (actorRole ? actorRole : "A party");
+    // Subject-safe destination: avoids "your your trip contract" when the
+    // destination falls back to the phrase "your trip".
+    const destinationLabel = destination === "your trip" ? "trip" : destination;
 
     // Decide recipients + copy per event
     let recipients: Party[];
@@ -234,7 +237,7 @@ serve(async (req) => {
         recipients = parties; // everyone, including the final signer
         title = "Contract fully executed";
         message = `All parties have signed the contract for ${destination}. The trip can now proceed to deposit.`;
-        emailSubject = `Fully executed — your ${destination} contract`;
+        emailSubject = `Fully executed — your ${destinationLabel} contract`;
         emailHeading = "Your contract is fully executed";
         emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;">Every party has now signed the contract for <strong>${destination}</strong>. A copy is available for download on the contract page, and the trip can proceed to deposit.</p>`;
         ctaLabel = "View the executed contract";
@@ -244,7 +247,7 @@ serve(async (req) => {
         recipients = parties.filter((p) => p.role !== actorRole);
         title = "Changes proposed to your contract";
         message = `${actorName} proposed changes to the contract for ${destination}. Review them to accept or reject.`;
-        emailSubject = `Proposed changes — your ${destination} contract`;
+        emailSubject = `Proposed changes — your ${destinationLabel} contract`;
         emailHeading = "Changes have been proposed";
         emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;"><strong>${actorName}</strong> has proposed changes to the contract for <strong>${destination}</strong>. Open the contract to review, accept, or reject them.</p>`;
         ctaLabel = "Review proposed changes";
@@ -254,7 +257,7 @@ serve(async (req) => {
         recipients = parties.filter((p) => p.role !== actorRole);
         title = "Proposed changes accepted";
         message = `${actorName} accepted the proposed changes to the contract for ${destination}. The contract text has been updated — every party needs to sign again.`;
-        emailSubject = `Changes accepted — your ${destination} contract`;
+        emailSubject = `Changes accepted — your ${destinationLabel} contract`;
         emailHeading = "Your proposed changes were accepted";
         emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;"><strong>${actorName}</strong> accepted the proposed changes to the contract for <strong>${destination}</strong>. The contract text has been updated, so every party needs to sign the revised version.</p>`;
         ctaLabel = "Review and sign";
@@ -264,7 +267,7 @@ serve(async (req) => {
         recipients = parties.filter((p) => p.role !== actorRole);
         title = "Proposed changes declined";
         message = `${actorName} declined the proposed changes to the contract for ${destination}.${note ? ` Note: "${note}"` : ""} The current contract text stands.`;
-        emailSubject = `Changes declined — your ${destination} contract`;
+        emailSubject = `Changes declined — your ${destinationLabel} contract`;
         emailHeading = "Proposed changes were declined";
         emailBody = `<p style="color:#4a4a4a;line-height:1.6;margin-bottom:20px;"><strong>${actorName}</strong> declined the proposed changes to the contract for <strong>${destination}</strong>.${note ? ` They added a note: &ldquo;${note}&rdquo;.` : ""} The current contract text stands — you can review it or propose different changes.</p>`;
         ctaLabel = "View the contract";
