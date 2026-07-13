@@ -447,14 +447,18 @@ async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bo
 
   const html = `
     <div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f7f3ea; padding:32px;">
-      <div style="max-width:560px; margin:0 auto; background:#ffffff; border:1px solid #E5DFC6; border-radius:16px; padding:32px;">
-        <h1 style="font-family: Georgia, 'Times New Roman', serif; color:#0a2225; font-size:22px; margin:0 0 16px;">How was your trip, ${travelerName}?</h1>
+      <div style="max-width:560px; margin:0 auto;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr>
+          <td align="center" style="padding:8px 0 28px;"><img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png" alt="Goldsainte" style="height:22px;width:auto;max-width:240px;display:block;margin:0 auto;"/></td>
+        </tr></tbody></table>
+        <hr style="border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 28px;"/>
+        <h1 style="font-family:'Playfair Display', Georgia, serif; font-weight:400; color:#0a2225; font-size:30px; margin:0 0 16px; text-align:center;">How was your trip, ${travelerName}?</h1>
         <p style="color:#3f3f3f; font-size:15px; line-height:1.6; margin:0 0 20px;">
           Now that your journey is wrapped, we'd love to hear how it went. Leave a review for
           <strong>${agentName}</strong> — it helps other travelers and rewards great specialists.
         </p>
         <p style="margin:28px 0;">
-          <a href="${reviewUrl}" style="display:inline-block; background:#0c4d47; color:#bfad72; text-decoration:none; padding:12px 22px; border-radius:999px; font-weight:600; font-size:14px;">
+          <a href="${reviewUrl}" style="display:inline-block; background:#0c4d47; color:#f7f3ea; text-decoration:none; padding:18px 40px; border-radius:2px; font-weight:500; font-size:13px; letter-spacing:0.18em; text-transform:uppercase;">
             Leave a review
           </a>
         </p>
