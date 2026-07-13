@@ -140,6 +140,11 @@ export function TripBookingSidebar({
   };
 
   const handleAskQuestion = async () => {
+    // You can't open a Q&A thread with yourself about your own trip.
+    if (user && (user.id === agentId || user.id === creatorId)) {
+      toast.info("This is your own trip — questions from travelers will appear in your Messages inbox.");
+      return;
+    }
     if (!user) {
       // Open zero-friction drawer — no redirect to auth page
       setIsAskDrawerOpen(true);
