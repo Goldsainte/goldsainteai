@@ -26,36 +26,54 @@ const OFFLINE_PATTERNS = [
   /\b(contact|reach)\s*(me|us)?\s*(at|on|via)?\b/gi,
 ];
 
+// Goldsainte's own links (contract signing, bookings, etc.) are never
+// sanitized — they're tokenized out first and restored at the end. Without
+// this, PHONE_REGEX eats the digit runs inside contract UUIDs and URL_REGEX
+// strips the rest, leaving mangled "[link removed]" fragments in messages.
+const PLATFORM_URL_REGEX = /https?:\/\/(?:www\.)?goldsainte\.(?:ai|com)(?:\/[^\s]*)?/gi;
+
 function filterMessage(content: string): { safe: string; flagged: boolean; reason?: string } {
-  let safe = content;
+  const preserved: string[] = [];
+  let safe = content.replace(PLATFORM_URL_REGEX, (m) => {
+    preserved.push(m);
+    return `[[GS_LINK_${preserved.length - 1}]]`;
+  });
   let flagged = false;
   let reason = "";
 
-  if (PHONE_REGEX.test(safe)) {
+  // NOTE: compare-after-replace instead of .test() — global regexes are
+  // stateful (lastIndex persists across calls in a warm isolate), so .test()
+  // intermittently skips matches.
+  const afterPhone = safe.replace(PHONE_REGEX, "[contact removed]");
+  if (afterPhone !== safe) {
     flagged = true;
     reason = "phone_removed";
-    safe = safe.replace(PHONE_REGEX, "[contact removed]");
+    safe = afterPhone;
   }
 
-  if (EMAIL_REGEX.test(safe)) {
+  const afterEmail = safe.replace(EMAIL_REGEX, "[contact removed]");
+  if (afterEmail !== safe) {
     flagged = true;
     reason = reason ? "contact_info_removed" : "email_removed";
-    safe = safe.replace(EMAIL_REGEX, "[contact removed]");
+    safe = afterEmail;
   }
 
-  if (URL_REGEX.test(safe)) {
+  const afterUrl = safe.replace(URL_REGEX, "[link removed]");
+  if (afterUrl !== safe) {
     flagged = true;
     reason = reason ? "contact_info_removed" : "url_removed";
-    safe = safe.replace(URL_REGEX, "[link removed]");
+    safe = afterUrl;
   }
 
   for (const pattern of OFFLINE_PATTERNS) {
-    if (pattern.test(content)) {
+    if (content.match(pattern)) {
       flagged = true;
       reason = "offline_attempt";
       break;
     }
   }
+
+  safe = safe.replace(/\[\[GS_LINK_(\d+)\]\]/g, (_m, i) => preserved[Number(i)] ?? "");
 
   return { safe, flagged, reason };
 }
