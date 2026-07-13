@@ -691,14 +691,9 @@ export function DirectMessageInbox() {
             </div>
 
             {/* Trip context banner */}
-            {(selectedConversation.tripTitle || selectedConversation.tripId) && (
-              <div className="px-4 py-2 bg-[#FDF9F0] border-b border-[#E5DFC6]/40 flex items-center gap-2 text-xs text-[#7A7151]">
-                <Plane className="h-3.5 w-3.5 text-[#C7A962] flex-shrink-0" />
-                <span className="truncate">
-                  Re: <span className="text-[#0a2225] font-medium">{selectedConversation.tripTitle || "Trip inquiry"}</span>
-                </span>
-              </div>
-            )}
+            {/* Conversation trip label removed intentionally: conversations are
+                per-pair, not per-trip, so a birth-trip label misleads once the
+                pair discusses anything else. Threading model on the ladder. */}
 
             {/* Request Banner */}
             {isRequest && (
