@@ -209,8 +209,31 @@ serve(async (req) => {
       }
     }
 
-    // Filter message content
-    const { safe: filteredMessage, flagged, reason } = filterMessage(message);
+    // Anti-disintermediation filtering applies only BEFORE the parties have a
+    // paid booking together. Once money is in escrow they are committed to the
+    // platform — and the agent legitimately needs to share hotel phone numbers,
+    // confirmation numbers, and reservation links with their traveler.
+    let hasActiveBooking = false;
+    try {
+      const { data: existingBooking } = await supabase
+        .from("trip_bookings")
+        .select("id")
+        .in("status", ["confirmed", "paid_in_full", "completed"])
+        .or(
+          `and(traveler_id.eq.${user.id},partner_id.eq.${recipientId}),and(traveler_id.eq.${recipientId},partner_id.eq.${user.id})`,
+        )
+        .limit(1)
+        .maybeSingle();
+      hasActiveBooking = !!existingBooking;
+    } catch (bookingCheckErr) {
+      // If the check itself fails, stay strict: filtering applies.
+      console.error("Booking check failed — filtering applies:", bookingCheckErr);
+    }
+
+    // Filter message content (skipped between parties with an active booking)
+    const { safe: filteredMessage, flagged, reason } = hasActiveBooking
+      ? { safe: message, flagged: false, reason: undefined as string | undefined }
+      : filterMessage(message);
 
     let targetConversationId = conversationId;
     let isNewConversation = false;
