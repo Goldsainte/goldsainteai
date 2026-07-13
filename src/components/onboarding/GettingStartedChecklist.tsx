@@ -16,6 +16,7 @@ interface ChecklistData {
   profileViews?: number;
   publishedTrips?: number;
   proposalsSent?: number;
+  agent?: any;
   activity?: { has_browsed_marketplace?: boolean; has_shared_profile?: boolean };
 }
 
@@ -169,7 +170,14 @@ const AGENT_ITEMS: ChecklistItem[] = [
     description: "Set up Stripe Connect so you can receive payments from travelers.",
     cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
-      !!(d.profile?.stripe_charges_enabled || d.profile?.stripe_payouts_enabled || d.profile?.stripe_connect_payouts_enabled),
+      !!(
+        d.agent?.stripe_charges_enabled ||
+        d.agent?.stripe_payouts_enabled ||
+        d.agent?.stripe_onboarding_completed ||
+        d.profile?.stripe_charges_enabled ||
+        d.profile?.stripe_payouts_enabled ||
+        d.profile?.stripe_connect_payouts_enabled
+      ),
   },
   {
     id: "publish-trip",
@@ -257,12 +265,16 @@ export function GettingStartedChecklist({ userId, role }: Props) {
           stats.draftTripId = draft?.id ?? null;
           stats.profileViews = profile?.creator_avg_views || 0;
         } else if (role === "agent") {
-          const [{ count: ptCount }, { count: pCount }] = await Promise.all([
+          const [{ count: ptCount }, { count: pCount }, { data: agentRow }] = await Promise.all([
             client.from("packaged_trips").select("id", { count: "exact", head: true }).eq("agent_id", userId).eq("status", "published"),
             client.from("trip_proposals").select("id", { count: "exact", head: true }).eq("agent_id", userId),
+            // Stripe status truth lives on travel_agents (written by
+            // check-stripe-connect-status) — profiles has no such flags.
+            client.from("travel_agents").select("stripe_charges_enabled, stripe_payouts_enabled, stripe_onboarding_completed").eq("user_id", userId).maybeSingle(),
           ]);
           stats.publishedTrips = ptCount || 0;
           stats.proposalsSent = pCount || 0;
+          stats.agent = agentRow || null;
         }
         if (role === "creator" || role === "agent") {
           try {
