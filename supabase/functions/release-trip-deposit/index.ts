@@ -286,6 +286,39 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Anchor the transfer to a settled charge (source_transaction) so escrow
+    // releases do NOT depend on the platform's *available* balance — new
+    // platforms have charges pending for ~2 business days, which made the
+    // first-ever release fail with "insufficient funds". Candidate charges:
+    // the booking's stored payment intent plus any recorded in
+    // metadata.payment_intents (the webhook appends one per payment). We use
+    // the first charge large enough to cover this payout; if none fits we
+    // fall back to an unanchored transfer (needs available balance) with the
+    // same honest error as before.
+    let sourceChargeId: string | null = null;
+    try {
+      const meta = (booking.metadata as Record<string, unknown>) ?? {};
+      const candidates: string[] = [
+        paymentIntentId,
+        ...(Array.isArray((meta as any).payment_intents) ? (meta as any).payment_intents : []),
+      ].filter((v, i, a) => typeof v === "string" && v && a.indexOf(v) === i);
+      for (let cand of candidates.slice(0, 4)) {
+        if (cand.startsWith("cs_")) {
+          const sess = await stripe.checkout.sessions.retrieve(cand);
+          if (!sess.payment_intent || typeof sess.payment_intent !== "string") continue;
+          cand = sess.payment_intent;
+        }
+        const pi = await stripe.paymentIntents.retrieve(cand, { expand: ["latest_charge"] });
+        const ch: any = pi.latest_charge;
+        if (ch && typeof ch === "object" && ch.status === "succeeded" && ch.amount >= toCents(payout)) {
+          sourceChargeId = ch.id;
+          break;
+        }
+      }
+    } catch (e) {
+      console.error("source_transaction lookup failed — falling back to balance transfer", e);
+    }
+
     // Transfer the milestone payout — Stripe amounts are in CENTS.
     let transferId: string;
     try {
@@ -293,6 +326,7 @@ Deno.serve(async (req) => {
         amount: toCents(payout),
         currency,
         destination: connectAccountId,
+        ...(sourceChargeId ? { source_transaction: sourceChargeId } : {}),
         metadata: {
           trip_booking_id: booking.id,
           partner_id: booking.partner_id,
