@@ -47,14 +47,12 @@ serve(async (req) => {
       }
     }
 
-    // Validate we have something to search for
+    // No search term? Serve a curated top destination instead of erroring —
+    // the default Tours tab should always show inventory (Booking-style
+    // browse), never an empty shelf.
     if (!body.searchTerm) {
-      return new Response(
-        JSON.stringify({ 
-          error: "At least one search parameter required: query (q) or location" 
-        }),
-        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
-      );
+      const curated = ["Paris", "Rome", "Tokyo", "New York", "Barcelona", "Amsterdam", "London", "Bali"];
+      body.searchTerm = curated[Math.floor(Math.random() * curated.length)];
     }
 
     // Viator freetext search — matches the searchTerm-based body above.
@@ -99,9 +97,17 @@ serve(async (req) => {
       productCode: p.productCode,
       title: p.title,
       shortDescription: p.shortDescription || p.summary || null,
-      thumbnailURL:
-        p.images?.[0]?.variants?.[p.images?.[0]?.variants?.length - 1]?.url ||
-        p.thumbnailURL || p.defaultImage?.url || null,
+      thumbnailURL: (() => {
+        const variants = p.images?.[0]?.variants;
+        if (Array.isArray(variants) && variants.length) {
+          let best = variants[0];
+          for (const v of variants) {
+            if ((v?.width ?? 0) * (v?.height ?? 0) > (best?.width ?? 0) * (best?.height ?? 0)) best = v;
+          }
+          if (best?.url) return best.url;
+        }
+        return p.thumbnailURL || p.defaultImage?.url || null;
+      })(),
       destination: p.destinations?.[0]?.name || p.destination || p.primaryDestination?.name || null,
       rating: p.reviews?.combinedAverageRating ?? p.reviewsStats?.avgRating ?? null,
       reviewCount: p.reviews?.totalReviews ?? p.reviewsStats?.numReviews ?? null,
