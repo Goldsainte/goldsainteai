@@ -242,7 +242,7 @@ export default function ContractSignPage() {
       toast({
         title: "No changes to propose",
         description:
-          "You haven't modified any fields. Edit a value first, then propose.",
+          "The contract fields above are editable right now — change at least one value, then send. For general questions, message your specialist from your bookings dashboard.",
       });
       return;
     }
@@ -847,6 +847,10 @@ export default function ContractSignPage() {
               <CardContent>
                 {editMode ? (
                   <div className="space-y-3">
+                    <p className="rounded-lg bg-[#C7A962]/10 border border-[#C7A962]/40 px-3 py-2 text-sm text-[#0a2225]">
+                      The contract fields above are now editable — scroll up, change the
+                      values you'd like revised, then send them here.
+                    </p>
                     <div>
                       <Label htmlFor="revision-message">
                         Message to the agent (optional)
