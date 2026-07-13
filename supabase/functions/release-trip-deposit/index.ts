@@ -252,8 +252,20 @@ Deno.serve(async (req) => {
       .select("stripe_account_id, stripe_connect_account_id")
       .eq("id", booking.partner_id)
       .maybeSingle();
-    const connectAccountId =
+    let connectAccountId: string | undefined =
       partnerProfile?.stripe_account_id || partnerProfile?.stripe_connect_account_id;
+    if (!connectAccountId) {
+      // Agents onboard via stripe-connect-onboarding, which stores the
+      // account on travel_agents (creators store theirs on profiles) —
+      // check there too. Found in the Jul 12 rehearsal: the two halves of
+      // the money path disagreed on where the bank account lives.
+      const { data: agentRow } = await admin
+        .from("travel_agents")
+        .select("stripe_account_id")
+        .eq("user_id", booking.partner_id)
+        .maybeSingle();
+      connectAccountId = agentRow?.stripe_account_id ?? undefined;
+    }
     if (!connectAccountId) {
       return json(req, { error: "The partner has no connected Stripe account yet — they need to connect one before payouts can be released" }, 400);
     }
