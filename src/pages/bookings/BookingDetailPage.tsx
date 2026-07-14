@@ -444,8 +444,22 @@ export default function BookingDetailPage() {
       .slice(0, 2)
       .join("")
       .toUpperCase() || "GS";
+  // What has ACTUALLY been collected: the webhook accumulates fee-stripped
+  // dollars into metadata.amount_collected on every checkout (deposit and
+  // balance both land there). Bookings from before that tracking existed
+  // won't have it — for those, a confirmed booking means the deposit was
+  // paid. paid_in_full / completed always mean the full total.
+  const collected = Number((booking?.metadata as any)?.amount_collected ?? 0);
+  const amountPaid =
+    booking?.status === "paid_in_full" || booking?.status === "completed"
+      ? total
+      : collected > 0
+        ? Math.min(collected, total)
+        : booking?.status === "confirmed"
+          ? deposit
+          : 0;
   const paidPct =
-    total > 0 ? Math.min(100, Math.round((deposit / total) * 100)) : 0;
+    total > 0 ? Math.min(100, Math.round((amountPaid / total) * 100)) : 0;
   const progressPct = booking?.status === "paid_in_full" ? 100 : paidPct;
 
 
@@ -566,7 +580,7 @@ export default function BookingDetailPage() {
                     Payment
                   </p>
                   <p className="mt-3 font-secondary text-[26px] text-[#0a2225]">
-                    {formatMoney(deposit, currency)}{" "}
+                    {formatMoney(amountPaid, currency)}{" "}
                     <span className="text-[14px] text-[#0a2225]/45">
                       of {formatMoney(total, currency)} paid
                     </span>
