@@ -1,5 +1,5 @@
 // src/pages/proposals/ProposalDetailPage.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -27,7 +27,7 @@ import {
   declineProposal,
   type ProposalDetail,
 } from "@/services/proposalsService";
-import { withdrawProposal } from "@/services/proposalService";
+import { withdrawProposal, markProposalViewed } from "@/services/proposalService";
 import { TrustSafetyInline } from "@/components/trust/TrustSafetyInline";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -142,6 +142,18 @@ export default function ProposalDetailPage() {
 
   const isTraveler = proposal && currentUserId === proposal.traveler?.id;
   const isProposer = proposal && currentUserId === proposal.proposer?.id;
+
+  // First genuine view by the trip owner flips sent → traveler_review, so the
+  // proposer's Manage Proposal panel tells the truth ("currently reviewing")
+  // instead of "hasn't reviewed this yet" forever. Server-side function
+  // verifies ownership and only moves from 'sent'; fire-and-forget.
+  const viewedMarkedRef = useRef(false);
+  useEffect(() => {
+    if (viewedMarkedRef.current) return;
+    if (!proposal || !isTraveler || proposal.status !== "sent") return;
+    viewedMarkedRef.current = true;
+    void markProposalViewed(proposal.id);
+  }, [proposal, isTraveler]);
   const isPending = proposal?.status === "pending" || proposal?.status === "sent" || proposal?.status === "traveler_review";
 
   async function handleAccept() {
