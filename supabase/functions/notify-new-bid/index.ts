@@ -1,4 +1,5 @@
 import "../_shared/resend-guard.ts";
+import { emailShell } from "../_shared/brandEmail.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
@@ -116,8 +117,13 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
               from: 'Goldsainte Marketplace <hello@goldsainte.com>',
               to: [profile.email],
-              subject: `📬 New Bid: ${bid.currency} ${bid.customer_facing_price} for ${job.title}`,
-              html: emailHtml,
+              subject: `A new bid has arrived for ${job.title}`,
+              html: emailShell(
+                "A new bid has arrived.",
+                `An agent has submitted a bid of <strong>${bid.currency} ${Number(bid.customer_facing_price).toLocaleString()}</strong> for <strong>${job.title}</strong>.<br/><br/>Review it alongside any other bids and choose the specialist that fits your trip best. Everything stays protected inside Goldsainte.`,
+                "Review your bids",
+                "https://goldsainte.ai/my-jobs"
+              ),
             }),
           });
 
