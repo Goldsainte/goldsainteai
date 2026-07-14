@@ -11,13 +11,82 @@ import { supabase } from "@/integrations/supabase/client";
 
 const TOP_DESTINATIONS = ["Paris", "London", "Rome", "New York", "Tokyo", "Dubai"];
 
-const REGIONS: Record<string, string[]> = {
-  Europe: ["London", "Paris", "Rome", "Barcelona", "Amsterdam", "Athens", "Lisbon", "Venice"],
-  "North America": ["New York", "Las Vegas", "Miami", "Los Angeles", "San Francisco", "Chicago", "Toronto", "Vancouver"],
-  Asia: ["Tokyo", "Kyoto", "Bangkok", "Singapore", "Bali", "Hong Kong", "Seoul", "Hanoi"],
-  "Middle East & Africa": ["Dubai", "Istanbul", "Marrakech", "Cairo", "Cape Town", "Abu Dhabi", "Doha", "Nairobi"],
-  "Latin America & Caribbean": ["Mexico City", "Cancun", "Rio de Janeiro", "Buenos Aires", "Lima", "Cartagena", "Nassau", "San Juan"],
-  Oceania: ["Sydney", "Melbourne", "Queenstown", "Auckland", "Cairns", "Gold Coast", "Fiji", "Hobart"],
+const REGIONS: Record<string, Record<string, string[]>> = {
+  Europe: {
+    "United Kingdom": ["London", "Edinburgh", "Manchester"],
+    France: ["Paris", "Nice", "Lyon"],
+    Italy: ["Rome", "Venice", "Florence", "Milan", "Naples"],
+    Spain: ["Barcelona", "Madrid", "Seville", "Malaga"],
+    Portugal: ["Lisbon", "Porto"],
+    Netherlands: ["Amsterdam"],
+    Greece: ["Athens", "Santorini", "Mykonos"],
+    Germany: ["Berlin", "Munich", "Hamburg"],
+    Austria: ["Vienna", "Salzburg"],
+    Czechia: ["Prague"],
+    Hungary: ["Budapest"],
+    Ireland: ["Dublin"],
+    Croatia: ["Dubrovnik", "Split"],
+    Switzerland: ["Zurich", "Interlaken"],
+    Iceland: ["Reykjavik"],
+    Poland: ["Krakow", "Warsaw"],
+  },
+  "North America": {
+    "United States": ["New York", "Las Vegas", "Miami", "Los Angeles", "San Francisco", "Chicago", "Orlando", "New Orleans", "Washington DC", "Boston", "Honolulu", "Seattle", "San Diego", "Nashville"],
+    Canada: ["Toronto", "Vancouver", "Montreal", "Quebec City", "Banff"],
+  },
+  Asia: {
+    Japan: ["Tokyo", "Kyoto", "Osaka"],
+    Thailand: ["Bangkok", "Phuket", "Chiang Mai"],
+    Singapore: ["Singapore"],
+    Indonesia: ["Bali"],
+    Vietnam: ["Hanoi", "Ho Chi Minh City"],
+    "Hong Kong": ["Hong Kong"],
+    "South Korea": ["Seoul"],
+    India: ["Delhi", "Mumbai", "Jaipur", "Agra"],
+    Malaysia: ["Kuala Lumpur"],
+    Philippines: ["Manila", "Cebu"],
+    China: ["Beijing", "Shanghai"],
+    Taiwan: ["Taipei"],
+    Cambodia: ["Siem Reap"],
+    Maldives: ["Male"],
+  },
+  "Middle East & Africa": {
+    "United Arab Emirates": ["Dubai", "Abu Dhabi"],
+    Turkey: ["Istanbul", "Cappadocia", "Antalya"],
+    Morocco: ["Marrakech", "Casablanca", "Fes"],
+    Egypt: ["Cairo", "Luxor", "Hurghada", "Sharm El Sheikh"],
+    "South Africa": ["Cape Town", "Johannesburg"],
+    Qatar: ["Doha"],
+    Jordan: ["Amman", "Petra"],
+    Israel: ["Jerusalem", "Tel Aviv"],
+    Kenya: ["Nairobi"],
+    Tanzania: ["Zanzibar", "Arusha"],
+    "Saudi Arabia": ["Riyadh", "Jeddah"],
+    Oman: ["Muscat"],
+  },
+  "Latin America & Caribbean": {
+    Mexico: ["Mexico City", "Cancun", "Tulum", "Playa del Carmen", "Cabo San Lucas", "Puerto Vallarta", "Oaxaca"],
+    Brazil: ["Rio de Janeiro", "Sao Paulo"],
+    Argentina: ["Buenos Aires", "Mendoza"],
+    Peru: ["Lima", "Cusco"],
+    Colombia: ["Cartagena", "Medellin", "Bogota"],
+    Chile: ["Santiago"],
+    "Costa Rica": ["San Jose", "La Fortuna"],
+    Ecuador: ["Quito"],
+    Bahamas: ["Nassau"],
+    "Puerto Rico": ["San Juan"],
+    "Dominican Republic": ["Punta Cana", "Santo Domingo"],
+    Jamaica: ["Montego Bay"],
+    Aruba: ["Oranjestad"],
+    Panama: ["Panama City"],
+    Guatemala: ["Antigua Guatemala"],
+  },
+  Oceania: {
+    Australia: ["Sydney", "Melbourne", "Cairns", "Gold Coast", "Brisbane", "Perth", "Adelaide", "Hobart"],
+    "New Zealand": ["Queenstown", "Auckland", "Rotorua", "Christchurch", "Wellington"],
+    Fiji: ["Nadi"],
+    "French Polynesia": ["Bora Bora", "Papeete"],
+  },
 };
 
 // Curated covers (Unsplash CDN, hotlink-friendly). Swap any URL freely —
@@ -152,6 +221,39 @@ function DestinationCard({
   );
 }
 
+function GridCityCard({ name, onSelect }: { name: string; onSelect: (name: string) => void }) {
+  const curated = DESTINATION_IMAGES[name] ?? null;
+  const [failed, setFailed] = useState(false);
+  const showPhoto = curated && !failed;
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(name)}
+      className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[#E5DFC6] text-left shadow-sm transition-shadow hover:shadow-md"
+      aria-label={`Browse tours in ${name}`}
+    >
+      {showPhoto ? (
+        <>
+          <img
+            src={curated!}
+            alt=""
+            loading="lazy"
+            onError={() => setFailed(true)}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/15 to-transparent" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
+      )}
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <p className="font-secondary text-lg leading-tight text-[#fdfaf2]">{name}</p>
+        <p className="mt-0.5 text-[12px] tracking-wide text-[#C7A962]">Explore tours &rarr;</p>
+      </div>
+    </button>
+  );
+}
+
 export function TourDestinationBrowse({ onSelect }: { onSelect: (name: string) => void }) {
   const regionNames = Object.keys(REGIONS);
   const [activeRegion, setActiveRegion] = useState(regionNames[0]);
@@ -186,9 +288,16 @@ export function TourDestinationBrowse({ onSelect }: { onSelect: (name: string) =
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {REGIONS[activeRegion].map((name) => (
-          <DestinationCard key={`${activeRegion}-${name}`} name={name} onSelect={onSelect} />
+      <div className="space-y-8">
+        {Object.entries(REGIONS[activeRegion]).map(([country, cities]) => (
+          <div key={`${activeRegion}-${country}`}>
+            <p className="mb-3 text-[12px] uppercase tracking-[0.18em] text-[#8a7a3f]">{country}</p>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {cities.map((name) => (
+                <GridCityCard key={`${country}-${name}`} name={name} onSelect={onSelect} />
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>
