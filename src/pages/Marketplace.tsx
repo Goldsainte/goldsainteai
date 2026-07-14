@@ -135,6 +135,17 @@ export default function Marketplace() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // Tab switches and destination picks change only the query string
+  // (?tab=…&tq=…), so the route-level ScrollToTop — which watches the
+  // pathname — never fires. The old scroll offset then carries into the new
+  // view, where the browser clamps it (or scroll-anchors to the footer) and
+  // the page appears to "load at the bottom". Treat a tab or tour-query
+  // change as a fresh page: start at the top. Mere filter tweaks don't
+  // re-trigger this because they aren't in the dependency list.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab, tourQuery]);
+
   const hasActiveFilters = !!(
     filters.destination ||
     filters.startDate ||
