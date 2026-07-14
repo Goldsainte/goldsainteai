@@ -11,82 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 const TOP_DESTINATIONS = ["Paris", "London", "Rome", "New York", "Tokyo", "Dubai"];
 
-const REGIONS: Record<string, Record<string, string[]>> = {
-  Europe: {
-    "United Kingdom": ["London", "Edinburgh", "Manchester"],
-    France: ["Paris", "Nice", "Lyon"],
-    Italy: ["Rome", "Venice", "Florence", "Milan", "Naples"],
-    Spain: ["Barcelona", "Madrid", "Seville", "Malaga"],
-    Portugal: ["Lisbon", "Porto"],
-    Netherlands: ["Amsterdam"],
-    Greece: ["Athens", "Santorini", "Mykonos"],
-    Germany: ["Berlin", "Munich", "Hamburg"],
-    Austria: ["Vienna", "Salzburg"],
-    Czechia: ["Prague"],
-    Hungary: ["Budapest"],
-    Ireland: ["Dublin"],
-    Croatia: ["Dubrovnik", "Split"],
-    Switzerland: ["Zurich", "Interlaken"],
-    Iceland: ["Reykjavik"],
-    Poland: ["Krakow", "Warsaw"],
-  },
-  "North America": {
-    "United States": ["New York", "Las Vegas", "Miami", "Los Angeles", "San Francisco", "Chicago", "Orlando", "New Orleans", "Washington DC", "Boston", "Honolulu", "Seattle", "San Diego", "Nashville"],
-    Canada: ["Toronto", "Vancouver", "Montreal", "Quebec City", "Banff"],
-  },
-  Asia: {
-    Japan: ["Tokyo", "Kyoto", "Osaka"],
-    Thailand: ["Bangkok", "Phuket", "Chiang Mai"],
-    Singapore: ["Singapore"],
-    Indonesia: ["Bali"],
-    Vietnam: ["Hanoi", "Ho Chi Minh City"],
-    "Hong Kong": ["Hong Kong"],
-    "South Korea": ["Seoul"],
-    India: ["Delhi", "Mumbai", "Jaipur", "Agra"],
-    Malaysia: ["Kuala Lumpur"],
-    Philippines: ["Manila", "Cebu"],
-    China: ["Beijing", "Shanghai"],
-    Taiwan: ["Taipei"],
-    Cambodia: ["Siem Reap"],
-    Maldives: ["Male"],
-  },
-  "Middle East & Africa": {
-    "United Arab Emirates": ["Dubai", "Abu Dhabi"],
-    Turkey: ["Istanbul", "Cappadocia", "Antalya"],
-    Morocco: ["Marrakech", "Casablanca", "Fes"],
-    Egypt: ["Cairo", "Luxor", "Hurghada", "Sharm El Sheikh"],
-    "South Africa": ["Cape Town", "Johannesburg"],
-    Qatar: ["Doha"],
-    Jordan: ["Amman", "Petra"],
-    Israel: ["Jerusalem", "Tel Aviv"],
-    Kenya: ["Nairobi"],
-    Tanzania: ["Zanzibar", "Arusha"],
-    "Saudi Arabia": ["Riyadh", "Jeddah"],
-    Oman: ["Muscat"],
-  },
-  "Latin America & Caribbean": {
-    Mexico: ["Mexico City", "Cancun", "Tulum", "Playa del Carmen", "Cabo San Lucas", "Puerto Vallarta", "Oaxaca"],
-    Brazil: ["Rio de Janeiro", "Sao Paulo"],
-    Argentina: ["Buenos Aires", "Mendoza"],
-    Peru: ["Lima", "Cusco"],
-    Colombia: ["Cartagena", "Medellin", "Bogota"],
-    Chile: ["Santiago"],
-    "Costa Rica": ["San Jose", "La Fortuna"],
-    Ecuador: ["Quito"],
-    Bahamas: ["Nassau"],
-    "Puerto Rico": ["San Juan"],
-    "Dominican Republic": ["Punta Cana", "Santo Domingo"],
-    Jamaica: ["Montego Bay"],
-    Aruba: ["Oranjestad"],
-    Panama: ["Panama City"],
-    Guatemala: ["Antigua Guatemala"],
-  },
-  Oceania: {
-    Australia: ["Sydney", "Melbourne", "Cairns", "Gold Coast", "Brisbane", "Perth", "Adelaide", "Hobart"],
-    "New Zealand": ["Queenstown", "Auckland", "Rotorua", "Christchurch", "Wellington"],
-    Fiji: ["Nadi"],
-    "French Polynesia": ["Bora Bora", "Papeete"],
-  },
+const REGIONS: Record<string, string[]> = {
+  Europe: ["London", "Paris", "Rome", "Barcelona", "Amsterdam", "Athens", "Lisbon", "Venice", "Florence", "Milan", "Madrid", "Seville", "Edinburgh", "Dublin", "Berlin", "Munich", "Vienna", "Prague", "Budapest", "Porto", "Santorini", "Mykonos", "Dubrovnik", "Split", "Zurich", "Interlaken", "Reykjavik", "Krakow", "Nice", "Naples"],
+  "North America": ["New York", "Las Vegas", "Miami", "Los Angeles", "San Francisco", "Chicago", "Orlando", "New Orleans", "Washington DC", "Boston", "Honolulu", "Seattle", "San Diego", "Nashville", "Toronto", "Vancouver", "Montreal", "Quebec City", "Banff"],
+  Asia: ["Tokyo", "Kyoto", "Osaka", "Bangkok", "Phuket", "Chiang Mai", "Singapore", "Bali", "Hanoi", "Ho Chi Minh City", "Hong Kong", "Seoul", "Delhi", "Mumbai", "Jaipur", "Agra", "Kuala Lumpur", "Manila", "Cebu", "Beijing", "Shanghai", "Taipei", "Siem Reap", "Male"],
+  "Middle East & Africa": ["Dubai", "Abu Dhabi", "Istanbul", "Cappadocia", "Antalya", "Marrakech", "Casablanca", "Fes", "Cairo", "Luxor", "Hurghada", "Sharm El Sheikh", "Cape Town", "Johannesburg", "Doha", "Amman", "Petra", "Jerusalem", "Tel Aviv", "Nairobi", "Zanzibar", "Riyadh", "Jeddah", "Muscat"],
+  "Latin America & Caribbean": ["Mexico City", "Cancun", "Tulum", "Playa del Carmen", "Cabo San Lucas", "Puerto Vallarta", "Rio de Janeiro", "Sao Paulo", "Buenos Aires", "Mendoza", "Lima", "Cusco", "Cartagena", "Medellin", "Bogota", "Santiago", "San Jose", "Quito", "Nassau", "San Juan", "Punta Cana", "Montego Bay", "Oranjestad", "Panama City", "Antigua Guatemala"],
+  Oceania: ["Sydney", "Melbourne", "Cairns", "Gold Coast", "Brisbane", "Perth", "Adelaide", "Hobart", "Queenstown", "Auckland", "Rotorua", "Christchurch", "Wellington", "Nadi", "Bora Bora", "Papeete"],
 };
 
 // Curated covers (Unsplash CDN, hotlink-friendly). Swap any URL freely —
@@ -141,6 +72,72 @@ const DESTINATION_IMAGES: Record<string, string> = {
   "Gold Coast": u("photo-1572454591674-2739f30d8c40"),
   Fiji: u("photo-1573843981267-be1999ff37cd"),
   Hobart: u("photo-1591081658714-f576fb7ea3ed"),
+  Edinburgh: u("photo-1506377585622-bedcbb027afc"),
+  Manchester: u("photo-1515586838455-8f8f940d6853"),
+  Nice: u("photo-1491166617655-0723a0999cfc"),
+  Lyon: u("photo-1524396309943-e03f5249f002"),
+  Florence: u("photo-1541370976299-4d24ebbc9077"),
+  Milan: u("photo-1520440229-6469a149ac59"),
+  Naples: u("photo-1516483638261-f4dbaf036963"),
+  Madrid: u("photo-1539037116277-4db20889f2d4"),
+  Seville: u("photo-1559682468-a6a29e7d9517"),
+  Porto: u("photo-1555881400-74d7acaacd8b"),
+  Santorini: u("photo-1613395877344-13d4a8e0d49e"),
+  Mykonos: u("photo-1601581875039-e899893d520c"),
+  Berlin: u("photo-1560969184-10fe8719e047"),
+  Munich: u("photo-1595867818082-083862f3d630"),
+  Vienna: u("photo-1516550893923-42d28e5677af"),
+  Prague: u("photo-1541849546-216549ae216d"),
+  Budapest: u("photo-1551867633-194f125bddfa"),
+  Dublin: u("photo-1549918864-48ac978761a4"),
+  Dubrovnik: u("photo-1555990538-1e6c0f0f2f14"),
+  Split: u("photo-1555990538-32b1a1262260"),
+  Zurich: u("photo-1515488764276-beab7607c1e6"),
+  Interlaken: u("photo-1527668752968-14dc70a27c95"),
+  Reykjavik: u("photo-1504829857797-ddff29c27927"),
+  Krakow: u("photo-1562692447-5cd07e5f232a"),
+  Orlando: u("photo-1597466599360-3b9775841aec"),
+  "New Orleans": u("photo-1571893544028-06b07af6dade"),
+  "Washington DC": u("photo-1501466044931-62695aada8e9"),
+  Boston: u("photo-1501979376754-2ff867a4f659"),
+  Honolulu: u("photo-1507876466758-bc54f384809c"),
+  Seattle: u("photo-1502175353174-a7a70e73b362"),
+  "San Diego": u("photo-1519659528534-7fd733a832a0"),
+  Nashville: u("photo-1545419913-775e3e82c7db"),
+  Montreal: u("photo-1519178614-68673b201f36"),
+  "Quebec City": u("photo-1519832979-6fa011b87667"),
+  Banff: u("photo-1561134643-668f9057cce4"),
+  Osaka: u("photo-1590559899731-a382839e5549"),
+  Phuket: u("photo-1589394815804-964ed0be2eb5"),
+  "Chiang Mai": u("photo-1512553353614-82a7370096dc"),
+  "Ho Chi Minh City": u("photo-1583417319070-4a69db38a482"),
+  Delhi: u("photo-1587474260584-136574528ed5"),
+  Mumbai: u("photo-1570168007204-dfb528c6958f"),
+  Jaipur: u("photo-1477587458883-47145ed94245"),
+  Agra: u("photo-1564507592333-c60657eea523"),
+  "Kuala Lumpur": u("photo-1596422846543-75c6fc197f07"),
+  Beijing: u("photo-1508804185872-d7badad00f7d"),
+  Shanghai: u("photo-1474181487882-5abf3f0ba6c2"),
+  Taipei: u("photo-1470004914212-05527e49370b"),
+  "Siem Reap": u("photo-1552465011-b4e21bf6e79a"),
+  Cappadocia: u("photo-1570939274717-7eda259b50ed"),
+  Antalya: u("photo-1593238738928-e0d4b62b730f"),
+  Casablanca: u("photo-1577147443647-81856d5151af"),
+  Luxor: u("photo-1587975844610-957b1e5d4b48"),
+  Petra: u("photo-1563177978-4c5ffc081b25"),
+  Jerusalem: u("photo-1544734037-e4ec2e35e5eb"),
+  "Tel Aviv": u("photo-1544971587-b842c27f8e14"),
+  Zanzibar: u("photo-1586861635167-e5223aadc9fe"),
+  Tulum: u("photo-1504730655501-24c39e5d1152"),
+  Cusco: u("photo-1526392060635-9d6019884377"),
+  Medellin: u("photo-1599999905374-b3e63e58f89b"),
+  Bogota: u("photo-1568632234157-ce7aecd03d0d"),
+  Santiago: u("photo-1478827387698-1527781a4887"),
+  "Punta Cana": u("photo-1505881502353-a1986add3762"),
+  "Montego Bay": u("photo-1547149600-a6cdf8fce60c"),
+  Brisbane: u("photo-1566734904496-9309bb1798b3"),
+  Perth: u("photo-1573935448851-4b07c29ee181"),
+  "Bora Bora": u("photo-1589197331516-4d84b72ebde3"),
 };
 
 interface DestinationCardData {
@@ -148,8 +145,9 @@ interface DestinationCardData {
   image: string | null;
 }
 
-function useDestinationTours(name: string) {
+function useDestinationTours(name: string, enabled = true) {
   return useQuery<DestinationCardData>({
+    enabled,
     queryKey: ["viator-destination-card", name],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke("viator-search", {
@@ -189,7 +187,7 @@ function DestinationCard({
       type="button"
       onClick={() => onSelect(name)}
       className={`group relative w-full overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#F5F0E8] text-left shadow-sm transition-shadow hover:shadow-md ${
-        large ? "aspect-[16/10]" : "aspect-[4/3]"
+        large ? "aspect-[3/2]" : "aspect-[3/2]"
       }`}
       aria-label={`Browse tours in ${name}`}
     >
@@ -223,32 +221,35 @@ function DestinationCard({
 
 function GridCityCard({ name, onSelect }: { name: string; onSelect: (name: string) => void }) {
   const curated = DESTINATION_IMAGES[name] ?? null;
-  const [failed, setFailed] = useState(false);
-  const showPhoto = curated && !failed;
+  const [curatedFailed, setCuratedFailed] = useState(false);
+  // Fetch a Viator photo ONLY when there is no working curated cover — keeps
+  // API usage bounded while giving (nearly) every card a real photograph.
+  const needViator = !curated || curatedFailed;
+  const { data } = useDestinationTours(name, needViator);
+  const imgSrc = curated && !curatedFailed ? curated : data?.image ?? null;
   return (
     <button
       type="button"
       onClick={() => onSelect(name)}
-      className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[#E5DFC6] text-left shadow-sm transition-shadow hover:shadow-md"
+      className="group relative aspect-[3/2] w-full overflow-hidden rounded-xl border border-[#E5DFC6] text-left shadow-sm transition-shadow hover:shadow-md"
       aria-label={`Browse tours in ${name}`}
     >
-      {showPhoto ? (
+      {imgSrc ? (
         <>
           <img
-            src={curated!}
+            src={imgSrc}
             alt=""
             loading="lazy"
-            onError={() => setFailed(true)}
+            onError={() => { if (curated && !curatedFailed) setCuratedFailed(true); }}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/15 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/80 via-[#0a2225]/10 to-transparent" />
         </>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
       )}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <p className="font-secondary text-lg leading-tight text-[#fdfaf2]">{name}</p>
-        <p className="mt-0.5 text-[12px] tracking-wide text-[#C7A962]">Explore tours &rarr;</p>
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <p className="font-secondary text-[17px] leading-tight text-[#fdfaf2]">{name}</p>
       </div>
     </button>
   );
@@ -288,16 +289,9 @@ export function TourDestinationBrowse({ onSelect }: { onSelect: (name: string) =
           </button>
         ))}
       </div>
-      <div className="space-y-8">
-        {Object.entries(REGIONS[activeRegion]).map(([country, cities]) => (
-          <div key={`${activeRegion}-${country}`}>
-            <p className="mb-3 text-[12px] uppercase tracking-[0.18em] text-[#8a7a3f]">{country}</p>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {cities.map((name) => (
-                <GridCityCard key={`${country}-${name}`} name={name} onSelect={onSelect} />
-              ))}
-            </div>
-          </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {REGIONS[activeRegion].map((name) => (
+          <GridCityCard key={`${activeRegion}-${name}`} name={name} onSelect={onSelect} />
         ))}
       </div>
     </div>
