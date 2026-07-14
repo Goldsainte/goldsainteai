@@ -1,7 +1,7 @@
 // src/pages/bookings/BookingDetailPage.tsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ShieldAlert, CalendarX } from "lucide-react";
+import { ArrowLeft, ShieldAlert, CalendarX, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
@@ -122,6 +122,8 @@ export default function BookingDetailPage() {
   const [releasingFinal, setReleasingFinal] = useState(false);
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [depositReleased, setDepositReleased] = useState(false);
+  const [finalReleased, setFinalReleased] = useState(false);
+  const [contractStatus, setContractStatus] = useState<string | null>(null);
 
   // Specialist (partner) profile for the sidebar card
   const [partnerProfile, setPartnerProfile] = useState<{
@@ -229,6 +231,7 @@ export default function BookingDetailPage() {
 
         // Released milestones (drives the escrow card; best-effort).
         let depositMilestoneReleased = false;
+        let finalMilestoneReleased = false;
         try {
           const { data: payouts } = await supabase
             .from("trip_payouts")
@@ -237,8 +240,27 @@ export default function BookingDetailPage() {
           depositMilestoneReleased = (payouts ?? []).some(
             (p: any) => p.milestone === "deposit"
           );
+          finalMilestoneReleased = (payouts ?? []).some(
+            (p: any) => p.milestone === "final"
+          );
         } catch {
           depositMilestoneReleased = false;
+        }
+
+        // Contract status for the journey tracker (same query the
+        // ContractStatusCard uses; best-effort).
+        let contractRow: { status?: string } | null = null;
+        try {
+          const { data: c } = await supabase
+            .from("trip_contracts")
+            .select("id, status")
+            .eq("booking_id", bookingId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          contractRow = (c as any) ?? null;
+        } catch {
+          contractRow = null;
         }
 
         // Specialist profile (best-effort; platform bookings may have none)
@@ -258,6 +280,8 @@ export default function BookingDetailPage() {
           setDisputes(disputeRows);
           setCancellations(cancellationRows);
           setDepositReleased(depositMilestoneReleased);
+          setFinalReleased(finalMilestoneReleased);
+          setContractStatus(contractRow?.status ?? null);
           setPartnerProfile(partnerRow);
         }
       } catch (err: any) {
@@ -703,6 +727,109 @@ export default function BookingDetailPage() {
                     )}
                   </div>
                 </div>
+
+                {/* ── Escrow journey tracker: the arc, with live truth ── */}
+                {booking.status !== "cancelled" && (() => {
+                  const contractExecuted = contractStatus === "fully_executed";
+                  const depositPaid =
+                    (deposit > 0 && amountPaid >= deposit - 0.01) ||
+                    ["confirmed", "paid_in_full", "completed"].includes(booking.status);
+                  const balancePaid =
+                    booking.status === "paid_in_full" ||
+                    booking.status === "completed" ||
+                    (total > 0 && amountPaid >= total - 0.01);
+                  const tripDone = booking.status === "completed" || finalReleased;
+                  const journey = [
+                    {
+                      label: "Booking created",
+                      done: true,
+                      sub: "Escrow protects every payment from here.",
+                    },
+                    {
+                      label: "Contract signed by both parties",
+                      done: contractExecuted,
+                      sub: contractExecuted
+                        ? "Fully executed — the terms below are in effect."
+                        : contractStatus
+                          ? "Awaiting signatures — review and sign in the contract card below."
+                          : "Your specialist prepares the contract; you'll be notified to sign.",
+                    },
+                    {
+                      label: "Deposit paid into escrow",
+                      done: depositPaid,
+                      sub: depositPaid
+                        ? `${formatMoney(deposit, currency)} secured — it stays under your control.`
+                        : "Once the contract executes, pay the deposit. It's held in escrow, controlled by you.",
+                    },
+                    {
+                      label: "Reservations confirmed — you release the deposit",
+                      done: depositReleased,
+                      sub: depositReleased
+                        ? "Released to your specialist as working capital."
+                        : "Your specialist shares confirmed reservations in Messages. Release only after you've reviewed them.",
+                    },
+                    {
+                      label: "Balance paid",
+                      done: balancePaid,
+                      sub: balancePaid
+                        ? "Paid in full — held in escrow through your trip."
+                        : `Due before departure${balance > 0 ? ` (${formatMoney(balance, currency)})` : ""}.`,
+                    },
+                    {
+                      label: "Trip complete — final payment released",
+                      done: tripDone,
+                      sub: tripDone
+                        ? "All settled. We wish you many more journeys."
+                        : "After your trip, confirm it went as agreed — that releases the final payment to your specialist.",
+                    },
+                  ];
+                  const currentIdx = journey.findIndex((st) => !st.done);
+                  return (
+                    <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6">
+                      <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                        Your trip, step by step
+                      </p>
+                      <ol className="mt-4 space-y-4">
+                        {journey.map((st, i) => {
+                          const state = st.done ? "done" : i === currentIdx ? "current" : "upcoming";
+                          return (
+                            <li key={st.label} className="flex items-start gap-3.5">
+                              {state === "done" ? (
+                                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5 text-[#0c4d47]" />
+                              ) : (
+                                <span
+                                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold mt-0.5 ${
+                                    state === "current"
+                                      ? "border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
+                                      : "border-[#0a2225]/20 text-[#0a2225]/40"
+                                  }`}
+                                >
+                                  {i + 1}
+                                </span>
+                              )}
+                              <div className="min-w-0">
+                                <p
+                                  className={`text-[15px] leading-snug ${
+                                    state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
+                                  } ${state === "current" ? "font-medium" : ""}`}
+                                >
+                                  {st.label}
+                                </p>
+                                <p
+                                  className={`mt-0.5 text-[12.5px] leading-relaxed ${
+                                    state === "upcoming" ? "text-[#0a2225]/35" : "text-[#0a2225]/65"
+                                  }`}
+                                >
+                                  {st.sub}
+                                </p>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </div>
+                  );
+                })()}
 
                 <ContractStatusCard variant="traveler" bookingId={booking.id} />
 
