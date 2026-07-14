@@ -1,6 +1,6 @@
 // src/pages/bookings/BookingDetailPage.tsx
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ShieldAlert, CalendarX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
@@ -130,6 +130,39 @@ export default function BookingDetailPage() {
     avatar_url?: string | null;
   } | null>(null);
 
+  // Returning from Stripe checkout (?paid=1). Stripe redirects the traveler
+  // back BEFORE the webhook has necessarily updated the booking, so: greet
+  // the payment immediately, strip the param from the URL, and quietly
+  // refetch a few times so the numbers below catch up on their own.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [justPaid, setJustPaid] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  useEffect(() => {
+    if (searchParams.get("paid") !== "1") return;
+    setJustPaid(true);
+    const next = new URLSearchParams(searchParams);
+    next.delete("paid");
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!justPaid) return;
+    let cancelled = false;
+    let tries = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      if (cancelled || tries >= 5) return;
+      tries += 1;
+      setReloadKey((k) => k + 1);
+      timer = setTimeout(tick, 2500);
+    };
+    timer = setTimeout(tick, 1500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [justPaid]);
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -237,7 +270,7 @@ export default function BookingDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [bookingId, navigate]);
+  }, [bookingId, navigate, reloadKey]);
 
   async function handleFileClaim(e: React.FormEvent) {
     e.preventDefault();
@@ -466,6 +499,20 @@ export default function BookingDetailPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
+      {justPaid && (
+        <div className="mx-auto max-w-6xl px-6 pt-6">
+          <div className="rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-5 py-4">
+            <p className="font-secondary text-[17px] text-[#0a2225]">
+              Payment received — thank you.
+            </p>
+            <p className="mt-1 text-[13px] leading-relaxed text-[#0a2225]/65">
+              {booking?.status === "paid_in_full" || booking?.status === "completed"
+                ? "Your trip is paid in full. Your specialist will confirm the remaining details — keep an eye on your Messages, and a receipt is on its way to your email."
+                : "A receipt is on its way to your email, and the numbers below may take a few seconds to update. Next: your specialist secures your reservations and shares them in Messages — you release the deposit only after you've seen them."}
+            </p>
+          </div>
+        </div>
+      )}
       <section className="mx-auto max-w-6xl px-6 pt-8 pb-2">
         <Link
           to="/my-bookings"
