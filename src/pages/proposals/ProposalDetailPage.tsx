@@ -688,9 +688,9 @@ export default function ProposalDetailPage() {
                 <CardContent className="p-6 pt-2 space-y-3">
                   {proposal.attachments.map((att) => (
                     <div key={att.id} className="flex items-center justify-between py-2.5 border-b last:border-0">
-                      <div className="flex items-center gap-3 text-sm">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-foreground font-medium">{att.file_name}</span>
+                      <div className="flex items-center gap-3 text-sm min-w-0">
+                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-foreground font-medium break-all min-w-0">{att.file_name}</span>
                         {att.file_type && (
                           <Badge variant="outline" className="text-[10px]">{att.file_type}</Badge>
                         )}
@@ -706,12 +706,12 @@ export default function ProposalDetailPage() {
                     const url = typeof link === "string" ? link : link?.url || "";
                     const label = typeof link === "string" ? link : (link?.label || link?.url || "Link");
                     return (
-                    <div key={i} className="flex items-center justify-between py-2.5 border-b last:border-0">
-                      <div className="flex items-center gap-3 text-sm">
-                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-foreground">{label}</span>
+                    <div key={i} className="flex items-center justify-between gap-3 py-2.5 border-b last:border-0 min-w-0">
+                      <div className="flex items-start gap-3 text-sm min-w-0">
+                        <ExternalLink className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                        <span className="text-foreground break-all min-w-0">{label}</span>
                       </div>
-                      <Button variant="ghost" size="xs" asChild>
+                      <Button variant="ghost" size="xs" asChild className="shrink-0">
                         <a href={url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
