@@ -865,7 +865,7 @@ export default function NewProposalPage() {
                         type="number"
                         min={0}
                         placeholder="0"
-                        className={`${inputClasses} pl-9`}
+                        className={`${inputClasses} pl-9 sm:pl-10`}
                         value={priceFrom}
                         onChange={(e) => setPriceFrom(e.target.value ? Number(e.target.value) : "")}
                       />
@@ -894,7 +894,7 @@ export default function NewProposalPage() {
                               : "border-border hover:border-muted-foreground/30"
                           }`}
                         >
-                          <opt.icon className={`h-5 w-5 ${commissionModel === opt.value ? "text-[#0c4d47]" : "text-muted-foreground"}`} />
+                          <opt.icon className={`h-5 w-5 ${commissionModel === opt.value ? "text-[#0c4d47]" : "text-[#8D6B2F]"}`} strokeWidth={2.25} />
                           <div>
                             <p className="text-sm font-medium">{opt.label}</p>
                             <p className="text-xs text-muted-foreground">{opt.desc}</p>
@@ -1029,7 +1029,7 @@ export default function NewProposalPage() {
                               type="number"
                               min={0}
                               placeholder="0"
-                              className={`${inputClasses} pl-9`}
+                              className={`${inputClasses} pl-9 sm:pl-10`}
                               value={flatFeeAmount}
                               onChange={(e) => setFlatFeeAmount(e.target.value ? Number(e.target.value) : "")}
                             />
@@ -1075,7 +1075,7 @@ export default function NewProposalPage() {
                                 type="number"
                                 min={0}
                                 placeholder="0"
-                                className={`${inputClasses} pl-9`}
+                                className={`${inputClasses} pl-9 sm:pl-10`}
                                 value={hybridFlatFee}
                                 onChange={(e) => setHybridFlatFee(e.target.value ? Number(e.target.value) : "")}
                               />
@@ -1205,7 +1205,7 @@ export default function NewProposalPage() {
                         type="number"
                         min={0}
                         placeholder="0"
-                        className={`${inputClasses} pl-9`}
+                        className={`${inputClasses} pl-9 sm:pl-10`}
                         value={changeFee}
                         onChange={(e) => setChangeFee(e.target.value ? Number(e.target.value) : "")}
                       />
