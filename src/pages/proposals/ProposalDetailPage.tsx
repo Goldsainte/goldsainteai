@@ -645,7 +645,22 @@ export default function ProposalDetailPage() {
                 {/* Payment Schedule */}
                 <div className="space-y-3">
                   <p className="text-xs uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">Payment Schedule</p>
-                  {proposal.payment_schedule && proposal.payment_schedule.length > 0 ? (
+                  {(() => {
+                    // Heal proposals saved with the old bogus "Full Payment
+                    // 100%" default: when the stored schedule contradicts the
+                    // deposit terms, derive the true one for display.
+                    const stored = proposal.payment_schedule;
+                    const dep = Number(proposal.deposit_percentage ?? 0);
+                    const isBogusDefault =
+                      Array.isArray(stored) && stored.length === 1 &&
+                      Number(stored[0]?.percentage) === 100 && dep > 0 && dep < 100;
+                    const schedule = (!stored || stored.length === 0 || isBogusDefault) && dep > 0 && dep < 100
+                      ? [
+                          { name: "Deposit", percentage: dep, due: (proposal as any).deposit_due_days ? `Within ${(proposal as any).deposit_due_days} days of acceptance` : "On acceptance" },
+                          { name: "Balance", percentage: 100 - dep, due: "Before departure" },
+                        ]
+                      : stored;
+                    return schedule && schedule.length > 0 ? (
                     <div className="rounded-lg border overflow-hidden">
                       <div className="overflow-x-auto"><table className="w-full text-sm">
                         <thead className="bg-muted/50">
@@ -656,7 +671,7 @@ export default function ProposalDetailPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {proposal.payment_schedule.map((item: any, idx: number) => {
+                          {schedule.map((item: any, idx: number) => {
                             const milestoneLabel = item.label || item.name || `Payment ${idx + 1}`;
                             const milestoneAmount = item.amount
                               ? formatMoney(item.amount, proposal.currency || "USD")
@@ -666,7 +681,7 @@ export default function ProposalDetailPage() {
                             return (
                               <tr key={`${milestoneLabel}-${idx}`} className="border-t">
                                 <td className="px-4 py-3 font-medium text-foreground">{milestoneLabel}</td>
-                                <td className="px-4 py-3 text-[#0a2225]/75">{item.due_on ? formatDate(item.due_on) : "—"}</td>
+                                <td className="px-4 py-3 text-[#0a2225]/75">{item.due || (item.due_on ? formatDate(item.due_on) : "—")}</td>
                                 <td className="px-4 py-3 text-right font-semibold text-foreground">
                                   {milestoneAmount}
                                 </td>
@@ -682,7 +697,8 @@ export default function ProposalDetailPage() {
                         Payment schedule hasn't been specified yet. Confirm the deposit and balance structure with your partner before proceeding.
                       </p>
                     </div>
-                  )}
+                  );
+                  })()}
                 </div>
 
                 <p className="text-xs text-[#0a2225]/75 pt-2 border-t">
