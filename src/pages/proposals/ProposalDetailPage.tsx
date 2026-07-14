@@ -327,9 +327,9 @@ export default function ProposalDetailPage() {
           MAIN CONTENT
           ═══════════════════════════════════════════════ */}
       <section className="mx-auto max-w-5xl px-4 py-8 md:py-12">
-        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* Left Column */}
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
 
             {/* ── SECTION 2: THE PITCH ── */}
             {(proposal.message || proposal.itinerary_summary) && (
@@ -632,7 +632,7 @@ export default function ProposalDetailPage() {
                   <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold">Payment Schedule</p>
                   {proposal.payment_schedule && proposal.payment_schedule.length > 0 ? (
                     <div className="rounded-lg border overflow-hidden">
-                      <table className="w-full text-sm">
+                      <div className="overflow-x-auto"><table className="w-full text-sm">
                         <thead className="bg-muted/50">
                           <tr>
                             <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Milestone</th>
@@ -659,7 +659,7 @@ export default function ProposalDetailPage() {
                             );
                           })}
                         </tbody>
-                      </table>
+                      </table></div>
                     </div>
                   ) : (
                     <div className="bg-muted/50 rounded-lg p-4">
@@ -772,7 +772,7 @@ export default function ProposalDetailPage() {
           {/* ═══════════════════════════════════════════════
               RIGHT SIDEBAR
               ═══════════════════════════════════════════════ */}
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <div className="lg:sticky lg:top-24 space-y-5">
 
               {/* Proposer info */}
