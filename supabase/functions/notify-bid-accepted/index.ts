@@ -1,4 +1,5 @@
 import "../_shared/resend-guard.ts";
+import { emailShell } from "../_shared/brandEmail.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
@@ -143,8 +144,13 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
               from: 'Goldsainte Marketplace <hello@goldsainte.com>',
               to: [customerProfile.email],
-              subject: `🎉 Bid Accepted - Payment Required for ${job.title}`,
-              html: customerEmailHtml,
+              subject: `Bid accepted — next: your payment for ${job.title}`,
+              html: emailShell(
+                "Your specialist is confirmed.",
+                `You've accepted a bid for <strong>${job.title}</strong>. Next: complete your payment — it's held in Goldsainte's escrow and released to your specialist on agreed milestones, so your booking stays protected.`,
+                "Complete payment",
+                "https://goldsainte.ai/my-jobs"
+              ),
             }),
           });
 
@@ -217,8 +223,13 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
               from: 'Goldsainte Marketplace <hello@goldsainte.com>',
               to: [agentProfile.email],
-              subject: `🎉 Bid Accepted! New Booking: ${job.title}`,
-              html: agentEmailHtml,
+              subject: `Your bid was accepted — ${job.title}`,
+              html: emailShell(
+                "Your bid was accepted.",
+                `Congratulations — the traveler chose your bid for <strong>${job.title}</strong>. Next: the traveler completes payment into escrow; you'll be notified the moment it lands. Keep all trip details and communication on-platform.`,
+                "Open your dashboard",
+                "https://goldsainte.ai/agent-dashboard"
+              ),
             }),
           });
 
