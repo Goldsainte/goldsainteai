@@ -104,6 +104,10 @@ export default function CreatorOnboardingPage() {
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
+  // Optional "fun facts" — all stored in profiles.about_details (jsonb)
+  const [aboutDetails, setAboutDetails] = useState<Record<string, string>>({});
+  const setAbout = (k: string, v: string) =>
+    setAboutDetails((prev) => ({ ...prev, [k]: v }));
   const [homeBase, setHomeBase] = useState("");
   const [primaryPlatform, setPrimaryPlatform] = useState("");
   const [tiktokHandle, setTiktokHandle] = useState("");
@@ -154,6 +158,7 @@ export default function CreatorOnboardingPage() {
       else if (data.full_name) setDisplayName(data.full_name);
       if (data.avatar_url) setAvatarUrl(data.avatar_url);
       if (data.bio) setBio(data.bio);
+      if ((data as any).about_details) setAboutDetails((data as any).about_details);
       if (data.home_base) setHomeBase(data.home_base);
       if (data.primary_platform) setPrimaryPlatform(data.primary_platform);
       if (data.tiktok_handle) setTiktokHandle(normalizeHandle(data.tiktok_handle));
@@ -305,6 +310,12 @@ export default function CreatorOnboardingPage() {
           tiktok_handle: normalizeHandle(tiktokHandle) || null,
           instagram_handle: normalizeHandle(instagramHandle) || null,
           website: website || null,
+          about_details: (() => {
+            const clean = Object.fromEntries(
+              Object.entries(aboutDetails).filter(([, v]) => (v || "").trim() !== "")
+            );
+            return Object.keys(clean).length ? clean : null;
+          })(),
           creator_niches: selectedNiches,
           content_style_tags: selectedStyles,
           creator_budget_levels: selectedBudgets,
@@ -548,6 +559,44 @@ export default function CreatorOnboardingPage() {
                       className="mt-2"
                       inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
+                  </div>
+
+                  {/* ── Fun facts → profiles.about_details. All optional. ── */}
+                  <div className="pt-2">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F] font-semibold">
+                      A little more about you{" "}
+                      <span className="normal-case tracking-normal text-[#0a2225]/50 font-normal">(all optional — travelers love this)</span>
+                    </p>
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-[#0a2225] font-medium">Countries visited</Label>
+                        <Input value={aboutDetails.countries_visited || ""} onChange={(e) => setAbout("countries_visited", e.target.value)} placeholder="e.g. 27" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                      <div>
+                        <Label className="text-[#0a2225] font-medium">Languages you speak</Label>
+                        <Input value={aboutDetails.languages_spoken || ""} onChange={(e) => setAbout("languages_spoken", e.target.value)} placeholder="English, Spanish…" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                      <div>
+                        <Label className="text-[#0a2225] font-medium">Your travel style in three words</Label>
+                        <Input value={aboutDetails.three_words || ""} onChange={(e) => setAbout("three_words", e.target.value)} placeholder="Slow, spontaneous, delicious" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                      <div>
+                        <Label className="text-[#0a2225] font-medium">Window or aisle?</Label>
+                        <Input value={aboutDetails.window_or_aisle || ""} onChange={(e) => setAbout("window_or_aisle", e.target.value)} placeholder="Window, always" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-[#0a2225] font-medium">Most unforgettable trip</Label>
+                        <Input value={aboutDetails.favorite_trip || ""} onChange={(e) => setAbout("favorite_trip", e.target.value)} placeholder="Sunrise over Bagan in a hot-air balloon" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-[#0a2225] font-medium">Still on the dream list</Label>
+                        <Input value={aboutDetails.dream_destination || ""} onChange={(e) => setAbout("dream_destination", e.target.value)} placeholder="Antarctica by expedition ship" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-[#0a2225] font-medium">A travel tip you swear by</Label>
+                        <Input value={aboutDetails.travel_tip || ""} onChange={(e) => setAbout("travel_tip", e.target.value)} placeholder="Book the first morning slot at major sights" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
