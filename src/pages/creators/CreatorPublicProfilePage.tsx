@@ -116,6 +116,18 @@ export default function CreatorPublicProfilePage() {
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
   const [creatorData, setCreatorData] = useState<CreatorProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  // Optional fun facts from profiles.about_details (fetched directly —
+  // the creator directory object doesn't carry new columns).
+  const [aboutDetails, setAboutDetails] = useState<Record<string, any> | null>(null);
+  useEffect(() => {
+    if (!id) return;
+    supabase
+      .from("profiles")
+      .select("about_details")
+      .eq("id", id)
+      .maybeSingle()
+      .then(({ data }) => setAboutDetails(((data as any)?.about_details) ?? null));
+  }, [id]);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
@@ -737,6 +749,10 @@ export default function CreatorPublicProfilePage() {
                     positioningTitle && positioningTitle !== "Travel Designer" && { k: "Specialty", v: positioningTitle },
                     creator.created_at && { k: "Member since", v: String(new Date(creator.created_at).getFullYear()) },
                     responseTimeText && { k: "Responds in", v: responseTimeText },
+                    aboutDetails?.countries_visited && { k: "Countries visited", v: String(aboutDetails.countries_visited) },
+                    aboutDetails?.languages_spoken && { k: "Languages", v: String(aboutDetails.languages_spoken) },
+                    aboutDetails?.three_words && { k: "Travel style", v: String(aboutDetails.three_words) },
+                    aboutDetails?.window_or_aisle && { k: "Window or aisle", v: String(aboutDetails.window_or_aisle) },
                   ]
                     .filter(Boolean)
                     .map((f: any, i, arr) => (
@@ -751,6 +767,24 @@ export default function CreatorPublicProfilePage() {
                       </div>
                     ))}
                 </div>
+
+                {/* Narrative fun-facts — full width below the About grid */}
+                {(aboutDetails?.favorite_trip || aboutDetails?.dream_destination || aboutDetails?.travel_tip) && (
+                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[
+                      { q: "Most unforgettable trip", a: aboutDetails?.favorite_trip },
+                      { q: "Still on the dream list", a: aboutDetails?.dream_destination },
+                      { q: "A tip I swear by", a: aboutDetails?.travel_tip },
+                    ]
+                      .filter((x) => x.a)
+                      .map((x) => (
+                        <div key={x.q} className="rounded-[20px] border border-[#E5DFC6] bg-white p-5">
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-[#8D6B2F] font-semibold">{x.q}</p>
+                          <p className="mt-2 font-secondary text-[17px] leading-snug text-[#0a2225]">{String(x.a)}</p>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
