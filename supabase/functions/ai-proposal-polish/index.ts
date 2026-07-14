@@ -170,6 +170,19 @@ serve(async (req) => {
     const role = body.role === "creator" ? "travel creator" : "travel agent";
     const budgetMin = Number(body.budgetMin) || 0;
     const budgetMax = Number(body.budgetMax) || 0;
+    // ISO trip dates (optional) → exact day count computed in code, because
+    // models reliably fail calendar arithmetic on display strings like
+    // "Jul 27 – Aug 4" and fall back to the 7-day default.
+    const startDateIso = String(body.startDate ?? "").slice(0, 24).trim();
+    const endDateIso = String(body.endDate ?? "").slice(0, 24).trim();
+    let tripDays = 0;
+    if (startDateIso && endDateIso) {
+      const sMs = Date.parse(startDateIso);
+      const eMs = Date.parse(endDateIso);
+      if (Number.isFinite(sMs) && Number.isFinite(eMs) && eMs >= sMs) {
+        tripDays = Math.min(30, Math.round((eMs - sMs) / 86400000) + 1);
+      }
+    }
     const budget =
       budgetMin || budgetMax
         ? `$${budgetMin.toLocaleString()}${budgetMax ? ` – $${budgetMax.toLocaleString()}` : "+"}`
@@ -200,6 +213,7 @@ serve(async (req) => {
         `Specialist role: ${role}`,
         destination ? `Trip destination: ${destination}` : "",
         dates ? `Trip dates: ${dates}` : "",
+        tripDays > 0 ? `Trip length: ${tripDays} days.` : "",
         budget ? `Traveler's stated budget: ${budget}` : "",
         currentHeadline ? `Their current headline draft: "${currentHeadline}"` : "",
         "",
@@ -234,7 +248,9 @@ serve(async (req) => {
         "Output strict JSON with EXACTLY these keys:",
         '{ "headline": string, "pitch": string, "itinerary_summary": string, "inclusions": string[], "exclusions": string[], "price_per_person": number, "deposit_percentage": number, "delivery_days": number, "cancellation_terms": string, "booking_management": boolean, "on_trip_support": boolean }',
         "headline: max 9 words, title case. pitch: 120–190 words, 2–3 paragraphs separated by \\n\\n.",
-        "itinerary_summary: one line per day in the form 'Day N: ...' covering the trip length implied by the dates (default 7 days if unknown).",
+        tripDays > 0
+          ? `itinerary_summary: EXACTLY ${tripDays} lines, one per day, each in the form 'Day N: ...' — this trip runs ${tripDays} days. Do not stop early and do not default to 7.`
+          : "itinerary_summary: one line per day in the form 'Day N: ...' covering the trip length implied by the dates (default 7 days if unknown).",
         "inclusions: 5–9 lines. exclusions: 3–6 lines. deposit_percentage: 20–40 (default 25). delivery_days: 3–10 (days to deliver the full itinerary after acceptance).",
         "cancellation_terms: 2–3 sentences, plain language, consistent with a 25% deposit and tiered refunds; no legal jargon.",
         "booking_management/on_trip_support: true when the notes or a full-service posture support them.",
@@ -243,6 +259,7 @@ serve(async (req) => {
         `Specialist role: ${role}`,
         destination ? `Trip destination: ${destination}` : "",
         dates ? `Trip dates: ${dates}` : "",
+        tripDays > 0 ? `Trip length: ${tripDays} days.` : "",
         budget ? `Traveler's stated budget (per person): ${budget}` : "",
         interests ? `Traveler's interests: ${interests}` : "",
         requestDescription ? `Traveler's request, in their words:\n"""${requestDescription}"""` : "",
