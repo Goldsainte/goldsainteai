@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import ProposalCard from "@/components/marketplace/ProposalCard";
 import { Loader2, MapPin, Calendar, Users, DollarSign } from "lucide-react";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
@@ -50,7 +51,7 @@ export type Proposal = {
 type TripRequest = {
   id: string;
   tripTitle: string;
-  status: "open" | "in_progress" | "closed";
+  status: "open" | "matched" | "in_progress" | "completed" | "cancelled" | "closed";
   destination: string;
   departingFrom: string;
   dateRangeLabel: string;
@@ -286,6 +287,30 @@ export default function TripRequestDetail() {
       return;
     }
     navigate(`/proposals/new?tripId=${request?.id}`);
+  }
+
+  async function handleCloseRequest() {
+    if (!request) return;
+    const ok = await confirmDialog({
+      title: "Close this trip request?",
+      description:
+        "It will leave the open marketplace immediately and agents and creators will no longer be able to submit proposals.",
+      confirmText: "Close request",
+      destructive: true,
+    });
+    if (!ok) return;
+    try {
+      const { error } = await supabase
+        .from("trip_requests")
+        .update({ status: "cancelled" })
+        .eq("id", request.id);
+      if (error) throw error;
+      setRequest({ ...request, status: "cancelled" });
+      toast.success("Your request is closed and off the marketplace.");
+    } catch (err: any) {
+      console.error("Failed to close trip request", err);
+      toast.error(err.message || "Failed to close the request");
+    }
   }
 
   if (loading) {
@@ -626,11 +651,31 @@ export default function TripRequestDetail() {
                 )}
                 {/* Honest states instead of a silent dead-end: say WHY there is
                     no submit button, mirroring the own-trip message pattern. */}
-                {isRequestOwner && (
+                {isRequestOwner && request.status === "open" && (
+                  <div className="space-y-4">
+                    <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                      This is your trip request — you can't submit a proposal to
+                      yourself. Proposals from agents and creators will appear
+                      below as they come in.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleCloseRequest}
+                      className="block w-full rounded-full border border-[#0a2225]/15 py-3 text-center text-[12px] font-medium uppercase tracking-[0.12em] text-[#8b3a2e] transition-colors hover:border-[#8b3a2e]/40 hover:bg-[#8b3a2e]/5 min-h-[44px]"
+                    >
+                      Close This Request
+                    </button>
+                  </div>
+                )}
+                {isRequestOwner && request.status === "cancelled" && (
                   <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
-                    This is your trip request — you can't submit a proposal to
-                    yourself. Proposals from agents and creators will appear
-                    below as they come in.
+                    You closed this request — it's no longer visible on the open
+                    marketplace.
+                  </p>
+                )}
+                {isRequestOwner && request.status !== "open" && request.status !== "cancelled" && (
+                  <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                    Proposals are closed while this trip is underway.
                   </p>
                 )}
                 {!isRequestOwner && request.status !== "open" && (
