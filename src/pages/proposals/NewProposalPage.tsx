@@ -271,6 +271,10 @@ export default function NewProposalPage() {
           headline,
           destination: tripData?.destination ?? undefined,
           dates,
+          // ISO dates so the backend can compute the exact day count —
+          // the display string alone made the AI default to 7-day itineraries.
+          startDate: tripData?.start_date ?? undefined,
+          endDate: tripData?.end_date ?? undefined,
           budgetMin: tripData?.budget_min ?? undefined,
           budgetMax: tripData?.budget_max ?? undefined,
           role: proposerRole,
