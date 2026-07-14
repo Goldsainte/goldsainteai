@@ -835,8 +835,8 @@ export default function ProposalDetailPage() {
                       {/* Status messaging */}
                       <div className="bg-muted/50 rounded-lg p-3">
                         <p className="text-sm text-muted-foreground">
-                          {proposal.status === "sent" && "The traveler hasn't reviewed this yet. You can withdraw or edit while it's pending."}
-                          {proposal.status === "traveler_review" && "The traveler is currently reviewing your proposal."}
+                          {proposal.status === "sent" && "The traveler hasn't reviewed this yet. You can withdraw or edit while it's pending — and you'll get an email the moment they respond."}
+                          {proposal.status === "traveler_review" && "The traveler is currently reviewing your proposal. You'll get an email when they decide — no need to keep checking."}
                           {proposal.status === "accepted" && "This proposal has been accepted. A booking has been created."}
                           {proposal.status === "declined" && "This proposal was declined by the traveler."}
                           {proposal.status === "withdrawn" && "You withdrew this proposal."}
