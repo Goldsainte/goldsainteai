@@ -484,7 +484,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                   <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
                   <Input
                     ref={mobileInputRef}
-                    className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
+                    className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 sm:pl-10 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
                     placeholder="Where are you going?"
                     value={destination}
                     onChange={(e) => {
