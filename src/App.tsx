@@ -13,6 +13,7 @@ import { Footer } from "@/components/Footer";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import FeatureAnnouncement from "@/components/announcements/FeatureAnnouncement";
 import { OnboardingWelcomeModal } from "@/components/OnboardingWelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -157,6 +158,7 @@ function AppContent() {
       <OnboardingWelcomeModal />
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
       <OnboardingTour />
+      <FeatureAnnouncement />
       {hideHeader ? null : <Header />}
       <main id="main-content" className="flex-1 flex flex-col" tabIndex={-1}>
         <RouteSectionBoundary section="app">
