@@ -289,7 +289,7 @@ export function TripRequestModal({
               <div className="relative">
                 <MapPin className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-[#BFAD72]" />
                 <Input
-                  className="pl-7 text-sm"
+                  className="pl-7 sm:pl-7 text-sm"
                   placeholder="e.g. Amalfi Coast, Barbados, Iceland"
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
