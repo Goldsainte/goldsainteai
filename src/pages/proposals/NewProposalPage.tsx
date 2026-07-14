@@ -362,10 +362,16 @@ export default function NewProposalPage() {
         toast.error(`${file.name} exceeds 50MB limit`);
         continue;
       }
-      const path = `${user.id}/${tripId}/${Date.now()}_${file.name}`;
+      // Storage keys reject spaces and special characters — a screenshot
+      // named "Screenshot 2026-07-13 at 5.39.25 PM.png" must be sanitized
+      // for the KEY while the original name is kept for display.
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `${user.id}/${tripId}/${Date.now()}_${safeName}`;
       const { error } = await supabase.storage.from("proposal-attachments").upload(path, file);
       if (error) {
-        toast.error(`Failed to upload ${file.name}`);
+        // Surface the REAL reason (invalid key vs bucket not found vs policy)
+        // instead of a generic message that hides the diagnosis.
+        toast.error(`Failed to upload ${file.name}: ${error.message}`);
         continue;
       }
       setUploadedFiles((prev) => [...prev, { name: file.name, path, size: file.size, type: file.type }]);
