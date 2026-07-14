@@ -1,5 +1,5 @@
 import "../_shared/resend-guard.ts";
-import { accumulateCollected, isFullyPaid } from '../_shared/payoutMath.ts';
+import { accumulateCollected, isFullyPaid, stripTravelerFee } from '../_shared/payoutMath.ts';
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
@@ -644,8 +644,26 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
 
     if (!bookingData) return;
 
-    // Increment partner (creator/agent) lifetime sales for tier progression
-    if (bookingData.partner_id) {
+    // ---- Money picture for THIS payment. The booking row was updated
+    // before this call, so metadata.amount_collected (fee-stripped dollars)
+    // already includes this charge. chargedNow is what actually hit the
+    // card (incl. the traveler-side 3.5% fee) — that's what a receipt must
+    // say to match their statement.
+    const totalPrice = Number(bookingData.total_price ?? 0);
+    const collected = Number((bookingData.metadata as any)?.amount_collected ?? 0);
+    const chargedNow = (session?.amount_total ?? 0) / 100;
+    const contributionNow = stripTravelerFee(session?.amount_total ?? 0);
+    const balanceDueNow = Math.max(0, Number((totalPrice - collected).toFixed(2)));
+    const nowPaidInFull = isFullyPaid(collected, totalPrice);
+    const isFirstPayment = collected - contributionNow < 0.01;
+    const currencyCode = (bookingData.currency || session?.currency || 'USD').toUpperCase();
+    const fmt = (n: number) =>
+      n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Increment partner (creator/agent) lifetime sales for tier progression.
+    // First payment only — this used to fire on the balance checkout too,
+    // double-counting every split-paid booking toward tiers.
+    if (bookingData.partner_id && isFirstPayment) {
       try {
         await supabaseClient.rpc('increment_lifetime_sales', {
           _user_id: bookingData.partner_id,
@@ -670,8 +688,10 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
       await supabaseClient.from('notifications').insert({
         user_id: bookingData.partner_id,
         type: 'booking_confirmed',
-        title: 'New booking confirmed',
-        message: 'A traveler has paid the deposit for your trip. Check your bookings dashboard.',
+        title: nowPaidInFull ? 'Booking paid in full' : 'New booking confirmed',
+        message: nowPaidInFull
+          ? `The traveler has paid in full — ${currencyCode} ${fmt(collected)} collected for this trip.`
+          : 'A traveler has paid the deposit for your trip. Check your bookings dashboard.',
         entity_type: 'trip_booking',
         entity_id: tripBookingId,
         action_url: '/partner-bookings',
@@ -716,23 +736,55 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
       ((bookingData as any).metadata?.trip_title as string | undefined) ||
       'your Goldsainte trip';
 
-    const { error: emailErr } = await supabaseClient.functions.invoke(
+    // Official receipt for the CHARGE itself — one per checkout session,
+    // deposit and balance alike (the balance payment used to produce no
+    // email at all). Stripe webhook redeliveries dedupe on the session id.
+    const { error: receiptErr } = await supabaseClient.functions.invoke(
       'send-transactional-email',
       {
         body: {
-          templateName: 'booking-confirmation-traveler',
+          templateName: 'payment-receipt',
           recipientEmail: travelerEmail,
-          idempotencyKey: `booking-confirmed-${tripBookingId}`,
+          idempotencyKey: `payment-receipt-${session?.id ?? session?.payment_intent ?? tripBookingId}`,
           templateData: {
-            bookingId: tripBookingId,
-            specialistName,
+            amount: `${currencyCode} ${fmt(chargedNow)}`,
             tripName,
+            bookingId: tripBookingId,
           },
         },
       }
     );
-    if (emailErr) {
-      console.error('Booking confirmation email dispatch failed', emailErr);
+    if (receiptErr) {
+      console.error('Payment receipt email dispatch failed', receiptErr);
+    }
+
+    // Booking confirmation with the money breakdown (deposit paid, trip
+    // total, balance remaining) — the registry rewrite had dropped these
+    // fields. First payment only; the idempotency key also protects it.
+    if (isFirstPayment) {
+      const { error: emailErr } = await supabaseClient.functions.invoke(
+        'send-transactional-email',
+        {
+          body: {
+            templateName: 'booking-confirmation-traveler',
+            recipientEmail: travelerEmail,
+            idempotencyKey: `booking-confirmed-${tripBookingId}`,
+            templateData: {
+              bookingId: tripBookingId,
+              specialistName,
+              tripName,
+              bookingReference: `GS-${tripBookingId.slice(0, 8).toUpperCase()}`,
+              tripTotal: fmt(totalPrice),
+              amountPaid: fmt(contributionNow),
+              balanceDue: balanceDueNow > 0 ? fmt(balanceDueNow) : undefined,
+              currency: currencyCode,
+            },
+          },
+        }
+      );
+      if (emailErr) {
+        console.error('Booking confirmation email dispatch failed', emailErr);
+      }
     }
   } catch (e) {
     console.error('notifyAndEmailOnBookingConfirmed error', e);
