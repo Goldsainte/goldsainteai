@@ -43,11 +43,14 @@ export async function sendProposal(id: string, validForDays = 5) {
 }
 
 export async function markProposalViewed(id: string) {
-  const { error } = await supabase
-    .from("trip_proposals")
-    .update({ status: "traveler_review" })
-    .eq("id", id)
-    .eq("status", "sent");
+  // Goes through a SECURITY DEFINER database function
+  // (mark_proposal_viewed) that verifies the caller owns the trip request
+  // and only moves the status from 'sent'. A direct row update here would
+  // require giving travelers UPDATE rights on other people's proposals —
+  // far too broad.
+  const { error } = await supabase.rpc("mark_proposal_viewed", {
+    p_proposal_id: id,
+  });
 
   if (error) {
     console.error("Error marking proposal viewed", error);
