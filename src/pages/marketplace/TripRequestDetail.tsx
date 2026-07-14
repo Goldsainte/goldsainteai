@@ -624,6 +624,20 @@ export default function TripRequestDetail() {
                     </p>
                   </>
                 )}
+                {/* Honest states instead of a silent dead-end: say WHY there is
+                    no submit button, mirroring the own-trip message pattern. */}
+                {isRequestOwner && (
+                  <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                    This is your trip request — you can't submit a proposal to
+                    yourself. Proposals from agents and creators will appear
+                    below as they come in.
+                  </p>
+                )}
+                {!isRequestOwner && request.status !== "open" && (
+                  <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                    This request is no longer accepting proposals.
+                  </p>
+                )}
               </div>
 
               {/* How it works — editorial dark card */}
