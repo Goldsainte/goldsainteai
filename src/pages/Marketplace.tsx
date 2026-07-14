@@ -81,8 +81,8 @@ export default function Marketplace() {
   // Standalone tours search: "I'm in New York, just show me tours" without a
   // trip search. Draft commits on submit (Enter / Search) so we don't hit the
   // Viator function per keystroke; falls back to the main destination filter.
-  const [tourSearchDraft, setTourSearchDraft] = useState("");
-  const [tourQuery, setTourQuery] = useState("");
+  const [tourSearchDraft, setTourSearchDraft] = useState(searchParams.get("tq") ?? "");
+  const [tourQuery, setTourQuery] = useState(searchParams.get("tq") ?? "");
 
   const queryClient = useQueryClient();
   const { isAdmin } = useUserRole();
@@ -111,8 +111,29 @@ export default function Marketplace() {
     if (filters.travelers && filters.travelers > 1) params.set("travelers", filters.travelers.toString());
     if (filters.infants && filters.infants > 0) params.set("infants", filters.infants.toString());
     if (filters.pets && filters.pets > 0) params.set("pets", filters.pets.toString());
-    setSearchParams(params, { replace: true });
-  }, [activeTab, filters, setSearchParams]);
+    if (tourQuery) params.set("tq", tourQuery);
+    // Real navigation (tab switch, destination selection) PUSHES a history
+    // entry so the browser back button walks back through it; mere filter
+    // tweaks REPLACE so they don't spam history.
+    const navChanged =
+      searchParams.get("tab") !== activeTab ||
+      (searchParams.get("tq") ?? "") !== tourQuery;
+    setSearchParams(params, { replace: !navChanged });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, filters, tourQuery, setSearchParams]);
+
+  // Back/forward: when the URL changes underneath us (popstate), adopt it —
+  // without this, state re-writes the old URL and traps the back button.
+  useEffect(() => {
+    const urlTab = (searchParams.get("tab") as Tab) || "trips";
+    if (validTabs.includes(urlTab) && urlTab !== activeTab) setActiveTab(urlTab);
+    const urlTq = searchParams.get("tq") ?? "";
+    if (urlTq !== tourQuery) {
+      setTourQuery(urlTq);
+      setTourSearchDraft(urlTq);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const hasActiveFilters = !!(
     filters.destination ||
