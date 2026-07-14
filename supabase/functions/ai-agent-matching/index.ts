@@ -1,4 +1,5 @@
 import "../_shared/resend-guard.ts";
+import { emailShell } from "../_shared/brandEmail.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
@@ -231,8 +232,13 @@ Deno.serve(async (req) => {
               body: JSON.stringify({
                 from: 'Goldsainte Marketplace <hello@goldsainte.com>',
                 to: [agent.profiles.email],
-                subject: `🎯 Priority Match: ${job.title}`,
-                html: emailHtml,
+                subject: `Priority match: ${job.title}`,
+                html: emailShell(
+                  "A trip matched your specialty.",
+                  `<strong>${job.title}</strong> matches your profile and expertise. Review the traveler's brief on your dashboard and place your bid — priority matches move quickly.`,
+                  "View the match",
+                  "https://goldsainte.ai/agent-dashboard"
+                ),
               }),
             });
 
