@@ -18,12 +18,12 @@
     <!-- CSP Policy -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://browser.sentry-cdn.com https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://maps.googleapis.com https://js.stripe.com https://www.tiktok.com https://*.tiktokcdn.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://browser.sentry-cdn.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://www.google-analytics.com https://*.clarity.ms https://maps.googleapis.com https://js.stripe.com https://www.tiktok.com https://*.tiktokcdn.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' data: https://fonts.gstatic.com;
       img-src 'self' data: blob: https: http:;
       media-src 'self' blob: https: http:;
-      connect-src 'self' https://*.sentry.io https://*.google-analytics.com https://www.google.com https://*.clarity.ms https://maps.googleapis.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321 https://api.stripe.com https://www.tiktok.com https://*.tiktokcdn.com https://noembed.com;
+      connect-src 'self' https://*.sentry.io https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://browser.sentry-cdn.com https://www.google.com https://*.clarity.ms https://maps.googleapis.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321 https://api.stripe.com https://www.tiktok.com https://*.tiktokcdn.com https://noembed.com;
       frame-src 'self' blob: https://*.supabase.co https://js.stripe.com https://hooks.stripe.com https://www.tiktok.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;
       worker-src 'self' blob:;
       child-src 'self' blob:;
