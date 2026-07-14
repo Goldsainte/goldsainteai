@@ -28,6 +28,9 @@ import {
   type ProposalDetail,
 } from "@/services/proposalsService";
 import { withdrawProposal, markProposalViewed } from "@/services/proposalService";
+
+const humanize = (v?: string | null) =>
+  v ? v.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase()) : v;
 import { TrustSafetyInline } from "@/components/trust/TrustSafetyInline";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -299,7 +302,7 @@ export default function ProposalDetailPage() {
                   {formatMoney(proposal.price_from, proposal.currency || "USD")}
                 </p>
                 {pb?.pricing_type && (
-                  <p className="text-xs text-muted-foreground">{pb.pricing_type}</p>
+                  <p className="text-[12.5px] text-[#0a2225]/70">{humanize(pb.pricing_type)}</p>
                 )}
                 <div className="border-t pt-3 space-y-1.5">
                   {depositAmount && (
@@ -314,7 +317,7 @@ export default function ProposalDetailPage() {
                   {pb?.balance_due && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Balance Due</span>
-                      <span className="text-foreground">{pb.balance_due}</span>
+                      <span className="text-foreground">{humanize(pb.balance_due)}</span>
                     </div>
                   )}
                   {proposal.valid_until && isPending && (
@@ -447,14 +450,14 @@ export default function ProposalDetailPage() {
                   <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold">Pricing Breakdown</p>
                   <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                     {pb?.pricing_type && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Pricing Type</span>
-                        <span className="font-medium text-foreground">{pb.pricing_type}</span>
+                      <div className="flex justify-between text-[15px]">
+                        <span className="text-[#0a2225]/75">Pricing Type</span>
+                        <span className="font-medium text-foreground">{humanize(pb.pricing_type)}</span>
                       </div>
                     )}
                     {proposal.price_from && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Trip Cost</span>
+                      <div className="flex justify-between text-[15px]">
+                        <span className="text-[#0a2225]/75">Trip Cost</span>
                         <span className="font-semibold text-foreground">
                           {formatMoney(proposal.price_from, proposal.currency || "USD")}
                         </span>
@@ -464,27 +467,27 @@ export default function ProposalDetailPage() {
                     {/* Commission Structure */}
                     {pb?.commission_model && (
                       <div className="border-t pt-2 mt-2 space-y-1.5">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Commission Structure</p>
+                        <p className="text-xs font-semibold text-[#0a2225]/75 uppercase tracking-wide">Commission Structure</p>
                         {pb.commission_model === "percentage" && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Commission</span>
+                          <div className="flex justify-between text-[15px]">
+                            <span className="text-[#0a2225]/75">Commission</span>
                             <span className="font-medium text-foreground">{pb.commission_pct}% on total trip value</span>
                           </div>
                         )}
                         {pb.commission_model === "flat_fee" && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Service Fee</span>
+                          <div className="flex justify-between text-[15px]">
+                            <span className="text-[#0a2225]/75">Service Fee</span>
                             <span className="font-medium text-foreground">
                               {formatMoney(pb.flat_fee_amount, proposal.currency || "USD")}
-                              <span className="text-xs text-muted-foreground ml-1">
+                              <span className="text-xs text-[#0a2225]/75 ml-1">
                                 ({pb.flat_fee_covers === "planning" ? "Planning only" : pb.flat_fee_covers === "execution" ? "Planning + Execution" : "Full service"})
                               </span>
                             </span>
                           </div>
                         )}
                         {pb.commission_model === "hybrid" && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Service Fee + Commission</span>
+                          <div className="flex justify-between text-[15px]">
+                            <span className="text-[#0a2225]/75">Service Fee + Commission</span>
                             <span className="font-medium text-foreground">
                               {formatMoney(pb.hybrid_flat_fee, proposal.currency || "USD")} + {pb.hybrid_commission_pct}%
                             </span>
@@ -493,7 +496,7 @@ export default function ProposalDetailPage() {
                         {pb.commission_tiered && pb.commission_tiers && Array.isArray(pb.commission_tiers) && (
                           <div className="pl-2 space-y-1">
                             {(pb.commission_tiers as Array<{threshold: number; pct: number}>).map((tier, i) => (
-                              <p key={i} className="text-xs text-muted-foreground">
+                              <p key={i} className="text-xs text-[#0a2225]/75">
                                 {tier.threshold === Infinity || !tier.threshold
                                   ? `Above previous tier`
                                   : i === 0
@@ -510,16 +513,16 @@ export default function ProposalDetailPage() {
                     {/* Traveler-facing fee rows */}
                     {pb?.guest_service_fee_estimate && proposal.price_from && (
                       <div className="border-t pt-2 mt-2 space-y-1.5">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground flex items-center gap-1">
+                        <div className="flex justify-between text-[15px]">
+                          <span className="text-[#0a2225]/75 flex items-center gap-1">
                             Service Fee (3.5%)
                             <span title="Covers Goldsainte traveler protection, support, and secure payment processing." className="cursor-help">
-                              <Info className="h-3 w-3 text-muted-foreground" />
+                              <Info className="h-3 w-3 text-[#0a2225]/75" />
                             </span>
                           </span>
                           <span className="text-foreground">+{formatMoney(pb.guest_service_fee_estimate, proposal.currency || "USD")}</span>
                         </div>
-                        <div className="flex justify-between text-sm font-semibold">
+                        <div className="flex justify-between text-[15px] font-semibold">
                           <span className="text-foreground">Traveler Total</span>
                           <span className="text-foreground">{formatMoney(pb.traveler_total_estimate, proposal.currency || "USD")}</span>
                         </div>
@@ -529,16 +532,16 @@ export default function ProposalDetailPage() {
                     {/* Agent-facing rows (only for proposer) */}
                     {isProposer && pb?.agent_commission_estimate != null && (
                       <div className="border-t pt-2 mt-2 space-y-1.5">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Your Earnings</p>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Your Commission</span>
+                        <p className="text-xs font-semibold text-[#0a2225]/75 uppercase tracking-wide">Your Earnings</p>
+                        <div className="flex justify-between text-[15px]">
+                          <span className="text-[#0a2225]/75">Your Commission</span>
                           <span className="font-medium text-foreground">{formatMoney(pb.agent_commission_estimate, proposal.currency || "USD")}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Platform Fee (3.5%)</span>
+                        <div className="flex justify-between text-[15px]">
+                          <span className="text-[#0a2225]/75">Platform Fee (3.5%)</span>
                           <span className="text-destructive">-{formatMoney(Math.round((proposal.price_from || 0) * 0.035), proposal.currency || "USD")}</span>
                         </div>
-                        <div className="flex justify-between text-sm font-semibold">
+                        <div className="flex justify-between text-[15px] font-semibold">
                           <span className="text-emerald-700">Your Payout</span>
                           <span className="text-emerald-700">{formatMoney(pb.agent_payout_estimate, proposal.currency || "USD")}</span>
                         </div>
@@ -546,8 +549,8 @@ export default function ProposalDetailPage() {
                     )}
 
                     {pb?.planning_fee && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
+                      <div className="flex justify-between text-[15px]">
+                        <span className="text-[#0a2225]/75">
                           Planning Fee
                           {pb.planning_fee_refundable !== undefined && (
                             <Badge variant={pb.planning_fee_refundable ? "default" : "secondary"} className="text-[10px] ml-2">
@@ -561,12 +564,12 @@ export default function ProposalDetailPage() {
                       </div>
                     )}
                     {depositAmount && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Deposit ({proposal.deposit_percentage}%)</span>
+                      <div className="flex justify-between text-[15px]">
+                        <span className="text-[#0a2225]/75">Deposit ({proposal.deposit_percentage}%)</span>
                         <span className="font-medium text-foreground">
                           {formatMoney(depositAmount, proposal.currency || "USD")}
                           {proposal.deposit_due_days && (
-                            <span className="text-xs text-muted-foreground ml-1">
+                            <span className="text-xs text-[#0a2225]/75 ml-1">
                               due within {proposal.deposit_due_days} day{proposal.deposit_due_days === 1 ? "" : "s"}
                             </span>
                           )}
@@ -574,9 +577,9 @@ export default function ProposalDetailPage() {
                       </div>
                     )}
                     {pb?.balance_due && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Balance Due</span>
-                        <span className="text-foreground">{pb.balance_due}</span>
+                      <div className="flex justify-between text-[15px]">
+                        <span className="text-[#0a2225]/75">Balance Due</span>
+                        <span className="text-foreground">{humanize(pb.balance_due)}</span>
                       </div>
                     )}
                   </div>
@@ -585,7 +588,7 @@ export default function ProposalDetailPage() {
                 {/* Cancellation Policy */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold">Cancellation Policy</p>
+                    <p className="text-xs uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">Cancellation Policy</p>
                     {pb?.deposit_refundable && (
                       <Badge variant={pb.deposit_refundable === "fully" ? "default" : pb.deposit_refundable === "partial" ? "outline" : "secondary"} className="text-[10px]">
                         Deposit: {pb.deposit_refundable === "fully" ? "Fully Refundable" : pb.deposit_refundable === "partial" ? "Partially Refundable" : "Non-refundable"}
@@ -611,29 +614,29 @@ export default function ProposalDetailPage() {
                     </div>
                   ) : (
                     <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#0a2225]/75">
                         Standard Goldsainte cancellation policy applies. Contact your partner for specific terms.
                       </p>
                     </div>
                   )}
 
                   {pb?.change_fee && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <p className="text-sm text-[#0a2225]/75 flex items-center gap-2">
                       <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
                       Change fee: {formatMoney(pb.change_fee, proposal.currency || "USD")} per revision after approval
                     </p>
                   )}
 
                   {pb?.supplier_dependent && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                    <p className="text-sm text-[#0a2225]/75 flex items-center gap-2">
+                      <Info className="h-3.5 w-3.5 text-[#0a2225]/75" />
                       {pb.supplier_dependent_note || "Supplier cancellation policies may also apply."}
                     </p>
                   )}
 
                   {proposal.custom_cancellation_terms && (
                     <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">Additional Terms</p>
+                      <p className="text-xs uppercase tracking-wide text-[#0a2225]/75 font-semibold mb-1">Additional Terms</p>
                       <p className="text-sm text-foreground whitespace-pre-line">{proposal.custom_cancellation_terms}</p>
                     </div>
                   )}
@@ -641,15 +644,15 @@ export default function ProposalDetailPage() {
 
                 {/* Payment Schedule */}
                 <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold">Payment Schedule</p>
+                  <p className="text-xs uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">Payment Schedule</p>
                   {proposal.payment_schedule && proposal.payment_schedule.length > 0 ? (
                     <div className="rounded-lg border overflow-hidden">
                       <div className="overflow-x-auto"><table className="w-full text-sm">
                         <thead className="bg-muted/50">
                           <tr>
-                            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Milestone</th>
-                            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Due</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Amount</th>
+                            <th className="text-left px-4 py-2.5 font-medium text-[#0a2225]/75">Milestone</th>
+                            <th className="text-left px-4 py-2.5 font-medium text-[#0a2225]/75">Due</th>
+                            <th className="text-right px-4 py-2.5 font-medium text-[#0a2225]/75">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -663,7 +666,7 @@ export default function ProposalDetailPage() {
                             return (
                               <tr key={`${milestoneLabel}-${idx}`} className="border-t">
                                 <td className="px-4 py-3 font-medium text-foreground">{milestoneLabel}</td>
-                                <td className="px-4 py-3 text-muted-foreground">{item.due_on ? formatDate(item.due_on) : "—"}</td>
+                                <td className="px-4 py-3 text-[#0a2225]/75">{item.due_on ? formatDate(item.due_on) : "—"}</td>
                                 <td className="px-4 py-3 text-right font-semibold text-foreground">
                                   {milestoneAmount}
                                 </td>
@@ -675,14 +678,14 @@ export default function ProposalDetailPage() {
                     </div>
                   ) : (
                     <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#0a2225]/75">
                         Payment schedule hasn't been specified yet. Confirm the deposit and balance structure with your partner before proceeding.
                       </p>
                     </div>
                   )}
                 </div>
 
-                <p className="text-xs text-muted-foreground pt-2 border-t">
+                <p className="text-xs text-[#0a2225]/75 pt-2 border-t">
                   All payments are handled through Goldsainte's secure flow so your booking and any eligible refunds stay protected.
                 </p>
               </CardContent>
@@ -701,7 +704,7 @@ export default function ProposalDetailPage() {
                   {proposal.attachments.map((att) => (
                     <div key={att.id} className="flex items-center justify-between py-2.5 border-b last:border-0">
                       <div className="flex items-center gap-3 text-sm min-w-0">
-                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <FileText className="h-4 w-4 text-[#0a2225]/75 shrink-0" />
                         <span className="text-foreground font-medium break-all min-w-0">{att.file_name}</span>
                         {att.file_type && (
                           <Badge variant="outline" className="text-[10px]">{att.file_type}</Badge>
@@ -720,7 +723,7 @@ export default function ProposalDetailPage() {
                     return (
                     <div key={i} className="flex items-center justify-between gap-3 py-2.5 border-b last:border-0 min-w-0">
                       <div className="flex items-start gap-3 text-sm min-w-0">
-                        <ExternalLink className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                        <ExternalLink className="h-4 w-4 mt-0.5 text-[#0a2225]/75 shrink-0" />
                         <span className="text-foreground break-all min-w-0">{label}</span>
                       </div>
                       <Button variant="ghost" size="xs" asChild className="shrink-0">
