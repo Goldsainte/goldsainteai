@@ -33,7 +33,6 @@ type TripRequestData = {
   interests: string[] | null;
 };
 
-type Milestone = { name: string; percentage: number };
 type CancellationWindow = { band: string; refund_pct: number };
 type UploadedFile = { name: string; path: string; size: number; type: string };
 type CommissionModel = "percentage" | "flat_fee" | "hybrid";
@@ -111,11 +110,6 @@ export default function NewProposalPage() {
   const [depositDueDays, setDepositDueDays] = useState<number | "">(7);
   const [balanceDue, setBalanceDue] = useState("before_departure");
   const [pricingConfirmed, setPricingConfirmed] = useState("confirmed");
-  const [paymentScheduleType, setPaymentScheduleType] = useState("full_on_acceptance");
-  const [milestones, setMilestones] = useState<Milestone[]>([
-    { name: "Deposit", percentage: 50 },
-    { name: "Final Payment", percentage: 50 },
-  ]);
   const [deliveryDays, setDeliveryDays] = useState<number | "">(7);
 
   // Commission model
@@ -443,11 +437,24 @@ export default function NewProposalPage() {
       guest_service_fee_estimate: commissionCalc.guestFee,
     };
 
-    const paymentSchedule = paymentScheduleType === "milestone" || paymentScheduleType === "custom"
-      ? milestones
-      : paymentScheduleType === "50_50"
-        ? [{ name: "Deposit", percentage: 50 }, { name: "Final Payment", percentage: 50 }]
-        : [{ name: "Full Payment", percentage: 100 }];
+    // The payment schedule IS the platform's escrow model — derived from the
+    // deposit terms the agent already chose, never hand-authored. (The old
+    // schedule-type state was dead UI that silently saved "Full Payment
+    // 100%" onto every proposal, contradicting its own deposit terms.)
+    const paymentSchedule =
+      typeof depositPct === "number" && depositPct > 0 && depositPct < 100
+        ? [
+            {
+              name: "Deposit",
+              percentage: depositPct,
+              due:
+                typeof depositDueDays === "number"
+                  ? `Within ${depositDueDays} days of acceptance`
+                  : "On acceptance",
+            },
+            { name: "Balance", percentage: 100 - depositPct, due: "Before departure" },
+          ]
+        : [{ name: "Full Payment", percentage: 100, due: "On acceptance" }];
 
     const payload = {
       trip_request_id: tripId,
@@ -1536,17 +1543,17 @@ export default function NewProposalPage() {
                     </div>
                   </div>
 
-                  {/* Payment Schedule */}
-                  {paymentScheduleType !== "full_on_acceptance" && (
+                  {/* Payment Schedule — derived from the deposit terms above */}
+                  {typeof depositPct === "number" && depositPct > 0 && depositPct < 100 && (
                     <div className="rounded-lg border p-4 space-y-2">
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Payment Schedule</h3>
+                      <h3 className="text-xs font-semibold text-[#0a2225]/75 uppercase tracking-wider">Payment Schedule</h3>
                       <div className="space-y-1">
-                        {(paymentScheduleType === "50_50"
-                          ? [{ name: "Deposit", percentage: 50 }, { name: "Final Payment", percentage: 50 }]
-                          : milestones
-                        ).map((m, i) => (
-                          <div key={i} className="flex justify-between text-sm">
-                            <span>{m.name}</span>
+                        {[
+                          { name: "Deposit", percentage: depositPct, due: typeof depositDueDays === "number" ? `within ${depositDueDays} days of acceptance` : "on acceptance" },
+                          { name: "Balance", percentage: 100 - depositPct, due: "before departure" },
+                        ].map((m, i) => (
+                          <div key={i} className="flex justify-between text-[15px]">
+                            <span>{m.name} <span className="text-[#0a2225]/60">({m.due})</span></span>
                             <span className="font-medium">{m.percentage}%{typeof priceFrom === "number" ? ` ($${Math.round(priceFrom * m.percentage / 100).toLocaleString()})` : ""}</span>
                           </div>
                         ))}
