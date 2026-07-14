@@ -70,10 +70,10 @@ const SECTIONS = [
     body: "Exact terms for your booking are defined in the proposal and the underlying supplier rules. The following is a simplified guide only — the binding terms are always those in your confirmed booking documents.",
     tiers: [
       {
-        window: "60–90+ days before departure",
+        window: "60+ days before departure",
         label: "Far in advance",
         color: "#0c4d47",
-        desc: "More options may be available for partial refunds or credits, subject to supplier rules and the travel professional's policy. This is the best time to make changes.",
+        desc: "The most generous window. Many professionals offer their highest refund percentages here, subject to supplier rules. This is the best time to make changes.",
       },
       {
         window: "30–59 days before departure",
@@ -82,15 +82,21 @@ const SECTIONS = [
         desc: "Partial refunds may still be available on some components. Non-refundable elements begin to take effect. Review your specific booking terms.",
       },
       {
-        window: "Inside 30 days",
+        window: "14–29 days before departure",
         label: "Close in",
         color: "#ba7517",
-        desc: "Trips may become partially or fully non-refundable. Supplier rules become most restrictive. Travel insurance becomes especially valuable here.",
+        desc: "Refund percentages typically drop significantly. Supplier rules become more restrictive. Travel insurance becomes especially valuable here.",
+      },
+      {
+        window: "Under 14 days before departure",
+        label: "Final window",
+        color: "#993c1d",
+        desc: "Trips are commonly fully non-refundable this close to departure, per the professional's stated tiers and supplier rules.",
       },
       {
         window: "After departure",
         label: "In-trip or post-departure",
-        color: "#993c1d",
+        color: "#7a2f18",
         desc: "Most services are fully non-refundable. No-shows are typically treated as full forfeiture per supplier rules.",
       },
     ],
@@ -111,11 +117,11 @@ const SECTIONS = [
     icon: Scale,
     eyebrow: "06 — Disputes",
     title: "If something goes wrong, file a claim from your booking page.",
-    body: "Goldsainte is not responsible for the acts, errors, or omissions of independent travel professionals or suppliers. However, if you have a dispute, our team reviews evidence from both parties and issues a binding decision within 7 business days.",
+    body: "Goldsainte is not responsible for the acts, errors, or omissions of independent travel professionals or suppliers. However, if you have a dispute, our team reviews evidence from both parties and aims to issue a binding decision within 7 business days.",
     points: [
       "File a claim directly from your booking page",
       "Our team reviews on-platform messages, documents, and payment records",
-      "Binding decision issued within 7 business days",
+      "We aim to issue a binding decision within 7 business days",
       "Escalation path to senior review available if needed",
     ],
     cta: { label: "View full dispute process", to: "/trust-safety" },
