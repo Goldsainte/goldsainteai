@@ -18,6 +18,7 @@ const transitions: Record<
   open: {
     admin: ["matched", "cancelled"],
     creator_agent: ["in_progress"], // If they manually pick it up
+    traveler: ["cancelled"], // Owner may close their own request before anyone picks it up
   },
   matched: {
     creator_agent: ["in_progress"],
