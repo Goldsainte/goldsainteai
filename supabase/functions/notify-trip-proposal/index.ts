@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-import { generateProposalReceivedEmail } from "./_templates/proposal-received-email.ts";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 function corsHeaders(req?: Request): Record<string, string> {
@@ -29,8 +27,6 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
     // Fetch trip request to get user_id and traveler profile
     const { data: tripRequest, error: tripError } = await supabaseClient
       .from("trip_requests")
@@ -53,7 +49,7 @@ serve(async (req) => {
     // Get the latest proposal for this trip with proposer info
     const { data: proposal, error: proposalError } = await supabaseClient
       .from("trip_proposals")
-      .select("proposer_role, headline, price_from, proposer_id")
+      .select("id, proposer_role, headline, price_from, proposer_id")
       .eq("trip_request_id", tripRequestId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -74,37 +70,32 @@ serve(async (req) => {
     const proposerName = proposerProfile?.first_name || proposerProfile?.username || "A creator";
     const roleLabel = proposal.proposer_role === "creator" ? "TikTok Creator" : "Travel Agent";
     const priceText = proposal.price_from ? ` starting from $${proposal.price_from} per person` : "";
-    const travelerFirstName = travelerProfile?.first_name || "there";
     const travelerEmail = travelerProfile?.email;
 
-    // Send email notification via Resend
+    // Traveler email — routed through the branded template registry
+    // (send-transactional-email + 'new-proposal-received': headline, Next
+    // Steps, escrow framing, on-platform reminder). This function used to
+    // render one-off inline HTML here; that was the last off-brand email a
+    // traveler could hit in the core proposal flow.
     if (travelerEmail) {
-      try {
-        const emailHtml = generateProposalReceivedEmail({
-          firstName: travelerFirstName,
-          tripTitle: tripRequest.title || `Trip to ${tripRequest.destination}`,
-          destination: tripRequest.destination || "your destination",
-          proposerName,
-          proposerRole: roleLabel,
-          priceFrom: proposal.price_from,
-          headline: proposal.headline,
-          tripRequestId,
-        });
-
-        const { error: emailError } = await resend.emails.send({
-          from: "Goldsainte <hello@goldsainte.com>",
-          to: [travelerEmail],
-          subject: "Your Goldsainte trip just received a new proposal",
-          html: emailHtml,
-        });
-
-        if (emailError) {
-          console.error("[NOTIFY_TRIP_PROPOSAL] Email error:", emailError);
-        } else {
-          console.log("[NOTIFY_TRIP_PROPOSAL] Email sent successfully to:", travelerEmail);
+      const { error: emailError } = await supabaseClient.functions.invoke(
+        "send-transactional-email",
+        {
+          body: {
+            templateName: "new-proposal-received",
+            recipientEmail: travelerEmail,
+            idempotencyKey: `new-proposal-${proposal.id}`,
+            templateData: {
+              proposalId: proposal.id,
+              specialistName: proposerName,
+            },
+          },
         }
-      } catch (emailError) {
-        console.error("[NOTIFY_TRIP_PROPOSAL] Email send failed:", emailError);
+      );
+      if (emailError) {
+        console.error("[NOTIFY_TRIP_PROPOSAL] Email error:", emailError);
+      } else {
+        console.log("[NOTIFY_TRIP_PROPOSAL] Branded email dispatched to:", travelerEmail);
       }
     }
 
