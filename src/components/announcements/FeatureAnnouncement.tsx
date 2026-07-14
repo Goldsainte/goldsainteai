@@ -11,7 +11,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -95,33 +94,31 @@ export default function FeatureAnnouncement() {
 
   return (
     <Dialog open onOpenChange={(open) => !open && dismiss()}>
-      <DialogContent className="max-w-md overflow-hidden rounded-[24px] border-[#E5DFC6] p-0">
-        <div className="bg-[#0c4d47] px-7 pb-6 pt-7">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] font-semibold">
-            {active.eyebrow}
-          </p>
-          <h2 className="mt-2 font-secondary text-[24px] font-semibold leading-snug text-white">
-            {active.title}
-          </h2>
-        </div>
-        <div className="px-7 pb-7 pt-5">
-          <p className="text-[15px] leading-relaxed text-[#0a2225]/75">
-            {active.body}
-          </p>
-          <div className="mt-6 flex items-center gap-3">
-            <Button
-              onClick={goToFeature}
-              className="h-11 flex-1 rounded-full bg-[#C7A962] text-sm font-semibold text-[#0a2225] hover:bg-[#b6984f]"
-            >
-              {active.ctaLabel}
-            </Button>
-            <button
-              onClick={dismiss}
-              className="px-3 text-sm text-[#0a2225]/50 hover:text-[#0a2225]/75"
-            >
-              Maybe later
-            </button>
-          </div>
+      <DialogContent className="max-w-md rounded-[24px] border border-[#E5DFC6] bg-[#FDF9F0] p-8">
+        {/* Atelier voice: ink on cream, muted-green eyebrow, serif headline,
+            deep-green pill primary — gold is an accent here, not a voice. */}
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+          {active.eyebrow}
+        </p>
+        <h2 className="mt-2 font-secondary text-[26px] leading-tight text-[#0a2225]">
+          {active.title}
+        </h2>
+        <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
+          {active.body}
+        </p>
+        <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <button
+            onClick={goToFeature}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors"
+          >
+            {active.ctaLabel}
+          </button>
+          <button
+            onClick={dismiss}
+            className="inline-flex items-center justify-center rounded-full border border-[#0c4d47]/25 px-6 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-white transition-colors"
+          >
+            Maybe later
+          </button>
         </div>
       </DialogContent>
     </Dialog>
