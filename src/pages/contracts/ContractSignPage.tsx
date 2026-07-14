@@ -637,7 +637,9 @@ export default function ContractSignPage() {
                     This contract is fully executed.
                   </p>
                   <p className="text-sm text-green-800">
-                    Both parties have signed. You can now proceed to deposit.
+                    {userRole === "traveler"
+                      ? "Both parties have signed. Next: pay your deposit from your booking — it stays in escrow, and only you can release it after your specialist shows you confirmed reservations."
+                      : "Both parties have signed. Next: the traveler pays the deposit — you'll be notified. Then share the confirmed reservations in Messages so they can release it to you."}
                   </p>
                 </div>
               </div>
