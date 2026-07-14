@@ -1,4 +1,5 @@
 import "../_shared/resend-guard.ts";
+import { emailShell } from "../_shared/brandEmail.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
@@ -67,22 +68,15 @@ serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'Luxury Travel <hello@goldsainte.com>',
+              from: 'Goldsainte <hello@goldsainte.com>',
               to: [agent.email],
-              subject: `New Travel Job: ${jobTitle}`,
-              html: `
-                <h2>New Job Opportunity!</h2>
-                <p>Hello ${agent.primary_contact_name || agent.agency_name},</p>
-                <p>A new job has been posted on the marketplace that might interest you:</p>
-                <ul>
-                  <li><strong>Title:</strong> ${jobTitle}</li>
-                  <li><strong>Description:</strong> ${jobDescription}</li>
-                  <li><strong>Destination:</strong> ${destination}</li>
-                  <li><strong>Budget:</strong> $${budgetMin} - $${budgetMax}</li>
-                </ul>
-                <p>Log in to your agent dashboard to view full details and place your bid!</p>
-                <p>Best regards,<br/>The Luxury Travel Team</p>
-              `,
+              subject: `New trip on the marketplace: ${jobTitle}`,
+              html: emailShell(
+                "A new trip is looking for its specialist.",
+                `Hello ${agent.primary_contact_name || agent.agency_name},<br/><br/><strong>${jobTitle}</strong> was just posted on the Goldsainte marketplace. Review the traveler's brief and place your bid before another specialist does.`,
+                "View & bid",
+                "https://goldsainte.ai/agent-dashboard"
+              ),
             }),
           })
             .then((response) => response.json())
