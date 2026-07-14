@@ -735,14 +735,24 @@ export default function ProposalDetailPage() {
                 <CardContent className="p-6 pt-2">
                   <p className="text-sm text-muted-foreground mb-3">If the traveler accepts this proposal:</p>
                   <ol className="space-y-2.5">
-                    {[
-                      depositAmount
-                        ? `Deposit of ${formatMoney(depositAmount, proposal.currency || "USD")} is charged`
-                        : "Deposit is charged upon acceptance",
-                      "Proposal becomes an active booking",
-                      "Itinerary confirmation begins",
-                      "Final documents delivered before departure",
-                    ].map((step, i) => (
+                    {(isProposer
+                      ? [
+                          "The proposal becomes an active booking — and the first move is YOURS: open the booking and hit Create contract (Goldsainte AI can draft it for you), then send it. Both of you sign; nothing moves until it's fully executed.",
+                          `Once both signatures are in, the traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow — not released to you yet.`,
+                          "You secure the reservations and share the confirmations with the traveler in Messages.",
+                          "The traveler reviews the confirmations and releases the deposit to you as working capital (minus the platform fee).",
+                          "The traveler pays the balance before departure; it stays in escrow through the trip.",
+                          "After the trip, the traveler confirms completion and your final payout is released.",
+                        ]
+                      : [
+                          "Accepting creates your booking. Your specialist prepares and sends the contract for both of you to sign — nothing is owed until it's fully executed.",
+                          `Once both signatures are in, you pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow and stays under your control.`,
+                          "Your specialist secures the reservations and shares the confirmations with you in Messages.",
+                          "Only after you've reviewed them do you release the deposit so your specialist can lock everything in.",
+                          "The balance is due before departure and stays in escrow through your trip.",
+                          "When you confirm the trip went as agreed, the final payment is released to your specialist.",
+                        ]
+                    ).map((step, i) => (
                       <li key={i} className="flex items-start gap-3 text-sm text-foreground">
                         <span className="flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold shrink-0 mt-0.5">
                           {i + 1}
