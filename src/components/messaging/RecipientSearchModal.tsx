@@ -90,12 +90,19 @@ export function RecipientSearchModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0">
+      <DialogContent className="max-w-xl gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0 [&>button]:hidden">
         {/* Header */}
-        <div className="flex h-14 items-center justify-center border-b border-[#E5DFC6]">
+        <div className="relative flex h-14 items-center justify-center border-b border-[#E5DFC6]">
           <h2 className="font-secondary text-[18px] font-semibold text-[#0a2225]">
             New message
           </h2>
+          <button
+            onClick={() => onOpenChange(false)}
+            aria-label="Close"
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#0a2225]/70 transition-colors hover:text-[#0a2225]"
+          >
+            <X className="h-5 w-5" strokeWidth={2} />
+          </button>
         </div>
 
         {/* To: row */}
@@ -118,13 +125,18 @@ export function RecipientSearchModal({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or @handle…"
-              className="min-w-[140px] flex-1 bg-transparent text-[15px] text-[#0a2225] outline-none placeholder:text-[#0a2225]/40"
+              className="min-w-[140px] flex-1 appearance-none border-0 bg-transparent p-0 text-[15px] text-[#0a2225] shadow-none outline-none ring-0 placeholder:text-[#0a2225]/40 focus:border-0 focus:shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+              style={{ boxShadow: "none" }}
             />
           )}
         </div>
 
         {/* Results */}
-        <div className="h-[320px] overflow-y-auto py-2">
+        <div
+          className={`overflow-y-auto py-2 transition-all ${
+            q.length >= 2 || selected ? "h-[320px]" : "h-[120px]"
+          }`}
+        >
           {loading && (
             <div className="flex items-center gap-2 px-5 py-3 text-sm text-[#0a2225]/50">
               <Loader2 className="h-4 w-4 animate-spin" /> Searching…
