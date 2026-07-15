@@ -1,5 +1,24 @@
 // ============================================================================
-// release-trip-deposit v4 — MILESTONE ESCROW
+// release-trip-deposit v5 — MILESTONE ESCROW
+// ============================================================================
+// v5 (Jul 15, launch eve) — three money-safety fixes over v4:
+//   1. CAPTURE-SKIP: checkout captures automatically (automatic_async), so
+//      v4's blind capture 400'd on every release (harmless but noisy, and one
+//      more call to fail). v5 retrieves the PI and captures only when it
+//      actually holds an uncaptured authorization.
+//   2. CHARGE DISCOVERY: v4 only knew the booking's stored payment intent —
+//      for two-payment bookings that's the FINAL payment, so the deposit
+//      release consumed the final charge's transfer capacity and the final
+//      release could never fit ($3.11 charge cannot fund $0.97 + $2.89).
+//      v5 discovers ALL of the booking's payments via Stripe PI search on
+//      metadata trip_booking_id (both checkouts stamp it), tracks capacity
+//      already consumed by earlier milestones, and anchors each milestone to
+//      the SMALLEST charge that still fits — deposit rides the deposit
+//      charge, final rides the balance charge.
+//   3. IDEMPOTENCY: transfer creation carries an idempotency key scoped to
+//      booking+milestone+anchor, so a double-click or network retry can
+//      never create a second transfer (the ledger's unique index remains the
+//      backstop).
 // ============================================================================
 // The combined model (decided Jul 11): traveler money sits with Goldsainte
 // and is released in up to two milestones, each paying 96.5% of its slice
@@ -276,44 +295,100 @@ Deno.serve(async (req) => {
       paymentIntentId = session.payment_intent;
     }
 
-    // Ensure the charge is captured (checkout normally auto-captures)
+    // Ensure the charge is captured. Checkout auto-captures
+    // (automatic_async), so a blind capture 400s on every release — retrieve
+    // first and capture only a genuine uncaptured authorization.
+    let storedPi: any;
     try {
-      await stripe.paymentIntents.capture(paymentIntentId);
+      storedPi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+        expand: ["latest_charge"],
+      });
     } catch (e: any) {
-      if (!String(e?.message || "").toLowerCase().includes("already")) {
+      return json(req, { error: `Could not load the booking's payment: ${e.message}` }, 500);
+    }
+    if (storedPi.status === "requires_capture") {
+      try {
+        await stripe.paymentIntents.capture(paymentIntentId);
+        storedPi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+          expand: ["latest_charge"],
+        });
+      } catch (e: any) {
         console.error("Capture failed", e);
         return json(req, { error: `Capture failed: ${e.message}` }, 500);
       }
     }
 
-    // Anchor the transfer to a settled charge (source_transaction) so escrow
-    // releases do NOT depend on the platform's *available* balance — new
-    // platforms have charges pending for ~2 business days, which made the
-    // first-ever release fail with "insufficient funds". Candidate charges:
-    // the booking's stored payment intent plus any recorded in
-    // metadata.payment_intents (the webhook appends one per payment). We use
-    // the first charge large enough to cover this payout; if none fits we
-    // fall back to an unanchored transfer (needs available balance) with the
-    // same honest error as before.
+    // ── Anchor the transfer to a specific charge (source_transaction) ──
+    // An anchored transfer draws on THAT charge's funds, so releases never
+    // depend on the platform's available balance (which sits negative or
+    // pending on a young platform). Rules that make two-milestone escrow
+    // work:
+    //   • Candidates: the stored PI, every PI the webhook recorded, and — the
+    //     safety net for bookings that predate the webhook change — a Stripe
+    //     search for all PIs stamped with this booking id.
+    //   • A charge's capacity is its GROSS amount minus what earlier
+    //     milestones already transferred from it (tracked on booking
+    //     metadata as deposit_source_charge_id).
+    //   • Pick the SMALLEST charge that still fits, preserving the larger
+    //     charge's headroom for the larger milestone.
+    // If nothing fits we fall back to an unanchored transfer (needs available
+    // balance) with the same honest error as before.
+    const payoutCents = toCents(payout);
+    const usedCentsOn = (chargeId: string): number =>
+      (meta as any).deposit_source_charge_id === chargeId && depositRow
+        ? toCents(Number(depositRow.payout_amount) || 0)
+        : 0;
+
     let sourceChargeId: string | null = null;
     try {
-      const meta = (booking.metadata as Record<string, unknown>) ?? {};
-      const candidates: string[] = [
-        paymentIntentId,
-        ...(Array.isArray((meta as any).payment_intents) ? (meta as any).payment_intents : []),
-      ].filter((v, i, a) => typeof v === "string" && v && a.indexOf(v) === i);
-      for (let cand of candidates.slice(0, 4)) {
-        if (cand.startsWith("cs_")) {
-          const sess = await stripe.checkout.sessions.retrieve(cand);
-          if (!sess.payment_intent || typeof sess.payment_intent !== "string") continue;
-          cand = sess.payment_intent;
+      const candidateIds = new Set<string>();
+      candidateIds.add(paymentIntentId);
+      const metaPis = Array.isArray((meta as any).payment_intents)
+        ? ((meta as any).payment_intents as unknown[])
+        : [];
+      for (const p of metaPis) {
+        if (typeof p === "string" && p) candidateIds.add(p);
+      }
+      try {
+        const found = await stripe.paymentIntents.search({
+          query: `metadata['trip_booking_id']:'${booking.id}'`,
+          limit: 10,
+        });
+        for (const pi of found.data) candidateIds.add(pi.id);
+      } catch (e) {
+        // Search lags ~1 min on brand-new objects and may be unavailable on
+        // some accounts — the stored/webhook candidates still apply.
+        console.error("PI search failed — continuing with stored candidates", e);
+      }
+
+      const usable: { id: string; remaining: number }[] = [];
+      for (let cand of [...candidateIds].slice(0, 8)) {
+        try {
+          if (cand.startsWith("cs_")) {
+            const sess = await stripe.checkout.sessions.retrieve(cand);
+            if (!sess.payment_intent || typeof sess.payment_intent !== "string") continue;
+            cand = sess.payment_intent;
+          }
+          const pi =
+            cand === storedPi.id
+              ? storedPi
+              : await stripe.paymentIntents.retrieve(cand, { expand: ["latest_charge"] });
+          const ch: any = pi.latest_charge;
+          if (!ch || typeof ch !== "object" || ch.status !== "succeeded") continue;
+          if (usable.some((u) => u.id === ch.id)) continue;
+          const remaining = Number(ch.amount) - usedCentsOn(ch.id);
+          if (remaining >= payoutCents) usable.push({ id: ch.id, remaining });
+        } catch (e) {
+          console.error(`source candidate ${cand} lookup failed`, e);
         }
-        const pi = await stripe.paymentIntents.retrieve(cand, { expand: ["latest_charge"] });
-        const ch: any = pi.latest_charge;
-        if (ch && typeof ch === "object" && ch.status === "succeeded" && ch.amount >= toCents(payout)) {
-          sourceChargeId = ch.id;
-          break;
-        }
+      }
+
+      usable.sort((a, b) => a.remaining - b.remaining);
+      sourceChargeId = usable[0]?.id ?? null;
+      if (!sourceChargeId) {
+        console.error(
+          `No charge with ${payoutCents}c capacity found for booking ${booking.id} — falling back to balance transfer`
+        );
       }
     } catch (e) {
       console.error("source_transaction lookup failed — falling back to balance transfer", e);
@@ -322,18 +397,30 @@ Deno.serve(async (req) => {
     // Transfer the milestone payout — Stripe amounts are in CENTS.
     let transferId: string;
     try {
-      const transfer = await stripe.transfers.create({
-        amount: toCents(payout),
-        currency,
-        destination: connectAccountId,
-        ...(sourceChargeId ? { source_transaction: sourceChargeId } : {}),
-        metadata: {
-          trip_booking_id: booking.id,
-          partner_id: booking.partner_id,
-          milestone: action === "release_deposit" ? "deposit" : "final",
-          type: "trip_booking_payout",
+      const transfer = await stripe.transfers.create(
+        {
+          amount: payoutCents,
+          currency,
+          destination: connectAccountId,
+          ...(sourceChargeId ? { source_transaction: sourceChargeId } : {}),
+          metadata: {
+            trip_booking_id: booking.id,
+            partner_id: booking.partner_id,
+            milestone: action === "release_deposit" ? "deposit" : "final",
+            type: "trip_booking_payout",
+            source_charge_id: sourceChargeId ?? "balance",
+          },
         },
-      });
+        {
+          // Scoped to booking+milestone+anchor: a straight retry replays the
+          // same result instead of double-paying; a retry after the anchor
+          // changed (e.g. first try fell back to balance) gets a fresh key
+          // rather than replaying a cached Stripe error.
+          idempotencyKey: `trip-payout-${booking.id}-${
+            action === "release_deposit" ? "deposit" : "final"
+          }-${sourceChargeId ?? "balance"}`,
+        }
+      );
       transferId = transfer.id;
     } catch (e: any) {
       console.error("Transfer failed", e);
@@ -395,6 +482,9 @@ Deno.serve(async (req) => {
               deposit_released_at: new Date().toISOString(),
               deposit_released_by: user.id,
               deposit_stripe_transfer_id: transferId,
+              // The final release subtracts this from the charge's capacity —
+              // one charge can fund both milestones only up to its gross.
+              deposit_source_charge_id: sourceChargeId,
             },
           };
 
