@@ -21,7 +21,7 @@ export const NewTripMatchEmail = ({ destination, requestId }: Props) => (
     `Communicate with the traveler on-platform once invited.`,
     `All accepted bookings settle through Goldsainte's escrow.`
   ]}
-    cta={{ label: 'View request', url: `https://goldsainte.ai/agent/requests/${requestId ?? ""}` }}
+    cta={{ label: 'View request', url: `https://goldsainte.ai/marketplace/request/${requestId ?? ""}` }}
   />
 )
 
