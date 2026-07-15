@@ -22,7 +22,7 @@ export const DisputeOpenedEmail = ({ disputeId, disputeOpenedBy, tripName }: Pro
     `Resolution typically occurs within 5–10 business days.`,
     `All comms regarding the dispute must remain on-platform.`
   ]}
-    cta={{ label: 'View dispute', url: `https://goldsainte.ai/disputes/${disputeId ?? ""}` }}
+    cta={{ label: 'View dispute', url: `https://goldsainte.ai/my-bookings` }}
   />
 )
 
