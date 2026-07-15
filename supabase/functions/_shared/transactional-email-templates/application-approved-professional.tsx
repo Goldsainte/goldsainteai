@@ -39,7 +39,7 @@ export const ApplicationApprovedProfessionalEmail = ({
       steps={steps}
       cta={{
         label: 'Sign in to your dashboard',
-        url: `https://goldsainte.ai/login?next=%2Fagent-dashboard`,
+        url: `https://goldsainte.ai/login?redirect=%2Fagent-dashboard`,
       }}
     />
   )
