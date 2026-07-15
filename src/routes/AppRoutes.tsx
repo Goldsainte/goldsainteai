@@ -370,6 +370,8 @@ export const AppRoutes = () => (
           </RequireAuth>
         )}
       />
+      {/* Stale-path healer: old links used the path form instead of ?tab= */}
+      <Route path="/marketplace/trip-requests" element={<Navigate to="/marketplace?tab=trip-requests" replace />} />
       <Route path="/my-trips" element={<Navigate to="/my-bookings" replace />} />
       <Route
         path="/post-trip"
