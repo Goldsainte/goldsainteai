@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 
 // Pipeline → Proposals: every proposal this creator/agent has sent, rendered
 // in the same card language as the traveler journeys page (MyBookingsPage):
@@ -126,13 +127,22 @@ export function CreatorProposalsTab() {
             to={`/proposals/${r.id}`}
             className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
           >
-            {/* Panel IS the card — sanctioned fallback treatment */}
+            {/* Photo IS the card — same destination imagery as the
+                marketplace request cards, gradient beneath as fallback */}
             <div className="relative h-44 overflow-hidden md:h-48">
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
                 <span className="font-secondary text-xl italic text-[#C7A962]/80">
                   {r.trip_request?.destination || "Goldsainte"}
                 </span>
               </div>
+              {r.trip_request?.destination && (
+                <img
+                  src={getTripRequestImageUrl(r.trip_request.destination)}
+                  alt={r.trip_request.destination}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+              )}
 
               {/* Status pill on the panel */}
               <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6] ring-1 ring-[#E5DFC6]/25">
