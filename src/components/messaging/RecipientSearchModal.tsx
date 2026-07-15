@@ -35,6 +35,7 @@ export function RecipientSearchModal({
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Recipient[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -51,18 +52,20 @@ export function RecipientSearchModal({
       }
 
       setLoading(true);
+      setSearchError(null);
       try {
         const { data, error } = await supabase
           .from("profiles")
           .select("id, display_name, full_name, username, avatar_url, account_type, is_verified")
           .neq("id", user?.id || "")
-          .or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`)
+          .or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%,username.ilike.%${search}%`)
           .limit(10);
 
         if (error) throw error;
         setResults(data || []);
-      } catch (e) {
+      } catch (e: any) {
         console.error("Search error:", e);
+        setSearchError(e?.message || "Search failed — please try again.");
         setResults([]);
       } finally {
         setLoading(false);
@@ -96,7 +99,7 @@ export function RecipientSearchModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#FDF9F0]">
+      <DialogContent className="sm:max-w-lg bg-[#FDF9F0] rounded-[24px] border border-[#E5DFC6]">
         <DialogHeader>
           <DialogTitle className="font-secondary text-[#0a2225] text-xl">
             New Message
@@ -107,10 +110,10 @@ export function RecipientSearchModal({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a9a9c]" />
             <Input
-              placeholder="Search by name, username, or email..."
+              placeholder="Search by name or username"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-white border-[#E5DFC6] focus:border-[#C7A962] rounded-full"
+              className="pl-10 sm:pl-10 bg-white border-[#E5DFC6] focus:border-[#C7A962] rounded-full"
             />
           </div>
 
@@ -134,9 +137,13 @@ export function RecipientSearchModal({
             {!loading && search.length < 2 && (
               <div className="text-center py-8">
                 <Search className="h-10 w-10 mx-auto text-[#C7A962] mb-2" />
+                {searchError ? (
+                  <p className="text-sm text-[#993c1d]">{searchError}</p>
+                ) : (
                 <p className="text-[#5a6c6e] text-sm">
                   Search for someone to message
                 </p>
+                )}
                 <p className="text-[#8a9a9c] text-xs mt-1">
                   Type at least 2 characters
                 </p>
