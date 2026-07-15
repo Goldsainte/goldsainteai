@@ -21,7 +21,7 @@ export const TripPublishedEmail = ({ tripId, tripName }: Props) => (
     `Refine pricing, photos, and inclusions anytime.`,
     `We promote the most exceptional listings to our curated audience.`
   ]}
-    cta={{ label: 'View live trip', url: `https://goldsainte.ai/marketplace/trips/${tripId ?? ""}` }}
+    cta={{ label: 'View live trip', url: `https://goldsainte.ai/creator-dashboard` }}
   />
 )
 
