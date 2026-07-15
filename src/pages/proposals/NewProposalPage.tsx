@@ -71,6 +71,8 @@ const CANCELLATION_LABELS: Record<string, string> = {
 export default function NewProposalPage() {
   const [searchParams] = useSearchParams();
   const tripId = searchParams.get("tripId") || "";
+  const editId = searchParams.get("edit");
+  const isEditing = !!editId;
   const navigate = useNavigate();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -141,6 +143,74 @@ export default function NewProposalPage() {
   const [onTripSupportLevel, setOnTripSupportLevel] = useState("business_hours");
   const [delConcierge, setDelConcierge] = useState(false);
   const [conciergeDetails, setConciergeDetails] = useState("");
+
+  // ── Edit mode: prefill every field from the existing proposal. The Edit
+  // button has ALWAYS navigated here with ?edit=<id>; the wizard just never
+  // read it — agents had to start over. Now it loads their work back. ──
+  const prefilledRef = useRef(false);
+  useEffect(() => {
+    if (!editId || prefilledRef.current) return;
+    (async () => {
+      const { data: p, error } = await supabase
+        .from("trip_proposals")
+        .select("*")
+        .eq("id", editId)
+        .maybeSingle();
+      if (error || !p) {
+        toast.error("Couldn't load this proposal for editing.");
+        return;
+      }
+      prefilledRef.current = true;
+      setHeadline(p.headline ?? "");
+      setMessage(p.message ?? "");
+      setItinerarySummary(p.itinerary_summary ?? "");
+      if (p.proposer_role === "agent" || p.proposer_role === "creator") setProposerRole(p.proposer_role);
+      if (typeof p.price_from === "number") setPriceFrom(p.price_from);
+      if (typeof p.deposit_percentage === "number") setDepositPct(p.deposit_percentage);
+      if (typeof p.deposit_due_days === "number") setDepositDueDays(p.deposit_due_days);
+      if (typeof p.nights === "number") setDeliveryDays(p.nights);
+      if (Array.isArray(p.inclusions)) setInclusionsText(p.inclusions.join("\n"));
+      if (Array.isArray(p.exclusions)) setExclusionsText(p.exclusions.join("\n"));
+      if (p.custom_cancellation_terms) setCustomCancellationTerms(p.custom_cancellation_terms);
+      const pb: any = p.price_breakdown ?? {};
+      if (pb.service_level) setServiceLevel(pb.service_level);
+      if (pb.revision_count != null) setRevisionCount(String(pb.revision_count));
+      if (pb.support_level) setSupportLevel(pb.support_level);
+      if (typeof pb.handles_supplier_payments === "boolean") setHandlesSupplierPayments(pb.handles_supplier_payments);
+      if (pb.pricing_type) setPricingType(pb.pricing_type);
+      if (pb.pricing_confirmed === false) setPricingConfirmed("estimated");
+      if (pb.balance_due) setBalanceDue(pb.balance_due);
+      if (pb.deposit_refundable) setDepositRefundable(pb.deposit_refundable);
+      if (Array.isArray(pb.cancellation_windows) && pb.cancellation_windows.length > 0) {
+        setCancellationWindows(
+          pb.cancellation_windows.map((w: any) => ({
+            label: w.label ?? "",
+            refund_percent: w.refund_percent ?? 0,
+          })) as any
+        );
+      }
+      if (pb.planning_fee) {
+        setHasPlanningFee(true);
+        setPlanningFee(pb.planning_fee);
+        setPlanningFeeRefundable(!!pb.planning_fee_refundable);
+      }
+      if (pb.change_fee) setChangeFee(pb.change_fee);
+      if (pb.supplier_dependent) {
+        setSupplierDependent(true);
+        setSupplierDependentNote(pb.supplier_dependent_note ?? "");
+      }
+      if (Array.isArray(pb.external_links)) {
+        const urls = pb.external_links.map((l: any) => l?.url).filter(Boolean);
+        if (urls.length > 0) setExternalLinks(urls);
+      }
+      if (pb.commission_model) setCommissionModel(pb.commission_model);
+      if (pb.commission_pct != null) setCommissionPct(pb.commission_pct);
+      if (pb.flat_fee_amount != null) setFlatFeeAmount(pb.flat_fee_amount);
+      if (pb.flat_fee_covers) setFlatFeeCovers(pb.flat_fee_covers);
+      if (pb.hybrid_flat_fee != null) setHybridFlatFee(pb.hybrid_flat_fee);
+      if (pb.hybrid_commission_pct != null) setHybridCommissionPct(pb.hybrid_commission_pct);
+    })();
+  }, [editId]);
 
   // Step 5 — Attachments
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -484,7 +554,25 @@ export default function NewProposalPage() {
       ...(proposerRole === "agent" ? { agent_id: user.id } : { creator_id: user.id }),
     };
 
-    const { data: insertedData, error } = await supabase.from("trip_proposals").insert(payload as any).select("id").single();
+    let insertedData: { id: string } | null = null;
+    let error: any = null;
+    if (editId) {
+      // Update in place: identity + status fields stay untouched.
+      const updatePayload: any = { ...payload };
+      delete updatePayload.trip_request_id;
+      delete updatePayload.proposer_id;
+      delete updatePayload.proposer_role;
+      delete updatePayload.status;
+      delete updatePayload.agent_id;
+      delete updatePayload.creator_id;
+      const res = await supabase.from("trip_proposals").update(updatePayload).eq("id", editId).select("id").single();
+      insertedData = res.data as any;
+      error = res.error;
+    } else {
+      const res = await supabase.from("trip_proposals").insert(payload as any).select("id").single();
+      insertedData = res.data as any;
+      error = res.error;
+    }
 
     if (error || !insertedData) {
       console.error("Proposal submit error", error);
@@ -507,10 +595,13 @@ export default function NewProposalPage() {
       );
     }
 
-    // Notify traveler (non-blocking)
-    supabase.functions.invoke("notify-trip-proposal", {
-      body: { tripRequestId: tripId },
-    }).catch((err) => console.error("Notification error:", err));
+    // Notify traveler (non-blocking) — only for NEW proposals; edits
+    // shouldn't re-send "you received a new proposal".
+    if (!editId) {
+      supabase.functions.invoke("notify-trip-proposal", {
+        body: { tripRequestId: tripId },
+      }).catch((err) => console.error("Notification error:", err));
+    }
 
     toast.success("Proposal submitted successfully!");
     navigate(`/proposals/${insertedData.id}`);
@@ -1632,21 +1723,21 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-terms" checked={ackTerms} onCheckedChange={(c) => setAckTerms(!!c)} className="mt-0.5" />
                       <Label htmlFor="ack-terms" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
-                        I agree to Goldsainte's marketplace terms and conditions
+                        I agree to Goldsainte's <a href="/terms" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>marketplace terms and conditions</a>
                       </Label>
                     </div>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-deposit" checked={ackDeposit} onCheckedChange={(c) => setAckDeposit(!!c)} className="mt-0.5" />
                       <Label htmlFor="ack-deposit" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
-                        I understand deposit handling rules and payment processing terms
+                        I understand the <a href="/terms" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>deposit handling rules and payment processing terms</a>
                       </Label>
                     </div>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-cancel" checked={ackCancellation} onCheckedChange={(c) => setAckCancellation(!!c)} className="mt-0.5" />
                       <Label htmlFor="ack-cancel" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
-                        I acknowledge that the cancellation policy and refund terms stated above are binding commitments
+                        I acknowledge that the <a href="/cancellation-refund-policy" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>cancellation policy and refund terms</a> stated above are binding commitments
                       </Label>
                     </div>
                   </div>
@@ -1751,7 +1842,7 @@ export default function NewProposalPage() {
                 disabled={submitting}
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0c4d47] px-8 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
               >
-                {submitting ? "Submitting…" : "Submit Proposal"} <Send className="h-3.5 w-3.5" />
+                {submitting ? (isEditing ? "Saving…" : "Submitting…") : isEditing ? "Save Changes" : "Submit Proposal"} <Send className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
