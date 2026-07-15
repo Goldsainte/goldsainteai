@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { DirectMessageInbox } from "@/components/messaging/DirectMessageInbox";
 import { BackButton } from "@/components/ui/BackButton";
-import { Sparkles, UserCircle2, X, Home, Compass, MessageCircle, Luggage, FileText, LayoutDashboard, TrendingUp } from "lucide-react";
+import { Sparkles, UserCircle2, X, Home, Compass, MessageCircle, Luggage, FileText, LayoutDashboard } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,6 @@ function MessagesRail() {
             label: "Dashboard",
             to: isCreator ? "/creator-dashboard" : "/agent-dashboard",
           },
-          { icon: TrendingUp, label: "Earnings", to: "/earnings" },
         ]
       : []),
   ];
