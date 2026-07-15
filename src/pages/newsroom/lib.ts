@@ -71,7 +71,7 @@ export function formatDate(iso?: string | null) {
 export async function fetchPublishedArticles(opts?: { type?: string; limit?: number }) {
   let q = (supabase as any)
     .from("newsroom_articles")
-    .select("*, author:newsroom_authors(*)")
+    .select("*, author:newsroom_authors(id, slug, full_name, title, avatar_url, bio, expertise, quote, signature_image_url, linkedin_url, twitter_url)")
     .eq("status", "published")
     .order("published_at", { ascending: false });
   if (opts?.type) q = q.eq("type", opts.type);
@@ -84,7 +84,7 @@ export async function fetchPublishedArticles(opts?: { type?: string; limit?: num
 export async function fetchArticleBySlug(slug: string) {
   const { data, error } = await (supabase as any)
     .from("newsroom_articles")
-    .select("*, author:newsroom_authors(*)")
+    .select("*, author:newsroom_authors(id, slug, full_name, title, avatar_url, bio, expertise, quote, signature_image_url, linkedin_url, twitter_url)")
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
@@ -94,7 +94,7 @@ export async function fetchArticleBySlug(slug: string) {
 export async function fetchAuthors() {
   const { data, error } = await (supabase as any)
     .from("newsroom_authors")
-    .select("*")
+    .select("id, slug, full_name, title, avatar_url, bio, expertise, quote, signature_image_url, linkedin_url, twitter_url")
     .order("full_name");
   if (error) throw error;
   return (data || []) as NewsroomAuthor[];
