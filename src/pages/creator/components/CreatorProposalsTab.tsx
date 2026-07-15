@@ -32,24 +32,56 @@ const STATUS_LABELS: Record<string, string> = {
 export function CreatorProposalsTab() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
     (async () => {
+      // Two-step fetch, no embed — and errors are SHOWN, never converted
+      // into a fake "no proposals" empty state.
       const { data, error } = await supabase
         .from("trip_proposals")
-        .select(
-          "id, headline, status, price_from, currency, created_at, trip_request:trip_requests(title, destination)"
-        )
+        .select("id, headline, status, price_from, currency, created_at, trip_request_id")
         .or(`proposer_id.eq.${user.id},agent_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
-      if (!cancelled) setRows(error ? [] : ((data as any) ?? []));
+      if (error) {
+        console.error("[MyProposals] load failed:", error);
+        if (!cancelled) setLoadError(error.message);
+        return;
+      }
+      const base = (data as any[]) ?? [];
+      const tripIds = [...new Set(base.map((r) => r.trip_request_id).filter(Boolean))];
+      let tripsById: Record<string, { title: string | null; destination: string | null }> = {};
+      if (tripIds.length > 0) {
+        const { data: trips, error: tripsError } = await supabase
+          .from("trip_requests")
+          .select("id, title, destination")
+          .in("id", tripIds);
+        if (tripsError) console.error("[MyProposals] trip lookup failed:", tripsError);
+        for (const t of (trips as any[]) ?? []) tripsById[t.id] = t;
+      }
+      if (!cancelled)
+        setRows(
+          base.map((r) => ({ ...r, trip_request: tripsById[r.trip_request_id] ?? null }))
+        );
     })();
     return () => {
       cancelled = true;
     };
   }, [user?.id]);
+
+  if (loadError) {
+    return (
+      <div className="rounded-2xl bg-white ring-1 ring-[#E5DFC6] p-8 text-center">
+        <p className="text-sm text-[#0a2225]/70">
+          We couldn't load your proposals. Please refresh — and if this
+          persists, contact support.
+        </p>
+        <p className="mt-2 font-mono text-[11px] text-[#0a2225]/40">{loadError}</p>
+      </div>
+    );
+  }
 
   if (rows === null) {
     return (
