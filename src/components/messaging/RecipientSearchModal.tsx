@@ -1,30 +1,36 @@
-import { useState, useEffect } from "react";
-import { Search, User, CheckCircle2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
+import { Check, Loader2, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface Recipient {
+// IG-replica "New message" sheet in the Goldsainte palette: To: row with a
+// selected-recipient chip, live results as you type, Chat button at the
+// bottom. Search runs through the SECURITY DEFINER search_messageable_users
+// function (profiles is locked to counterparties — by design).
+
+type Recipient = {
   id: string;
   display_name: string;
+  full_name?: string | null;
   username: string | null;
   avatar_url: string | null;
   account_type: string | null;
-  is_verified: boolean | null;
-}
+  is_verified?: boolean | null;
+};
 
 interface RecipientSearchModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectRecipient: (recipient: { id: string; name: string }) => void;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  creator: "Creator",
+  agent: "Travel Agent",
+  traveler: "Traveler",
+  brand: "Brand",
+};
 
 export function RecipientSearchModal({
   open,
@@ -34,6 +40,7 @@ export function RecipientSearchModal({
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Recipient[]>([]);
+  const [selected, setSelected] = useState<Recipient | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
@@ -41,24 +48,24 @@ export function RecipientSearchModal({
     if (!open) {
       setSearch("");
       setResults([]);
+      setSelected(null);
+      setSearchError(null);
     }
   }, [open]);
 
   useEffect(() => {
     const searchUsers = async () => {
-      if (search.length < 2) {
+      const q = search.trim().replace(/^@+/, "").replace(/[%,()]/g, "");
+      if (q.length < 2) {
         setResults([]);
         return;
       }
-
       setLoading(true);
       setSearchError(null);
       try {
-        const q = search.trim().replace(/^@+/, "").replace(/[%,()]/g, "");
         const { data, error } = await supabase.rpc("search_messageable_users", { q });
-
         if (error) throw error;
-        setResults(data || []);
+        setResults((data as any) || []);
       } catch (e: any) {
         console.error("Search error:", e);
         setSearchError(e?.message || "Search failed — please try again.");
@@ -67,117 +74,126 @@ export function RecipientSearchModal({
         setLoading(false);
       }
     };
-
     const debounce = setTimeout(searchUsers, 300);
     return () => clearTimeout(debounce);
   }, [search, user?.id]);
 
-  const handleSelect = (recipient: Recipient) => {
+  const startChat = () => {
+    if (!selected) return;
     onSelectRecipient({
-      id: recipient.id,
-      name: recipient.display_name || (recipient as any).full_name || "User",
+      id: selected.id,
+      name: selected.display_name || selected.full_name || "User",
     });
-    onOpenChange(false);
   };
 
-  const getAccountTypeLabel = (type: string | null) => {
-    switch (type) {
-      case "creator":
-        return "Creator";
-      case "agent":
-        return "Travel Agent";
-      case "traveler":
-        return "Traveler";
-      default:
-        return "Member";
-    }
-  };
+  const q = search.trim().replace(/^@+/, "");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-[#FDF9F0] rounded-[24px] border border-[#E5DFC6]">
-        <DialogHeader>
-          <DialogTitle className="font-secondary text-[#0a2225] text-xl">
-            New Message
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-xl gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0">
+        {/* Header */}
+        <div className="flex h-14 items-center justify-center border-b border-[#E5DFC6]">
+          <h2 className="font-secondary text-[18px] font-semibold text-[#0a2225]">
+            New message
+          </h2>
+        </div>
 
-        <div className="space-y-4 py-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a9a9c]" />
-            <Input
-              placeholder="Search by name or username"
+        {/* To: row */}
+        <div className="flex min-h-[56px] flex-wrap items-center gap-2 border-b border-[#E5DFC6] px-5 py-2">
+          <span className="text-[15px] font-semibold text-[#0a2225]">To:</span>
+          {selected ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] py-1 pl-3 pr-1.5 text-[13px] font-medium text-[#f7f3ea]">
+              {selected.display_name || selected.full_name || "User"}
+              <button
+                onClick={() => setSelected(null)}
+                className="rounded-full p-0.5 hover:bg-white/15"
+                aria-label="Remove recipient"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          ) : (
+            <input
+              autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 sm:pl-10 bg-white border-[#E5DFC6] focus:border-[#C7A962] rounded-full"
+              placeholder="Search by name or @handle…"
+              className="min-w-[140px] flex-1 bg-transparent text-[15px] text-[#0a2225] outline-none placeholder:text-[#0a2225]/40"
             />
-          </div>
+          )}
+        </div>
 
-          <div className="max-h-[300px] overflow-y-auto space-y-2">
-            {loading && (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C7A962]" />
-              </div>
-            )}
-
-            {!loading && search.length >= 2 && results.length === 0 && (
-              <div className="text-center py-8">
-                <User className="h-10 w-10 mx-auto text-[#C7A962] mb-2" />
-                <p className="text-[#5a6c6e] text-sm">No users found</p>
-                <p className="text-[#8a9a9c] text-xs mt-1">
-                  Try a different search term
-                </p>
-              </div>
-            )}
-
-            {!loading && search.length < 2 && (
-              <div className="text-center py-8">
-                <Search className="h-10 w-10 mx-auto text-[#C7A962] mb-2" />
-                {searchError ? (
-                  <p className="text-sm text-[#993c1d]">{searchError}</p>
+        {/* Results */}
+        <div className="h-[320px] overflow-y-auto py-2">
+          {loading && (
+            <div className="flex items-center gap-2 px-5 py-3 text-sm text-[#0a2225]/50">
+              <Loader2 className="h-4 w-4 animate-spin" /> Searching…
+            </div>
+          )}
+          {!loading && searchError && (
+            <p className="px-5 py-3 text-sm text-[#993c1d]">{searchError}</p>
+          )}
+          {!loading && !searchError && q.length < 2 && !selected && (
+            <p className="px-5 py-3 text-sm text-[#0a2225]/45">
+              Type at least 2 characters to search.
+            </p>
+          )}
+          {!loading && !searchError && q.length >= 2 && results.length === 0 && (
+            <p className="px-5 py-3 text-sm text-[#0a2225]/55">
+              No account matches — check the spelling of their name or @handle.
+            </p>
+          )}
+          {results.map((r) => {
+            const isSelected = selected?.id === r.id;
+            const name = r.display_name || r.full_name || "User";
+            return (
+              <button
+                key={r.id}
+                onClick={() => setSelected(isSelected ? null : r)}
+                className="flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors hover:bg-white/70"
+              >
+                {r.avatar_url ? (
+                  <img
+                    src={r.avatar_url}
+                    alt=""
+                    className="h-11 w-11 shrink-0 rounded-full object-cover"
+                  />
                 ) : (
-                <p className="text-[#5a6c6e] text-sm">
-                  Search for someone to message
-                </p>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0c4d47] font-secondary text-[17px] text-[#E5DFC6]">
+                    {name[0]?.toUpperCase() || "G"}
+                  </span>
                 )}
-                <p className="text-[#8a9a9c] text-xs mt-1">
-                  Type at least 2 characters
-                </p>
-              </div>
-            )}
-
-            {!loading &&
-              results.map((recipient) => (
-                <button
-                  key={recipient.id}
-                  onClick={() => handleSelect(recipient)}
-                  className="w-full flex items-center gap-3 p-3 bg-white hover:bg-[#F6F0E4] border border-[#E5DFC6] rounded-xl transition-colors text-left"
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] text-[#0a2225]">{name}</span>
+                  <span className="block truncate text-[13px] text-[#0a2225]/55">
+                    {r.username && <span className="text-[#8D6B2F]">@{r.username}</span>}
+                    {r.username && r.account_type && " · "}
+                    {r.account_type ? ROLE_LABELS[r.account_type] ?? r.account_type : ""}
+                  </span>
+                </span>
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                    isSelected
+                      ? "border-[#0c4d47] bg-[#0c4d47]"
+                      : "border-[#0a2225]/25"
+                  }`}
                 >
-                  <Avatar className="h-10 w-10 border border-[#E5DFC6]">
-                    <AvatarImage src={recipient.avatar_url || undefined} />
-                    <AvatarFallback className="bg-[#F6F0E4] text-[#0a2225]">
-                      {(recipient.display_name || "U")[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-medium text-[#0a2225] truncate">
-                        {recipient.display_name || "User"}
-                      </span>
-                      {recipient.is_verified && (
-                        <CheckCircle2 className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-[#8a9a9c]">
-                      {recipient.username && (
-                        <span className="text-[#C7A962]">@{recipient.username}</span>
-                      )}
-                      <span>{getAccountTypeLabel(recipient.account_type)}</span>
-                    </div>
-                  </div>
-                </button>
-              ))}
-          </div>
+                  {isSelected && <Check className="h-3.5 w-3.5 text-[#f7f3ea]" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Chat button */}
+        <div className="border-t border-[#E5DFC6] p-4">
+          <button
+            disabled={!selected}
+            onClick={startChat}
+            className="h-11 w-full rounded-xl bg-[#0c4d47] text-[15px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Chat
+          </button>
         </div>
       </DialogContent>
     </Dialog>
