@@ -38,7 +38,7 @@ serve(async (req) => {
         <p style="font-size: 15px; line-height: 1.6;">Thank you for applying to join the <em>Goldsainte</em> advisor network. We've received your application and our team will review it within <strong>24–48 hours</strong>.</p>
         <p style="font-size: 15px; line-height: 1.6;">You'll receive another email as soon as your account is approved, with credentials to access your dashboard.</p>
         <p style="margin: 28px 0;">
-          <a href="https://goldsainte.ai/application-status" style="display: inline-block; background: #0c4d47; color: #E5DFC6; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: 600;">Check Application Status</a>
+          <a href="https://goldsainte.ai/application/status" style="display: inline-block; background: #0c4d47; color: #E5DFC6; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: 600;">Check Application Status</a>
         </p>
         <p style="font-size: 13px; color: #6B7280;">Questions? Reply to this email or visit our Help Centre.</p>
         <hr style="border: none; border-top: 1px solid #E5DFC6; margin: 32px 0;" />
