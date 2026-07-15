@@ -740,10 +740,10 @@ export default function CreatorPublicProfilePage() {
                   certifications={creatorData?.certifications ?? null}
                 />
                 {/* Facts card — every row conditional on real data */}
-                <div
-                  className="rounded-[20px] border border-[#E5DFC6] bg-white p-6 text-[13.5px]"
-                  style={{ fontFamily: "Inter, sans-serif" }}
-                >
+                <div className="rounded-[20px] border border-[#E5DFC6] bg-white p-6">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#0c4d47]/70 pb-2">
+                    At a glance
+                  </p>
                   {[
                     creator.location && { k: "Home base", v: creator.location },
                     positioningTitle && positioningTitle !== "Travel Designer" && { k: "Specialty", v: positioningTitle },
@@ -758,12 +758,12 @@ export default function CreatorPublicProfilePage() {
                     .map((f: any, i, arr) => (
                       <div
                         key={f.k}
-                        className={`flex items-center justify-between py-3 text-[#6B7280] ${
+                        className={`flex items-center justify-between gap-4 py-3 ${
                           i < arr.length - 1 ? "border-b border-[#f7f3ea]" : ""
                         }`}
                       >
-                        <span>{f.k}</span>
-                        <span className="font-semibold text-[#0a2225]">{f.v}</span>
+                        <span className="text-[13px] text-[#0a2225]/60">{f.k}</span>
+                        <span className="font-secondary text-[15px] text-right text-[#0a2225]">{f.v}</span>
                       </div>
                     ))}
                 </div>
