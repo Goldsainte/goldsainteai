@@ -21,7 +21,7 @@ export const NewMessageTravelerEmail = ({ conversationId, senderName }: Props) =
     `Attachments and proposals are saved automatically.`,
     `Need help? Contact our concierge team.`
   ]}
-    cta={{ label: 'Open conversation', url: `https://goldsainte.ai/messages/${conversationId ?? ""}` }}
+    cta={{ label: 'Open conversation', url: `https://goldsainte.ai/messages?conversation=${conversationId ?? ""}` }}
   />
 )
 
