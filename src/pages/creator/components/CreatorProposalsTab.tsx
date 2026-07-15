@@ -1,18 +1,142 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+
+// Pipeline → Proposals: every proposal this creator/agent has sent, rendered
+// in the same card language as the traveler journeys page (MyBookingsPage):
+// photo-is-the-card with the sanctioned deep-green fallback panel, status
+// pill on the image, scrim with gold destination eyebrow + cream serif
+// title, slim footer strip.
+
+type Row = {
+  id: string;
+  headline: string | null;
+  status: string | null;
+  price_from: number | null;
+  currency: string | null;
+  created_at: string;
+  trip_request: { title: string | null; destination: string | null } | null;
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  sent: "Sent",
+  pending: "Pending",
+  traveler_review: "In review",
+  accepted: "Accepted",
+  declined: "Not selected",
+  withdrawn: "Withdrawn",
+  expired: "Expired",
+};
 
 export function CreatorProposalsTab() {
+  const { user } = useAuth();
+  const [rows, setRows] = useState<Row[] | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("trip_proposals")
+        .select(
+          "id, headline, status, price_from, currency, created_at, trip_request:trip_requests(title, destination)"
+        )
+        .or(`proposer_id.eq.${user.id},agent_id.eq.${user.id}`)
+        .order("created_at", { ascending: false });
+      if (!cancelled) setRows(error ? [] : ((data as any) ?? []));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  if (rows === null) {
+    return (
+      <div className="rounded-2xl bg-white ring-1 ring-[#E5DFC6] p-8 text-center text-sm text-[#0a2225]/50">
+        Loading your proposals…
+      </div>
+    );
+  }
+
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-2xl bg-white ring-1 ring-[#E5DFC6] p-8 md:p-12 text-center">
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+          Your pipeline
+        </p>
+        <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">No proposals yet</h2>
+        <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-[#0a2225]/60">
+          Browse the trip requests on the marketplace and send your first
+          tailored proposal — travelers are waiting for the right specialist.
+        </p>
+        <Link
+          to="/marketplace?tab=trip-requests"
+          className="mt-8 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-7 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+        >
+          Browse trip requests
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white border border-[#E5DFC6] rounded-2xl p-8 md:p-12 text-center">
-      <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">All Proposals</h2>
-      <p className="text-sm text-[#6B7280] max-w-md mx-auto mb-6">
-        View and manage every proposal you've submitted to travelers.
-      </p>
-      <Link
-        to="/my-proposals"
-        className="inline-flex items-center gap-2 rounded-full bg-[#0a2225] px-6 py-3 text-sm font-medium text-white hover:bg-[#0a2225]/90 transition-colors"
-      >
-        View My Proposals
-      </Link>
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {rows.map((r) => {
+        const submitted = new Date(r.created_at).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        return (
+          <Link
+            key={r.id}
+            to={`/proposals/${r.id}`}
+            className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
+          >
+            {/* Panel IS the card — sanctioned fallback treatment */}
+            <div className="relative h-44 overflow-hidden md:h-48">
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+                <span className="font-secondary text-xl italic text-[#C7A962]/80">
+                  {r.trip_request?.destination || "Goldsainte"}
+                </span>
+              </div>
+
+              {/* Status pill on the panel */}
+              <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6] ring-1 ring-[#E5DFC6]/25">
+                {STATUS_LABELS[r.status ?? ""] ?? r.status ?? "—"}
+              </span>
+
+              {/* Bottom scrim with serif headline */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
+                {r.trip_request?.title && (
+                  <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">
+                    {r.trip_request.title}
+                  </p>
+                )}
+                <p className="mt-1.5 font-secondary text-[21px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
+                  {r.headline || "Untitled proposal"}
+                </p>
+                <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+                  Submitted {submitted}
+                </p>
+              </div>
+            </div>
+
+            {/* Slim footer strip */}
+            <div className="flex items-center justify-between px-5 py-3.5">
+              <span className="text-[11.5px] text-[#0a2225]/50">
+                {typeof r.price_from === "number"
+                  ? `from $${Number(r.price_from).toLocaleString()}`
+                  : "—"}
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[#0c4d47] transition-colors group-hover:text-[#0a2225]">
+                View proposal →
+              </span>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }
