@@ -487,7 +487,7 @@ async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bo
     travelerProfile?.full_name ||
     "there";
   const agentName = agentProfile?.display_name || agentProfile?.full_name || "your travel specialist";
-  const reviewUrl = `https://goldsainte.ai/reviews/new?booking=${booking.id}`;
+  const reviewUrl = `https://goldsainte.ai/bookings/${booking.id}`;
 
   const html = `
     <div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f7f3ea; padding:32px;">
