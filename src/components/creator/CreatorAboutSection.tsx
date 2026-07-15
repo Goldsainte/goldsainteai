@@ -17,7 +17,7 @@ export function CreatorAboutSection({ bio, certifications }: CreatorAboutSection
     <div className="max-w-2xl">
       {/* Travel philosophy */}
       {bio && (
-        <p className="font-primary text-lg md:text-xl italic text-[#4a4a4a] leading-relaxed mb-6">
+        <p className="font-secondary text-[22px] md:text-[26px] italic text-[#0a2225]/85 leading-snug mb-6">
           "{bio}"
         </p>
       )}
