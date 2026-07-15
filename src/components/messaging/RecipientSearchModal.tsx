@@ -54,12 +54,8 @@ export function RecipientSearchModal({
       setLoading(true);
       setSearchError(null);
       try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id, display_name, full_name, username, avatar_url, account_type, is_verified")
-          .neq("id", user?.id || "")
-          .or(`display_name.ilike.%${search}%,full_name.ilike.%${search}%,username.ilike.%${search}%`)
-          .limit(10);
+        const q = search.trim().replace(/^@+/, "").replace(/[%,()]/g, "");
+        const { data, error } = await supabase.rpc("search_messageable_users", { q });
 
         if (error) throw error;
         setResults(data || []);
