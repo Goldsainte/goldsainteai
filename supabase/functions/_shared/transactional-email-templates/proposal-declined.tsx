@@ -21,7 +21,7 @@ export const ProposalDeclinedEmail = ({ requestSummary, travelerName }: Props) =
     `Consider refining your storefront or services to broaden your reach.`,
     `Our team is here to help you grow your practice.`
   ]}
-    cta={{ label: 'View dashboard', url: `https://goldsainte.ai/agent` }}
+    cta={{ label: 'View dashboard', url: `https://goldsainte.ai/agent-dashboard` }}
   />
 )
 
