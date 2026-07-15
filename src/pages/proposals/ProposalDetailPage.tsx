@@ -234,7 +234,28 @@ export default function ProposalDetailPage() {
     );
   }
 
-  if (!proposal) return null;
+  if (!proposal)
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-[#FDF9F0] px-6">
+        <div className="max-w-md rounded-[20px] border border-[#E5DFC6] bg-white p-8 text-center">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#0c4d47]/70">Proposal</p>
+          <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">
+            This proposal isn't available
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-[#0a2225]/60">
+            It may have been withdrawn, or your account may not have access to
+            it. If you arrived from an email, make sure you're signed in with
+            the address the trip request was posted under.
+          </p>
+          <button
+            onClick={() => navigate("/my-bookings")}
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors"
+          >
+            Go to my journeys
+          </button>
+        </div>
+      </div>
+    );
 
   const inclusionsList = proposal.inclusions?.split("\n").filter(Boolean) ?? [];
   const exclusionsList = proposal.exclusions?.split("\n").filter(Boolean) ?? [];
