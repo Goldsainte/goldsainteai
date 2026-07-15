@@ -355,7 +355,11 @@ const Auth = () => {
           const { error: resendError } = await supabase.auth.resend({
             type: "signup",
             email: normalizedEmail,
-            options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+            options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback${
+                          redirectTarget ? `?redirect=${encodeURIComponent(redirectTarget)}` : ""
+                        }`,
+                      },
           });
           if (resendError) {
             toast({ title: "Email not confirmed", description: "We couldn't resend the confirmation email. Please try again shortly.", variant: "destructive" });
@@ -1068,7 +1072,11 @@ const Auth = () => {
                     const { error } = await supabase.auth.resend({
                       type: "signup",
                       email: normalizedEmail,
-                      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+                      options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback${
+                          redirectTarget ? `?redirect=${encodeURIComponent(redirectTarget)}` : ""
+                        }`,
+                      },
                     });
                     if (error) {
                       toast({ title: "Could not resend email", description: error.message, variant: "destructive" });
