@@ -309,6 +309,11 @@ export default function CreatorOnboardingPage() {
           primary_platform: primaryPlatform || null,
           tiktok_handle: normalizeHandle(tiktokHandle) || null,
           instagram_handle: normalizeHandle(instagramHandle) || null,
+          // Adopt the social handle as the platform username (TikTok first —
+          // this is a TikTok-creator marketplace — else Instagram), so
+          // creators are searchable by the handle everyone knows them by.
+          username:
+            normalizeHandle(tiktokHandle) || normalizeHandle(instagramHandle) || null,
           website: website || null,
           about_details: (() => {
             const clean = Object.fromEntries(
