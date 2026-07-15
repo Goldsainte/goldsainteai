@@ -21,7 +21,7 @@ export const NewMessageProfessionalEmail = ({ conversationId, senderName }: Prop
     `Attachments and proposals are saved automatically.`,
     `Aim to respond within 24 hours for best results.`
   ]}
-    cta={{ label: 'Open conversation', url: `https://goldsainte.ai/messages/${conversationId ?? ""}` }}
+    cta={{ label: 'Open conversation', url: `https://goldsainte.ai/messages?conversation=${conversationId ?? ""}` }}
   />
 )
 
