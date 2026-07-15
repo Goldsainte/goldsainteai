@@ -22,7 +22,7 @@ export const ProposalAcceptedEmail = ({ bookingId, travelerName, tripName }: Pro
     `Payouts settle to your connected Stripe account.`,
     `Deliver an extraordinary experience — and earn a glowing review.`
   ]}
-    cta={{ label: 'View booking', url: `https://goldsainte.ai/agent/bookings/${bookingId ?? ""}` }}
+    cta={{ label: 'View booking', url: `https://goldsainte.ai/partner-bookings` }}
   />
 )
 
