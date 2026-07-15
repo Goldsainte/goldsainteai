@@ -410,24 +410,24 @@ export default function CreatorOnboardingPage() {
           </h1>
           <p className="text-[#6B7280] text-lg mb-10">Your journeys inspire the world.</p>
 
-          <div className="bg-white border-2 border-[#C7A962] rounded-2xl p-8 shadow-lg text-left">
+          <div className="bg-white border border-[#E5DFC6] rounded-[24px] p-8 text-left">
             <div className="flex items-center gap-4 mb-6">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
                   alt={displayName}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-[#C7A962] flex-shrink-0"
+                  className="w-16 h-16 rounded-full object-cover border border-[#E5DFC6] flex-shrink-0"
                   loading="lazy"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-[#FDF9F0] border-2 border-[#C7A962] flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-full bg-[#FDF9F0] border border-[#E5DFC6] flex items-center justify-center flex-shrink-0">
                   <User className="w-7 h-7 text-[#C7A962]" />
                 </div>
               )}
               <div>
                 <h2 className="font-secondary text-xl text-[#0a2225]">{displayName}</h2>
-                <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-emerald-50 border border-emerald-600 rounded-full text-xs text-emerald-700 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-white border border-[#0c4d47]/25 rounded-full text-xs text-[#0c4d47] font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0c4d47]" />
                   Live
                 </div>
               </div>
@@ -458,7 +458,7 @@ export default function CreatorOnboardingPage() {
               <Button
                 onClick={() => navigate("/creator-dashboard?tab=earnings")}
                 variant="outline"
-                className="w-full border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47] hover:text-white"
+                className="w-full rounded-full border-[#0c4d47]/40 text-[#0c4d47] hover:bg-[#0c4d47] hover:text-white"
               >
                 Connect payouts in Earnings
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -468,7 +468,7 @@ export default function CreatorOnboardingPage() {
 
           <Button
             onClick={() => navigate("/creator-dashboard")}
-            className="mt-6 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white px-8 py-6 rounded-xl text-lg"
+            className="mt-6 rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-8 py-3 text-sm font-medium"
           >
             View Your Dashboard
             <ArrowRight className="w-5 h-5 ml-2" />
