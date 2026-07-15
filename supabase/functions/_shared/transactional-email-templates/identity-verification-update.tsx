@@ -21,7 +21,7 @@ export const IdentityVerificationUpdateEmail = ({ statusDetail, verificationStat
     `Re-verification is rare but may be requested for security.`,
     `Contact our concierge team if you have questions.`
   ]}
-    cta={{ label: 'Open dashboard', url: `https://goldsainte.ai/account/verification` }}
+    cta={{ label: 'Open dashboard', url: `https://goldsainte.ai/application/status` }}
   />
 )
 
