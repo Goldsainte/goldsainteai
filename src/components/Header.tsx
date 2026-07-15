@@ -251,7 +251,7 @@ export const Header = () => {
                                 <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
                               </DropdownMenuItem>
                             )}
-                            {(isAgentAccount || isCreator) && (
+                            {(isAgentAccount || isCreator || isAdmin || isBrand) && (
                               <DropdownMenuItem
                                 onClick={() => navigate('/my-proposals')}
                                 className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
