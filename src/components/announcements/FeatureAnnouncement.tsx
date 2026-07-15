@@ -22,6 +22,9 @@ type Announcement = {
   body: string;
   ctaLabel: string;
   ctaTo: string;
+  /** If the profile shows the user already used the feature, never show
+   *  the announcement (and persist seen) — device-independent. */
+  satisfiedWhen?: (profile: Record<string, any> | null) => boolean;
 };
 
 const ANNOUNCEMENTS: Announcement[] = [
@@ -34,6 +37,8 @@ const ANNOUNCEMENTS: Announcement[] = [
       "We added a set of optional questions to your profile — countries visited, the trip you'll never forget, the tip you swear by. Profiles with answers win more requests.",
     ctaLabel: "Answer them now",
     ctaTo: "/onboarding/creator",
+    satisfiedWhen: (profile) =>
+      !!profile?.about_details && Object.keys(profile.about_details).length > 0,
   },
 ];
 
@@ -54,18 +59,28 @@ export default function FeatureAnnouncement() {
       );
       if (pending.length === 0) return;
 
-      // Only fetch the account type if any pending announcement targets one.
-      let accountType: string | null = null;
-      if (pending.some((a) => !a.audience.includes("*"))) {
+      // One profile fetch covers audience targeting AND satisfied-checks.
+      let profile: Record<string, any> | null = null;
+      if (pending.some((a) => !a.audience.includes("*") || a.satisfiedWhen)) {
         const { data } = await supabase
           .from("profiles")
-          .select("account_type")
+          .select("account_type, about_details")
           .eq("id", user.id)
           .maybeSingle();
-        accountType = (data as any)?.account_type ?? null;
+        profile = (data as any) ?? null;
       }
+      const accountType: string | null = profile?.account_type ?? null;
 
-      const match = pending.find(
+      const candidates = pending.filter((a) => {
+        if (a.satisfiedWhen && a.satisfiedWhen(profile)) {
+          // Already using the feature — never advertise it, on any device.
+          localStorage.setItem(seenKey(a.id, user.id), "1");
+          return false;
+        }
+        return true;
+      });
+
+      const match = candidates.find(
         (a) =>
           a.audience.includes("*") ||
           (accountType !== null && a.audience.includes(accountType))
