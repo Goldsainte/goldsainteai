@@ -22,7 +22,7 @@ export const AdminNewTripPendingEmail = ({ specialistName, tripId, tripName }: P
     `Decline with feedback — the specialist is notified automatically.`,
     `All moderation decisions are recorded in the audit log.`
   ]}
-    cta={{ label: 'Open moderation queue', url: `https://goldsainte.ai/admin/trips/${tripId ?? ""}` }}
+    cta={{ label: 'Open moderation queue', url: `https://goldsainte.ai/admin` }}
   />
 )
 
