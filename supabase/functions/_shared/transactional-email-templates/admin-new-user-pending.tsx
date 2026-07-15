@@ -22,7 +22,7 @@ export const AdminNewUserPendingEmail = ({ applicantName, applicantRole, applica
     `Decline with a reason — the applicant is notified automatically.`,
     `All admin decisions are recorded in the audit log.`
   ]}
-    cta={{ label: 'Open admin queue', url: `https://goldsainte.ai/admin/applications/${applicationId ?? ""}` }}
+    cta={{ label: 'Open admin queue', url: `https://goldsainte.ai/admin/applications` }}
   />
 )
 
