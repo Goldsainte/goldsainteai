@@ -524,7 +524,7 @@ export function DirectMessageInbox() {
         {/* IG-style folder pills: Primary · General · Requests
             ("General" is the archived bucket — same semantics as Instagram's
             secondary folder; internal keys unchanged). */}
-        <div className="flex items-center gap-2 px-4 pb-2" style={{ fontFamily: "Inter, sans-serif" }}>
+        <div className="flex items-center gap-5 px-4 pb-1" style={{ fontFamily: "Inter, sans-serif" }}>
           {([
             { key: "primary", label: "Primary", count: totalUnread },
             { key: "archived", label: "General", count: 0 },
@@ -534,15 +534,15 @@ export function DirectMessageInbox() {
               key={t.key}
               onClick={() => setActiveTab(t.key)}
               aria-pressed={activeTab === t.key}
-              className={`rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors ${
+              className={`px-1 py-1.5 text-[15px] transition-colors ${
                 activeTab === t.key
-                  ? "bg-[#0a2225] text-white"
-                  : "bg-white text-[#5a6c6e] border border-[#E5DFC6] hover:text-[#0a2225]"
+                  ? "font-bold text-[#0a2225]"
+                  : "font-medium text-[#0a2225]/45 hover:text-[#0a2225]/70"
               }`}
             >
               {t.label}
               {t.count > 0 && (
-                <span className={activeTab === t.key ? " text-white/70" : " text-[#C7A962]"}> {t.count}</span>
+                <span className={activeTab === t.key ? " text-[#0c4d47]" : " text-[#C7A962]"}> {t.count}</span>
               )}
             </button>
           ))}
@@ -930,7 +930,7 @@ export function DirectMessageInbox() {
                   </Button>
                   <Input
                     ref={inputRef}
-                    placeholder="Write something… use @ to mention"
+                    placeholder="Message…"
                     value={newMessage}
                     onChange={(e) => handleComposerChange(e.target.value)}
                     className="flex-1 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-full bg-[#FDFBF7] h-11"
@@ -939,9 +939,10 @@ export function DirectMessageInbox() {
                   <Button 
                     type="submit" 
                     disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
-                    className="bg-[#0a2225] hover:bg-[#0a2225]/90 text-white rounded-full px-6 h-11"
+                    variant="ghost"
+                    className="rounded-full px-4 h-11 text-[15px] font-semibold text-[#0c4d47] hover:bg-transparent hover:text-[#0a2225] disabled:opacity-0"
                   >
-                    <Send className="h-4 w-4" />
+                    Send
                   </Button>
                 </form>
               </div>
@@ -1155,14 +1156,14 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={`max-w-[min(32rem,calc(100vw-6rem))] rounded-[18px] px-3.5 py-2 ${
+        className={`max-w-[min(29rem,calc(100vw-6rem))] rounded-[22px] px-4 py-2 ${
           isSelf
-            ? "bg-[#E8DCC8] text-[#0a2225]"
-            : "bg-[#F6F0E4] text-[#0a2225] border border-[#E5DFC6]/40"
+            ? "bg-[#0c4d47] text-[#f7f3ea]"
+            : "bg-white text-[#0a2225] ring-1 ring-[#E5DFC6]"
         }`}
       >
         <p
-          className="whitespace-pre-wrap break-words text-[#0a2225]"
+          className="whitespace-pre-wrap break-words"
           style={{
             fontFamily:
               '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
