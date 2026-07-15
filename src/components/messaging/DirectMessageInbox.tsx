@@ -126,9 +126,10 @@ export function DirectMessageInbox() {
     loading,
     sendMessage,
     manageConversation,
+    refetch: refetchConversations,
   } = useDirectMessages();
 
-  const { messages, loading: messagesLoading } = useConversationMessages(
+  const { messages, loading: messagesLoading, refetch: refetchMessages } = useConversationMessages(
     selectedConversation?.id || null
   );
 
@@ -270,6 +271,9 @@ export function DirectMessageInbox() {
         selectedConversation.id,
         pendingAttachments
       );
+      // Show the sent message immediately (don't depend on realtime echo).
+      refetchMessages();
+      refetchConversations();
       setNewMessage("");
       setPendingAttachments([]);
       setMentionQuery(null);
@@ -831,6 +835,8 @@ export function DirectMessageInbox() {
                             voiceUrl,
                             selectedConversation.id,
                           );
+                          refetchMessages();
+                          refetchConversations();
                           setShowVoiceRecorder(false);
                         } catch (e: any) {
                           toast({ title: "Failed to send", description: e.message, variant: "destructive" });
