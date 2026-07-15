@@ -735,10 +735,29 @@ export default function CreatorPublicProfilePage() {
             <div id="about" className="mx-auto max-w-5xl px-4 py-12 md:py-16 scroll-mt-24">
               <SectionHead eyebrow="About" title="The philosophy" />
               <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr] md:gap-12 items-start">
-                <CreatorAboutSection
-                  bio={bio}
-                  certifications={creatorData?.certifications ?? null}
-                />
+                <div className="space-y-5">
+                  <CreatorAboutSection
+                    bio={bio}
+                    certifications={creatorData?.certifications ?? null}
+                  />
+                  {/* Story cards fill the column below the quote — no dead space */}
+                  {(aboutDetails?.favorite_trip || aboutDetails?.dream_destination || aboutDetails?.travel_tip) && (
+                    <div className="space-y-4">
+                      {[
+                        { q: "Most unforgettable trip", a: aboutDetails?.favorite_trip },
+                        { q: "Still on the dream list", a: aboutDetails?.dream_destination },
+                        { q: "A tip I swear by", a: aboutDetails?.travel_tip },
+                      ]
+                        .filter((x) => x.a)
+                        .map((x) => (
+                          <div key={x.q} className="rounded-[20px] border border-[#E5DFC6] bg-white p-5">
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-[#0c4d47]/70">{x.q}</p>
+                            <p className="mt-2 font-secondary text-[19px] leading-snug text-[#0a2225]">{String(x.a)}</p>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
                 {/* Facts card — every row conditional on real data */}
                 <div className="rounded-[20px] border border-[#E5DFC6] bg-white p-6">
                   <p className="text-[10px] uppercase tracking-[0.28em] text-[#0c4d47]/70 pb-2">
@@ -767,24 +786,6 @@ export default function CreatorPublicProfilePage() {
                       </div>
                     ))}
                 </div>
-
-                {/* Narrative fun-facts — full width below the About grid */}
-                {(aboutDetails?.favorite_trip || aboutDetails?.dream_destination || aboutDetails?.travel_tip) && (
-                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[
-                      { q: "Most unforgettable trip", a: aboutDetails?.favorite_trip },
-                      { q: "Still on the dream list", a: aboutDetails?.dream_destination },
-                      { q: "A tip I swear by", a: aboutDetails?.travel_tip },
-                    ]
-                      .filter((x) => x.a)
-                      .map((x) => (
-                        <div key={x.q} className="rounded-[20px] border border-[#E5DFC6] bg-white p-5">
-                          <p className="text-[10px] uppercase tracking-[0.2em] text-[#8D6B2F] font-semibold">{x.q}</p>
-                          <p className="mt-2 font-secondary text-[17px] leading-snug text-[#0a2225]">{String(x.a)}</p>
-                        </div>
-                      ))}
-                  </div>
-                )}
               </div>
             </div>
           </div>
