@@ -22,7 +22,7 @@ export const BookingConfirmationProfessionalEmail = ({ bookingId, travelerName, 
     `Payouts settle to your connected Stripe account.`,
     `Communication and payment must remain on-platform.`
   ]}
-    cta={{ label: 'Open booking', url: `https://goldsainte.ai/agent/bookings/${bookingId ?? ""}` }}
+    cta={{ label: 'Open booking', url: `https://goldsainte.ai/partner-bookings` }}
   />
 )
 
