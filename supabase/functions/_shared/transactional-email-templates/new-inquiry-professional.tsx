@@ -21,7 +21,7 @@ export const NewInquiryProfessionalEmail = ({ inquiryId, travelerName }: Props) 
     `Direct inquiries typically convert faster than open requests.`,
     `Aim to respond within 24 hours for best results.`
   ]}
-    cta={{ label: 'Open inquiry', url: `https://goldsainte.ai/agent/inquiries/${inquiryId ?? ""}` }}
+    cta={{ label: 'Open inquiry', url: `https://goldsainte.ai/messages` }}
   />
 )
 
