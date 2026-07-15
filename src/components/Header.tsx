@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -249,6 +249,15 @@ export const Header = () => {
                               >
                                 <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                                 <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                              </DropdownMenuItem>
+                            )}
+                            {(isAgentAccount || isCreator) && (
+                              <DropdownMenuItem
+                                onClick={() => navigate('/my-proposals')}
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                              >
+                                <FileText className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                <span className="text-[15px] font-medium text-[#0a2225]">My Proposals</span>
                               </DropdownMenuItem>
                             )}
                             {showRequestTrip && (
