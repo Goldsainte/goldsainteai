@@ -22,7 +22,7 @@ export const PayoutSentEmail = ({ amount, payoutId, tripName }: Props) => (
     `Tax documents are generated annually for your records.`,
     `Questions? Contact our concierge team.`
   ]}
-    cta={{ label: 'View payout', url: `https://goldsainte.ai/agent/payouts/${payoutId ?? ""}` }}
+    cta={{ label: 'View payout', url: `https://goldsainte.ai/earnings` }}
   />
 )
 
