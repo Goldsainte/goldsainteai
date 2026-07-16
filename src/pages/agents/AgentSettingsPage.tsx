@@ -28,6 +28,7 @@ export default function AgentSettingsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const loadedFor = useRef<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<"avatar" | "logo" | null>(null);
   const avatarInput = useRef<HTMLInputElement>(null);
@@ -54,7 +55,11 @@ export default function AgentSettingsPage() {
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   useEffect(() => {
-    if (!user) return;
+    // Load ONCE per signed-in user. Tab focus refreshes the auth session
+    // and re-emits `user` — without this guard, the reload overwrites
+    // whatever the person is typing with the last-saved values.
+    if (!user || loadedFor.current === user.id) return;
+    loadedFor.current = user.id;
     (async () => {
       const [{ data: p }, { data: a }] = await Promise.all([
         supabase
