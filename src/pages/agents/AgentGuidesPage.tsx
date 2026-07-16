@@ -14,9 +14,12 @@ import { toast } from "sonner";
 // Route: /agent-guides (linked from Agent Settings).
 // ============================================================================
 
+interface HotelDraft { name: string; description: string; perksText: string }
+
 interface GuideRow {
   id: string; title: string; slug: string; hero_image_url: string | null;
   tags: string[]; statement: string | null; body: string | null; published: boolean;
+  hotels: { name: string; description: string; perks: string[] }[];
 }
 
 const label = "block text-[15px] font-semibold text-[#0a2225]";
@@ -37,6 +40,9 @@ export default function AgentGuidesPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ title: "", hero_image_url: "", tags: "", statement: "", body: "", published: true });
+  const [hotels, setHotels] = useState<HotelDraft[]>([]);
+  const updateHotel = (i: number, k: keyof HotelDraft, v: string) =>
+    setHotels((hs) => hs.map((h, j) => (j === i ? { ...h, [k]: v } : h)));
   const [ai, setAi] = useState({ destination: "", days: "", notes: "" });
   const [generating, setGenerating] = useState(false);
   const setAiField = (k: keyof typeof ai) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -67,6 +73,14 @@ export default function AgentGuidesPage() {
         tags: Array.isArray(data.tags) ? data.tags.join(", ") : f.tags,
         body: data.body || f.body,
       }));
+      if (Array.isArray(data.hotels) && data.hotels.length > 0) {
+        setHotels(
+          data.hotels.map((h: any) => ({
+            name: h.name || "", description: h.description || "",
+            perksText: Array.isArray(h.perks) ? h.perks.join("\n") : "",
+          }))
+        );
+      }
       toast.success("Draft generated — review, edit, add your photos, then save");
     } catch (e: any) {
       toast.error(e.message || "Generation failed — try again");
@@ -79,7 +93,7 @@ export default function AgentGuidesPage() {
     if (!user) return;
     const { data } = await supabase
       .from("partner_guides")
-      .select("id, title, slug, hero_image_url, tags, statement, body, published")
+      .select("id, title, slug, hero_image_url, tags, statement, body, published, hotels")
       .eq("author_id", user.id)
       .order("created_at", { ascending: false });
     setGuides((data as GuideRow[]) ?? []);
@@ -89,6 +103,7 @@ export default function AgentGuidesPage() {
   const openNew = () => {
     setEditing(null); setCreating(true);
     setForm({ title: "", hero_image_url: "", tags: "", statement: "", body: "", published: true });
+    setHotels([]);
   };
   const openEdit = (g: GuideRow) => {
     setCreating(true); setEditing(g);
@@ -96,6 +111,11 @@ export default function AgentGuidesPage() {
       title: g.title, hero_image_url: g.hero_image_url || "", tags: (g.tags || []).join(", "),
       statement: g.statement || "", body: g.body || "", published: g.published,
     });
+    setHotels(
+      (g.hotels ?? []).map((h) => ({
+        name: h.name || "", description: h.description || "", perksText: (h.perks ?? []).join("\n"),
+      }))
+    );
   };
 
   const uploadHero = async (file: File) => {
@@ -126,6 +146,13 @@ export default function AgentGuidesPage() {
         statement: form.statement.trim() || null,
         body: form.body.trim() || null,
         published: form.published,
+        hotels: hotels
+          .filter((h) => h.name.trim())
+          .map((h) => ({
+            name: h.name.trim(),
+            description: h.description.trim(),
+            perks: h.perksText.split("\n").map((x) => x.trim()).filter(Boolean),
+          })),
         updated_at: new Date().toISOString(),
       };
       if (editing) {
@@ -242,6 +269,41 @@ export default function AgentGuidesPage() {
                 Formatting: start a line with <span className="font-mono">##</span> for a section heading, <span className="font-mono">-</span> for an arrow bullet, paste a bare image URL on its own line for a full-width photo, and leave a blank line between blocks.
               </p>
             </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <label className={label}>Where to stay</label>
+                <button type="button"
+                  onClick={() => setHotels((hs) => [...hs, { name: "", description: "", perksText: "" }])}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#0a2225]/25 px-4 py-2 text-[13px] text-[#0a2225] hover:bg-white">
+                  <Plus className="h-3.5 w-3.5" /> Add hotel
+                </button>
+              </div>
+              <p className="mt-1 text-[13px] text-[#6B7280]">
+                Renders as the hotel carousel with per-property bullets. Only list perks you can actually deliver.
+              </p>
+              <div className="mt-4 space-y-5">
+                {hotels.map((h, i) => (
+                  <div key={i} className="rounded-2xl border border-[#E5DFC6] bg-white/70 p-4">
+                    <div className="flex items-center gap-3">
+                      <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]"
+                        value={h.name} onChange={(e) => updateHotel(i, "name", e.target.value)}
+                        placeholder="Splendido, A Belmond Hotel, Portofino" />
+                      <button type="button" onClick={() => setHotels((hs) => hs.filter((_, j) => j !== i))}
+                        className="shrink-0 rounded-full border border-[#0a2225]/20 px-3 py-2 text-[12px] text-[#0a2225]/70 hover:bg-white">
+                        Remove
+                      </button>
+                    </div>
+                    <textarea className="mt-3 min-h-[64px] w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]"
+                      value={h.description} onChange={(e) => updateHotel(i, "description", e.target.value)}
+                      placeholder="Two or three sentences on why this property." />
+                    <textarea className="mt-3 min-h-[64px] w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]"
+                      value={h.perksText} onChange={(e) => updateHotel(i, "perksText", e.target.value)}
+                      placeholder={"One perk or highlight per line\nBreakfast daily.\nUpgrade & extended check-in/out whenever possible."} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <label className="flex items-center gap-3 text-[15px] text-[#0a2225]">
               <input type="checkbox" checked={form.published}
                 onChange={(e) => setForm((f) => ({ ...f, published: e.target.checked }))}
