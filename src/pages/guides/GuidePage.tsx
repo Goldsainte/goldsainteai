@@ -44,7 +44,7 @@ function Body({ text }: { text: string }) {
         if (b.startsWith("### "))
           return <h3 key={i} className="pt-2 font-secondary text-2xl text-[#0a2225]">{b.slice(4)}</h3>;
         if (IMG_RE.test(b))
-          return <img key={i} src={b} alt="" loading="lazy" className="w-full rounded-2xl object-cover" />;
+          return <img key={i} src={b} alt="" loading="lazy" className="max-h-[560px] w-full rounded-2xl object-cover" />;
         const lines = b.split("\n");
         if (lines.every((l) => l.startsWith("- ") || l.startsWith("→ ")))
           return (
