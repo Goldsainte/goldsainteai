@@ -294,8 +294,10 @@ export default function CreatorProfileForaPage() {
                 </p>
                 <h2 className="mt-2 font-secondary text-3xl text-[#0a2225]">Upcoming trips</h2>
                 <p className="mt-3 max-w-2xl leading-relaxed text-[#0a2225]/75">
-                  Trips {firstName} is planning to film and lead. Request a spot — {firstName} designs
-                  the itinerary with you, and everything is booked securely through Goldsainte.
+                  These are real trips {firstName} is planning to lead — and you can be on them.
+                  Tap Request to join and {firstName} will reply with the full itinerary and price.
+                  If it's a fit, you book right here: your payment stays protected in escrow until
+                  the trip happens.
                 </p>
                 <div className="mt-6 space-y-3">
                   {(extra!.upcoming_trips as { destination: string; timing: string }[]).map((t, i) => (
