@@ -8,13 +8,15 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
-// IG-style expanded sidebar — icon + label rows, bold active item, hover
-// pill, Profile row with avatar — Goldsainte's verified links only.
+// IG-style rail — a slim icon column that expands on HOVER, overlaying the
+// list (content never shifts), and collapses when the mouse leaves. Bold
+// active item, hover pill, Profile row with avatar — verified links only.
 function MessagesRail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isCreator, isAgent, isAdmin, isBrand } = useUserRole();
   const isPro = isCreator || isAgent || isAdmin || isBrand;
+  const [expanded, setExpanded] = useState(false);
   const items: { icon: any; label: string; to: string; active?: boolean }[] = [
     { icon: Home, label: "Home", to: "/" },
     { icon: Compass, label: "Marketplace", to: "/marketplace" },
@@ -33,31 +35,45 @@ function MessagesRail() {
   ];
   const initial = (user?.email?.[0] || "G").toUpperCase();
   return (
-    <aside className="hidden lg:flex w-[260px] xl:w-[300px] shrink-0 flex-col border-r border-[#E5DFC6] bg-[#FDF9F0] px-3 pb-5 pt-7">
+    <div className="relative hidden w-[76px] shrink-0 lg:block">
+      <aside
+        onMouseEnter={() => setExpanded(true)}
+        onMouseLeave={() => setExpanded(false)}
+        className={`absolute inset-y-0 left-0 z-30 flex flex-col overflow-hidden border-r border-[#E5DFC6] bg-[#FDF9F0] px-3 pb-5 pt-7 transition-[width] duration-200 ${
+          expanded
+            ? "w-[260px] xl:w-[300px] shadow-[8px_0_24px_rgba(10,34,37,0.08)]"
+            : "w-[76px]"
+        }`}
+      >
       <nav className="flex flex-1 flex-col gap-1">
         {items.map(({ icon: Icon, label, to, active }) => (
           <button
             key={label}
             onClick={() => navigate(to)}
-            className={`flex items-center gap-4 rounded-xl px-3 py-3 text-left text-[16px] transition-colors hover:bg-white/80 ${
+            title={label}
+            className={`flex items-center gap-4 rounded-xl py-3 text-left text-[16px] transition-colors hover:bg-white/80 ${
               active ? "font-bold text-[#0a2225]" : "text-[#0a2225]/85"
-            }`}
+            } ${expanded ? "px-3" : "justify-center px-0"}`}
           >
             <Icon className="h-6 w-6 shrink-0" strokeWidth={active ? 2.4 : 1.7} />
-            {label}
+            {expanded && <span className="whitespace-nowrap">{label}</span>}
           </button>
         ))}
         <button
           onClick={() => navigate("/profile")}
-          className="flex items-center gap-4 rounded-xl px-3 py-3 text-left text-[16px] text-[#0a2225]/85 transition-colors hover:bg-white/80"
+          title="Profile"
+          className={`flex items-center gap-4 rounded-xl py-3 text-left text-[16px] text-[#0a2225]/85 transition-colors hover:bg-white/80 ${
+            expanded ? "px-3" : "justify-center px-0"
+          }`}
         >
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0c4d47] text-[11px] font-semibold text-[#E5DFC6]">
             {initial}
           </span>
-          Profile
+          {expanded && <span className="whitespace-nowrap">Profile</span>}
         </button>
       </nav>
-    </aside>
+      </aside>
+    </div>
   );
 }
 
