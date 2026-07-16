@@ -34,35 +34,71 @@ interface Guide {
   hotels: GuideHotel[];
 }
 
-const IMG_RE = /^https?:\S+\.(jpg|jpeg|png|webp|gif)(\?\S*)?$/i;
+const IMG_RE = /^https?:\/\/\S+$/i;
 
+// Line-aware renderer — immune to the whitespace quirks of AI-written or
+// hand-pasted bodies: headings, arrow bullets, bare-URL photos, and
+// paragraphs are recognized PER LINE, never merged by missing blank lines.
 function Body({ text }: { text: string }) {
-  const blocks = text.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
-  return (
-    <div className="space-y-6">
-      {blocks.map((b, i) => {
-        if (b.startsWith("## "))
-          return <h2 key={i} className="pt-6 font-secondary text-4xl text-[#0a2225]">{b.slice(3)}</h2>;
-        if (b.startsWith("### "))
-          return <h3 key={i} className="pt-2 font-secondary text-2xl text-[#0a2225]">{b.slice(4)}</h3>;
-        if (IMG_RE.test(b))
-          return <img key={i} src={b} alt="" loading="lazy" className="max-h-[560px] w-full rounded-2xl object-cover" />;
-        const lines = b.split("\n");
-        if (lines.every((l) => l.startsWith("- ") || l.startsWith("→ ")))
-          return (
-            <ul key={i} className="space-y-4">
-              {lines.map((l, j) => (
-                <li key={j} className="flex gap-3 leading-relaxed text-[#0a2225]">
-                  <span className="shrink-0 text-[#0a2225]">→</span>
-                  <span>{l.replace(/^(-|→)\s+/, "")}</span>
-                </li>
-              ))}
-            </ul>
-          );
-        return <p key={i} className="leading-relaxed text-[#0a2225]">{b}</p>;
-      })}
-    </div>
-  );
+  const nodes: React.ReactNode[] = [];
+  let para: string[] = [];
+  let list: string[] = [];
+  let k = 0;
+  const flushPara = () => {
+    if (para.length) {
+      nodes.push(
+        <p key={k++} className="leading-relaxed text-[#0a2225]">{para.join(" ")}</p>
+      );
+      para = [];
+    }
+  };
+  const flushList = () => {
+    if (list.length) {
+      nodes.push(
+        <ul key={k++} className="space-y-4">
+          {list.map((item, j) => (
+            <li key={j} className="flex gap-3 leading-relaxed text-[#0a2225]">
+              <span className="shrink-0 text-[#0a2225]">→</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      list = [];
+    }
+  };
+  const flushAll = () => { flushList(); flushPara(); };
+
+  for (const raw of text.split("\n")) {
+    const l = raw.trim();
+    if (!l) { flushAll(); continue; }
+    if (l.startsWith("## ")) {
+      flushAll();
+      nodes.push(<h2 key={k++} className="pt-6 font-secondary text-4xl text-[#0a2225]">{l.slice(3)}</h2>);
+      continue;
+    }
+    if (l.startsWith("### ")) {
+      flushAll();
+      nodes.push(<h3 key={k++} className="pt-2 font-secondary text-2xl text-[#0a2225]">{l.slice(4)}</h3>);
+      continue;
+    }
+    if (IMG_RE.test(l)) {
+      flushAll();
+      nodes.push(
+        <img key={k++} src={l} alt="" loading="lazy" className="max-h-[560px] w-full rounded-2xl object-cover" />
+      );
+      continue;
+    }
+    if (l.startsWith("- ") || l.startsWith("→ ")) {
+      flushPara();
+      list.push(l.replace(/^(-|→)\s+/, ""));
+      continue;
+    }
+    flushList();
+    para.push(l);
+  }
+  flushAll();
+  return <div className="space-y-6">{nodes}</div>;
 }
 
 function WhereToStay({ hotels, place }: { hotels: GuideHotel[]; place?: string | null }) {
