@@ -48,6 +48,12 @@ export default function PostTripPage() {
   const { hasItineraryPrefill, prefillData: itineraryPrefill } = useItineraryPrefill();
 
   const [destination, setDestination] = useState("");
+  // "Request to join" and guide CTAs pass ?destination= — seed the form once.
+  useEffect(() => {
+    const d = searchParams.get("destination");
+    if (d && !destination) setDestination(d);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [title, setTitle] = useState("");
   const [startsOn, setStartsOn] = useState("");
   const [endsOn, setEndsOn] = useState("");
