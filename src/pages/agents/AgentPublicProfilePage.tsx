@@ -38,6 +38,7 @@ interface AgentRow {
   linkedin_url?: string | null;
   facebook_url?: string | null;
   pinterest_url?: string | null;
+  languages?: string[] | null;
 }
 
 export default function AgentPublicProfilePage() {
@@ -67,7 +68,7 @@ export default function AgentPublicProfilePage() {
           supabase
             .from("public_travel_agents" as unknown as "travel_agents")
             .select(
-              "agency_name, bio, specializations, destinations, website, travel_style, starting_price_per_night, logo_url, linkedin_url, facebook_url, pinterest_url"
+              "agency_name, bio, specializations, destinations, website, travel_style, starting_price_per_night, logo_url, linkedin_url, facebook_url, pinterest_url, languages"
             )
             .eq("user_id", id)
             .maybeSingle(),
@@ -193,6 +194,7 @@ export default function AgentPublicProfilePage() {
         businessName={agent?.agency_name}
         tierLabel={profile.agent_verification_status === "verified" ? "Goldsainte Verified" : null}
         location={profile.location}
+        languages={agent?.languages}
         startingPricePerNight={agent?.starting_price_per_night}
         askUsAbout={askUsAbout}
         story={agent?.bio || profile.bio}
