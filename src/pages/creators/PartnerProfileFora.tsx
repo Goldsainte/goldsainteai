@@ -69,6 +69,9 @@ export interface PartnerProfileForaProps {
   /** Owner-only controls (Edit public profile / Travel guides). Rendered on
    *  the sticky card when the signed-in viewer owns this profile. */
   ownerActions?: { label: string; onClick: () => void }[];
+  /** Influence strip on the sticky card (creators: followers / avg views /
+   *  trips) — the signal agents don't have. */
+  stats?: { label: string; value: string }[];
   /** Content-first center band (creators: media feed + inspired trips). */
   contentSlot?: React.ReactNode;
   /** Suppress the built-in bottom media gallery when contentSlot renders it. */
@@ -131,7 +134,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
-    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery,
+    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery, stats,
   } = props;
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showAllIdeas, setShowAllIdeas] = useState(false);
@@ -225,6 +228,17 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
                   </p>
                 )}
               </div>
+
+              {stats && stats.length > 0 && (
+                <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-white/70 p-4 text-center">
+                  {stats.map((s) => (
+                    <div key={s.label}>
+                      <p className="font-secondary text-xl text-[#0a2225]">{s.value}</p>
+                      <p className="mt-0.5 text-[11px] uppercase tracking-[0.12em] text-[#0a2225]/60">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <button
                 type="button"
