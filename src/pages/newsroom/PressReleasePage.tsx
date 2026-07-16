@@ -135,7 +135,7 @@ export default function PressReleasePage() {
         </div>
         <div className="mt-14 rounded-3xl bg-[#0c4d47]/[0.06] p-6 text-center text-[14px] text-[#0a2225]/75">
           Media inquiries:{" "}
-          <a href="mailto:press@goldsainte.ai" className="text-[#0c4d47] underline underline-offset-4">press@goldsainte.ai</a>
+          <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline underline-offset-4">press@goldsainte.com</a>
         </div>
       </div>
     </div>
