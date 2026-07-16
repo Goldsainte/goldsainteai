@@ -455,7 +455,7 @@ export default function AgentDashboard() {
           <div className="flex flex-col items-end gap-3">
             <button
               type="button"
-              onClick={() => navigate(`/agents/${agent.id}`)}
+              onClick={() => navigate(`/agents/${agent.user_id}`)}
               className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-6 py-3.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white"
             >
               <ExternalLink className="h-4 w-4" /> View public profile
