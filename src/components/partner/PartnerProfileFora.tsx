@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
-import { MapPin, Moon, Star, Instagram, Linkedin, Facebook, Link2, Globe } from "lucide-react";
+import { MapPin, Moon, Star, Instagram, Linkedin, Facebook, Link2, Globe, Music2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 
@@ -55,6 +55,7 @@ export interface PartnerProfileForaProps {
   travelStyle?: string | null;
   photos: string[];
   social: {
+    tiktok?: string | null;
     instagram?: string | null;
     linkedin?: string | null;
     facebook?: string | null;
@@ -68,6 +69,10 @@ export interface PartnerProfileForaProps {
   /** Owner-only controls (Edit public profile / Travel guides). Rendered on
    *  the sticky card when the signed-in viewer owns this profile. */
   ownerActions?: { label: string; onClick: () => void }[];
+  /** Content-first center band (creators: media feed + inspired trips). */
+  contentSlot?: React.ReactNode;
+  /** Suppress the built-in bottom media gallery when contentSlot renders it. */
+  hideBottomGallery?: boolean;
 }
 
 const H = "text-[13px] font-semibold uppercase tracking-[0.16em] text-[#7A7151]";
@@ -126,7 +131,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
-    reviews, reviewCount, ctaLabel, onCta, ownerActions,
+    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery,
   } = props;
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showAllIdeas, setShowAllIdeas] = useState(false);
@@ -134,6 +139,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
   const visibleIdeas = showAllIdeas ? ideas : ideas.slice(0, 3);
   const igHandle = social.instagram?.replace(/^@/, "");
+  const ttHandle = social.tiktok?.replace(/^@/, "");
 
   useEffect(() => {
     let cancelled = false;
@@ -278,10 +284,15 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
             </section>
           )}
 
-          {(igHandle || social.linkedin || social.facebook || social.pinterest || social.website) && (
+          {(ttHandle || igHandle || social.linkedin || social.facebook || social.pinterest || social.website) && (
             <section className="mt-10">
               <h3 className={`${H} mb-4`}>Stay connected</h3>
               <div className="flex items-center gap-5">
+                {ttHandle && (
+                  <SocialIcon href={`https://www.tiktok.com/@${ttHandle}`} label="TikTok">
+                    <Music2 className="h-6 w-6" />
+                  </SocialIcon>
+                )}
                 {igHandle && (
                   <SocialIcon href={`https://www.instagram.com/${igHandle}`} label="Instagram">
                     <Instagram className="h-6 w-6" />
@@ -310,6 +321,8 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
               </div>
             </section>
           )}
+
+          {contentSlot}
 
           {/* Reviews */}
           <section className="mt-14">
@@ -426,7 +439,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
               </div>
             </section>
           )}
-          <PartnerMediaGallery userId={userId} />
+          {!hideBottomGallery && <PartnerMediaGallery userId={userId} />}
         </div>
       </div>
     </div>
