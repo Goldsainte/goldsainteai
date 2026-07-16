@@ -9,7 +9,6 @@ import CompleteProfile from '@/pages/CompleteProfile';
 import ApplicationVerificationComplete from '@/pages/ApplicationVerificationComplete';
 import ApplicationReviewDashboard from '@/pages/admin/ApplicationReviewDashboard';
 import NotFound from '@/pages/NotFound';
-import DesktopShell from '@/layout/DesktopShell';
 import { RequireAgentTerms } from '@/components/RequireAgentTerms';
 
 import { MarketingLayout, AuthLayout, MemberLayout, AdminLayout } from './Layouts';
@@ -257,11 +256,9 @@ export const AppRoutes = () => (
     </Route>
 
     <Route element={<MemberLayout />}>
-      <Route element={<DesktopShell />}>
-        <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="/travel-profile" element={<TravelProfileRedirect />} />
-        <Route path="/travel-profile/:userId" element={<TravelProfileRedirect />} />
-      </Route>
+      <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+      <Route path="/travel-profile" element={<TravelProfileRedirect />} />
+      <Route path="/travel-profile/:userId" element={<TravelProfileRedirect />} />
 
       <Route
         path="/marketplace"
