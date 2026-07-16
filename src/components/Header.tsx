@@ -169,6 +169,7 @@ export const Header = () => {
   const navPath = location.pathname;
   const travelActive = navPath.startsWith('/marketplace') || navPath.startsWith('/post-trip') || navPath.startsWith('/trips');
   const creatorsActive = navPath.startsWith('/creators');
+  const specialistsActive = navPath.startsWith('/agents') || navPath.startsWith('/guides');
   const partnerActive = navPath.startsWith('/apply');
 
   return (
@@ -520,6 +521,17 @@ export const Header = () => {
                     <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${creatorsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Creators</span>
                   </span>
                   <span className={`h-[2.5px] w-full rounded-full transition-colors ${creatorsActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25'}`} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/agents')}
+                  className="group flex flex-col items-center pt-1 focus:outline-none"
+                >
+                  <span className="flex items-center pb-1.5">
+                    <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${specialistsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Specialists</span>
+                  </span>
+                  <span className={`h-[2.5px] w-full rounded-full transition-colors ${specialistsActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25'}`} />
                 </button>
 
                 <DropdownMenu>
