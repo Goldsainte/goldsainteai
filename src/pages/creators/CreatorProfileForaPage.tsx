@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
 import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
+import TravelMap from "@/components/partner/TravelMap";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 
 // ============================================================================
@@ -50,6 +51,7 @@ interface ExtraRow {
   pinterest_url: string | null;
   instagram_handle: string | null;
   tiktok_handle: string | null;
+  visited_countries: string[] | null;
 }
 
 export default function CreatorProfileForaPage() {
@@ -77,7 +79,7 @@ export default function CreatorProfileForaPage() {
           supabase
             .from("public_creator_profiles" as unknown as "creator_profiles")
             .select(
-              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle"
+              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle, visited_countries"
             )
             .eq("user_id", id)
             .maybeSingle(),
@@ -158,7 +160,9 @@ export default function CreatorProfileForaPage() {
     : n >= 1_000 ? (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K"
     : String(n);
   const followers = dir.tiktok_followers ?? dir.creator_followers ?? dir.followers_count;
+  const visitedCountries = extra?.visited_countries ?? [];
   const stats = [
+    visitedCountries.length > 0 ? { label: "Countries", value: String(visitedCountries.length) } : null,
     followers != null && followers > 0 ? { label: "Followers", value: compact(followers) } : null,
     dir.creator_avg_views != null && dir.creator_avg_views > 0
       ? { label: "Avg views", value: compact(dir.creator_avg_views) }
@@ -226,6 +230,19 @@ export default function CreatorProfileForaPage() {
         }
         contentSlot={
           <>
+            {visitedCountries.length > 0 && (
+              <section className="mt-14">
+                <div className="flex items-baseline justify-between gap-4">
+                  <h2 className="font-secondary text-3xl text-[#0a2225]">Where I've been</h2>
+                  <p className="font-secondary text-xl text-[#8D6B2F]">
+                    {visitedCountries.length} {visitedCountries.length === 1 ? "country" : "countries"}
+                  </p>
+                </div>
+                <div className="mt-6 rounded-3xl bg-white/60 p-4">
+                  <TravelMap visited={visitedCountries} />
+                </div>
+              </section>
+            )}
             <section className="mt-14">
               <h2 className="mb-6 font-secondary text-3xl text-[#0a2225]">Content</h2>
               <CreatorMediaGallery
