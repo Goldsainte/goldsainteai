@@ -1,6 +1,10 @@
 // ============================================================================
-// release-trip-deposit v5 — MILESTONE ESCROW
+// release-trip-deposit v5.1 — MILESTONE ESCROW
 // ============================================================================
+// v5.1 (Jul 15, later that night) — restores the literal `amount:
+//   toCents(payout)` in transfers.create; v5 had refactored it to a const,
+//   which tripped the Money Guards cents invariant (the guard checks the
+//   exact string, by design). Behavior unchanged.
 // v5 (Jul 15, launch eve) — three money-safety fixes over v4:
 //   1. CAPTURE-SKIP: checkout captures automatically (automatic_async), so
 //      v4's blind capture 400'd on every release (harmless but noisy, and one
@@ -399,7 +403,7 @@ Deno.serve(async (req) => {
     try {
       const transfer = await stripe.transfers.create(
         {
-          amount: payoutCents,
+          amount: toCents(payout),
           currency,
           destination: connectAccountId,
           ...(sourceChargeId ? { source_transaction: sourceChargeId } : {}),
