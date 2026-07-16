@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { atHandle, socialUrl } from "@/lib/socialHandles";
 import { Film, ExternalLink, Instagram, Star, ChevronLeft, ChevronRight } from "lucide-react";
@@ -34,6 +34,38 @@ export function CreatorMediaGallery({
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const highlightInput = useRef<HTMLInputElement>(null);
+  const [uploadingHighlight, setUploadingHighlight] = useState(false);
+  const uploadHighlight = async (file: File) => {
+    if (!creatorId) return;
+    setUploadingHighlight(true);
+    try {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const isVideo = file.type.startsWith("video/");
+      const path = `${creatorId}/highlights/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { cacheControl: "3600" });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      const { data: row, error: insErr } = await supabase
+        .from("creator_media")
+        .insert({
+          user_id: creatorId,
+          url: pub.publicUrl,
+          media_type: isVideo ? "video" : "image",
+          source: "upload",
+          sort_order: items.length,
+        })
+        .select("*")
+        .single();
+      if (insErr) throw insErr;
+      setItems((prev) => [...prev, row as any]);
+    } catch (e) {
+      console.error("highlight upload failed", e);
+      alert((e as any)?.message || "Upload failed");
+    } finally {
+      setUploadingHighlight(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -75,13 +107,16 @@ export function CreatorMediaGallery({
             <p className="text-xs text-[#6B7280] mb-4">
               Upload photos, videos, or link your Instagram and TikTok reels.
             </p>
+            <input ref={highlightInput} type="file" accept="image/*,video/*" className="hidden"
+              onChange={(e) => e.target.files?.[0] && uploadHighlight(e.target.files[0])} />
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = "/creator-dashboard?tab=portfolio"}
+              disabled={uploadingHighlight}
+              onClick={() => highlightInput.current?.click()}
               className="border-[#E5DFC6] text-[#0a2225]"
             >
-              Go to Portfolio
+              {uploadingHighlight ? "Uploading…" : "Upload photo or video"}
             </Button>
           </div>
         </section>
