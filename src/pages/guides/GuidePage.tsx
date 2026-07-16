@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { PenLine } from "lucide-react";
 
 // ============================================================================
 // GuidePage — public editorial guide, 1:1 with Fora's guide pages (verified
@@ -119,6 +121,7 @@ function WhereToStay({ hotels, place }: { hotels: GuideHotel[]; place?: string |
 export default function GuidePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [guide, setGuide] = useState<Guide | null>(null);
   const [author, setAuthor] = useState<{ name: string; businessName: string | null; avatarUrl: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -216,6 +219,15 @@ export default function GuidePage() {
                 </span>
               ))}
             </div>
+          )}
+          {user?.id === guide.author_id && (
+            <button
+              type="button"
+              onClick={() => navigate("/agent-guides")}
+              className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#0a2225]/30 px-5 py-2.5 text-[13px] font-medium text-[#0a2225] transition-colors hover:bg-white"
+            >
+              <PenLine className="h-4 w-4" /> Edit this guide
+            </button>
           )}
           <div className="mt-10 flex items-center gap-4">
             {author?.avatarUrl ? (
