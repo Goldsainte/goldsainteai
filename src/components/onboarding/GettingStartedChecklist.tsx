@@ -17,7 +17,7 @@ interface ChecklistData {
   publishedTrips?: number;
   proposalsSent?: number;
   agent?: any;
-  activity?: { has_browsed_marketplace?: boolean; has_shared_profile?: boolean };
+  activity?: { has_browsed_marketplace?: boolean; has_shared_profile?: boolean; has_read_handbook?: boolean };
 }
 
 interface ChecklistItem {
@@ -132,6 +132,13 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     isComplete: (d) => !!d.activity?.has_shared_profile,
   },
   {
+    id: "read-handbook",
+    label: "Read the Creator Handbook",
+    description: "Five minutes that explain everything — your profile, guides, AI tools, and how you get paid.",
+    cta: { label: "Open the handbook", to: () => "/creator-handbook" },
+    isComplete: (d) => !!d.activity?.has_read_handbook,
+  },
+  {
     id: "review-tax-info",
     label: "Review tax information",
     description: "Goldsainte issues annual tax documents based on your country of residence.",
@@ -241,6 +248,7 @@ export function GettingStartedChecklist({ userId, role }: Props) {
             has_shared_profile:
               typeof window !== "undefined" &&
               localStorage.getItem(sharedKey) === "true",
+            has_read_handbook: localStorage.getItem(`gs_read_handbook_${userId}`) === "true",
           },
         };
 
@@ -366,6 +374,12 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                     to={to}
                     onClick={() => {
                       // "Share your creator profile" completes when they open it.
+                      if (item.id === "read-handbook") {
+                        localStorage.setItem(`gs_read_handbook_${userId}`, "true");
+                        setData((prev) =>
+                          prev ? { ...prev, activity: { ...prev.activity, has_read_handbook: true } } : prev
+                        );
+                      }
                       if (item.id === "share-profile") {
                         localStorage.setItem(`gs_shared_profile_${userId}`, "true");
                         setData((prev) =>
