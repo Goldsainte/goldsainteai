@@ -3,6 +3,8 @@ import { StatsStrip } from "@/components/home/StatsStrip";
 import { HowItWorksSteps } from "@/components/home/HowItWorksSteps";
 import { DreamTripBand } from "@/components/home/DreamTripBand";
 import { EarnSection } from "@/components/home/EarnSection";
+import { lazy, Suspense } from "react";
+const PlatformDemoSection = lazy(() => import("@/components/home/PlatformDemoSection"));
 import { OneConversationSection } from "@/components/home/OneConversationSection";
 import { TrustPlaque } from "@/components/home/TrustPlaque";
 import { FinalCTABand } from "@/components/home/FinalCTABand";
@@ -74,6 +76,9 @@ export default function HomePage() {
       <HowItWorksSteps />
       <FeaturedTripsSection />
       <DreamTripBand />
+      <Suspense fallback={null}>
+        <PlatformDemoSection />
+      </Suspense>
       <EarnSection />
       <TrustPlaque />
       <FinalCTABand />
