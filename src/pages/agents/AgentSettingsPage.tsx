@@ -5,6 +5,7 @@ import { Loader2, Camera, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 
 // ============================================================================
 // AgentSettingsPage (Jul 15, 11 PM build) — "Edit public profile" for agents.
@@ -265,7 +266,13 @@ export default function AgentSettingsPage() {
               </div>
               <div>
                 <label className={label}>Based in</label>
-                <input className={input} value={form.location} onChange={set("location")} placeholder="Charlotte, North Carolina" />
+                <div className="mt-2">
+                  <GoogleCityAutocomplete
+                    value={form.location}
+                    onChange={(v) => setForm((f) => ({ ...f, location: v }))}
+                    placeholder="Charlotte, NC, USA"
+                  />
+                </div>
               </div>
               <div>
                 <label className={label}>Trips starting at ($/night)</label>
