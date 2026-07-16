@@ -39,15 +39,20 @@ const COPY: Record<DirectoryKind, { title: string; subtitle: string; link: (id: 
 
 async function fetchCards(kind: DirectoryKind): Promise<DirectoryCard[]> {
   if (kind === "agent") {
+    // profiles/travel_agents are RLS-locked for non-owners — public pages
+    // read through the public_* window views (173).
     const { data: rows } = await supabase
-      .from("travel_agents")
+      .from("public_travel_agents" as unknown as "travel_agents")
       .select("user_id, agency_name, destinations, specializations, logo_url")
       .eq("is_active", true)
       .order("agency_name");
     const list = rows ?? [];
     const ids = [...new Set(list.map((r) => r.user_id).filter(Boolean))];
     const { data: profs } = ids.length
-      ? await supabase.from("profiles").select("id, full_name, display_name, avatar_url").in("id", ids)
+      ? await supabase
+          .from("public_profiles" as unknown as "profiles")
+          .select("id, full_name, display_name, avatar_url")
+          .in("id", ids)
       : { data: [] as any[] };
     const profById = new Map((profs ?? []).map((p: any) => [p.id, p]));
     return list
@@ -63,19 +68,20 @@ async function fetchCards(kind: DirectoryKind): Promise<DirectoryCard[]> {
         };
       });
   }
+  // Creators live in profiles behind the existing creator_directory public
+  // window (same source the original creators marketplace used).
   const { data: rows } = await supabase
-    .from("creator_profiles")
-    .select("user_id, display_name, handle, avatar_url, logo_url, primary_niches, primary_regions, specialties")
-    .order("display_name");
-  return (rows ?? [])
-    .filter((r) => r.user_id && (r.display_name || r.handle))
+    .from("creator_directory" as unknown as "profiles")
+    .select("id, display_name, full_name, avatar_url, creator_niches, content_style_tags, home_base");
+  return ((rows ?? []) as any[])
+    .filter((r) => r.id && (r.display_name || r.full_name))
     .map((r) => ({
-      userId: r.user_id,
-      name: r.display_name || `@${r.handle}`,
+      userId: r.id,
+      name: r.display_name || r.full_name,
       avatarUrl: r.avatar_url,
-      logoUrl: (r as any).logo_url ?? null,
+      logoUrl: null,
       tags: [
-        ...new Set([...(r.primary_niches ?? []), ...(r.primary_regions ?? []), ...(r.specialties ?? [])]),
+        ...new Set([...(r.creator_niches ?? []), ...(r.content_style_tags ?? [])]),
       ] as string[],
     }));
 }
