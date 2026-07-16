@@ -66,16 +66,24 @@ export default function AgentGuidesPage() {
     if (!ai.destination.trim()) { toast.error("Tell the AI a destination or topic"); return; }
     setGenerating(true);
     try {
-      const { data: agentRow } = user
-        ? await supabase.from("travel_agents").select("travel_style").eq("user_id", user.id).maybeSingle()
-        : { data: null as any };
+      // Voice: the author's own travel style — agents from travel_agents,
+      // creators from creator_profiles (whichever row exists).
+      let voiceStyle = "";
+      if (user) {
+        const { data: agentRow } = await supabase.from("travel_agents").select("travel_style").eq("user_id", user.id).maybeSingle();
+        if (agentRow?.travel_style) voiceStyle = agentRow.travel_style;
+        else {
+          const { data: creatorRow } = await supabase.from("creator_profiles").select("travel_style").eq("user_id", user.id).maybeSingle();
+          voiceStyle = creatorRow?.travel_style || "";
+        }
+      }
       const { data, error } = await supabase.functions.invoke("ai-content-tools", {
         body: {
           tool: "guide",
           destination: ai.destination.trim(),
           days: ai.days.trim(),
           notes: ai.notes.trim(),
-          voice: agentRow?.travel_style || "",
+          voice: voiceStyle,
         },
       });
       if (error) throw error;
@@ -191,7 +199,12 @@ export default function AgentGuidesPage() {
         if (error) throw error;
       } else {
         const { error } = await supabase.from("partner_guides").insert({
-          ...payload, author_id: user.id, author_kind: "agent", slug: slugify(form.title),
+          ...payload,
+          author_id: user.id,
+          author_kind: (await supabase.from("travel_agents").select("user_id").eq("user_id", user.id).maybeSingle()).data
+            ? "agent"
+            : "creator",
+          slug: slugify(form.title),
         });
         if (error) throw error;
       }
