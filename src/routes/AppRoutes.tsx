@@ -41,6 +41,7 @@ const AgentsDirectoryPage = lazy(() => import('@/pages/agents/AgentsDirectoryPag
 const CreatorsDirectoryPage = lazy(() => import('@/pages/creators/CreatorsDirectoryPage'));
 const CreatorSettingsPage = lazy(() => import('@/pages/creators/CreatorSettingsPage'));
 const CreatorProfileForaPage = lazy(() => import('@/pages/creators/CreatorProfileForaPage'));
+const CreatorHandbookPage = lazy(() => import('@/pages/creators/CreatorHandbookPage'));
 const AgentGuidesPage = lazy(() => import('@/pages/agents/AgentGuidesPage'));
 const GuidePage = lazy(() => import('@/pages/guides/GuidePage'));
 const AgentSettingsPage = lazy(() => import('@/pages/agents/AgentSettingsPage'));
@@ -203,6 +204,7 @@ export const AppRoutes = () => (
       <Route path="/guides/:slug" element={<GuidePage />} />
       <Route path="/agent-settings" element={<RequireAuth><AgentSettingsPage /></RequireAuth>} />
       <Route path="/creator-settings" element={<RequireAuth><CreatorSettingsPage /></RequireAuth>} />
+      <Route path="/creator-handbook" element={<CreatorHandbookPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
       <Route path="/how-it-works/traveler" element={<HowItWorksTraveler />} />
