@@ -275,7 +275,14 @@ export default function CreatorProfileForaPage() {
             </section>
             {(extra?.upcoming_trips ?? []).length > 0 && (
               <section className="mt-14">
-                <h2 className="font-secondary text-3xl text-[#0a2225]">Upcoming trips</h2>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                  Travel with {firstName}
+                </p>
+                <h2 className="mt-2 font-secondary text-3xl text-[#0a2225]">Upcoming trips</h2>
+                <p className="mt-3 max-w-2xl leading-relaxed text-[#0a2225]/75">
+                  Trips {firstName} is planning to film and lead. Request a spot — {firstName} designs
+                  the itinerary with you, and everything is booked securely through Goldsainte.
+                </p>
                 <div className="mt-6 space-y-3">
                   {(extra!.upcoming_trips as { destination: string; timing: string }[]).map((t, i) => (
                     <div key={i} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#F5F0E0]/70 px-6 py-4">
@@ -297,7 +304,14 @@ export default function CreatorProfileForaPage() {
             )}
             {extra?.open_to_collabs && (
               <section className="mt-14 rounded-3xl bg-[#F0EADA]/80 p-8">
-                <h2 className="font-secondary text-3xl text-[#0a2225]">Work with {firstName}</h2>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                  For brands & partners
+                </p>
+                <h2 className="mt-2 font-secondary text-3xl text-[#0a2225]">Work with {firstName}</h2>
+                <p className="mt-3 max-w-2xl leading-relaxed text-[#0a2225]/80">
+                  {firstName} is open to paid brand collaborations — the formats below. Download the
+                  media kit for audience details and rates.
+                </p>
                 {(extra.collab_types ?? []).length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-2">
                     {(extra.collab_types as string[]).map((t) => (
