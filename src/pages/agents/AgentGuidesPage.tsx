@@ -19,6 +19,7 @@ interface HotelDraft { name: string; description: string; perksText: string }
 interface GuideRow {
   id: string; title: string; slug: string; hero_image_url: string | null;
   tags: string[]; statement: string | null; body: string | null; published: boolean;
+  view_count: number;
   hotels: { name: string; description: string; perks: string[] }[];
 }
 
@@ -132,7 +133,7 @@ export default function AgentGuidesPage() {
     if (!user) return;
     const { data } = await supabase
       .from("partner_guides")
-      .select("id, title, slug, hero_image_url, tags, statement, body, published, hotels")
+      .select("id, title, slug, hero_image_url, tags, statement, body, published, hotels, view_count")
       .eq("author_id", user.id)
       .order("created_at", { ascending: false });
     setGuides((data as GuideRow[]) ?? []);
@@ -246,7 +247,10 @@ export default function AgentGuidesPage() {
                 {g.hero_image_url && <img src={g.hero_image_url} alt="" className="h-16 w-24 rounded-xl object-cover" />}
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-secondary text-xl text-[#0a2225]">{g.title}</p>
-                  <p className="text-[13px] text-[#6B7280]">{g.published ? "Published" : "Draft"}</p>
+                  <p className="text-[13px] text-[#6B7280]">
+                    {g.published ? "Published" : "Draft"}
+                    {g.published ? ` · ${(g.view_count ?? 0).toLocaleString()} view${(g.view_count ?? 0) === 1 ? "" : "s"}` : ""}
+                  </p>
                 </div>
                 <button type="button" onClick={() => navigate(`/guides/${g.slug}`)} title="View"
                   className="rounded-full border border-[#0a2225]/25 p-2.5 text-[#0a2225] hover:bg-white"><ExternalLink className="h-4 w-4" /></button>
