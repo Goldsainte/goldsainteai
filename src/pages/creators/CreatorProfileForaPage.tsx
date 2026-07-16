@@ -1,449 +1,225 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
-import { MapPin, Moon, Star, Instagram, Linkedin, Facebook, Link2, Globe, Music2 } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
+import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 
 // ============================================================================
-// PartnerProfileFora v2 — 1:1 replica of foratravel.com/advisor/{slug},
-// corrected against the founder's live screenshots (Jul 15, 10:16 PM):
-//   • Two-column layout: STICKY left identity card (rounded portrait photo,
-//     logo chip overlapping, name, tier line, based-in / trips-starting-at
-//     facts, contact button) — right column scrolls past it.
-//   • Business name is the right column's H1.
-//   • Ask us about → Our story (READ MORE) → Travel style (READ MORE) →
-//     Stay connected → Reviews (n) as 2-col cards with gold stars +
-//     "travel to {destination}" → See-all pill → Travel ideas (n) as
-//     image-left rows with tag pills + Explore → Travel photos 2-col grid.
-// kind="agent" tonight; creators reuse with kind="creator" — one skeleton.
+// CreatorProfileForaPage (Phase B preview — Jul 16 AM)
+// The content-first creator profile on the shared Fora chassis:
+// agents read like a magazine, creators play like a feed — same funnel.
+// Center band order: creator CONTENT (media feed) → "Trips inspired by this
+// creator" → reviews → travel ideas (guides) → photos.
+// Preview route: /creators-preview/:id — flips to /creators/:id only after
+// the founder's side-by-side eyeball.
+// Reads exclusively through public windows (creator_directory,
+// public_creator_profiles, public_profiles) so logged-out visitors see it.
 // ============================================================================
 
-export type PartnerKind = "agent" | "creator";
-
-export interface PartnerReview {
+interface DirRow {
   id: string;
-  reviewerName: string;
-  destination?: string | null;
-  rating: number;
-  createdAt: string;
-  comment: string | null;
+  display_name: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  creator_niches: string[] | null;
+  content_style_tags: string[] | null;
+  home_base: string | null;
 }
 
-interface TravelIdea {
-  id: string;
-  title: string;
-  slug: string;
-  destination: string | null;
-  cover_image_url: string | null;
-  description?: string | null;
-  href: string;
+interface ExtraRow {
+  handle: string | null;
+  bio: string | null;
+  travel_style: string | null;
+  primary_niches: string[] | null;
+  primary_regions: string[] | null;
+  specialties: string[] | null;
+  starting_price_per_night: number | null;
+  logo_url: string | null;
+  website: string | null;
+  linkedin_url: string | null;
+  facebook_url: string | null;
+  pinterest_url: string | null;
+  instagram_handle: string | null;
+  tiktok_handle: string | null;
 }
 
-export interface PartnerProfileForaProps {
-  kind: PartnerKind;
-  userId: string;
-  name: string;
-  avatarUrl?: string | null;
-  logoUrl?: string | null;
-  businessName?: string | null;
-  tierLabel?: string | null;
-  location?: string | null;
-  startingPricePerNight?: number | null;
-  askUsAbout: string[];
-  story?: string | null;
-  travelStyle?: string | null;
-  photos: string[];
-  social: {
-    tiktok?: string | null;
-    instagram?: string | null;
-    linkedin?: string | null;
-    facebook?: string | null;
-    pinterest?: string | null;
-    website?: string | null;
-  };
-  reviews: PartnerReview[];
-  reviewCount: number;
-  ctaLabel: string;
-  onCta: () => void;
-  /** Owner-only controls (Edit public profile / Travel guides). Rendered on
-   *  the sticky card when the signed-in viewer owns this profile. */
-  ownerActions?: { label: string; onClick: () => void }[];
-  /** Content-first center band (creators: media feed + inspired trips). */
-  contentSlot?: React.ReactNode;
-  /** Suppress the built-in bottom media gallery when contentSlot renders it. */
-  hideBottomGallery?: boolean;
-}
-
-const H = "text-[13px] font-semibold uppercase tracking-[0.16em] text-[#7A7151]";
-
-function Stars({ rating }: { rating: number }) {
-  return (
-    <span className="inline-flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          className={`h-4 w-4 ${i <= Math.round(rating) ? "fill-[#C7A962] text-[#C7A962]" : "text-[#C7A962]/30"}`}
-        />
-      ))}
-    </span>
-  );
-}
-
-function ReadMore({ text }: { text: string }) {
-  const [open, setOpen] = useState(false);
-  const long = text.length > 320;
-  return (
-    <div>
-      <p className={`whitespace-pre-line leading-relaxed text-[#0a2225] ${!open && long ? "line-clamp-4" : ""}`}>
-        {text}
-      </p>
-      {long && !open && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="mt-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#0a2225] underline underline-offset-4"
-        >
-          Read more
-        </button>
-      )}
-    </div>
-  );
-}
-
-function SocialIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
-  const url = href.startsWith("http") ? href : `https://${href}`;
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      title={label}
-      className="text-[#0a2225] transition-colors hover:text-[#0c4d47]"
-    >
-      {children}
-    </a>
-  );
-}
-
-export function PartnerProfileFora(props: PartnerProfileForaProps) {
-  const {
-    kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
-    startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
-    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery,
-  } = props;
-  const [showAllReviews, setShowAllReviews] = useState(false);
-  const [showAllIdeas, setShowAllIdeas] = useState(false);
-  const [ideas, setIdeas] = useState<TravelIdea[]>([]);
-  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
-  const visibleIdeas = showAllIdeas ? ideas : ideas.slice(0, 3);
-  const igHandle = social.instagram?.replace(/^@/, "");
-  const ttHandle = social.tiktok?.replace(/^@/, "");
+export default function CreatorProfileForaPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [dir, setDir] = useState<DirRow | null>(null);
+  const [extra, setExtra] = useState<ExtraRow | null>(null);
+  const [reviews, setReviews] = useState<PartnerReview[]>([]);
+  const [reviewCount, setReviewCount] = useState(0);
 
   useEffect(() => {
+    if (!id) return;
     let cancelled = false;
     (async () => {
-      // Fora-model: Travel ideas are editorial GUIDES first; bookable trips
-      // remain the fallback until the author has written guides.
-      const { data: guides } = await supabase
-        .from("partner_guides")
-        .select("id, title, slug, hero_image_url, tags, statement")
-        .eq("author_id", userId)
-        .eq("published", true)
-        .order("created_at", { ascending: false })
-        .limit(24);
-      if (cancelled) return;
-      if (guides && guides.length > 0) {
-        setIdeas(
-          guides.map((g: any) => ({
-            id: g.id,
-            title: g.title,
-            slug: g.slug,
-            destination: (g.tags ?? [])[0] ?? null,
-            cover_image_url: g.hero_image_url,
-            description: g.statement,
-            href: `/guides/${g.slug}`,
-          }))
+      setLoading(true);
+      try {
+        const [dirRes, extraRes] = await Promise.all([
+          supabase
+            .from("creator_directory" as unknown as "profiles")
+            .select("id, display_name, full_name, avatar_url, creator_niches, content_style_tags, home_base")
+            .eq("id", id)
+            .maybeSingle(),
+          supabase
+            .from("public_creator_profiles" as unknown as "creator_profiles")
+            .select(
+              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle"
+            )
+            .eq("user_id", id)
+            .maybeSingle(),
+        ]);
+        if (cancelled) return;
+        setDir((dirRes.data as unknown as DirRow) ?? null);
+        setExtra((extraRes.data as unknown as ExtraRow) ?? null);
+
+        const { data: reviewRows, count } = await supabase
+          .from("reviews")
+          .select("id, comment, rating, created_at, reviewer_id, booking_id", { count: "exact" })
+          .eq("reviewee_id", id)
+          .eq("is_public", true)
+          .order("created_at", { ascending: false })
+          .limit(30);
+        const rows = reviewRows ?? [];
+        setReviewCount(count ?? rows.length);
+        const reviewerIds = [...new Set(rows.map((r) => r.reviewer_id).filter(Boolean))];
+        const { data: reviewers } = reviewerIds.length
+          ? await supabase
+              .from("public_profiles" as unknown as "profiles")
+              .select("id, display_name, full_name")
+              .in("id", reviewerIds)
+          : { data: [] as any[] };
+        if (cancelled) return;
+        const byId = new Map(((reviewers as any[]) ?? []).map((p) => [p.id, p]));
+        setReviews(
+          rows.map((r) => {
+            const rp = byId.get(r.reviewer_id);
+            const fullish = rp?.display_name || rp?.full_name || "Guest";
+            const parts = String(fullish).trim().split(/\s+/);
+            const first = parts[0] || "Guest";
+            const lastInitial = parts.length > 1 ? ` ${parts[parts.length - 1][0].toUpperCase()}.` : "";
+            return {
+              id: r.id,
+              reviewerName: `${first}${lastInitial}`,
+              destination: null,
+              rating: Number(r.rating) || 5,
+              createdAt: r.created_at ?? new Date().toISOString(),
+              comment: r.comment,
+            };
+          })
         );
-        return;
+      } catch (e) {
+        console.error("creator profile load failed", e);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      const { data } = await supabase
-        .from("packaged_trips")
-        .select("id, title, slug, destination, cover_image_url, description")
-        .eq("creator_id", userId)
-        .eq("status", "published")
-        .order("created_at", { ascending: false })
-        .limit(24);
-      if (!cancelled)
-        setIdeas(((data as any[]) ?? []).map((t) => ({ ...t, href: `/trips/${t.slug}` })));
     })();
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#FDF9F0]">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#C7A962]" />
+      </div>
+    );
+  }
+
+  if (!dir) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#FDF9F0] px-4 text-center">
+        <h1 className="font-secondary text-4xl text-[#0a2225]">Creator not found</h1>
+        <button type="button" onClick={() => navigate("/creators")}
+          className="mt-8 rounded-full bg-[#0c4d47] px-8 py-3.5 text-[14px] text-[#f7f3ea] hover:bg-[#0a2225]">
+          Browse creators
+        </button>
+      </div>
+    );
+  }
+
+  const displayName = dir.display_name || dir.full_name || "Goldsainte Creator";
+  const firstName = displayName.split(" ")[0];
+  const askUsAbout = [
+    ...new Set([
+      ...(extra?.primary_niches ?? dir.creator_niches ?? []),
+      ...(extra?.primary_regions ?? []),
+      ...(extra?.specialties ?? dir.content_style_tags ?? []),
+    ]),
+  ];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-20 pt-8">
-      <div className="gap-10 lg:grid lg:grid-cols-[360px_1fr]">
-        {/* ── Sticky identity card ─────────────────────────────────────── */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-3xl bg-[#F5F0E0]/70 p-3">
-            <div className="relative">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={name} className="aspect-[4/5] w-full rounded-2xl object-cover" />
-              ) : (
-                <div className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-[#0c4d47]/10 font-secondary text-6xl text-[#0c4d47]">
-                  {name.slice(0, 2).toUpperCase()}
-                </div>
-              )}
-              {logoUrl && (
-                <img
-                  src={logoUrl}
-                  alt={businessName || "logo"}
-                  className="absolute bottom-4 left-4 h-20 w-20 rounded-2xl border border-[#E5DFC6] bg-white object-contain p-1 shadow"
-                />
-              )}
-            </div>
+    <div className="min-h-screen bg-[#FDF9F0]">
+      <Helmet>
+        <title>{displayName + " · Goldsainte Creator"}</title>
+        <meta name="description" content={"Turn " + displayName + "'s journeys into your next trip — booked securely through Goldsainte."} />
+      </Helmet>
 
-            <div className="px-4 pb-5 pt-6">
-              <h2 className="font-secondary text-3xl text-[#0a2225]">{name}</h2>
-              {tierLabel && (
-                <p className="mt-1 text-[13px] uppercase tracking-[0.18em] text-[#8D6B2F]">{tierLabel}</p>
-              )}
-
-              <div className="mt-5 divide-y divide-[#E5DFC6] border-y border-[#E5DFC6]">
-                {location && (
-                  <p className="flex items-center gap-2.5 py-4 text-[16px] text-[#0a2225]">
-                    <MapPin className="h-5 w-5 shrink-0 text-[#0a2225]" /> Based in {location}
-                  </p>
-                )}
-                {startingPricePerNight != null && startingPricePerNight > 0 && (
-                  <p className="flex items-center gap-2.5 py-4 text-[16px] text-[#0a2225]">
-                    <Moon className="h-5 w-5 shrink-0 text-[#0a2225]" /> Trips starting at $
-                    {Number(startingPricePerNight).toLocaleString()}/night
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={onCta}
-                className="mt-6 w-full rounded-full bg-[#0c4d47] px-6 py-4 text-[15px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225]"
-              >
-                {ctaLabel}
-              </button>
-              {ownerActions && ownerActions.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {ownerActions.map((a) => (
-                    <button
-                      key={a.label}
-                      type="button"
-                      onClick={a.onClick}
-                      className="w-full rounded-full border border-[#0a2225]/25 px-6 py-3 text-[14px] font-medium text-[#0a2225] transition-colors hover:bg-white"
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Scrolling column ─────────────────────────────────────────── */}
-        <div className="mt-10 min-w-0 lg:mt-0">
-          {businessName && (
-            <h1 className="font-secondary text-5xl leading-tight text-[#0a2225] md:text-6xl">{businessName}</h1>
-          )}
-
-          {askUsAbout.length > 0 && (
-            <section className="mt-10">
-              <h3 className={H}>Ask us about</h3>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {askUsAbout.map((tag) => (
-                  <span key={tag} className="rounded-full bg-[#F5F0E0] px-5 py-2.5 text-[15px] text-[#0a2225]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {story && (
-            <section className="mt-10">
-              <h3 className={`${H} mb-3`}>Our story</h3>
-              <ReadMore text={story} />
-            </section>
-          )}
-
-          {travelStyle && (
-            <section className="mt-10">
-              <h3 className={`${H} mb-3`}>Travel style</h3>
-              <ReadMore text={travelStyle} />
-            </section>
-          )}
-
-          {(ttHandle || igHandle || social.linkedin || social.facebook || social.pinterest || social.website) && (
-            <section className="mt-10">
-              <h3 className={`${H} mb-4`}>Stay connected</h3>
-              <div className="flex items-center gap-5">
-                {ttHandle && (
-                  <SocialIcon href={`https://www.tiktok.com/@${ttHandle}`} label="TikTok">
-                    <Music2 className="h-6 w-6" />
-                  </SocialIcon>
-                )}
-                {igHandle && (
-                  <SocialIcon href={`https://www.instagram.com/${igHandle}`} label="Instagram">
-                    <Instagram className="h-6 w-6" />
-                  </SocialIcon>
-                )}
-                {social.linkedin && (
-                  <SocialIcon href={social.linkedin} label="LinkedIn">
-                    <Linkedin className="h-6 w-6" />
-                  </SocialIcon>
-                )}
-                {social.facebook && (
-                  <SocialIcon href={social.facebook} label="Facebook">
-                    <Facebook className="h-6 w-6" />
-                  </SocialIcon>
-                )}
-                {social.pinterest && (
-                  <SocialIcon href={social.pinterest} label="Pinterest">
-                    <Link2 className="h-6 w-6" />
-                  </SocialIcon>
-                )}
-                {social.website && (
-                  <SocialIcon href={social.website} label="Website">
-                    <Globe className="h-6 w-6" />
-                  </SocialIcon>
-                )}
-              </div>
-            </section>
-          )}
-
-          {contentSlot}
-
-          {/* Reviews */}
-          <section className="mt-14">
-            <h2 className="font-secondary text-3xl text-[#0a2225]">Reviews ({reviewCount})</h2>
-            {visibleReviews.length === 0 ? (
-              <p className="mt-4 text-[15px] text-[#6B7280]">No reviews yet.</p>
-            ) : (
-              <div className="mt-6 grid gap-5 md:grid-cols-2">
-                {visibleReviews.map((r) => (
-                  <article key={r.id} className="rounded-3xl bg-[#F5F0E0]/70 p-6">
-                    <div className="flex items-start gap-3">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0a2225] text-[15px] font-semibold text-[#f7f3ea]">
-                        {r.reviewerName[0]?.toUpperCase() || "G"}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-[17px] font-semibold text-[#0a2225]">{r.reviewerName}</p>
-                        {r.destination && (
-                          <p className="font-secondary italic text-[15px] text-[#0a2225]/80">
-                            travel to {r.destination}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-4 flex items-center gap-3">
-                      <Stars rating={r.rating} />
-                      <span className="text-[13px] text-[#6B7280]">
-                        {formatDistanceToNow(new Date(r.createdAt), { addSuffix: true })}
-                      </span>
-                    </div>
-                    {r.comment && (
-                      <p className="mt-3 line-clamp-5 leading-relaxed text-[#0a2225]">{r.comment}</p>
-                    )}
-                  </article>
-                ))}
-              </div>
-            )}
-            {reviewCount > 4 && !showAllReviews && (
-              <button
-                type="button"
-                onClick={() => setShowAllReviews(true)}
-                className="mt-7 rounded-full border border-[#0a2225]/30 px-7 py-3.5 text-[15px] font-medium text-[#0a2225] transition-colors hover:bg-white"
-              >
-                See all {reviewCount} reviews
-              </button>
-            )}
-          </section>
-
-          {/* Travel ideas */}
-          <section className="mt-14">
-            <h2 className="font-secondary text-3xl text-[#0a2225]">Travel ideas ({ideas.length})</h2>
-            {ideas.length === 0 ? (
-              <div className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-8 text-center">
-                <p className="font-secondary text-lg text-[#0a2225]">Trips coming soon</p>
-                <p className="mt-1 text-sm text-[#6B7280]">
-                  {kind === "agent"
-                    ? "This specialist is building their trip collection."
-                    : "This creator is building their trip collection."}
-                </p>
-              </div>
-            ) : (
-              <div className="mt-6 space-y-10">
-                {visibleIdeas.map((t) => (
-                  <div key={t.id} className="flex flex-col gap-6 md:flex-row">
-                    {t.cover_image_url && (
-                      <img
-                        src={t.cover_image_url}
-                        alt={t.title}
-                        loading="lazy"
-                        className="aspect-[4/3] w-full rounded-3xl object-cover md:w-[45%]"
-                      />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-secondary text-2xl leading-snug text-[#0a2225] md:text-3xl">{t.title}</h3>
-                      {t.destination && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <span className="rounded-full bg-[#F5F0E0] px-4 py-1.5 text-[13px] text-[#0a2225]">
-                            {t.destination}
-                          </span>
-                        </div>
-                      )}
-                      {t.description && (
-                        <p className="mt-3 line-clamp-3 leading-relaxed text-[#0a2225]/85">{t.description}</p>
-                      )}
-                      <Link
-                        to={t.href}
-                        className="mt-4 inline-block rounded-full border border-[#0a2225]/30 px-6 py-2.5 text-[14px] font-medium text-[#0a2225] transition-colors hover:bg-white"
-                      >
-                        Explore
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {ideas.length > 3 && !showAllIdeas && (
-              <button
-                type="button"
-                onClick={() => setShowAllIdeas(true)}
-                className="mt-8 rounded-full border border-[#0a2225]/30 px-7 py-3.5 text-[15px] font-medium text-[#0a2225] transition-colors hover:bg-white"
-              >
-                See all {ideas.length} travel ideas
-              </button>
-            )}
-          </section>
-
-          {/* Travel photos */}
-          {photos.length > 0 && (
-            <section className="mt-14">
-              <h2 className="mb-6 font-secondary text-3xl text-[#0a2225]">Travel photos</h2>
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                {photos.map((src) => (
-                  <img key={src} src={src} alt="Travel" loading="lazy" className="w-full rounded-3xl object-cover" />
-                ))}
-              </div>
-            </section>
-          )}
-          {!hideBottomGallery && <PartnerMediaGallery userId={userId} />}
-        </div>
+      <div className="mx-auto max-w-6xl px-4 pt-6">
+        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/creators"))}
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-[#0a2225]/70 transition-colors hover:text-[#0a2225]">
+          <ArrowLeft className="h-4 w-4" /> Back
+        </button>
       </div>
+
+      <PartnerProfileFora
+        kind="creator"
+        userId={dir.id}
+        name={displayName}
+        avatarUrl={dir.avatar_url}
+        logoUrl={extra?.logo_url}
+        businessName={extra?.handle ? "@" + extra.handle.replace(/^@/, "") : null}
+        tierLabel="Goldsainte Creator"
+        location={dir.home_base}
+        startingPricePerNight={extra?.starting_price_per_night}
+        askUsAbout={askUsAbout}
+        story={extra?.bio}
+        travelStyle={extra?.travel_style}
+        photos={[]}
+        social={{
+          tiktok: extra?.tiktok_handle,
+          instagram: extra?.instagram_handle,
+          linkedin: extra?.linkedin_url,
+          facebook: extra?.facebook_url,
+          pinterest: extra?.pinterest_url,
+          website: extra?.website,
+        }}
+        reviews={reviews}
+        reviewCount={reviewCount}
+        ctaLabel={"Design my trip with " + firstName}
+        onCta={() =>
+          navigate("/post-trip?creatorId=" + dir.id + "&creatorName=" + encodeURIComponent(displayName))
+        }
+        ownerActions={
+          user?.id === dir.id
+            ? [
+                { label: "Edit public profile", onClick: () => navigate("/creator-settings") },
+                { label: "Travel guides", onClick: () => navigate("/creator-guides") },
+              ]
+            : undefined
+        }
+        contentSlot={
+          <>
+            <section className="mt-14">
+              <h2 className="mb-6 font-secondary text-3xl text-[#0a2225]">Content</h2>
+              <PartnerMediaGallery userId={dir.id} />
+            </section>
+            <section className="mt-14">
+              <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Trips inspired by this creator" />
+            </section>
+          </>
+        }
+        hideBottomGallery
+      />
     </div>
   );
 }
-
-export default PartnerProfileFora;
