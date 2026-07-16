@@ -39,6 +39,7 @@ export default function CreatorSettingsPage() {
     specialties: "", starting_price_per_night: "", logo_url: "",
     instagram_handle: "", tiktok_handle: "", website: "",
     linkedin_url: "", facebook_url: "", pinterest_url: "",
+    languages: "",
   });
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -114,7 +115,7 @@ export default function CreatorSettingsPage() {
         supabase
           .from("creator_profiles")
           .select(
-            "display_name, handle, avatar_url, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, instagram_handle, tiktok_handle, website, linkedin_url, facebook_url, pinterest_url, visited_countries, upcoming_trips, open_to_collabs, collab_types, media_kit_url, ai_summary"
+            "display_name, handle, avatar_url, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, instagram_handle, tiktok_handle, website, linkedin_url, facebook_url, pinterest_url, visited_countries, upcoming_trips, open_to_collabs, collab_types, media_kit_url, ai_summary, languages"
           )
           .eq("user_id", user.id)
           .maybeSingle(),
@@ -137,6 +138,7 @@ export default function CreatorSettingsPage() {
         linkedin_url: c?.linkedin_url || "",
         facebook_url: c?.facebook_url || "",
         pinterest_url: c?.pinterest_url || "",
+        languages: ((c as any)?.languages ?? []).join(", "),
       });
       setVisited(((c as any)?.visited_countries as string[]) ?? []);
       setUpcoming((((c as any)?.upcoming_trips as any[]) ?? []).map((t) => ({
@@ -230,6 +232,7 @@ export default function CreatorSettingsPage() {
         collab_types: toArray(collab.types),
         media_kit_url: collab.media_kit_url || null,
         ai_summary: aiSummary.trim() || null,
+          languages: toArray(form.languages),
       };
       const { data: cRows, error: cErr } = await supabase
         .from("creator_profiles")
@@ -401,6 +404,11 @@ export default function CreatorSettingsPage() {
                 <label className={label}>Trips starting at ($/night)</label>
                 <input className={input} value={form.starting_price_per_night} onChange={set("starting_price_per_night")} placeholder="300" inputMode="numeric" />
                 <p className={hint}>Leave blank to hide this line.</p>
+              </div>
+              <div>
+                <label className={label}>Languages spoken</label>
+                <input className={input} value={form.languages} onChange={set("languages")} placeholder="English, Spanish, Portuguese" />
+                <p className={hint}>Separate with commas — shown on your card, like Fora.</p>
               </div>
             </div>
           </div>
