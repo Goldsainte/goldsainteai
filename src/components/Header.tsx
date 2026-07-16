@@ -146,7 +146,7 @@ export const Header = () => {
 
   const getProfilePath = () => {
     if (isCreator) return `/creators/${user?.id}`;
-    if (isAgentAccount) return '/agent-dashboard';
+    if (isAgentAccount) return `/agents/${user?.id}`;
     return '/traveler';
   };
 
