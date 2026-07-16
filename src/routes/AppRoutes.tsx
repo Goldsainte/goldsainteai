@@ -193,7 +193,8 @@ export const AppRoutes = () => (
       <Route path="/bundle/:id" element={<BundleDetailPage />} />
       <Route path="/bundle-builder" element={<BundleBuilder />} />
       <Route path="/creators" element={<CreatorsDirectoryPage />} />
-      <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
+      <Route path="/creators/:id" element={<CreatorProfileForaPage />} />
+      <Route path="/creators-legacy/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/creators-preview/:id" element={<CreatorProfileForaPage />} />
       <Route path="/agents" element={<AgentsDirectoryPage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
