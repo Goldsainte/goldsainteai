@@ -58,14 +58,14 @@ export default function AgentPublicProfilePage() {
       try {
         const [profileRes, agentRes] = await Promise.all([
           supabase
-            .from("profiles")
+            .from("public_profiles" as unknown as "profiles")
             .select(
               "id, full_name, display_name, avatar_url, bio, agent_verification_status, instagram_handle, location, featured_photos"
             )
             .eq("id", id)
             .maybeSingle(),
           supabase
-            .from("travel_agents")
+            .from("public_travel_agents" as unknown as "travel_agents")
             .select(
               "agency_name, bio, specializations, destinations, website, travel_style, starting_price_per_night, logo_url, linkedin_url, facebook_url, pinterest_url"
             )
@@ -91,7 +91,7 @@ export default function AgentPublicProfilePage() {
         const bookingIds = [...new Set(rows.map((r) => r.booking_id).filter(Boolean))];
         const [reviewersRes, bookingsRes] = await Promise.all([
           reviewerIds.length
-            ? supabase.from("profiles").select("id, first_name, last_name, display_name, full_name").in("id", reviewerIds)
+            ? supabase.from("public_profiles" as unknown as "profiles").select("id, display_name, full_name").in("id", reviewerIds)
             : Promise.resolve({ data: [] } as any),
           bookingIds.length
             ? supabase.from("trip_bookings").select("id, metadata").in("id", bookingIds)
@@ -104,8 +104,10 @@ export default function AgentPublicProfilePage() {
         setReviews(
           rows.map((r) => {
             const rp = reviewerById.get(r.reviewer_id);
-            const first = rp?.first_name || rp?.display_name || rp?.full_name || "Guest";
-            const lastInitial = rp?.last_name ? ` ${String(rp.last_name)[0].toUpperCase()}.` : "";
+            const fullish = rp?.display_name || rp?.full_name || "Guest";
+            const parts = String(fullish).trim().split(/\s+/);
+            const first = parts[0] || "Guest";
+            const lastInitial = parts.length > 1 ? ` ${parts[parts.length - 1][0].toUpperCase()}.` : "";
             const meta = (bookingById.get(r.booking_id)?.metadata ?? {}) as Record<string, unknown>;
             const destination =
               (meta.destination as string) || (meta.trip_title as string) || null;
