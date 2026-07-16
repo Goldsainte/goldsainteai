@@ -72,14 +72,22 @@ function Body({ text }: { text: string }) {
   for (const raw of text.split("\n")) {
     const l = raw.trim();
     if (!l) { flushAll(); continue; }
-    if (l.startsWith("## ")) {
+    if (l.startsWith("## ") || l.startsWith("### ")) {
+      const text = l.replace(/^#{2,3}\s+/, "");
+      // Guard: a "heading" longer than ~90 chars is body text wearing a
+      // heading marker (AI run-ons) — render it as a paragraph instead of
+      // supersizing a whole section.
+      if (text.length > 90) {
+        flushList();
+        para.push(text);
+        continue;
+      }
       flushAll();
-      nodes.push(<h2 key={k++} className="pt-6 font-secondary text-4xl text-[#0a2225]">{l.slice(3)}</h2>);
-      continue;
-    }
-    if (l.startsWith("### ")) {
-      flushAll();
-      nodes.push(<h3 key={k++} className="pt-2 font-secondary text-2xl text-[#0a2225]">{l.slice(4)}</h3>);
+      if (l.startsWith("## ")) {
+        nodes.push(<h2 key={k++} className="pt-6 font-secondary text-4xl text-[#0a2225]">{text}</h2>);
+      } else {
+        nodes.push(<h3 key={k++} className="pt-2 font-secondary text-2xl text-[#0a2225]">{text}</h3>);
+      }
       continue;
     }
     if (IMG_RE.test(l)) {
