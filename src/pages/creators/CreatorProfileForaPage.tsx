@@ -58,6 +58,7 @@ interface ExtraRow {
   collab_types: string[] | null;
   media_kit_url: string | null;
   ai_summary: string | null;
+  languages: string[] | null;
 }
 
 export default function CreatorProfileForaPage() {
@@ -85,7 +86,7 @@ export default function CreatorProfileForaPage() {
           supabase
             .from("public_creator_profiles" as unknown as "creator_profiles")
             .select(
-              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle, visited_countries, upcoming_trips, open_to_collabs, collab_types, media_kit_url, ai_summary"
+              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle, visited_countries, upcoming_trips, open_to_collabs, collab_types, media_kit_url, ai_summary, languages"
             )
             .eq("user_id", id)
             .maybeSingle(),
@@ -206,6 +207,7 @@ export default function CreatorProfileForaPage() {
         businessName={extra?.handle ? "@" + extra.handle.replace(/^@/, "") : null}
         tierLabel="Goldsainte Creator"
         location={dir.home_base}
+        languages={extra?.languages}
         startingPricePerNight={extra?.starting_price_per_night}
         askUsAbout={askUsAbout}
         story={extra?.bio}
