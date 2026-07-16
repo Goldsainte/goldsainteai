@@ -65,6 +65,9 @@ export interface PartnerProfileForaProps {
   reviewCount: number;
   ctaLabel: string;
   onCta: () => void;
+  /** Owner-only controls (Edit public profile / Travel guides). Rendered on
+   *  the sticky card when the signed-in viewer owns this profile. */
+  ownerActions?: { label: string; onClick: () => void }[];
 }
 
 const H = "text-[13px] font-semibold uppercase tracking-[0.16em] text-[#7A7151]";
@@ -123,7 +126,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
-    reviews, reviewCount, ctaLabel, onCta,
+    reviews, reviewCount, ctaLabel, onCta, ownerActions,
   } = props;
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showAllIdeas, setShowAllIdeas] = useState(false);
@@ -224,6 +227,20 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
               >
                 {ctaLabel}
               </button>
+              {ownerActions && ownerActions.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {ownerActions.map((a) => (
+                    <button
+                      key={a.label}
+                      type="button"
+                      onClick={a.onClick}
+                      className="w-full rounded-full border border-[#0a2225]/25 px-6 py-3 text-[14px] font-medium text-[#0a2225] transition-colors hover:bg-white"
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
