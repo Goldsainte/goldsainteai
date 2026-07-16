@@ -52,6 +52,11 @@ interface ExtraRow {
   instagram_handle: string | null;
   tiktok_handle: string | null;
   visited_countries: string[] | null;
+  upcoming_trips: { destination: string; timing: string }[] | null;
+  open_to_collabs: boolean | null;
+  collab_types: string[] | null;
+  media_kit_url: string | null;
+  ai_summary: string | null;
 }
 
 export default function CreatorProfileForaPage() {
@@ -79,7 +84,7 @@ export default function CreatorProfileForaPage() {
           supabase
             .from("public_creator_profiles" as unknown as "creator_profiles")
             .select(
-              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle, visited_countries"
+              "handle, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, instagram_handle, tiktok_handle, visited_countries, upcoming_trips, open_to_collabs, collab_types, media_kit_url, ai_summary"
             )
             .eq("user_id", id)
             .maybeSingle(),
@@ -230,6 +235,16 @@ export default function CreatorProfileForaPage() {
         }
         contentSlot={
           <>
+            {extra?.ai_summary && (
+              <section className="mt-12 rounded-3xl bg-[#0c4d47]/[0.06] p-6">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                  Goldsainte AI on {firstName}
+                </p>
+                <p className="mt-3 font-secondary italic text-[18px] leading-relaxed text-[#0a2225]">
+                  {extra.ai_summary}
+                </p>
+              </section>
+            )}
             {visitedCountries.length > 0 && (
               <section className="mt-14">
                 <div className="flex items-baseline justify-between gap-4">
@@ -258,6 +273,46 @@ export default function CreatorProfileForaPage() {
             <section className="mt-14">
               <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Trips inspired by this creator" />
             </section>
+            {(extra?.upcoming_trips ?? []).length > 0 && (
+              <section className="mt-14">
+                <h2 className="font-secondary text-3xl text-[#0a2225]">Upcoming trips</h2>
+                <div className="mt-6 space-y-3">
+                  {(extra!.upcoming_trips as { destination: string; timing: string }[]).map((t, i) => (
+                    <div key={i} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#F5F0E0]/70 px-6 py-4">
+                      <div>
+                        <p className="font-secondary text-xl text-[#0a2225]">{t.destination}</p>
+                        {t.timing && <p className="text-[13px] uppercase tracking-[0.12em] text-[#0a2225]/60">{t.timing}</p>}
+                      </div>
+                      <button type="button"
+                        onClick={() =>
+                          navigate("/post-trip?creatorId=" + dir.id + "&destination=" + encodeURIComponent(t.destination))
+                        }
+                        className="rounded-full border border-[#0a2225]/30 px-6 py-2.5 text-[14px] font-medium text-[#0a2225] hover:bg-white">
+                        Request to join
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+            {extra?.open_to_collabs && (
+              <section className="mt-14 rounded-3xl bg-[#F0EADA]/80 p-8">
+                <h2 className="font-secondary text-3xl text-[#0a2225]">Work with {firstName}</h2>
+                {(extra.collab_types ?? []).length > 0 && (
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {(extra.collab_types as string[]).map((t) => (
+                      <span key={t} className="rounded-full bg-white px-4 py-1.5 text-[13px] text-[#0a2225]">{t}</span>
+                    ))}
+                  </div>
+                )}
+                {extra.media_kit_url && (
+                  <a href={extra.media_kit_url} target="_blank" rel="noopener noreferrer"
+                    className="mt-6 inline-block rounded-full bg-[#0a2225] px-7 py-3.5 text-[13px] font-medium uppercase tracking-[0.14em] text-[#f7f3ea] hover:bg-[#0c4d47]">
+                    Download media kit
+                  </a>
+                )}
+              </section>
+            )}
           </>
         }
         hideBottomGallery
