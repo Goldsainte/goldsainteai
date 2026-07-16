@@ -5,6 +5,7 @@ import { Loader2, Camera, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { WORLD_COUNTRIES } from "@/components/partner/worldCountries";
 
 // ============================================================================
 // CreatorSettingsPage (Jul 16 AM) — "Edit public profile" for creators,
@@ -38,6 +39,13 @@ export default function CreatorSettingsPage() {
   });
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
+  const [visited, setVisited] = useState<string[]>([]);
+  const [countryQuery, setCountryQuery] = useState("");
+  const toggleCountry = (name: string) =>
+    setVisited((v) => (v.includes(name) ? v.filter((x) => x !== name) : [...v, name].sort()));
+  const countryMatches = countryQuery.trim()
+    ? WORLD_COUNTRIES.filter((c) => c.name.toLowerCase().includes(countryQuery.trim().toLowerCase())).slice(0, 8)
+    : [];
   const toArray = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
   useEffect(() => {
@@ -48,7 +56,7 @@ export default function CreatorSettingsPage() {
         supabase
           .from("creator_profiles")
           .select(
-            "display_name, handle, avatar_url, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, instagram_handle, tiktok_handle, website, linkedin_url, facebook_url, pinterest_url"
+            "display_name, handle, avatar_url, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, instagram_handle, tiktok_handle, website, linkedin_url, facebook_url, pinterest_url, visited_countries"
           )
           .eq("user_id", user.id)
           .maybeSingle(),
@@ -72,6 +80,7 @@ export default function CreatorSettingsPage() {
         facebook_url: c?.facebook_url || "",
         pinterest_url: c?.pinterest_url || "",
       });
+      setVisited(((c as any)?.visited_countries as string[]) ?? []);
       setLoading(false);
     })();
   }, [user]);
@@ -134,6 +143,7 @@ export default function CreatorSettingsPage() {
           linkedin_url: form.linkedin_url.trim() || null,
           facebook_url: form.facebook_url.trim() || null,
           pinterest_url: form.pinterest_url.trim() || null,
+          visited_countries: visited,
         })
         .eq("user_id", user.id)
         .select("user_id");
@@ -274,6 +284,58 @@ export default function CreatorSettingsPage() {
               <input className={input} value={form.specialties} onChange={set("specialties")} placeholder="Food tours, Photography spots" />
             </div>
           </div>
+        </section>
+
+        {/* My travel map */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <h2 className="font-secondary text-2xl text-[#0a2225]">My travel map</h2>
+          <p className={hint}>
+            Add every country you've traveled — they light up gold on your profile map, and your countries count shows on your card.
+          </p>
+          <input
+            className={input}
+            value={countryQuery}
+            onChange={(e) => setCountryQuery(e.target.value)}
+            placeholder="Search countries — e.g. Japan"
+          />
+          {countryMatches.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {countryMatches.map((c) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => { toggleCountry(c.name); setCountryQuery(""); }}
+                  className={`rounded-full px-4 py-2 text-[14px] transition-colors ${
+                    visited.includes(c.name)
+                      ? "bg-[#0c4d47] text-[#f7f3ea]"
+                      : "border border-[#E5DFC6] bg-white text-[#0a2225] hover:border-[#C7A962]"
+                  }`}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
+          {visited.length > 0 && (
+            <>
+              <p className="mt-5 text-[15px] font-semibold text-[#0a2225]">
+                {visited.length} {visited.length === 1 ? "country" : "countries"}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {visited.map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => toggleCountry(name)}
+                    title="Remove"
+                    className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[13px] text-[#0a2225] hover:bg-[#C7A962]/35"
+                  >
+                    {name} ×
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </section>
 
         {/* Stay connected */}
