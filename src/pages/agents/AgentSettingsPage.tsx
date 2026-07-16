@@ -51,6 +51,7 @@ export default function AgentSettingsPage() {
     linkedin_url: "",
     facebook_url: "",
     pinterest_url: "",
+    languages: "",
   });
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -71,7 +72,7 @@ export default function AgentSettingsPage() {
         supabase
           .from("travel_agents")
           .select(
-            "agency_name, bio, travel_style, destinations, specializations, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url"
+            "agency_name, bio, travel_style, destinations, specializations, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, languages"
           )
           .eq("user_id", user.id)
           .maybeSingle(),
@@ -92,6 +93,7 @@ export default function AgentSettingsPage() {
         linkedin_url: a?.linkedin_url || "",
         facebook_url: a?.facebook_url || "",
         pinterest_url: a?.pinterest_url || "",
+        languages: ((a as any)?.languages ?? []).join(", "),
       });
       setLoading(false);
     })();
@@ -159,6 +161,7 @@ export default function AgentSettingsPage() {
           linkedin_url: form.linkedin_url.trim() || null,
           facebook_url: form.facebook_url.trim() || null,
           pinterest_url: form.pinterest_url.trim() || null,
+          languages: toArray(form.languages),
         })
         .eq("user_id", user.id)
         .select("user_id");
@@ -278,6 +281,11 @@ export default function AgentSettingsPage() {
                 <label className={label}>Trips starting at ($/night)</label>
                 <input className={input} value={form.starting_price_per_night} onChange={set("starting_price_per_night")} placeholder="400" inputMode="numeric" />
                 <p className={hint}>Leave blank to hide this line.</p>
+              </div>
+              <div>
+                <label className={label}>Languages spoken</label>
+                <input className={input} value={form.languages} onChange={set("languages")} placeholder="English, Spanish, Portuguese" />
+                <p className={hint}>Separate with commas — shown on your card, like Fora.</p>
               </div>
             </div>
           </div>
