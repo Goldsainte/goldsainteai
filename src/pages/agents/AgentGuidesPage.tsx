@@ -26,6 +26,20 @@ const label = "block text-[15px] font-semibold text-[#0a2225]";
 const input =
   "mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]";
 
+// Fora rhythm: a full-width location photo directly under each section
+// heading. Bare URLs on their own line are what GuidePage renders as photos.
+const weavePhotos = (body: string, photos: string[]) => {
+  if (!photos.length || !body) return body;
+  const blocks = body.split(/\n{2,}/);
+  const out: string[] = [];
+  let i = 0;
+  for (const b of blocks) {
+    out.push(b);
+    if (b.startsWith("## ") && i < photos.length) out.push(photos[i++]);
+  }
+  return out.join("\n\n");
+};
+
 const slugify = (t: string) =>
   t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) +
   "-" + Math.random().toString(36).slice(2, 6);
@@ -66,12 +80,29 @@ export default function AgentGuidesPage() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+
+      // Real photography, AI-matched to the destination, via the already
+      // deployed unsplash-search function (same source as storyboards).
+      let photos: string[] = [];
+      try {
+        const { data: ph } = await supabase.functions.invoke("unsplash-search", {
+          body: { q: ai.destination.trim() },
+        });
+        photos = ((ph?.results as any[]) ?? [])
+          .map((r) => r?.urls?.regular)
+          .filter(Boolean)
+          .slice(0, 5);
+      } catch (e) {
+        console.error("photo search failed — guide continues without photos", e);
+      }
+
       setForm((f) => ({
         ...f,
         title: data.title || f.title,
         statement: data.statement || f.statement,
         tags: Array.isArray(data.tags) ? data.tags.join(", ") : f.tags,
-        body: data.body || f.body,
+        body: weavePhotos(data.body || f.body, photos.slice(1)),
+        hero_image_url: f.hero_image_url || photos[0] || f.hero_image_url,
       }));
       if (Array.isArray(data.hotels) && data.hotels.length > 0) {
         setHotels(
@@ -81,7 +112,7 @@ export default function AgentGuidesPage() {
           }))
         );
       }
-      toast.success("Draft generated — review, edit, add your photos, then save");
+      toast.success("Draft generated with location photos — review, edit, then save");
     } catch (e: any) {
       toast.error(e.message || "Generation failed — try again");
     } finally { setGenerating(false); }
