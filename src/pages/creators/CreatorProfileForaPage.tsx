@@ -8,6 +8,7 @@ import PartnerProfileFora, { type PartnerReview } from "@/components/partner/Par
 import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 import TravelMap from "@/components/partner/TravelMap";
+import { MessageButton } from "@/components/messaging/MessageButton";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 
 // ============================================================================
@@ -225,6 +226,17 @@ export default function CreatorProfileForaPage() {
           navigate("/post-trip?fromCreator=" + dir.id)
         }
         stats={stats}
+        belowCta={
+          user && user.id !== dir.id ? (
+            <MessageButton
+              recipientId={dir.id}
+              recipientName={displayName}
+              variant="outline"
+              className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
+              label={"Message " + firstName}
+            />
+          ) : undefined
+        }
         ownerActions={
           user?.id === dir.id
             ? [
