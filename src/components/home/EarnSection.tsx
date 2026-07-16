@@ -1,14 +1,12 @@
-// "Earn on Goldsainte" — one earn-focused section that consolidates the
-// old HowGoldsainteWorks role tabs + TwoWaysComparison + RoleSpecificCTAs.
-// Travelers get their story in the hero and DreamTripBand; this section
-// belongs to the supply side: creators and certified experts.
+// "Earn on Goldsainte" — the supply-side conversion cards (redesigned Jul 16
+// eve to the house editorial language: cream cards, hairline borders, serif
+// titles, photo as a restrained top band — matching the rest of the site
+// instead of dark-billboard advertising grammar).
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
-
 import creatorImage from "@/assets/home/hero-amalfi-coast.webp";
 import expertImage from "@/assets/fine-dining-hero.webp";
 
-const inter = { fontFamily: "Inter, sans-serif" } as const;
+const inter = { fontFamily: "Inter, sans-serif" };
 
 const cards = [
   {
@@ -26,7 +24,7 @@ const cards = [
     title: "Design journeys for clients worldwide",
     mechanics: "Trip requests · Bespoke proposals · Guaranteed milestone payouts",
     body: "Real travelers post dream trips; you answer with bespoke proposals. Get paid in guaranteed milestones — your deposit releases as working capital once reservations are confirmed, the balance on completion. No invoicing, no chasing.",
-    cta: "Join as a travel expert",
+    cta: "Join as a specialist",
     link: "/apply/agent",
     image: expertImage,
     alt: "Refined fine dining setting at golden hour",
@@ -55,27 +53,32 @@ export function EarnSection() {
               key={c.tag}
               to={c.link}
               aria-label={c.title}
-              className="group relative block aspect-[16/11] md:aspect-[16/10] overflow-hidden rounded-[26px] bg-[#0a2225] shadow-[0_24px_60px_rgba(10,34,37,0.12)] transition-all duration-500 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_36px_80px_rgba(10,34,37,0.22)]"
+              className="group block overflow-hidden rounded-[26px] border border-[#E5DFC6] bg-white/70 transition-all duration-500 ease-out motion-safe:hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(10,34,37,0.12)]"
             >
-              <img
-                src={c.image}
-                alt={c.alt}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out motion-safe:group-hover:scale-[1.06]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/90 via-[#0a2225]/35 to-transparent" />
-              <span className="absolute left-6 top-6 inline-block rounded-full bg-[#0a2225]/70 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-[#E8C977] backdrop-blur-sm" style={inter}>
-                {c.tag}
-              </span>
-              <div className="absolute inset-x-0 bottom-0 p-6 md:p-7 text-white">
-                <h3 className="font-secondary italic text-[22px] md:text-[26px] leading-[1.15]">{c.title}</h3>
-                <p className="mt-1.5 font-secondary text-[15px] md:text-[17px] text-[#E8C977]">{c.mechanics}</p>
-                <p className="mt-2 max-w-[440px] text-[13px] md:text-[13.5px] leading-relaxed text-white/85" style={inter}>
+              <div className="h-44 overflow-hidden md:h-52">
+                <img
+                  src={c.image}
+                  alt={c.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+              </div>
+              <div className="p-7 md:p-8">
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#8a7136]" style={inter}>
+                  {c.tag}
+                </p>
+                <h3 className="mt-3 font-secondary text-[24px] leading-snug text-[#0a2225] md:text-[26px]">
+                  {c.title}
+                </h3>
+                <p className="mt-2 text-[13px] text-[#8D6B2F]" style={inter}>
+                  {c.mechanics}
+                </p>
+                <p className="mt-4 text-[15px] leading-relaxed text-[#0a2225]/75">
                   {c.body}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#E8C977]" style={inter}>
-                  {c.cta} <ArrowUpRight className="h-4 w-4" />
+                <span className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-medium text-[#0c4d47]">
+                  {c.cta}
+                  <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </span>
               </div>
             </Link>
