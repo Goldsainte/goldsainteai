@@ -18,11 +18,13 @@ interface Trip {
 interface ProfileTripsGridProps {
   creatorId: string;
   creatorType?: "creator" | "agent";
+  title?: string;
 }
 
 export function ProfileTripsGrid({
   creatorId,
   creatorType,
+  title = "Marketplace Trips",
 }: ProfileTripsGridProps) {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +57,7 @@ export function ProfileTripsGrid({
     return (
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-          Marketplace Trips
+          {title}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {[1, 2].map((i) => (
@@ -79,14 +81,16 @@ export function ProfileTripsGrid({
     return (
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
-          Marketplace Trips
+          {title}
         </h2>
         <div className="rounded-2xl border border-[#E5DFC6] bg-gradient-to-br from-white to-[#F5F0E0]/50 p-8 text-center">
           <p className="font-secondary text-lg text-[#0a2225]">
             Trips coming soon
           </p>
           <p className="mt-1 text-sm text-[#6B7280]">
-            This creator is building their trip collection.
+            {creatorType === "agent"
+              ? "This specialist is building their trip collection."
+              : "This creator is building their trip collection."}
           </p>
         </div>
       </section>
@@ -97,7 +101,7 @@ export function ProfileTripsGrid({
     <section>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151]">
-          Marketplace Trips
+          {title}
         </h2>
         <span className="text-xs text-[#8C8470]">
           {trips.length} {trips.length === 1 ? "trip" : "trips"}
