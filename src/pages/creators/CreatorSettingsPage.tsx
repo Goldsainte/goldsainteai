@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { WORLD_COUNTRIES } from "@/components/partner/worldCountries";
+import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 
 // ============================================================================
 // CreatorSettingsPage (Jul 16 AM) — "Edit public profile" for creators,
@@ -81,6 +82,18 @@ export default function CreatorSettingsPage() {
   const updateUpcoming = (i: number, k: "destination" | "timing", v: string) =>
     setUpcoming((u) => u.map((t, j) => (j === i ? { ...t, [k]: v } : t)));
   const [countryQuery, setCountryQuery] = useState("");
+  const [regionQuery, setRegionQuery] = useState("");
+  const regionList = form.primary_regions.split(",").map((x) => x.trim()).filter(Boolean);
+  const addRegion = () => {
+    const r = regionQuery.trim();
+    if (!r) return;
+    if (!regionList.includes(r)) {
+      setForm((f) => ({ ...f, primary_regions: [...regionList, r].join(", ") }));
+    }
+    setRegionQuery("");
+  };
+  const removeRegion = (r: string) =>
+    setForm((f) => ({ ...f, primary_regions: regionList.filter((x) => x !== r).join(", ") }));
   const toggleCountry = (name: string) =>
     setVisited((v) => (v.includes(name) ? v.filter((x) => x !== name) : [...v, name].sort()));
   const countryMatches = countryQuery.trim()
@@ -359,7 +372,13 @@ export default function CreatorSettingsPage() {
               </div>
               <div>
                 <label className={label}>Based in</label>
-                <input className={input} value={form.location} onChange={set("location")} placeholder="Charlotte, North Carolina" />
+                <div className="mt-2">
+                  <GoogleCityAutocomplete
+                    value={form.location}
+                    onChange={(v) => setForm((f) => ({ ...f, location: v }))}
+                    placeholder="Charlotte, NC, USA"
+                  />
+                </div>
               </div>
               <div>
                 <label className={label}>Trips starting at ($/night)</label>
@@ -396,7 +415,30 @@ export default function CreatorSettingsPage() {
             </div>
             <div>
               <label className={label}>Primary regions</label>
-              <input className={input} value={form.primary_regions} onChange={set("primary_regions")} placeholder="Europe, SE Asia, Caribbean" />
+              <div className="mt-2 flex gap-3">
+                <div className="flex-1">
+                  <GoogleCityAutocomplete
+                    value={regionQuery}
+                    onChange={setRegionQuery}
+                    types={["(regions)"]}
+                    placeholder="Search a country or region — e.g. Portugal"
+                  />
+                </div>
+                <button type="button" onClick={addRegion}
+                  className="shrink-0 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] hover:bg-white">
+                  Add
+                </button>
+              </div>
+              {regionList.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {regionList.map((r) => (
+                    <button key={r} type="button" onClick={() => removeRegion(r)} title="Remove"
+                      className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[13px] text-[#0a2225] hover:bg-[#C7A962]/35">
+                      {r} ×
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className={label}>Specialties</label>
