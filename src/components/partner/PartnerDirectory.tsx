@@ -86,6 +86,19 @@ async function fetchCards(kind: DirectoryKind): Promise<DirectoryCard[]> {
     }));
 }
 
+// Placement v1 — completeness-first: real photo, then richer tag sets, then
+// name. Finish your profile, rank higher. (Engagement-weighted ranking is the
+// boarded v2 once views/bookings accumulate.)
+function rankCards(cards: DirectoryCard[]): DirectoryCard[] {
+  return [...cards].sort((a, b) => {
+    const photo = Number(Boolean(b.avatarUrl)) - Number(Boolean(a.avatarUrl));
+    if (photo !== 0) return photo;
+    const tags = Math.min(b.tags.length, 6) - Math.min(a.tags.length, 6);
+    if (tags !== 0) return tags;
+    return a.name.localeCompare(b.name);
+  });
+}
+
 export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   const navigate = useNavigate();
   const copy = COPY[kind];
@@ -97,7 +110,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
     (async () => {
       try {
         const result = await fetchCards(kind);
-        if (!cancelled) setCards(result);
+        if (!cancelled) setCards(rankCards(result));
       } catch (e) {
         console.error(`${kind} directory load failed`, e);
       } finally {
