@@ -38,6 +38,7 @@ interface TravelIdea {
   cover_image_url: string | null;
   description?: string | null;
   href: string;
+  views?: number;
 }
 
 export interface PartnerProfileForaProps {
@@ -69,6 +70,9 @@ export interface PartnerProfileForaProps {
   /** Owner-only controls (Edit public profile / Travel guides). Rendered on
    *  the sticky card when the signed-in viewer owns this profile. */
   ownerActions?: { label: string; onClick: () => void }[];
+  /** Influence strip on the sticky card (creators: followers / avg views /
+   *  trips) — the signal agents don't have. */
+  stats?: { label: string; value: string }[];
   /** Content-first center band (creators: media feed + inspired trips). */
   contentSlot?: React.ReactNode;
   /** Suppress the built-in bottom media gallery when contentSlot renders it. */
@@ -131,7 +135,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
-    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery,
+    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery, stats,
   } = props;
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showAllIdeas, setShowAllIdeas] = useState(false);
@@ -148,7 +152,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
       // remain the fallback until the author has written guides.
       const { data: guides } = await supabase
         .from("partner_guides")
-        .select("id, title, slug, hero_image_url, tags, statement")
+        .select("id, title, slug, hero_image_url, tags, statement, view_count")
         .eq("author_id", userId)
         .eq("published", true)
         .order("created_at", { ascending: false })
@@ -163,6 +167,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
             destination: (g.tags ?? [])[0] ?? null,
             cover_image_url: g.hero_image_url,
             description: g.statement,
+            views: g.view_count ?? 0,
             href: `/guides/${g.slug}`,
           }))
         );
@@ -225,6 +230,17 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
                   </p>
                 )}
               </div>
+
+              {stats && stats.length > 0 && (
+                <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-white/70 p-4 text-center">
+                  {stats.map((s) => (
+                    <div key={s.label}>
+                      <p className="font-secondary text-xl text-[#0a2225]">{s.value}</p>
+                      <p className="mt-0.5 text-[11px] uppercase tracking-[0.12em] text-[#0a2225]/60">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <button
                 type="button"
@@ -396,11 +412,18 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
                     )}
                     <div className="min-w-0 flex-1">
                       <h3 className="font-secondary text-2xl leading-snug text-[#0a2225] md:text-3xl">{t.title}</h3>
-                      {t.destination && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <span className="rounded-full bg-[#F5F0E0] px-4 py-1.5 text-[13px] text-[#0a2225]">
-                            {t.destination}
-                          </span>
+                      {(t.destination || (t.views ?? 0) > 0) && (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          {t.destination && (
+                            <span className="rounded-full bg-[#F5F0E0] px-4 py-1.5 text-[13px] text-[#0a2225]">
+                              {t.destination}
+                            </span>
+                          )}
+                          {(t.views ?? 0) > 0 && (
+                            <span className="text-[13px] text-[#0a2225]/55">
+                              {(t.views as number).toLocaleString()} views
+                            </span>
+                          )}
                         </div>
                       )}
                       {t.description && (
