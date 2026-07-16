@@ -69,6 +69,8 @@ export function CreatorMediaGallery({
 
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const coverInput = useRef<HTMLInputElement>(null);
   const addReelLink = async () => {
     const u = linkUrl.trim();
     const source = u.includes("tiktok.com") ? "tiktok" : u.includes("instagram.com") ? "instagram" : null;
@@ -77,6 +79,21 @@ export function CreatorMediaGallery({
       return;
     }
     try {
+      // Cover image: creator-provided wins; TikTok links can auto-fetch one
+      // (Instagram blocks thumbnail access without a registered FB app).
+      let thumbnail_url: string | null = null;
+      if (coverFile) {
+        const ext = (coverFile.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${creatorId}/highlights/cover-${Date.now()}.${ext}`;
+        const { error: cErr } = await supabase.storage.from("avatars").upload(path, coverFile, { cacheControl: "3600" });
+        if (cErr) throw cErr;
+        thumbnail_url = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+      } else if (source === "tiktok") {
+        try {
+          const r = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(u)}`);
+          if (r.ok) thumbnail_url = (await r.json())?.thumbnail_url ?? null;
+        } catch { /* fall back to the branded tile */ }
+      }
       const { data: row, error } = await supabase
         .from("creator_media")
         .insert({
@@ -85,6 +102,7 @@ export function CreatorMediaGallery({
           source,
           external_url: u,
           url: u,
+          thumbnail_url,
           sort_order: items.length,
         })
         .select("*")
@@ -92,6 +110,7 @@ export function CreatorMediaGallery({
       if (error) throw error;
       setItems((prev) => [...prev, row as any]);
       setLinkUrl("");
+      setCoverFile(null);
       setLinkOpen(false);
     } catch (e) {
       alert((e as any)?.message || "Couldn't add the link");
@@ -124,6 +143,17 @@ export function CreatorMediaGallery({
           <Button size="sm" onClick={addReelLink} className="bg-[#0c4d47] text-[#f7f3ea] hover:bg-[#0a2225]">
             Add
           </Button>
+        </div>
+      )}
+      {linkOpen && (
+        <div className="mt-2 flex items-center gap-2">
+          <input ref={coverInput} type="file" accept="image/*" className="hidden"
+            onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)} />
+          <button type="button" onClick={() => coverInput.current?.click()}
+            className="text-xs font-medium text-[#0c4d47] underline underline-offset-4">
+            {coverFile ? `Cover: ${coverFile.name}` : "Add a cover photo (recommended for Instagram)"}
+          </button>
+          <span className="text-[11px] text-[#6B7280]">TikTok covers are fetched automatically.</span>
         </div>
       )}
     </div>
@@ -218,6 +248,22 @@ export function CreatorMediaGallery({
               }
             }}
           >
+            {isOwnProfile && (
+              <button
+                type="button"
+                title="Remove"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (!confirm("Remove this highlight?")) return;
+                  await supabase.from("creator_media").delete().eq("id", item.id);
+                  setItems((prev) => prev.filter((x) => x.id !== item.id));
+                }}
+                className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                ×
+              </button>
+            )}
+
             {/* Image */}
             {item.media_type === "image" && (
               <>
