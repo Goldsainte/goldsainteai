@@ -19,6 +19,13 @@ import { initAnalytics } from "@/lib/analytics/init";
 // (single choke point for all ~30 upload sites — see the module header).
 import "@/lib/storageImageCompressionGuard";
 
+// Post-publish stale-chunk guard: when a deploy replaces the JS chunks an
+// open session tries to lazy-load, Vite fires this event — reload once and
+// the user gets the fresh app instead of the "Something went wrong" screen.
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload();
+});
+
 // Capture Google Ads click identifier (gclid) on landing so we can attribute
 // downstream conversions even after navigation.
 captureGclidFromUrl();
