@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
 import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
+import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 
 // ============================================================================
 // CreatorProfileForaPage (Phase B preview — Jul 16 AM)
@@ -28,6 +29,10 @@ interface DirRow {
   creator_niches: string[] | null;
   content_style_tags: string[] | null;
   home_base: string | null;
+  tiktok_followers: number | null;
+  creator_followers: number | null;
+  followers_count: number | null;
+  creator_avg_views: number | null;
 }
 
 interface ExtraRow {
@@ -66,7 +71,7 @@ export default function CreatorProfileForaPage() {
         const [dirRes, extraRes] = await Promise.all([
           supabase
             .from("creator_directory" as unknown as "profiles")
-            .select("id, display_name, full_name, avatar_url, creator_niches, content_style_tags, home_base")
+            .select("id, display_name, full_name, avatar_url, creator_niches, content_style_tags, home_base, tiktok_followers, creator_followers, followers_count, creator_avg_views")
             .eq("id", id)
             .maybeSingle(),
           supabase
@@ -148,6 +153,17 @@ export default function CreatorProfileForaPage() {
   }
 
   const displayName = dir.display_name || dir.full_name || "Goldsainte Creator";
+  const compact = (n: number) =>
+    n >= 1_000_000 ? (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M"
+    : n >= 1_000 ? (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K"
+    : String(n);
+  const followers = dir.tiktok_followers ?? dir.creator_followers ?? dir.followers_count;
+  const stats = [
+    followers != null && followers > 0 ? { label: "Followers", value: compact(followers) } : null,
+    dir.creator_avg_views != null && dir.creator_avg_views > 0
+      ? { label: "Avg views", value: compact(dir.creator_avg_views) }
+      : null,
+  ].filter(Boolean) as { label: string; value: string }[];
   const firstName = displayName.split(" ")[0];
   const askUsAbout = [
     ...new Set([
@@ -199,6 +215,7 @@ export default function CreatorProfileForaPage() {
         onCta={() =>
           navigate("/post-trip?creatorId=" + dir.id + "&creatorName=" + encodeURIComponent(displayName))
         }
+        stats={stats}
         ownerActions={
           user?.id === dir.id
             ? [
@@ -211,7 +228,15 @@ export default function CreatorProfileForaPage() {
           <>
             <section className="mt-14">
               <h2 className="mb-6 font-secondary text-3xl text-[#0a2225]">Content</h2>
-              <PartnerMediaGallery userId={dir.id} />
+              <CreatorMediaGallery
+                creatorId={dir.id}
+                fallbackPhotos={null}
+                instagramHandle={extra?.instagram_handle ?? null}
+                isOwnProfile={user?.id === dir.id}
+              />
+              <div className="mt-8">
+                <PartnerMediaGallery userId={dir.id} />
+              </div>
             </section>
             <section className="mt-14">
               <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Trips inspired by this creator" />
