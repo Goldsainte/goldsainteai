@@ -40,6 +40,7 @@ const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProf
 const AgentsDirectoryPage = lazy(() => import('@/pages/agents/AgentsDirectoryPage'));
 const CreatorsDirectoryPage = lazy(() => import('@/pages/creators/CreatorsDirectoryPage'));
 const CreatorSettingsPage = lazy(() => import('@/pages/creators/CreatorSettingsPage'));
+const CreatorProfileForaPage = lazy(() => import('@/pages/creators/CreatorProfileForaPage'));
 const AgentGuidesPage = lazy(() => import('@/pages/agents/AgentGuidesPage'));
 const GuidePage = lazy(() => import('@/pages/guides/GuidePage'));
 const AgentSettingsPage = lazy(() => import('@/pages/agents/AgentSettingsPage'));
@@ -193,6 +194,7 @@ export const AppRoutes = () => (
       <Route path="/bundle-builder" element={<BundleBuilder />} />
       <Route path="/creators" element={<CreatorsDirectoryPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
+      <Route path="/creators-preview/:id" element={<CreatorProfileForaPage />} />
       <Route path="/agents" element={<AgentsDirectoryPage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/agent-guides" element={<RequireAuth><AgentGuidesPage /></RequireAuth>} />
