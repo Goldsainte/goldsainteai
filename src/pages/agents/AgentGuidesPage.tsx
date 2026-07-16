@@ -49,6 +49,31 @@ export default function AgentGuidesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const heroInput = useRef<HTMLInputElement>(null);
+  const bodyPhotoInput = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  const insertBodyPhoto = async (file: File) => {
+    if (!user) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/guides/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { cacheControl: "3600" });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const url = data.publicUrl;
+      setForm((f) => {
+        const ta = bodyRef.current;
+        const pos = ta ? ta.selectionStart : f.body.length;
+        const before = f.body.slice(0, pos).replace(/\n*$/, "");
+        const after = f.body.slice(pos).replace(/^\n*/, "");
+        return { ...f, body: (before ? before + "\n\n" : "") + url + (after ? "\n\n" + after : "\n") };
+      });
+      toast.success("Photo inserted where your cursor was");
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally { setUploading(false); }
+  };
   const [guides, setGuides] = useState<GuideRow[]>([]);
   const [editing, setEditing] = useState<GuideRow | null>(null);
   const [creating, setCreating] = useState(false);
@@ -311,8 +336,15 @@ export default function AgentGuidesPage() {
             </div>
             <div>
               <label className={label}>The guide</label>
-              <textarea className={`${input} min-h-[320px] font-mono text-[14px]`} value={form.body} onChange={set("body")}
+              <textarea ref={bodyRef} className={`${input} min-h-[320px] font-mono text-[14px]`} value={form.body} onChange={set("body")}
                 placeholder={"## Where to stay\n\nA paragraph about the area.\n\n- Splendido, Portofino: why it's special\n- Grand Hotel Miramare: why it's special\n\nhttps://…/photo.jpg\n\n## Things to do\n\n- Wander the Piazzetta: the heart of town\n- Lunch at DaV Mare: order the Pasta DaV"} />
+              <input ref={bodyPhotoInput} type="file" accept="image/*" className="hidden"
+                onChange={(e) => e.target.files?.[0] && insertBodyPhoto(e.target.files[0])} />
+              <button type="button" onClick={() => bodyPhotoInput.current?.click()} disabled={uploading}
+                className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#0c4d47] underline underline-offset-4">
+                {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
+                Insert my own photo at cursor
+              </button>
               <p className="mt-2 text-[13px] leading-relaxed text-[#6B7280]">
                 Formatting: start a line with <span className="font-mono">##</span> for a section heading, <span className="font-mono">-</span> for an arrow bullet, paste a bare image URL on its own line for a full-width photo, and leave a blank line between blocks.
               </p>
