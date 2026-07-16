@@ -176,8 +176,8 @@ export default function GuidePage() {
         setGuide((g as Guide) ?? null);
         if (g) {
           const [{ data: p }, { data: a }] = await Promise.all([
-            supabase.from("profiles").select("display_name, full_name, avatar_url").eq("id", g.author_id).maybeSingle(),
-            supabase.from("travel_agents").select("agency_name").eq("user_id", g.author_id).maybeSingle(),
+            supabase.from("public_profiles" as unknown as "profiles").select("display_name, full_name, avatar_url").eq("id", g.author_id).maybeSingle(),
+            supabase.from("public_travel_agents" as unknown as "travel_agents").select("agency_name").eq("user_id", g.author_id).maybeSingle(),
           ]);
           if (cancelled) return;
           setAuthor({
