@@ -190,6 +190,15 @@ export default function AgentSettingsPage() {
               <ExternalLink className="h-4 w-4" /> View public profile
             </button>
           )}
+          {user && (
+            <button
+              type="button"
+              onClick={() => navigate("/agent-guides")}
+              className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white"
+            >
+              Travel guides
+            </button>
+          )}
         </div>
 
         {/* Identity */}
