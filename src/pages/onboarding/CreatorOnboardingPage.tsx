@@ -213,7 +213,7 @@ export default function CreatorOnboardingPage() {
       // Skip = leave onboarding for now. /creator-dashboard is guarded only by
       // RequireAuth (no onboarding-completion gate); it shows a "complete your
       // profile" banner + Getting Started checklist so they can finish later.
-      navigate("/creator-dashboard");
+      navigate("/creator-handbook");
     } catch (error) {
       console.error("Error saving partial progress:", error);
       toast.error("Failed to save progress.");
