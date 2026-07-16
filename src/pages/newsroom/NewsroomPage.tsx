@@ -39,7 +39,7 @@ export default function NewsroomPage() {
         <h1 className="mt-3 font-secondary text-5xl leading-tight text-[#0a2225]">News from Goldsainte</h1>
         <p className="mt-4 text-[17px] leading-relaxed text-[#0a2225]/75">
           Announcements, launches, and press. For media inquiries:{" "}
-          <a href="mailto:press@goldsainte.ai" className="text-[#0c4d47] underline underline-offset-4">press@goldsainte.ai</a>
+          <a href="mailto:press@goldsainte.com" className="text-[#0c4d47] underline underline-offset-4">press@goldsainte.com</a>
         </p>
 
         {loading ? (
