@@ -110,8 +110,9 @@ export function HomeHero() {
             </h1>
 
             <p className="mt-4 text-center md:text-left max-w-xl mx-auto md:mx-0 text-[15px] md:text-[17px] leading-relaxed text-[#3f4a4b]">
-              Book journeys crafted by certified specialists and real travelers —
-              or post your dream trip and let the experts come to you.
+              The marketplace where travel creators and certified specialists design
+              your trip — not an algorithm. Post your dream trip, let the experts come
+              to you, and book with every dollar protected in escrow until you travel.
             </p>
 
             {/* Search bar — the SAME MarketplaceSearch component the
