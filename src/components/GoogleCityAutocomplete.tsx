@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 
 interface GoogleCityAutocompleteProps {
   value: string;
+  /** Places types, e.g. ["(cities)"] (default) or ["(regions)"] */
+  types?: string[];
   onChange: (value: string) => void;
   placeholder?: string;
   id?: string;
@@ -30,6 +32,7 @@ export function GoogleCityAutocomplete({
   value,
   onChange,
   placeholder = "City, Country",
+  types = ["(cities)"],
   id,
   className,
   inputClassName,
@@ -93,7 +96,7 @@ export function GoogleCityAutocomplete({
       return;
     }
     serviceRef.current.getPlacePredictions(
-      { input: q, types: ["(cities)"], sessionToken: tokenRef.current || undefined },
+      { input: q, types, sessionToken: tokenRef.current || undefined },
       (preds, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK || !preds) {
           setSuggestions([]);
