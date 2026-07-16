@@ -37,6 +37,7 @@ const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
+const AgentsDirectoryPage = lazy(() => import('@/pages/agents/AgentsDirectoryPage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
 const TripRequestRedirect = lazy(() => import('@/pages/redirects/TripRequestRedirect'));
@@ -187,7 +188,7 @@ export const AppRoutes = () => (
       <Route path="/bundle-builder" element={<BundleBuilder />} />
       <Route path="/creators" element={<CreatorsPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
-      <Route path="/agents" element={<Navigate to="/marketplace" replace />} />
+      <Route path="/agents" element={<AgentsDirectoryPage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
