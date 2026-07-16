@@ -200,33 +200,23 @@ export default function AgentSettingsPage() {
               Everything here appears on your public profile — exactly what travelers see.
             </p>
           </div>
-          {user && (
-            <button
-              type="button"
-              onClick={() => navigate(`/agents/${user.id}`)}
-              className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white"
-            >
-              <ExternalLink className="h-4 w-4" /> View public profile
+          <div className="flex flex-wrap items-center gap-2">
+            {user && (
+              <button type="button" onClick={() => navigate(`/agents/${user.id}`)}
+                className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0c4d47] px-3.5 text-[13px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225]">
+                <ExternalLink className="h-3.5 w-3.5" /> View public profile
+              </button>
+            )}
+            <button type="button" onClick={() => navigate("/agent-handbook")}
+              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#C7A962]/50 px-3.5 text-[13px] font-medium text-[#8D6B2F] transition-colors hover:bg-white">
+              How it works
             </button>
-          )}
-          {user && (
-            <>
-              <button
-                type="button"
-                onClick={() => navigate("/agent-handbook")}
-                className="inline-flex items-center gap-2 rounded-full border border-[#C7A962]/60 bg-[#FDF9F0] px-5 py-2.5 text-[14px] font-medium text-[#8D6B2F] transition-colors hover:bg-white"
-              >
-                How it works
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/agent-guides")}
-                className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white"
-              >
-                Travel guides
-              </button>
-            </>
-          )}
+            <span className="mx-1 hidden h-5 w-px bg-[#E5DFC6] sm:block" />
+            <button type="button" onClick={() => navigate("/agent-guides")}
+              className="inline-flex h-9 items-center whitespace-nowrap rounded-lg border border-transparent px-3 text-[13px] text-[#0a2225]/70 transition-colors hover:border-[#E5DFC6] hover:bg-white hover:text-[#0a2225]">
+              Travel guides
+            </button>
+          </div>
         </div>
 
         {/* Identity */}
