@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sparkles, Hash, PenLine, Copy } from "lucide-react";
+import { Hash, PenLine, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 type Product = { id: string; title: string; description?: string | null; destination?: string | null; kind: "trip" | "guide" };
@@ -45,7 +45,6 @@ export function CreatorContentToolsTab() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Sparkles className="h-5 w-5 text-[#C7A962]" />
         <h2 className="font-secondary text-xl text-[#0a2225]">Content tools</h2>
       </div>
       <p className="text-sm text-[#6B7280]">
@@ -209,7 +208,6 @@ function DescriptionRewriter({ products }: { products: Product[] }) {
   return (
     <Card className="p-5">
       <div className="mb-3 flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-[#0c4d47]" />
         <h3 className="font-secondary text-lg text-[#0a2225]">Description rewriter</h3>
       </div>
       <Select value={productId} onValueChange={setProductId}>
