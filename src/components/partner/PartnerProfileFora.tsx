@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
-import { MapPin, Moon, Star, Instagram, Linkedin, Facebook, Link2, Globe, Music2 } from "lucide-react";
+import { MapPin, Moon, Star, Languages, Instagram, Linkedin, Facebook, Link2, Globe, Music2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 
@@ -50,6 +50,7 @@ export interface PartnerProfileForaProps {
   businessName?: string | null;
   tierLabel?: string | null;
   location?: string | null;
+  languages?: string[] | null;
   startingPricePerNight?: number | null;
   askUsAbout: string[];
   story?: string | null;
@@ -135,7 +136,7 @@ function SocialIcon({ href, label, children }: { href: string; label: string; ch
 
 export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const {
-    kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
+    kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location, languages,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
     reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery, stats, belowCta,
   } = props;
@@ -214,6 +215,11 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
                     <MapPin className="h-5 w-5 shrink-0 text-[#0a2225]" /> Based in {location}
                   </p>
                 )}
+                {languages && languages.length > 0 && (
+                  <p className="flex items-center gap-2.5 py-4 text-[16px] text-[#0a2225]">
+                    <Languages className="h-5 w-5 shrink-0 text-[#0a2225]" /> {languages.join(", ")}
+                  </p>
+                )}
                 {startingPricePerNight != null && startingPricePerNight > 0 && (
                   <p className="flex items-center gap-2.5 py-4 text-[16px] text-[#0a2225]">
                     <Moon className="h-5 w-5 shrink-0 text-[#0a2225]" /> Trips starting at $
@@ -223,7 +229,10 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
               </div>
 
               {stats && stats.length > 0 && (
-                <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl bg-white/70 p-4 text-center">
+                <div
+                  className="mt-5 grid gap-2 rounded-2xl bg-white/70 p-4 text-center"
+                  style={{ gridTemplateColumns: `repeat(${Math.min(stats.length, 3)}, minmax(0, 1fr))` }}
+                >
                   {stats.map((s) => (
                     <div key={s.label}>
                       <p className="font-secondary text-xl text-[#0a2225]">{s.value}</p>
