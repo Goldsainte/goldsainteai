@@ -124,8 +124,8 @@ const CREATOR_ITEMS: ChecklistItem[] = [
   },
   {
     id: "share-profile",
-    label: "Share your creator profile",
-    description: "Your public profile is your storefront. Share it on TikTok and Instagram.",
+    label: "View & share your profile",
+    description: "Open your public profile, then share the link on TikTok and Instagram.",
     cta: { label: "View my profile", to: (d) => `/creators/${d.profile?.id || ""}` },
     // "creator_avg_views > 10" was an imported TikTok metric unrelated to sharing.
     // Complete when the creator opens their public profile (the share/preview action).
