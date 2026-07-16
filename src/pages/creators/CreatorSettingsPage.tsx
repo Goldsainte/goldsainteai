@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { WORLD_COUNTRIES } from "@/components/partner/worldCountries";
 import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
+import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 
 // ============================================================================
 // CreatorSettingsPage (Jul 16 AM) — "Edit public profile" for creators,
@@ -386,6 +387,30 @@ export default function CreatorSettingsPage() {
                 <p className={hint}>Leave blank to hide this line.</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Content — the exact sections travelers see on your profile */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-secondary text-2xl text-[#0a2225]">Content</h2>
+            <button type="button" onClick={() => navigate("/profile/media")}
+              className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] hover:bg-white">
+              Manage photos & video →
+            </button>
+          </div>
+          <p className={hint}>
+            Your trip highlights, exactly as they appear in the Content section of your public profile — add or remove them right here.
+          </p>
+          <div className="mt-5">
+            {user && (
+              <CreatorMediaGallery
+                creatorId={user.id}
+                fallbackPhotos={null}
+                instagramHandle={form.instagram_handle.replace(/^@/, "").trim() || null}
+                isOwnProfile
+              />
+            )}
           </div>
         </section>
 
