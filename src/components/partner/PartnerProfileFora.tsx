@@ -73,6 +73,8 @@ export interface PartnerProfileForaProps {
   /** Influence strip on the sticky card (creators: followers / avg views /
    *  trips) — the signal agents don't have. */
   stats?: { label: string; value: string }[];
+  /** Rendered under the primary CTA on the card (e.g. a Message button). */
+  belowCta?: React.ReactNode;
   /** Content-first center band (creators: media feed + inspired trips). */
   contentSlot?: React.ReactNode;
   /** Suppress the built-in bottom media gallery when contentSlot renders it. */
@@ -135,7 +137,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
-    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery, stats,
+    reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery, stats, belowCta,
   } = props;
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showAllIdeas, setShowAllIdeas] = useState(false);
@@ -238,6 +240,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
               >
                 {ctaLabel}
               </button>
+              {belowCta && <div className="mt-3">{belowCta}</div>}
               {ownerActions && ownerActions.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {ownerActions.map((a) => (
