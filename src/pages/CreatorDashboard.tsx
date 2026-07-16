@@ -19,7 +19,6 @@ import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
 import { CreatorProposalsTab } from "./creator/components/CreatorProposalsTab";
 import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
 import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
-import { CreatorPortfolioTab } from "./creator/components/CreatorPortfolioTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
 import { CreatorGuidesTab } from "./creator/components/CreatorGuidesTab";
 import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTab";
@@ -214,7 +213,6 @@ export default function CreatorDashboard() {
       key: "catalog",
       label: "Catalog",
       children: [
-        { key: "portfolio", label: "Portfolio" },
         { key: "guides", label: "Guides" },
         { key: "services", label: "Services" },
       ],
@@ -270,8 +268,6 @@ export default function CreatorDashboard() {
         return <CreatorProposalsTab />;
       case "trips":
         return <CreatorTripsTab />;
-      case "portfolio":
-        return <CreatorPortfolioTab />;
       case "guides":
         return <CreatorGuidesTab />;
       case "services":
