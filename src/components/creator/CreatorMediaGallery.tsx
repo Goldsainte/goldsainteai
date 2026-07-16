@@ -67,6 +67,68 @@ export function CreatorMediaGallery({
     }
   };
 
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const addReelLink = async () => {
+    const u = linkUrl.trim();
+    const source = u.includes("tiktok.com") ? "tiktok" : u.includes("instagram.com") ? "instagram" : null;
+    if (!source) {
+      alert("Paste a TikTok or Instagram link (it should contain tiktok.com or instagram.com).");
+      return;
+    }
+    try {
+      const { data: row, error } = await supabase
+        .from("creator_media")
+        .insert({
+          user_id: creatorId,
+          media_type: "video",
+          source,
+          external_url: u,
+          url: u,
+          sort_order: items.length,
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      setItems((prev) => [...prev, row as any]);
+      setLinkUrl("");
+      setLinkOpen(false);
+    } catch (e) {
+      alert((e as any)?.message || "Couldn't add the link");
+    }
+  };
+
+  const addHighlightControls = (
+    <div>
+      <input ref={highlightInput} type="file" accept="image/*,video/*" className="hidden"
+        onChange={(e) => e.target.files?.[0] && uploadHighlight(e.target.files[0])} />
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Button variant="outline" size="sm" disabled={uploadingHighlight}
+          onClick={() => highlightInput.current?.click()}
+          className="border-[#E5DFC6] text-[#0a2225]">
+          {uploadingHighlight ? "Uploading…" : "Upload photo or video"}
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setLinkOpen((v) => !v)}
+          className="border-[#E5DFC6] text-[#0a2225]">
+          Link a TikTok / Instagram reel
+        </Button>
+      </div>
+      {linkOpen && (
+        <div className="mt-3 flex items-center gap-2">
+          <input
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="Paste the reel's link — e.g. https://www.tiktok.com/@you/video/…"
+            className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm text-[#0a2225] outline-none focus:border-[#C7A962]"
+          />
+          <Button size="sm" onClick={addReelLink} className="bg-[#0c4d47] text-[#f7f3ea] hover:bg-[#0a2225]">
+            Add
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase
@@ -91,6 +153,7 @@ export function CreatorMediaGallery({
             <img key={src} src={src} alt="Content" className="h-80 md:h-96 w-auto object-cover rounded-2xl flex-shrink-0" loading="lazy" />
           ))}
         </ScrollCarousel>
+      {isOwnProfile && <div className="mt-5">{addHighlightControls}</div>}
       </section>
     );
   }
@@ -105,19 +168,9 @@ export function CreatorMediaGallery({
             <Instagram className="h-6 w-6 text-[#C7A962] mx-auto mb-3" />
             <p className="text-sm text-[#0a2225] mb-1">Add trip highlights</p>
             <p className="text-xs text-[#6B7280] mb-4">
-              Upload photos, videos, or link your Instagram and TikTok reels.
+              The photos and short reels travelers see first on your profile. Upload from your device, or paste a link to one of your TikTok or Instagram reels.
             </p>
-            <input ref={highlightInput} type="file" accept="image/*,video/*" className="hidden"
-              onChange={(e) => e.target.files?.[0] && uploadHighlight(e.target.files[0])} />
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={uploadingHighlight}
-              onClick={() => highlightInput.current?.click()}
-              className="border-[#E5DFC6] text-[#0a2225]"
-            >
-              {uploadingHighlight ? "Uploading…" : "Upload photo or video"}
-            </Button>
+            {addHighlightControls}
           </div>
         </section>
       );
