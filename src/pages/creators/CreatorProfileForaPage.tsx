@@ -222,7 +222,7 @@ export default function CreatorProfileForaPage() {
         reviewCount={reviewCount}
         ctaLabel={"Design my trip with " + firstName}
         onCta={() =>
-          navigate("/post-trip?creatorId=" + dir.id + "&creatorName=" + encodeURIComponent(displayName))
+          navigate("/post-trip?fromCreator=" + dir.id)
         }
         stats={stats}
         ownerActions={
@@ -285,7 +285,7 @@ export default function CreatorProfileForaPage() {
                       </div>
                       <button type="button"
                         onClick={() =>
-                          navigate("/post-trip?creatorId=" + dir.id + "&destination=" + encodeURIComponent(t.destination))
+                          navigate("/post-trip?fromCreator=" + dir.id + "&destination=" + encodeURIComponent(t.destination))
                         }
                         className="rounded-full border border-[#0a2225]/30 px-6 py-2.5 text-[14px] font-medium text-[#0a2225] hover:bg-white">
                         Request to join
