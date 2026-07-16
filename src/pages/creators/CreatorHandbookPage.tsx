@@ -1,9 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowRight, Sparkles, Map, BookOpen, Plane, Briefcase, MessageCircle,
-  Banknote, Camera, ChevronRight, Users, Lock, TrendingUp,
-} from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 
 // ============================================================================
 // CreatorHandbookPage v2 — tutorial-style: flow diagram, icon sections, and
@@ -27,19 +24,19 @@ function Path({ steps }: { steps: string[] }) {
 }
 
 function Flow() {
-  const steps: [React.ElementType, string, string][] = [
-    [Camera, "Your content", "Guides, reels, your map — travelers discover you"],
-    [Users, "Trip request", "They tap Design my trip or Request to join"],
-    [Lock, "Escrow", "They pay Goldsainte — money held safely"],
-    [Banknote, "You're paid", "Released to your bank as the trip happens"],
+  const steps: [string, string][] = [
+    ["Your content", "Guides, reels, your map — travelers discover you"],
+    ["Trip request", "They tap Design my trip or Request to join"],
+    ["Escrow", "They pay Goldsainte — money held safely"],
+    ["You're paid", "Released to your bank as the trip happens"],
   ];
   return (
     <div className="mt-8 grid gap-4 rounded-3xl bg-[#0c4d47]/[0.06] p-6 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] sm:items-start">
-      {steps.map(([Icon, t, d], i) => (
+      {steps.map(([t, d], i) => (
         <div key={t} className="contents">
           <div className="text-center">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6]">
-              <Icon className="h-5 w-5" />
+            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0c4d47] font-secondary text-lg text-[#E5DFC6]">
+              {i + 1}
             </span>
             <p className="mt-2 text-[14px] font-semibold text-[#0a2225]">{t}</p>
             <p className="mt-1 text-[12px] leading-snug text-[#0a2225]/65">{d}</p>
@@ -53,15 +50,13 @@ function Flow() {
   );
 }
 
-function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
+function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <section className="mt-8 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-      <h2 className="flex items-center gap-3 font-secondary text-2xl text-[#0a2225]">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#C7A962]/20">
-          <Icon className="h-4.5 w-4.5 h-[18px] w-[18px] text-[#8D6B2F]" />
-        </span>
-        {title}
-      </h2>
+      <p className="font-secondary text-[15px] tracking-[0.28em] text-[#8D6B2F]">
+        {String(n).padStart(2, "0")}
+      </p>
+      <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">{title}</h2>
       {children}
     </section>
   );
@@ -85,7 +80,7 @@ export default function CreatorHandbookPage() {
           Your fee is a flat 3.5% — you keep 96.5% of your price. Travelers pay their own 3.5%. No invoicing, ever.
         </p>
 
-        <Section icon={Sparkles} title="Your profile — the storefront">
+        <Section n={1} title="Your profile — the storefront">
           <p className={P}>
             Everything travelers see is edited in one place, and the <strong>Profile strength meter</strong>{" "}
             at the top tells you exactly what to add next. Complete profiles also rank higher in the
@@ -94,7 +89,7 @@ export default function CreatorHandbookPage() {
           <Path steps={["Avatar menu", "Account Settings"]} />
         </Section>
 
-        <Section icon={Map} title="Your travel map">
+        <Section n={2} title="Your travel map">
           <p className={P}>
             Every country you add lights up gold, one by one, when someone opens your page — and your
             Countries count shows on your card. Ninety seconds after every trip.
@@ -102,7 +97,7 @@ export default function CreatorHandbookPage() {
           <Path steps={["Account Settings", "My travel map", "type a country", "Save"]} />
         </Section>
 
-        <Section icon={BookOpen} title="Travel guides — stories that sell you">
+        <Section n={3} title="Travel guides — stories that sell you">
           <p className={P}>
             Editorial destination guides that appear as <em>Travel ideas</em> on your profile. The AI
             writer drafts a full guide in <strong>your voice</strong> — real places, real photos — in
@@ -116,7 +111,7 @@ export default function CreatorHandbookPage() {
           </p>
         </Section>
 
-        <Section icon={Plane} title="Trips — where the real money is">
+        <Section n={4} title="Trips — where the real money is">
           <p className={P}>
             <strong>Trips inspired by this creator</strong> shows your published, bookable trip
             packages. <strong>Upcoming trips</strong> are ones you're planning ("Patagonia — December
@@ -126,7 +121,7 @@ export default function CreatorHandbookPage() {
           <Path steps={["Account Settings", "Upcoming trips", "+ Add trip"]} />
         </Section>
 
-        <Section icon={Briefcase} title="Work with brands">
+        <Section n={5} title="Work with brands">
           <p className={P}>
             Flip on collaborations, list your formats, upload a media kit — your profile grows a{" "}
             <strong>For brands & partners</strong> section with a media-kit download.
@@ -134,14 +129,14 @@ export default function CreatorHandbookPage() {
           <Path steps={["Account Settings", "Work with brands"]} />
         </Section>
 
-        <Section icon={MessageCircle} title="Messages">
+        <Section n={6} title="Messages">
           <p className={P}>
             Travelers message you from the button on your card; everything lives in your Goldsainte
             inbox. On-platform chat is what makes escrow protection and dispute support possible.
           </p>
         </Section>
 
-        <Section icon={TrendingUp} title="The weekly rhythm">
+        <Section n={7} title="The weekly rhythm">
           <p className={P}>
             Post where your audience lives — then here: add new countries, publish one AI-assisted
             guide, check your view counts and requests, answer messages. More guides → more views →
