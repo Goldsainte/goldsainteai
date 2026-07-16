@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Loader2, Camera, ExternalLink } from "lucide-react";
+import { Loader2, Camera, ExternalLink, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -40,6 +40,45 @@ export default function CreatorSettingsPage() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
   const [visited, setVisited] = useState<string[]>([]);
+  const [upcoming, setUpcoming] = useState<{ destination: string; timing: string }[]>([]);
+  const [collab, setCollab] = useState({ open: false, types: "", media_kit_url: "" });
+  const [aiSummary, setAiSummary] = useState("");
+  const [summarizing, setSummarizing] = useState(false);
+
+  const generateSummary = async () => {
+    if (!user) return;
+    setSummarizing(true);
+    try {
+      const { data: guides } = await supabase
+        .from("partner_guides")
+        .select("title, tags, view_count")
+        .eq("author_id", user.id)
+        .eq("published", true)
+        .limit(12);
+      const { data, error } = await supabase.functions.invoke("ai-content-tools", {
+        body: {
+          tool: "creator_summary",
+          name: form.display_name.trim() || "This creator",
+          bio: form.bio.trim(),
+          travelStyle: form.travel_style.trim(),
+          niches: form.primary_niches.split(",").map((x) => x.trim()).filter(Boolean),
+          regions: form.primary_regions.split(",").map((x) => x.trim()).filter(Boolean),
+          countries: visited.length,
+          guides: (guides ?? []).map((g: any) => ({ title: g.title, tags: g.tags, views: g.view_count })),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (!data?.summary) throw new Error("No summary returned — try again");
+      setAiSummary(data.summary);
+      toast.success("Summary generated — review, tweak, then save");
+    } catch (e: any) {
+      toast.error(e.message || "Generation failed");
+    } finally { setSummarizing(false); }
+  };
+
+  const updateUpcoming = (i: number, k: "destination" | "timing", v: string) =>
+    setUpcoming((u) => u.map((t, j) => (j === i ? { ...t, [k]: v } : t)));
   const [countryQuery, setCountryQuery] = useState("");
   const toggleCountry = (name: string) =>
     setVisited((v) => (v.includes(name) ? v.filter((x) => x !== name) : [...v, name].sort()));
@@ -56,7 +95,7 @@ export default function CreatorSettingsPage() {
         supabase
           .from("creator_profiles")
           .select(
-            "display_name, handle, avatar_url, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, instagram_handle, tiktok_handle, website, linkedin_url, facebook_url, pinterest_url, visited_countries"
+            "display_name, handle, avatar_url, bio, travel_style, primary_niches, primary_regions, specialties, starting_price_per_night, logo_url, instagram_handle, tiktok_handle, website, linkedin_url, facebook_url, pinterest_url, visited_countries, upcoming_trips, open_to_collabs, collab_types, media_kit_url, ai_summary"
           )
           .eq("user_id", user.id)
           .maybeSingle(),
@@ -81,9 +120,34 @@ export default function CreatorSettingsPage() {
         pinterest_url: c?.pinterest_url || "",
       });
       setVisited(((c as any)?.visited_countries as string[]) ?? []);
+      setUpcoming((((c as any)?.upcoming_trips as any[]) ?? []).map((t) => ({
+        destination: t?.destination || "", timing: t?.timing || "",
+      })));
+      setCollab({
+        open: Boolean((c as any)?.open_to_collabs),
+        types: (((c as any)?.collab_types as string[]) ?? []).join(", "),
+        media_kit_url: (c as any)?.media_kit_url || "",
+      });
+      setAiSummary((c as any)?.ai_summary || "");
       setLoading(false);
     })();
   }, [user]);
+
+  const uploadMediaKit = async (file: File) => {
+    if (!user) return;
+    setUploading("logo");
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/mediakit/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { cacheControl: "3600" });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      setCollab((cb) => ({ ...cb, media_kit_url: data.publicUrl }));
+      toast.success("Media kit uploaded");
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally { setUploading(null); }
+  };
 
   const uploadImage = async (file: File, kind: "avatar" | "logo") => {
     if (!user) return;
@@ -124,32 +188,50 @@ export default function CreatorSettingsPage() {
       if (pErr) throw pErr;
       if (!pRows || pRows.length === 0) throw new Error("Your profile row couldn't be updated — nothing was saved.");
 
+      const cPayload = {
+        display_name: form.display_name.trim() || null,
+        handle: form.handle.replace(/^@/, "").trim() || null,
+        avatar_url: form.avatar_url || null,
+        bio: form.bio.trim() || null,
+        travel_style: form.travel_style.trim() || null,
+        primary_niches: toArray(form.primary_niches),
+        primary_regions: toArray(form.primary_regions),
+        specialties: toArray(form.specialties),
+        starting_price_per_night: price,
+        logo_url: form.logo_url || null,
+        instagram_handle: form.instagram_handle.replace(/^@/, "").trim() || null,
+        tiktok_handle: form.tiktok_handle.replace(/^@/, "").trim() || null,
+        website: form.website.trim() || null,
+        linkedin_url: form.linkedin_url.trim() || null,
+        facebook_url: form.facebook_url.trim() || null,
+        pinterest_url: form.pinterest_url.trim() || null,
+        visited_countries: visited,
+        upcoming_trips: upcoming.filter((t) => t.destination.trim()),
+        open_to_collabs: collab.open,
+        collab_types: toArray(collab.types),
+        media_kit_url: collab.media_kit_url || null,
+        ai_summary: aiSummary.trim() || null,
+      };
       const { data: cRows, error: cErr } = await supabase
         .from("creator_profiles")
-        .update({
-          display_name: form.display_name.trim() || null,
-          handle: form.handle.replace(/^@/, "").trim() || null,
-          avatar_url: form.avatar_url || null,
-          bio: form.bio.trim() || null,
-          travel_style: form.travel_style.trim() || null,
-          primary_niches: toArray(form.primary_niches),
-          primary_regions: toArray(form.primary_regions),
-          specialties: toArray(form.specialties),
-          starting_price_per_night: price,
-          logo_url: form.logo_url || null,
-          instagram_handle: form.instagram_handle.replace(/^@/, "").trim() || null,
-          tiktok_handle: form.tiktok_handle.replace(/^@/, "").trim() || null,
-          website: form.website.trim() || null,
-          linkedin_url: form.linkedin_url.trim() || null,
-          facebook_url: form.facebook_url.trim() || null,
-          pinterest_url: form.pinterest_url.trim() || null,
-          visited_countries: visited,
-        })
+        .update(cPayload)
         .eq("user_id", user.id)
         .select("user_id");
       if (cErr) throw cErr;
-      if (!cRows || cRows.length === 0)
-        throw new Error("Your creator details couldn't be saved — the database blocked the update (permissions). Run the creators policy SQL (172) and try again.");
+      if (!cRows || cRows.length === 0) {
+        // Legacy creator — no creator_profiles row yet. Create it (own-row
+        // insert permission: SQL 178).
+        const { data: ins, error: insErr } = await supabase
+          .from("creator_profiles")
+          .insert({ user_id: user.id, ...cPayload })
+          .select("user_id");
+        if (insErr)
+          throw new Error(
+            "Couldn't create your creator record — run the creators insert policy SQL (178) and try again. (" + insErr.message + ")"
+          );
+        if (!ins || ins.length === 0)
+          throw new Error("Couldn't create your creator record — the database blocked it. Run SQL 178 and try again.");
+      }
 
       toast.success("Public profile saved");
     } catch (e: any) {
@@ -158,6 +240,21 @@ export default function CreatorSettingsPage() {
       setSaving(false);
     }
   };
+
+  const strengthChecks: [string, boolean][] = [
+    ["Profile photo", Boolean(form.avatar_url)],
+    ["Your name", Boolean(form.display_name.trim())],
+    ["Handle", Boolean(form.handle.trim())],
+    ["Based in", Boolean(form.location.trim())],
+    ["Your story", Boolean(form.bio.trim())],
+    ["Travel style", Boolean(form.travel_style.trim())],
+    ["Niches or regions", Boolean(form.primary_niches.trim() || form.primary_regions.trim())],
+    ["3+ countries on your map", visited.length >= 3],
+    ["2+ social links", [form.tiktok_handle, form.instagram_handle, form.website, form.linkedin_url, form.facebook_url, form.pinterest_url].filter((s) => s.trim()).length >= 2],
+    ["Trips starting at price", Boolean(form.starting_price_per_night.trim())],
+  ];
+  const strength = Math.round((strengthChecks.filter(([, ok]) => ok).length / strengthChecks.length) * 100);
+  const missing = strengthChecks.filter(([, ok]) => !ok).map(([l]) => l);
 
   if (loading) {
     return (
@@ -191,6 +288,23 @@ export default function CreatorSettingsPage() {
             </button>
           </div>
         </div>
+
+        {/* Profile strength */}
+        <section className="mt-8 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6">
+          <div className="flex items-baseline justify-between gap-4">
+            <p className="text-[15px] font-semibold text-[#0a2225]">Profile strength</p>
+            <p className="font-secondary text-2xl text-[#0c4d47]">{strength}%</p>
+          </div>
+          <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[#EDE5D1]">
+            <div className="h-full rounded-full bg-[#C7A962] transition-all" style={{ width: `${strength}%` }} />
+          </div>
+          {missing.length > 0 && (
+            <p className="mt-3 text-[13px] text-[#6B7280]">
+              To strengthen your profile: {missing.slice(0, 3).join(" · ")}
+              {missing.length > 3 ? ` · +${missing.length - 3} more` : ""}
+            </p>
+          )}
+        </section>
 
         {/* Identity */}
         <section className="mt-10 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
@@ -336,6 +450,87 @@ export default function CreatorSettingsPage() {
               </div>
             </>
           )}
+        </section>
+
+        {/* Upcoming trips */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <div className="flex items-center justify-between">
+            <h2 className="font-secondary text-2xl text-[#0a2225]">Upcoming trips</h2>
+            <button type="button"
+              onClick={() => setUpcoming((u) => [...u, { destination: "", timing: "" }])}
+              className="rounded-full border border-[#0a2225]/25 px-4 py-2 text-[13px] text-[#0a2225] hover:bg-white">
+              + Add trip
+            </button>
+          </div>
+          <p className={hint}>Travelers can request to join — every request lands in your trip funnel.</p>
+          <div className="mt-4 space-y-3">
+            {upcoming.map((t, i) => (
+              <div key={i} className="flex flex-col gap-3 md:flex-row">
+                <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]"
+                  value={t.destination} onChange={(e) => updateUpcoming(i, "destination", e.target.value)} placeholder="Patagonia" />
+                <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962] md:w-44"
+                  value={t.timing} onChange={(e) => updateUpcoming(i, "timing", e.target.value)} placeholder="August" />
+                <button type="button" onClick={() => setUpcoming((u) => u.filter((_, j) => j !== i))}
+                  className="shrink-0 rounded-full border border-[#0a2225]/20 px-3 py-2 text-[12px] text-[#0a2225]/70 hover:bg-white">
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Collaborations */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <h2 className="font-secondary text-2xl text-[#0a2225]">Work with brands</h2>
+          <label className="mt-5 flex items-center gap-3 text-[15px] text-[#0a2225]">
+            <input type="checkbox" checked={collab.open}
+              onChange={(e) => setCollab((cb) => ({ ...cb, open: e.target.checked }))}
+              className="h-5 w-5 accent-[#0c4d47]" />
+            Open to collaborations (shows a "Work with me" section on your profile)
+          </label>
+          <div className="mt-5">
+            <label className={label}>Collaboration types</label>
+            <input className={input} value={collab.types}
+              onChange={(e) => setCollab((cb) => ({ ...cb, types: e.target.value }))}
+              placeholder="Sponsored posts, Hotel reviews, Press trips, Destination campaigns" />
+            <p className={hint}>Separate with commas.</p>
+          </div>
+          <div className="mt-5">
+            <label className={label}>Media kit</label>
+            <input id="mediakit-input" type="file" accept=".pdf,image/*" className="hidden"
+              onChange={(e) => e.target.files?.[0] && uploadMediaKit(e.target.files[0])} />
+            <div className="mt-2 flex items-center gap-3">
+              <button type="button"
+                onClick={() => (document.getElementById("mediakit-input") as HTMLInputElement)?.click()}
+                className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] hover:bg-white">
+                Upload media kit (PDF)
+              </button>
+              {collab.media_kit_url && (
+                <a href={collab.media_kit_url} target="_blank" rel="noopener noreferrer"
+                  className="text-[13px] font-medium text-[#0c4d47] underline underline-offset-4">
+                  View current
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* AI summary */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <h2 className="flex items-center gap-2 font-secondary text-2xl text-[#0a2225]">
+            <Sparkles className="h-5 w-5 text-[#C7A962]" /> Your AI summary
+          </h2>
+          <p className={hint}>
+            Goldsainte AI writes a short third-person summary from your real profile, map, and guide stats — it appears as a card on your public profile. Regenerate any time your numbers grow.
+          </p>
+          <textarea className={`${input} min-h-[90px]`} value={aiSummary}
+            onChange={(e) => setAiSummary(e.target.value)}
+            placeholder="Generate below — then edit to taste and Save." />
+          <button type="button" onClick={generateSummary} disabled={summarizing}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-[14px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] disabled:opacity-50">
+            {summarizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {summarizing ? "Writing…" : aiSummary ? "Regenerate" : "Generate my AI summary"}
+          </button>
         </section>
 
         {/* Stay connected */}
