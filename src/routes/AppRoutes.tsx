@@ -39,6 +39,7 @@ const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const AgentsDirectoryPage = lazy(() => import('@/pages/agents/AgentsDirectoryPage'));
 const CreatorsDirectoryPage = lazy(() => import('@/pages/creators/CreatorsDirectoryPage'));
+const CreatorSettingsPage = lazy(() => import('@/pages/creators/CreatorSettingsPage'));
 const AgentGuidesPage = lazy(() => import('@/pages/agents/AgentGuidesPage'));
 const GuidePage = lazy(() => import('@/pages/guides/GuidePage'));
 const AgentSettingsPage = lazy(() => import('@/pages/agents/AgentSettingsPage'));
@@ -93,7 +94,7 @@ const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const ApplicationStatusCheck = lazy(() => import('@/pages/ApplicationStatusCheck'));
 const AgentApplicationForm = lazy(() => import('@/pages/AgentApplicationForm'));
 
-const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
+const LegacyCreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 
 const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
@@ -195,8 +196,10 @@ export const AppRoutes = () => (
       <Route path="/agents" element={<AgentsDirectoryPage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
       <Route path="/agent-guides" element={<RequireAuth><AgentGuidesPage /></RequireAuth>} />
+      <Route path="/creator-guides" element={<RequireAuth><AgentGuidesPage /></RequireAuth>} />
       <Route path="/guides/:slug" element={<GuidePage />} />
       <Route path="/agent-settings" element={<RequireAuth><AgentSettingsPage /></RequireAuth>} />
+      <Route path="/creator-settings" element={<RequireAuth><CreatorSettingsPage /></RequireAuth>} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
       <Route path="/how-it-works/traveler" element={<HowItWorksTraveler />} />
@@ -496,7 +499,7 @@ export const AppRoutes = () => (
       />
       <Route path="/email-preview" element={<AdminGuard><EmailPreview /></AdminGuard>} />
       <Route path="/billing-dashboard" element={<RequireAuth><BillingDashboard /></RequireAuth>} />
-      <Route path="/travel-settings" element={<RequireAuth><CreatorSettingsPage /></RequireAuth>} />
+      <Route path="/travel-settings" element={<RequireAuth><LegacyCreatorSettingsPage /></RequireAuth>} />
       <Route path="/travel-settings/general" element={<RequireAuth><TravelSettings /></RequireAuth>} />
       <Route
         path="/tiktok-callback"
