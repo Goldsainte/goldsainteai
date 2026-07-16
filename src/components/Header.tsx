@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
@@ -39,6 +39,18 @@ export const Header = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const { isAdmin, isCreator, isAgent: isAgentAccount, isBrand } = useUserRole();
+  const [menuAvatar, setMenuAvatar] = useState<string | null>(null);
+  const avatarFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!user?.id || avatarFor.current === user.id) return;
+    avatarFor.current = user.id;
+    supabase
+      .from("profiles")
+      .select("avatar_url")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => setMenuAvatar(data?.avatar_url ?? null));
+  }, [user?.id]);
   const isMobile = useIsMobile();
   
   
@@ -209,7 +221,11 @@ export const Header = () => {
                           className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-[#BFAD72]"
                           aria-label="Menu"
                         >
+                          {user && menuAvatar ? (
+                          <img src={menuAvatar} alt="Your profile" className="h-full w-full rounded-full object-cover" />
+                        ) : (
                           <User className="h-6 w-6 text-[#BFAD72] group-hover:text-[#0a2225] group-focus-visible:text-[#0a2225] transition-colors" />
+                        )}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -589,7 +605,11 @@ export const Header = () => {
                       aria-label="Menu"
                       data-tour="navigation"
                     >
-                      <User className="h-6 w-6 text-[#BFAD72] group-hover:text-[#0a2225] group-focus-visible:text-[#0a2225] transition-colors" />
+                      {user && menuAvatar ? (
+                          <img src={menuAvatar} alt="Your profile" className="h-full w-full rounded-full object-cover" />
+                        ) : (
+                          <User className="h-6 w-6 text-[#BFAD72] group-hover:text-[#0a2225] group-focus-visible:text-[#0a2225] transition-colors" />
+                        )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
