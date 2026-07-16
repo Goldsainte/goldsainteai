@@ -38,6 +38,8 @@ const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const AgentsDirectoryPage = lazy(() => import('@/pages/agents/AgentsDirectoryPage'));
+const AgentGuidesPage = lazy(() => import('@/pages/agents/AgentGuidesPage'));
+const GuidePage = lazy(() => import('@/pages/guides/GuidePage'));
 const AgentSettingsPage = lazy(() => import('@/pages/agents/AgentSettingsPage'));
 const CreatorPublicProfilePage = lazy(() => import('@/pages/creators/CreatorPublicProfilePage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
@@ -191,6 +193,8 @@ export const AppRoutes = () => (
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/agents" element={<AgentsDirectoryPage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
+      <Route path="/agent-guides" element={<RequireAuth><AgentGuidesPage /></RequireAuth>} />
+      <Route path="/guides/:slug" element={<GuidePage />} />
       <Route path="/agent-settings" element={<RequireAuth><AgentSettingsPage /></RequireAuth>} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
