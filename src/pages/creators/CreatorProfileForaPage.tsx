@@ -254,7 +254,7 @@ export default function CreatorProfileForaPage() {
                 <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
                   Goldsainte AI on {firstName}
                 </p>
-                <p className="mt-3 font-secondary italic text-[18px] leading-relaxed text-[#0a2225]">
+                <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/85">
                   {extra.ai_summary}
                 </p>
               </section>
