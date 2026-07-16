@@ -23,15 +23,39 @@ export function AnnouncementBanner() {
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await supabase
-          .from("site_announcements" as never)
-          .select("id, message, href")
-          .eq("active", true)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (cancelled || !data) return;
-        const row = data as unknown as Announcement;
+        // Two sources, newest wins: manual announcements, and press releases
+        // published with show_banner = true (the newsroom tie-in).
+        const [ann, press] = await Promise.all([
+          supabase
+            .from("site_announcements" as never)
+            .select("id, message, href, created_at")
+            .eq("active", true)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("press_releases" as never)
+            .select("id, title, slug, published_at")
+            .eq("published", true)
+            .eq("show_banner", true)
+            .order("published_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+        ]);
+        if (cancelled) return;
+        const a1 = ann.data as unknown as { id: string; message: string; href: string | null; created_at: string } | null;
+        const p1 = press.data as unknown as { id: string; title: string; slug: string; published_at: string } | null;
+        let row: Announcement | null = null;
+        if (a1 && p1) {
+          row = new Date(a1.created_at) >= new Date(p1.published_at)
+            ? { id: a1.id, message: a1.message, href: a1.href }
+            : { id: p1.id, message: p1.title, href: `/newsroom/${p1.slug}` };
+        } else if (a1) {
+          row = { id: a1.id, message: a1.message, href: a1.href };
+        } else if (p1) {
+          row = { id: p1.id, message: p1.title, href: `/newsroom/${p1.slug}` };
+        }
+        if (!row) return;
         setA(row);
         setDismissed(localStorage.getItem(`gs_dismissed_announcement_${row.id}`) === "true");
       } catch {
