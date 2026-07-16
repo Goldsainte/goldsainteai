@@ -34,9 +34,6 @@ function MessagesRail() {
   const initial = (user?.email?.[0] || "G").toUpperCase();
   return (
     <aside className="hidden lg:flex w-[260px] xl:w-[300px] shrink-0 flex-col border-r border-[#E5DFC6] bg-[#FDF9F0] px-3 pb-5 pt-7">
-      <span className="mb-8 px-3 font-secondary text-[19px] font-semibold tracking-[0.16em] text-[#0c4d47]">
-        GOLDS<span className="text-[#C7A962]">A</span>INTE
-      </span>
       <nav className="flex flex-1 flex-col gap-1">
         {items.map(({ icon: Icon, label, to, active }) => (
           <button
