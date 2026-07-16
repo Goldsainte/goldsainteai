@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
 
 // ============================================================================
@@ -42,6 +43,7 @@ interface AgentRow {
 export default function AgentPublicProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [agent, setAgent] = useState<AgentRow | null>(null);
@@ -206,6 +208,14 @@ export default function AgentPublicProfilePage() {
         ctaLabel={"Contact " + (agent?.agency_name || firstName)}
         onCta={() =>
           navigate("/post-trip?agentId=" + profile.id + "&agentName=" + encodeURIComponent(displayName))
+        }
+        ownerActions={
+          user?.id === profile.id
+            ? [
+                { label: "Edit public profile", onClick: () => navigate("/agent-settings") },
+                { label: "Travel guides", onClick: () => navigate("/agent-guides") },
+              ]
+            : undefined
         }
       />
     </div>
