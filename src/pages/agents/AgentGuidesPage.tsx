@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Loader2, Camera, Plus, ExternalLink, PenLine, Sparkles } from "lucide-react";
+import { Loader2, Camera, Plus, ExternalLink, PenLine} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -291,7 +291,7 @@ export default function AgentGuidesPage() {
             {/* Write with AI */}
             <div className="rounded-2xl bg-[#0c4d47]/[0.06] p-5">
               <p className="flex items-center gap-2 text-[15px] font-semibold text-[#0a2225]">
-                <Sparkles className="h-4 w-4 text-[#C7A962]" /> Write it with AI
+                Write it with AI
               </p>
               <p className="mt-1 text-[13px] text-[#6B7280]">
                 Name the destination, add anything it must include, and get a full draft in your voice — then edit before publishing.
@@ -306,7 +306,7 @@ export default function AgentGuidesPage() {
                 value={ai.notes} onChange={setAiField("notes")} placeholder="Optional: must-include hotels, restaurants, experiences, or angle" />
               <button type="button" onClick={generate} disabled={generating}
                 className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-[14px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] disabled:opacity-50">
-                {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {generating && <Loader2 className="h-4 w-4 animate-spin" />}
                 {generating ? "Writing your guide…" : "Generate draft"}
               </button>
             </div>
