@@ -38,6 +38,7 @@ const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
 const AgentsDirectoryPage = lazy(() => import('@/pages/agents/AgentsDirectoryPage'));
+const CreatorsDirectoryPage = lazy(() => import('@/pages/creators/CreatorsDirectoryPage'));
 const AgentGuidesPage = lazy(() => import('@/pages/agents/AgentGuidesPage'));
 const GuidePage = lazy(() => import('@/pages/guides/GuidePage'));
 const AgentSettingsPage = lazy(() => import('@/pages/agents/AgentSettingsPage'));
@@ -189,7 +190,7 @@ export const AppRoutes = () => (
       <Route path="/@:username/shop" element={<ShopPage />} />
       <Route path="/bundle/:id" element={<BundleDetailPage />} />
       <Route path="/bundle-builder" element={<BundleBuilder />} />
-      <Route path="/creators" element={<CreatorsPage />} />
+      <Route path="/creators" element={<CreatorsDirectoryPage />} />
       <Route path="/creators/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/agents" element={<AgentsDirectoryPage />} />
       <Route path="/agents/:id" element={<AgentPublicProfilePage />} />
