@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ============================================================================
@@ -13,6 +14,12 @@ import { supabase } from "@/integrations/supabase/client";
 // down. Route: /guides/:slug
 // ============================================================================
 
+interface GuideHotel {
+  name: string;
+  description: string;
+  perks: string[];
+}
+
 interface Guide {
   id: string;
   author_id: string;
@@ -22,6 +29,7 @@ interface Guide {
   tags: string[];
   statement: string | null;
   body: string | null;
+  hotels: GuideHotel[];
 }
 
 const IMG_RE = /^https?:\S+\.(jpg|jpeg|png|webp|gif)(\?\S*)?$/i;
@@ -55,6 +63,59 @@ function Body({ text }: { text: string }) {
   );
 }
 
+function WhereToStay({ hotels, place }: { hotels: GuideHotel[]; place?: string | null }) {
+  const rail = useRef<HTMLDivElement>(null);
+  const scroll = (dir: number) =>
+    rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: "smooth" });
+  if (!hotels || hotels.length === 0) return null;
+  return (
+    <section className="py-6">
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="font-secondary text-4xl text-[#0a2225]">
+          Where to stay{place ? ` in ${place}` : ""}
+        </h2>
+        {hotels.length > 2 && (
+          <div className="flex gap-3">
+            <button type="button" aria-label="Previous hotels" onClick={() => scroll(-1)}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#0a2225]/30 text-[#0a2225] hover:bg-white">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button type="button" aria-label="More hotels" onClick={() => scroll(1)}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#0a2225]/30 text-[#0a2225] hover:bg-white">
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+      </div>
+      <div ref={rail} className="mt-8 flex snap-x gap-10 overflow-x-auto pb-4">
+        {hotels.map((h, i) => (
+          <article key={i} className="min-w-[85%] snap-start sm:min-w-[46%] lg:min-w-[30%]">
+            <h3 className="font-secondary text-2xl leading-snug text-[#0a2225]">{h.name}</h3>
+            {h.description && (
+              <p className="mt-3 leading-relaxed text-[#0a2225]/85">{h.description}</p>
+            )}
+            {h.perks && h.perks.length > 0 && (
+              <>
+                <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
+                  Goldsainte perks
+                </p>
+                <ul className="mt-3 space-y-2.5">
+                  {h.perks.map((perk, j) => (
+                    <li key={j} className="flex gap-2.5 leading-relaxed text-[#0a2225]">
+                      <Star className="mt-1 h-4 w-4 shrink-0 fill-[#0a2225] text-[#0a2225]" />
+                      <span>{perk}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function GuidePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -69,7 +130,7 @@ export default function GuidePage() {
       try {
         const { data: g } = await supabase
           .from("partner_guides")
-          .select("id, author_id, title, slug, hero_image_url, tags, statement, body")
+          .select("id, author_id, title, slug, hero_image_url, tags, statement, body, hotels")
           .eq("slug", slug)
           .maybeSingle();
         if (cancelled) return;
@@ -204,6 +265,8 @@ export default function GuidePage() {
               ))}
             </div>
           </section>
+
+          <WhereToStay hotels={guide.hotels ?? []} place={guide.tags?.[0]} />
 
           {guide.body && <Body text={guide.body} />}
 
