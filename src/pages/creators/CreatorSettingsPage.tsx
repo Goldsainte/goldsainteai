@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Loader2, Camera, ExternalLink, Sparkles } from "lucide-react";
+import { Loader2, Camera, ExternalLink} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -610,7 +610,7 @@ export default function CreatorSettingsPage() {
         {/* AI summary */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <h2 className="flex items-center gap-2 font-secondary text-2xl text-[#0a2225]">
-            <Sparkles className="h-5 w-5 text-[#C7A962]" /> Your AI summary
+            Your AI summary
           </h2>
           <p className={hint}>
             Goldsainte AI writes a short third-person summary from your real profile, map, and guide stats — it appears as a card on your public profile. Regenerate any time your numbers grow.
@@ -620,7 +620,7 @@ export default function CreatorSettingsPage() {
             placeholder="Generate below — then edit to taste and Save." />
           <button type="button" onClick={generateSummary} disabled={summarizing}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-[14px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] disabled:opacity-50">
-            {summarizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {summarizing && <Loader2 className="h-4 w-4 animate-spin" />}
             {summarizing ? "Writing…" : aiSummary ? "Regenerate" : "Generate my AI summary"}
           </button>
         </section>
