@@ -8,6 +8,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ConfirmDialogHost } from "@/components/ui/confirm-dialog";
 import { Header } from "@/components/Header";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { Footer } from "@/components/Footer";
 
 import { SkipNavigation } from "@/components/SkipNavigation";
@@ -159,6 +160,7 @@ function AppContent() {
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
       <OnboardingTour />
       <FeatureAnnouncement />
+      {hideHeader ? null : <AnnouncementBanner />}
       {hideHeader ? null : <Header />}
       <main id="main-content" className="flex-1 flex flex-col" tabIndex={-1}>
         <RouteSectionBoundary section="app">
