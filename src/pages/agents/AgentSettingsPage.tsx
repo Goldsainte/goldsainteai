@@ -124,7 +124,7 @@ export default function AgentSettingsPage() {
       if (form.starting_price_per_night.trim() && Number.isNaN(price)) {
         throw new Error("Starting price must be a number");
       }
-      const { error: pErr } = await supabase
+      const { data: pRows, error: pErr } = await supabase
         .from("profiles")
         .update({
           display_name: form.display_name.trim() || null,
@@ -133,9 +133,13 @@ export default function AgentSettingsPage() {
           avatar_url: form.avatar_url || null,
           instagram_handle: form.instagram_handle.replace(/^@/, "").trim() || null,
         })
-        .eq("id", user.id);
+        .eq("id", user.id)
+        .select("id");
       if (pErr) throw pErr;
-      const { error: aErr } = await supabase
+      if (!pRows || pRows.length === 0) {
+        throw new Error("Your profile row couldn't be updated — nothing was saved.");
+      }
+      const { data: aRows, error: aErr } = await supabase
         .from("travel_agents")
         .update({
           agency_name: form.agency_name.trim() || null,
@@ -150,8 +154,14 @@ export default function AgentSettingsPage() {
           facebook_url: form.facebook_url.trim() || null,
           pinterest_url: form.pinterest_url.trim() || null,
         })
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .select("user_id");
       if (aErr) throw aErr;
+      if (!aRows || aRows.length === 0) {
+        throw new Error(
+          "Your specialist details couldn't be saved — the database blocked the update (permissions). Run the travel_agents policy SQL and try again."
+        );
+      }
       toast.success("Public profile saved");
     } catch (e: any) {
       toast.error(e.message || "Save failed — nothing was changed");
