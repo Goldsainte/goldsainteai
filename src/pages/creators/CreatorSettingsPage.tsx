@@ -309,6 +309,10 @@ export default function CreatorSettingsPage() {
               className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white">
               Sellable guides
             </button>
+            <button type="button" onClick={() => navigate("/creator-dashboard?tab=content")}
+              className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white">
+              Content tools
+            </button>
             <button type="button" onClick={() => navigate("/creator-dashboard?tab=services")}
               className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white">
               Services
@@ -542,14 +546,14 @@ export default function CreatorSettingsPage() {
               + Add trip
             </button>
           </div>
-          <p className={hint}>Travelers can request to join — every request lands in your trip funnel.</p>
+          <p className={hint}>Travelers can request to join — every request lands in your trip funnel. Include the year (e.g. "December 2026") so travelers know exactly when.</p>
           <div className="mt-4 space-y-3">
             {upcoming.map((t, i) => (
               <div key={i} className="flex flex-col gap-3 md:flex-row">
                 <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]"
                   value={t.destination} onChange={(e) => updateUpcoming(i, "destination", e.target.value)} placeholder="Patagonia" />
                 <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962] md:w-44"
-                  value={t.timing} onChange={(e) => updateUpcoming(i, "timing", e.target.value)} placeholder="August" />
+                  value={t.timing} onChange={(e) => updateUpcoming(i, "timing", e.target.value)} placeholder="August 2026" />
                 <button type="button" onClick={() => setUpcoming((u) => u.filter((_, j) => j !== i))}
                   className="shrink-0 rounded-full border border-[#0a2225]/20 px-3 py-2 text-[12px] text-[#0a2225]/70 hover:bg-white">
                   Remove
