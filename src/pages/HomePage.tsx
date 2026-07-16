@@ -76,11 +76,11 @@ export default function HomePage() {
       <HowItWorksSteps />
       <FeaturedTripsSection />
       <DreamTripBand />
+      <TrustPlaque />
       <Suspense fallback={null}>
         <PlatformDemoSection />
       </Suspense>
       <EarnSection />
-      <TrustPlaque />
       <FinalCTABand />
     </main>
   );
