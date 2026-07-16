@@ -37,6 +37,7 @@ interface TravelIdea {
   destination: string | null;
   cover_image_url: string | null;
   description?: string | null;
+  href: string;
 }
 
 export interface PartnerProfileForaProps {
@@ -134,6 +135,30 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // Fora-model: Travel ideas are editorial GUIDES first; bookable trips
+      // remain the fallback until the author has written guides.
+      const { data: guides } = await supabase
+        .from("partner_guides")
+        .select("id, title, slug, hero_image_url, tags, statement")
+        .eq("author_id", userId)
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(24);
+      if (cancelled) return;
+      if (guides && guides.length > 0) {
+        setIdeas(
+          guides.map((g: any) => ({
+            id: g.id,
+            title: g.title,
+            slug: g.slug,
+            destination: (g.tags ?? [])[0] ?? null,
+            cover_image_url: g.hero_image_url,
+            description: g.statement,
+            href: `/guides/${g.slug}`,
+          }))
+        );
+        return;
+      }
       const { data } = await supabase
         .from("packaged_trips")
         .select("id, title, slug, destination, cover_image_url, description")
@@ -141,7 +166,8 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
         .eq("status", "published")
         .order("created_at", { ascending: false })
         .limit(24);
-      if (!cancelled) setIdeas((data as TravelIdea[]) ?? []);
+      if (!cancelled)
+        setIdeas(((data as any[]) ?? []).map((t) => ({ ...t, href: `/trips/${t.slug}` })));
     })();
     return () => {
       cancelled = true;
@@ -351,7 +377,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
                         <p className="mt-3 line-clamp-3 leading-relaxed text-[#0a2225]/85">{t.description}</p>
                       )}
                       <Link
-                        to={`/trips/${t.slug}`}
+                        to={t.href}
                         className="mt-4 inline-block rounded-full border border-[#0a2225]/30 px-6 py-2.5 text-[14px] font-medium text-[#0a2225] transition-colors hover:bg-white"
                       >
                         Explore
