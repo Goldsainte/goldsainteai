@@ -309,6 +309,10 @@ export default function CreatorSettingsPage() {
               className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white">
               Sellable guides
             </button>
+            <button type="button" onClick={() => navigate("/creator-handbook")}
+              className="inline-flex items-center gap-2 rounded-full border border-[#C7A962]/60 bg-[#FDF9F0] px-5 py-2.5 text-[14px] font-medium text-[#8D6B2F] transition-colors hover:bg-white">
+              How it works
+            </button>
             <button type="button" onClick={() => navigate("/creator-dashboard?tab=content")}
               className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white">
               Content tools
