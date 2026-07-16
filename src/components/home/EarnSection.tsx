@@ -13,19 +13,19 @@ const inter = { fontFamily: "Inter, sans-serif" } as const;
 const cards = [
   {
     tag: "For travel creators",
-    title: "Turn your journeys into income",
-    mechanics: "Post guides, trips & tours · Set your price · Get paid",
-    body: "Publish itinerary guides from trips you've taken, list bookable trips and tours, and get paid out through Stripe — no minimum following required.",
+    title: "Turn your influence into booked trips",
+    mechanics: "AI-written guides · Your travel map · Brand collabs · Paid group trips",
+    body: "Your profile becomes a storefront: publish destination guides with an AI writer trained on your voice, light up your travel map, open brand collaborations, and let followers request spots on your trips — every booking protected by escrow, paid out through Stripe.",
     cta: "Start creating",
     link: "/auth?mode=signup&role=creator",
     image: creatorImage,
     alt: "Warm coastal vista along the Amalfi coastline",
   },
   {
-    tag: "For travel experts",
+    tag: "For travel specialists",
     title: "Design journeys for clients worldwide",
-    mechanics: "Win trip requests · Craft proposals · Build your book",
-    body: "Receive dream-trip requests from real travelers, respond with bespoke proposals, and manage bookings and payouts in one dashboard.",
+    mechanics: "Trip requests · Bespoke proposals · Guaranteed milestone payouts",
+    body: "Real travelers post dream trips; you answer with bespoke proposals. Get paid in guaranteed milestones — your deposit releases as working capital once reservations are confirmed, the balance on completion. No invoicing, no chasing.",
     cta: "Join as a travel expert",
     link: "/apply/agent",
     image: expertImage,
@@ -45,8 +45,8 @@ export function EarnSection() {
           Your travels are worth something
         </h2>
         <p className="mx-auto mt-3 mb-11 max-w-2xl text-[15px] md:text-[17px] leading-relaxed text-[#4a4a4a]">
-          Two ways to turn experience into income — as a creator sharing where you've
-          been, or as a certified expert designing where others go next.
+          Two ways to turn experience into income — as a creator whose content becomes
+          booked trips, or as a certified specialist designing where others go next.
         </p>
 
         <div className="grid grid-cols-1 gap-7 text-left md:grid-cols-2">
