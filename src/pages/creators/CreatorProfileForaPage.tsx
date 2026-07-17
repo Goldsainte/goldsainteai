@@ -152,7 +152,7 @@ export default function CreatorProfileForaPage() {
   if (!dir) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#FDF9F0] px-4 text-center">
-        <h1 className="font-secondary text-4xl text-[#0a2225]">Creator not found</h1>
+        <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Creator not found</h1>
         <button type="button" onClick={() => navigate("/creators")}
           className="mt-8 rounded-full bg-[#0c4d47] px-8 py-3.5 text-[14px] text-[#f7f3ea] hover:bg-[#0a2225]">
           Browse creators
@@ -262,7 +262,7 @@ export default function CreatorProfileForaPage() {
             {visitedCountries.length > 0 && (
               <section className="mt-14">
                 <div className="flex items-baseline justify-between gap-4">
-                  <h2 className="font-secondary text-3xl text-[#0a2225]">Where I've been</h2>
+                  <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Where I've been</h2>
                   <p className="font-secondary text-xl text-[#8D6B2F]">
                     {visitedCountries.length} {visitedCountries.length === 1 ? "country" : "countries"}
                   </p>
@@ -273,7 +273,7 @@ export default function CreatorProfileForaPage() {
               </section>
             )}
             <section className="mt-14">
-              <h2 className="mb-6 font-secondary text-3xl text-[#0a2225]">Content</h2>
+              <h2 className="mb-6 font-secondary text-2xl md:text-3xl text-[#0a2225]">Content</h2>
               <CreatorMediaGallery
                 creatorId={dir.id}
                 fallbackPhotos={null}
@@ -292,7 +292,7 @@ export default function CreatorProfileForaPage() {
                 <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
                   Travel with {firstName}
                 </p>
-                <h2 className="mt-2 font-secondary text-3xl text-[#0a2225]">Upcoming trips</h2>
+                <h2 className="mt-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">Upcoming trips</h2>
                 <p className="mt-3 max-w-2xl leading-relaxed text-[#0a2225]/75">
                   These are real trips {firstName} is planning to lead — and you can be on them.
                   Tap Request to join and {firstName} will reply with the full itinerary and price.
@@ -323,7 +323,7 @@ export default function CreatorProfileForaPage() {
                 <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
                   For brands & partners
                 </p>
-                <h2 className="mt-2 font-secondary text-3xl text-[#0a2225]">Work with {firstName}</h2>
+                <h2 className="mt-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">Work with {firstName}</h2>
                 <p className="mt-3 max-w-2xl leading-relaxed text-[#0a2225]/80">
                   {firstName} is open to paid brand collaborations — the formats below. Download the
                   media kit for audience details and rates.
