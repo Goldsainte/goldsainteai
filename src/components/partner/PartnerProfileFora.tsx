@@ -191,7 +191,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
               {avatarUrl ? (
                 <img src={avatarUrl} alt={name} className="aspect-[4/5] w-full rounded-2xl object-cover" />
               ) : (
-                <div className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-[#0c4d47]/10 font-secondary text-6xl text-[#0c4d47]">
+                <div className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-[#0c4d47]/10 font-secondary text-4xl md:text-6xl text-[#0c4d47]">
                   {name.slice(0, 2).toUpperCase()}
                 </div>
               )}
@@ -205,7 +205,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
             </div>
 
             <div className="px-4 pb-5 pt-6">
-              <h2 className="font-secondary text-3xl text-[#0a2225]">{name}</h2>
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">{name}</h2>
               {tierLabel && (
                 <p className="mt-1 text-[13px] uppercase tracking-[0.18em] text-[#8D6B2F]">{tierLabel}</p>
               )}
@@ -344,7 +344,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
 
           {/* Reviews */}
           <section className="mt-14">
-            <h2 className="font-secondary text-3xl text-[#0a2225]">Reviews ({reviewCount})</h2>
+            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Reviews ({reviewCount})</h2>
             {visibleReviews.length === 0 ? (
               <p className="mt-4 text-[15px] text-[#6B7280]">No reviews yet.</p>
             ) : (
@@ -390,7 +390,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
 
           {/* Travel ideas */}
           <section className="mt-14">
-            <h2 className="font-secondary text-3xl text-[#0a2225]">Travel ideas ({ideas.length})</h2>
+            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Travel ideas ({ideas.length})</h2>
             {ideas.length === 0 ? (
               <div className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-8 text-center">
                 <p className="font-secondary text-lg text-[#0a2225]">Trips coming soon</p>
@@ -462,7 +462,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
           {/* Travel photos */}
           {photos.length > 0 && (
             <section className="mt-14">
-              <h2 className="mb-6 font-secondary text-3xl text-[#0a2225]">Travel photos</h2>
+              <h2 className="mb-6 font-secondary text-2xl md:text-3xl text-[#0a2225]">Travel photos</h2>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 {photos.map((src) => (
                   <img key={src} src={src} alt="Travel" loading="lazy" className="w-full rounded-3xl object-cover" />
