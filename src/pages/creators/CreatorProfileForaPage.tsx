@@ -9,6 +9,7 @@ import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 import TravelMap from "@/components/partner/TravelMap";
 import { MessageButton } from "@/components/messaging/MessageButton";
+import FollowButton from "@/components/FollowButton";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 
 // ============================================================================
@@ -229,15 +230,24 @@ export default function CreatorProfileForaPage() {
         }
         stats={stats}
         belowCta={
-          user && user.id !== dir.id ? (
-            <MessageButton
-              recipientId={dir.id}
-              recipientName={displayName}
-              variant="outline"
-              className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
-              label={"Message " + firstName}
-            />
-          ) : undefined
+          // Owner sees ownerActions instead. Everyone else — INCLUDING logged-out
+          // visitors — gets Follow + Message; both route to /auth when signed out.
+          // (The old `user &&` gate hid these from every anonymous visitor.)
+          user?.id === dir.id ? undefined : (
+            <div className="grid grid-cols-2 gap-2">
+              <FollowButton
+                targetUserId={dir.id}
+                className="w-full rounded-full py-6 text-[15px]"
+              />
+              <MessageButton
+                recipientId={dir.id}
+                recipientName={displayName}
+                variant="outline"
+                className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
+                label="Message"
+              />
+            </div>
+          )
         }
         ownerActions={
           user?.id === dir.id
