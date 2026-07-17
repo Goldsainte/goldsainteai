@@ -323,7 +323,10 @@ export default function PostTripPage() {
               body: hireOnTrip
                 ? `A traveler wants to hire you to join their trip to ${destination}` + (hireDayRate ? ` at your listed rate of $${hireDayRate}/day` : "")
                 : `You received a direct trip request for ${destination}`,
-              type: "direct_trip_request",
+              // "direct_trip_request" was outside the notify contract's type
+              // set and (probe 192) can trip a DB check — "booking" is the
+              // closest first-class type and renders properly in the inbox.
+              type: "booking",
               priority: "high",
               actionUrl: `/marketplace/request/${insertedTrip.id}`,
               entityType: "trip_request",
