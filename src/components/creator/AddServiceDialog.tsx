@@ -55,31 +55,60 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const [title, setTitle] = useState(editService?.title || "");
   const [description, setDescription] = useState(editService?.description || "");
   const [price, setPrice] = useState(editService ? String(editService.starting_price_cents / 100) : "");
+  type ExpenseWho = "traveler" | "creator" | "split";
+  const [expenseTravel, setExpenseTravel] = useState<ExpenseWho | null>((editService as any)?.expense_travel ?? null);
+  const [expenseLodging, setExpenseLodging] = useState<ExpenseWho | null>((editService as any)?.expense_lodging ?? null);
+  const [expenseMeals, setExpenseMeals] = useState<ExpenseWho | null>((editService as any)?.expense_meals ?? null);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiVersions, setAiVersions] = useState<string[]>([]);
 
   // "Write it with AI" — rides the live ai-content-tools `rewrite` tool
-  // (anti-fabrication spine, 30/hr limit). Seeds from whatever the creator
-  // has typed; falls back to title + tier so an empty box still works.
-  async function suggestDescription() {
+  // (anti-fabrication spine, 30/hr limit). One helper serves every free-text
+  // field in this wizard; suggestions render under whichever field asked.
+  const [aiTarget, setAiTarget] = useState<string | null>(null);
+  async function aiSuggest(target: string, seed: string, tone: string) {
     setAiBusy(true);
+    setAiTarget(target);
     setAiVersions([]);
-    const tierHint =
-      tier === "on_trip"
-        ? "I join travelers on their own trip as their host \u2014 guiding the days and creating content as we go."
-        : tier === "add_on"
-        ? "A focused add-on travelers can book alongside a trip."
-        : "A personalized travel-planning service.";
-    const seed = description.trim() || `${title.trim()}. ${tierHint}`;
     const { data, error } = await supabase.functions.invoke("ai-content-tools", {
-      body: { tool: "rewrite", description: seed, tone: "editorial, warm, specific \u2014 a premium travel service, two sentences, no hype words" },
+      body: { tool: "rewrite", description: seed, tone },
     });
     setAiBusy(false);
     if (error || (data as any)?.error) {
       toast.error("Couldn't write suggestions" + (error?.message ? ": " + error.message : ""));
+      setAiTarget(null);
       return;
     }
     setAiVersions((((data as any).versions || []) as string[]).slice(0, 3));
+  }
+  const tierHint =
+    tier === "on_trip"
+      ? "I join travelers on their own trip as their host \u2014 guiding the days and creating content as we go."
+      : tier === "add_on"
+      ? "A focused add-on travelers can book alongside a trip."
+      : "A personalized travel-planning service.";
+  function suggestTitle() {
+    aiSuggest("title", `A service title of three to six words, no punctuation, for: ${description.trim() || tierHint}`,
+      "a short editorial service title, three to six words, title case, no quotes");
+  }
+  function suggestDescription() {
+    aiSuggest("description", description.trim() || `${title.trim()}. ${tierHint}`,
+      "editorial, warm, specific \u2014 a premium travel service, two sentences, no hype words");
+  }
+  function suggestFaqAnswer(i: number) {
+    aiSuggest(`faq-${i}`,
+      `Answer this traveler question in one to two plain sentences for the service "${title.trim()}": ${faq[i].question.trim()}`,
+      "plain, direct, reassuring \u2014 one to two sentences, no hype");
+  }
+  function applySuggestion(v: string) {
+    if (aiTarget === "title") setTitle(v.replace(/^["']|["']$/g, ""));
+    else if (aiTarget === "description") setDescription(v);
+    else if (aiTarget?.startsWith("faq-")) {
+      const i = Number(aiTarget.split("-")[1]);
+      updateFaqItem(i, "answer", v);
+    }
+    setAiVersions([]);
+    setAiTarget(null);
   }
   const [deliveryOption, setDeliveryOption] = useState(editService?.delivery_time_option || "5 days");
   const [tripDays, setTripDays] = useState(editService?.trip_days ? String(editService.trip_days) : "");
@@ -127,6 +156,9 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
       currency: "USD",
       includes: includes.length > 0 ? includes : [],
       is_active: true,
+      expense_travel: tier === "on_trip" ? expenseTravel : null,
+      expense_lodging: tier === "on_trip" ? expenseLodging : null,
+      expense_meals: tier === "on_trip" ? expenseMeals : null,
       delivery_time_option: tier === "custom_itinerary" || tier === "full_trip_design" ? deliveryOption : null,
       delivery_days: tier === "custom_itinerary" || tier === "full_trip_design" ? parseInt(deliveryOption) || null : null,
       trip_days: ["custom_itinerary", "full_trip_design"].includes(tier) ? (parseInt(tripDays) || null) : null,
@@ -140,9 +172,9 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
 
     let error;
     if (isEdit) {
-      ({ error } = await supabase.from("creator_services").update(payload).eq("id", editService.id));
+      ({ error } = await supabase.from("creator_services").update(payload as any).eq("id", editService.id));
     } else {
-      ({ error } = await supabase.from("creator_services").insert(payload));
+      ({ error } = await supabase.from("creator_services").insert(payload as any));
     }
 
     setSaving(false);
@@ -190,9 +222,32 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   }
 
   const selectedTier = TIERS.find((t) => t.value === tier);
+
+  const aiPanel = (target: string) =>
+    aiTarget === target && aiVersions.length > 0 ? (
+      <div className="mt-2 space-y-1.5">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-[#8D6B2F]">Tap one to use it</p>
+        {aiVersions.map((v, i) => (
+          <button key={i} type="button" onClick={() => applySuggestion(v)}
+            className="block w-full rounded-lg border border-[#E5DFC6] bg-white px-3 py-2 text-left text-sm leading-snug text-[#0a2225] transition-colors hover:border-[#C7A962] !min-h-0">
+            {v}
+          </button>
+        ))}
+      </div>
+    ) : null;
+  const aiLink = (label: string, onClick: () => void, disabled: boolean) => (
+    <button type="button" disabled={aiBusy || disabled} onClick={onClick}
+      className="text-xs font-semibold text-[#0c4d47] disabled:opacity-40 hover:underline !min-h-0 !min-w-0">
+      {aiBusy ? "Writing\u2026" : label}
+    </button>
+  );
   const isItineraryTier = tier === "custom_itinerary" || tier === "full_trip_design";
 
   function goNext() {
+    if (step === 1 && tier === "on_trip" && (!expenseTravel || !expenseLodging || !expenseMeals)) {
+      toast.error("Choose who covers flights, lodging, and meals");
+      return;
+    }
     if (step === 0 && (!title || !price)) {
       toast.error("Title and price are required");
       return;
@@ -232,11 +287,11 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
         {tier && (
           <>
             {selectedTier && (
-              <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0c4d47]">
+              <div className="inline-flex h-9 w-fit items-center gap-1.5 rounded-lg border border-[#E5DFC6] bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
                 {selectedTier.label}
                 {!isEdit && (
-                  <button onClick={() => setTier(null)} className="ml-1 opacity-60 hover:opacity-100">
-                    <X className="h-3 w-3" />
+                  <button type="button" onClick={() => setTier(null)} className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-transparent text-[#9CA3AF] transition-colors hover:border-[#E5DFC6] hover:bg-[#f7f3ea] hover:text-[#0a2225] !min-h-0 !min-w-0">
+                    <X className="h-3.5 w-3.5" />
                   </button>
                 )}
               </div>
@@ -274,37 +329,20 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
               {step === 0 && (
                 <>
                   <div>
-                    <label className="text-xs font-medium text-[#6B7280] mb-1 block">Title *</label>
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-xs font-medium text-[#6B7280] block">Title *</label>
+                      {aiLink("Write it with AI", suggestTitle, false)}
+                    </div>
                     <Input className={FIELD_CLASS} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Custom Italy Itinerary" />
+                    {aiPanel("title")}
                   </div>
                   <div>
                     <div className="mb-1 flex items-center justify-between">
                       <label className="text-xs font-medium text-[#6B7280] block">Description</label>
-                      <button
-                        type="button"
-                        disabled={aiBusy || !title.trim()}
-                        onClick={suggestDescription}
-                        className="text-xs font-semibold text-[#0c4d47] disabled:opacity-40 hover:underline !min-h-0 !min-w-0"
-                      >
-                        {aiBusy ? "Writing\u2026" : "Write it with AI"}
-                      </button>
+                      {aiLink("Write it with AI", suggestDescription, !title.trim())}
                     </div>
                     <Textarea className={FIELD_CLASS} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of this service" rows={3} />
-                    {aiVersions.length > 0 && (
-                      <div className="mt-2 space-y-1.5">
-                        <p className="text-[11px] uppercase tracking-[0.14em] text-[#8D6B2F]">Tap one to use it</p>
-                        {aiVersions.map((v, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={() => { setDescription(v); setAiVersions([]); }}
-                            className="block w-full rounded-lg border border-[#E5DFC6] bg-white px-3 py-2 text-left text-sm leading-snug text-[#0a2225] transition-colors hover:border-[#C7A962] !min-h-0"
-                          >
-                            {v}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    {aiPanel("description")}
                   </div>
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">{tier === "on_trip" ? "Day Rate (USD) *" : "Price (USD) *"}</label>
@@ -366,6 +404,35 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   )}
 
                   {tier === "on_trip" && (
+                    <div className="space-y-2.5">
+                      <p className="text-xs font-medium text-[#6B7280]">Who covers what *</p>
+                      <p className="text-xs text-[#9CA3AF] -mt-1">Shown on your profile so travelers can compare rates fairly before they reach out.</p>
+                      {([
+                        ["Flights & transport", expenseTravel, setExpenseTravel],
+                        ["Lodging", expenseLodging, setExpenseLodging],
+                        ["Meals", expenseMeals, setExpenseMeals],
+                      ] as [string, ExpenseWho | null, (v: ExpenseWho) => void][]).map(([label, value, set]) => (
+                        <div key={label} className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-sm text-[#0a2225]">{label}</span>
+                          <div className="inline-flex rounded-lg border border-[#E5DFC6] bg-white p-0.5">
+                            {([
+                              ["traveler", "Traveler covers"],
+                              ["creator", "In my rate"],
+                              ["split", "Each our own"],
+                            ] as [ExpenseWho, string][]).map(([v, l]) => (
+                              <button key={v} type="button" onClick={() => set(v)}
+                                className={`h-8 rounded-md px-3 text-[12px] font-medium transition-colors !min-h-0 !min-w-0 ${
+                                  value === v ? "bg-[#0c4d47] text-[#f7f3ea]" : "text-[#0a2225]/70 hover:bg-[#f7f3ea]"
+                                }`}>
+                                {l}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {tier === "on_trip" && (
                     <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4 space-y-2">
                       <p className="text-sm text-[#0a2225] font-medium">How On-Trip pricing works</p>
                       <p className="text-xs text-[#6B7280]">Travelers hire you at your listed day rate. When a hire request arrives, you reply in Messages and send a proposal with the final total — day rate × trip days, and whether the traveler covers your travel and lodging (say so in your description). Payment goes through Goldsainte escrow: deposit at booking, the rest released after the trip.</p>
@@ -407,7 +474,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                           <div key={item} className="flex items-center gap-2 text-sm text-[#0a2225]">
                             <Check className="h-3.5 w-3.5 text-[#C7A962] shrink-0" />
                             <span className="flex-1">{item}</span>
-                            <button onClick={() => toggleRequirement(item)} className="text-[#9CA3AF] hover:text-red-500">
+                            <button type="button" onClick={() => toggleRequirement(item)} className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-transparent text-[#9CA3AF] transition-colors hover:border-[#E5DFC6] hover:bg-[#f7f3ea] hover:text-[#0a2225] !min-h-0 !min-w-0">
                               <X className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -439,7 +506,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                         <div key={i} className="flex items-center gap-2 text-sm text-[#0a2225]">
                           <Check className="h-3.5 w-3.5 text-[#C7A962] shrink-0" />
                           <span className="flex-1">{item}</span>
-                          <button onClick={() => setIncludes(includes.filter((_, j) => j !== i))} className="text-[#9CA3AF] hover:text-red-500">
+                          <button type="button" onClick={() => setIncludes(includes.filter((_, j) => j !== i))} className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-transparent text-[#9CA3AF] transition-colors hover:border-[#E5DFC6] hover:bg-[#f7f3ea] hover:text-[#0a2225] !min-h-0 !min-w-0">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -471,6 +538,9 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                             onChange={(e) => updateFaqItem(i, "question", e.target.value)}
                             placeholder="Question"
                           />
+                          <div className="flex justify-end">
+                            {aiLink("Answer with AI", () => suggestFaqAnswer(i), !item.question.trim() || !title.trim())}
+                          </div>
                           <Textarea
                             className="bg-white border-[#E5DFC6] rounded-[10px]"
                             value={item.answer}
@@ -478,9 +548,10 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                             placeholder="Answer"
                             rows={2}
                           />
+                          {aiPanel(`faq-${i}`)}
                           <button
                             onClick={() => removeFaqItem(i)}
-                            className="text-xs font-medium text-red-500 hover:text-red-600"
+                            className="inline-flex h-8 items-center rounded-md border border-transparent px-2.5 text-[12px] font-medium text-[#9CA3AF] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 !min-h-0 !min-w-0"
                           >
                             Remove
                           </button>
