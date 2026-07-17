@@ -69,6 +69,10 @@ type TripRequest = {
   budgetPerPerson?: boolean;
   mustHaves?: string[];
   dealbreakers?: string[];
+  /** On-trip hire: the traveler wants this creator/agent to JOIN the trip. */
+  hireOnTrip?: boolean;
+  hireServiceTitle?: string | null;
+  hireDayRate?: number | null;
 };
 
 type TravelerProfile = {
@@ -168,6 +172,9 @@ export default function TripRequestDetail() {
         budgetPerPerson: sourceMeta.budget_per_person || false,
         mustHaves: Array.isArray(sourceMeta.must_haves) ? sourceMeta.must_haves : [],
         dealbreakers: Array.isArray(sourceMeta.dealbreakers) ? sourceMeta.dealbreakers : [],
+        hireOnTrip: sourceMeta.hire_on_trip === true,
+        hireServiceTitle: sourceMeta.hire_service_title || null,
+        hireDayRate: typeof sourceMeta.hire_day_rate_usd === "number" ? sourceMeta.hire_day_rate_usd : null,
       };
 
       setRequest(mappedRequest);
@@ -386,6 +393,14 @@ export default function TripRequestDetail() {
             <h1 className="mt-2 max-w-3xl font-secondary text-3xl leading-[1.05] text-[#fdfaf2] md:text-4xl lg:text-[44px]">
               {request.tripTitle}
             </h1>
+
+            {request.hireOnTrip && (
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0a2225]">
+                On-trip hire
+                {request.hireDayRate ? ` \u00b7 listed at $${request.hireDayRate.toLocaleString()}/day` : ""}
+                {request.hireServiceTitle ? ` \u00b7 ${request.hireServiceTitle}` : ""}
+              </p>
+            )}
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {request.destination && request.destination !== "Not specified" && (
