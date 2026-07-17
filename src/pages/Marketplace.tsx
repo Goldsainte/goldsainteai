@@ -308,7 +308,10 @@ export default function Marketplace() {
       let query = supabase
         .from("trip_requests")
         .select(`*, trip_proposals(count)`)
-        .eq("status", "open");
+        .eq("status", "open")
+        // On-trip HIRE requests are addressed to one named creator/agent —
+        // they must never appear on the public board for strangers to bid on.
+        .filter("source_metadata->>hire_on_trip", "is", null);
 
       // Destination filter
       if (filters.destination) {
