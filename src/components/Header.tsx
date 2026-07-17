@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText, Compass, Globe } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -245,6 +245,20 @@ export const Header = () => {
                               <ShoppingCart className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">Travel Marketplace</span>
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/creators')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Compass className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Browse Creators</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/agents')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Globe className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Find a Specialist</span>
+                            </DropdownMenuItem>
                           <DropdownMenuItem
                               onClick={() => navigate('/following')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -455,8 +469,30 @@ export const Header = () => {
                           </div>
                         </>
                       ) : (
-                        /* Logged Out - Simple Sign In / Sign Up */
+                        /* Logged Out - Discover links + Sign In / Sign Up */
                         <div className="py-2">
+                          <DropdownMenuItem
+                            onClick={() => navigate('/creators')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                          >
+                            <Compass className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                            <span className="text-[15px] font-medium text-[#0a2225]">Browse Creators</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/agents')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                          >
+                            <Globe className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                            <span className="text-[15px] font-medium text-[#0a2225]">Find a Specialist</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => navigate('/marketplace')}
+                            className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                          >
+                            <ShoppingCart className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                            <span className="text-[15px] font-medium text-[#0a2225]">Travel Marketplace</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="mx-5 my-2 bg-[#0a2225]/10" />
                           <DropdownMenuItem 
                             onClick={() => navigate('/auth')} 
                             className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
