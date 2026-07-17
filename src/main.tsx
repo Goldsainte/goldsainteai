@@ -23,8 +23,24 @@ import "@/lib/storageImageCompressionGuard";
 // open session tries to lazy-load, Vite fires this event — reload once and
 // the user gets the fresh app instead of the "Something went wrong" screen.
 window.addEventListener("vite:preloadError", () => {
-  window.location.reload();
+  // Loop brake: at most one automatic reload per session.
+  if (!sessionStorage.getItem("gs_chunk_reload")) {
+    sessionStorage.setItem("gs_chunk_reload", "1");
+    window.location.reload();
+  }
 });
+
+// When a freshly published service worker takes control (skipWaiting), the
+// old session's chunk map is stale — reload once so every open tab heals
+// itself the moment a deploy lands.
+if ("serviceWorker" in navigator) {
+  let swReloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (swReloaded) return;
+    swReloaded = true;
+    window.location.reload();
+  });
+}
 
 // Capture Google Ads click identifier (gclid) on landing so we can attribute
 // downstream conversions even after navigation.
