@@ -236,8 +236,12 @@ export const Header = () => {
                       {user ? (
                         <>
 
-                          {/* Core Experience */}
-                          <div className="py-2">
+                          {/* Three-zone regroup (Jul 17): EXPLORE (where do I go) /
+                              MY TRAVEL (what's mine) / MY WORK (partner pipeline,
+                              collapsed — same accordion pattern as Admin below).
+                              Every destination kept; only the grouping changed. */}
+                          <div className="pb-1 pt-2">
+                            <p className="px-6 pb-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#BFAD72]">Explore</p>
                             <DropdownMenuItem
                               onClick={() => navigate('/marketplace')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -259,13 +263,10 @@ export const Header = () => {
                               <Globe className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">Find a Specialist</span>
                             </DropdownMenuItem>
-                          <DropdownMenuItem
-                              onClick={() => navigate('/following')}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                            >
-                              <Users className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Saved &amp; Following</span>
-                            </DropdownMenuItem>
+                          </div>
+
+                          <div className="pb-1 pt-1">
+                            <p className="px-6 pb-1 pt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#BFAD72]">My Travel</p>
                             <DropdownMenuItem
                               onClick={() => navigate(primaryBookingsPath)}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -273,24 +274,13 @@ export const Header = () => {
                               <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
                             </DropdownMenuItem>
-                            {(isAgentAccount || isCreator || isAdmin || isBrand) && (
-                              <DropdownMenuItem
-                                onClick={() => navigate('/partner-bookings')}
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                              >
-                                <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
-                              </DropdownMenuItem>
-                            )}
-                            {(isAgentAccount || isCreator || isAdmin || isBrand) && (
-                              <DropdownMenuItem
-                                onClick={() => navigate('/my-proposals')}
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                              >
-                                <FileText className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">My Proposals</span>
-                              </DropdownMenuItem>
-                            )}
+                            <DropdownMenuItem
+                              onClick={() => navigate('/following')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Users className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Saved & Following</span>
+                            </DropdownMenuItem>
                             {showRequestTrip && (
                               <DropdownMenuItem
                                 onClick={() => navigate(postTripPath)}
@@ -309,26 +299,8 @@ export const Header = () => {
                                 <span className="text-[15px] font-medium text-[#0a2225]">My Guides</span>
                               </DropdownMenuItem>
                             )}
-                            {isAgentAccount && (
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/agent-trips')} 
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                              >
-                                <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Available Trips</span>
-                              </DropdownMenuItem>
-                            )}
-                            {(isCreator || isAgentAccount) && (
-                              <DropdownMenuItem 
-                                onClick={() => navigate('/trip-builder')} 
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                              >
-                                <Plus className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Create Trip Package</span>
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem 
-                              onClick={() => navigate('/messages')} 
+                            <DropdownMenuItem
+                              onClick={() => navigate('/messages')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <div className="relative flex-shrink-0">
@@ -342,6 +314,52 @@ export const Header = () => {
                               <span className="text-[15px] font-medium text-[#0a2225]">Messages</span>
                             </DropdownMenuItem>
                           </div>
+
+                          {(isAgentAccount || isCreator || isAdmin || isBrand) && (
+                            <Accordion type="multiple" className="w-full">
+                              <AccordionItem value="work" className="border-b-0">
+                                <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
+                                  <p className="text-xs font-semibold text-[#BFAD72] uppercase tracking-[0.15em]">My Work</p>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-0">
+                                  <div className="py-1">
+                                    <DropdownMenuItem
+                                      onClick={() => navigate('/partner-bookings')}
+                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                                    >
+                                      <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                      <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => navigate('/my-proposals')}
+                                      className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                                    >
+                                      <FileText className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                      <span className="text-[15px] font-medium text-[#0a2225]">My Proposals</span>
+                                    </DropdownMenuItem>
+                                    {isAgentAccount && (
+                                      <DropdownMenuItem
+                                        onClick={() => navigate('/agent-trips')}
+                                        className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                                      >
+                                        <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                        <span className="text-[15px] font-medium text-[#0a2225]">Available Trips</span>
+                                      </DropdownMenuItem>
+                                    )}
+                                    {(isCreator || isAgentAccount) && (
+                                      <DropdownMenuItem
+                                        onClick={() => navigate('/trip-builder')}
+                                        className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                                      >
+                                        <Plus className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                        <span className="text-[15px] font-medium text-[#0a2225]">Create Trip Package</span>
+                                      </DropdownMenuItem>
+                                    )}
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                          )}
 
                           <DropdownMenuSeparator className="mx-5 bg-[#0a2225]/10" />
 
