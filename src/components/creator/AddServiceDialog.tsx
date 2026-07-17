@@ -55,6 +55,32 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const [title, setTitle] = useState(editService?.title || "");
   const [description, setDescription] = useState(editService?.description || "");
   const [price, setPrice] = useState(editService ? String(editService.starting_price_cents / 100) : "");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiVersions, setAiVersions] = useState<string[]>([]);
+
+  // "Write it with AI" — rides the live ai-content-tools `rewrite` tool
+  // (anti-fabrication spine, 30/hr limit). Seeds from whatever the creator
+  // has typed; falls back to title + tier so an empty box still works.
+  async function suggestDescription() {
+    setAiBusy(true);
+    setAiVersions([]);
+    const tierHint =
+      tier === "on_trip"
+        ? "I join travelers on their own trip as their host \u2014 guiding the days and creating content as we go."
+        : tier === "add_on"
+        ? "A focused add-on travelers can book alongside a trip."
+        : "A personalized travel-planning service.";
+    const seed = description.trim() || `${title.trim()}. ${tierHint}`;
+    const { data, error } = await supabase.functions.invoke("ai-content-tools", {
+      body: { tool: "rewrite", description: seed, tone: "editorial, warm, specific \u2014 a premium travel service, two sentences, no hype words" },
+    });
+    setAiBusy(false);
+    if (error || (data as any)?.error) {
+      toast.error("Couldn't write suggestions" + (error?.message ? ": " + error.message : ""));
+      return;
+    }
+    setAiVersions((((data as any).versions || []) as string[]).slice(0, 3));
+  }
   const [deliveryOption, setDeliveryOption] = useState(editService?.delivery_time_option || "5 days");
   const [tripDays, setTripDays] = useState(editService?.trip_days ? String(editService.trip_days) : "");
   const [revisions, setRevisions] = useState(editService?.revisions ? String(editService.revisions) : "2");
@@ -121,7 +147,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
 
     setSaving(false);
     if (error) {
-      toast.error("Failed to save service");
+      toast.error("Failed to save service" + (error?.message ? ": " + error.message : ""));
       console.error(error);
       return;
     }
@@ -176,7 +202,6 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   }
 
   // Progress fraction for the connecting line overlay (0 at step 0, 1 at the last step)
-  const progressPct = STEPS.length > 1 ? (step / (STEPS.length - 1)) * 100 : 0;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
@@ -207,8 +232,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
         {tier && (
           <>
             {selectedTier && (
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border w-fit ${selectedTier.color}`}>
-                <selectedTier.icon className="h-3.5 w-3.5" />
+              <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0c4d47]">
                 {selectedTier.label}
                 {!isEdit && (
                   <button onClick={() => setTier(null)} className="ml-1 opacity-60 hover:opacity-100">
@@ -218,37 +242,23 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
               </div>
             )}
 
-            {/* Stepper — single absolute-positioned line under the dots, avoids flex/margin alignment fragility */}
-            <div className="pb-1">
-              <div className="relative flex items-start justify-between mt-5">
-                {/* background line: insets = half a dot-column width, so it spans exactly dot-center to dot-center */}
-                <div
-                  className="absolute top-[13px] h-0.5 bg-[#E5DFC6]"
-                  style={{ left: `${50 / STEPS.length}%`, right: `${50 / STEPS.length}%` }}
-                />
-                <div
-                  className="absolute top-[13px] h-0.5 bg-[#C7A962] transition-all duration-300"
-                  style={{
-                    left: `${50 / STEPS.length}%`,
-                    width: `${(100 - 100 / STEPS.length) * (progressPct / 100)}%`,
-                  }}
-                />
+            {/* Stepper — serif numerals over a hairline (brand: serif numerals for
+                section markers; a wizard is a true sequence). Gold = done,
+                green = current, sand = ahead. No circles. */}
+            <div className="mt-5 border-b border-[#E5DFC6] pb-3">
+              <div className="flex items-end justify-between gap-2">
                 {STEPS.map((label, i) => (
-                  <div key={label} className="relative z-10 flex min-w-0 flex-col items-center" style={{ width: `${100 / STEPS.length}%` }}>
-                    <div
-                      className={`h-[26px] w-[26px] rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
-                        i === step
-                          ? "bg-[#0c4d47] text-white"
-                          : i < step
-                          ? "bg-[#C7A962] text-[#0a2225]"
-                          : "bg-[#E5DFC6] text-[#9CA3AF]"
+                  <div key={label} className="flex min-w-0 items-baseline gap-2">
+                    <span
+                      className={`font-secondary text-[22px] leading-none ${
+                        i === step ? "text-[#0c4d47]" : i < step ? "text-[#8D6B2F]" : "text-[#D8D0BA]"
                       }`}
                     >
-                      {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                    </div>
+                      {i + 1}
+                    </span>
                     <span
-                      className={`text-[9.5px] font-semibold uppercase tracking-wide mt-[5px] text-center ${
-                        i === step ? "text-[#0c4d47]" : "text-[#9CA3AF]"
+                      className={`hidden truncate text-[10px] font-semibold uppercase tracking-[0.15em] sm:block ${
+                        i === step ? "text-[#0a2225]" : "text-[#9CA3AF]"
                       }`}
                     >
                       {label}
@@ -256,6 +266,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   </div>
                 ))}
               </div>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-[#8D6B2F] sm:hidden">{STEPS[step]}</p>
             </div>
 
             <div className="space-y-4 pt-1">
@@ -267,8 +278,33 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     <Input className={FIELD_CLASS} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Custom Italy Itinerary" />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-[#6B7280] mb-1 block">Description</label>
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-xs font-medium text-[#6B7280] block">Description</label>
+                      <button
+                        type="button"
+                        disabled={aiBusy || !title.trim()}
+                        onClick={suggestDescription}
+                        className="text-xs font-semibold text-[#0c4d47] disabled:opacity-40 hover:underline !min-h-0 !min-w-0"
+                      >
+                        {aiBusy ? "Writing\u2026" : "Write it with AI"}
+                      </button>
+                    </div>
                     <Textarea className={FIELD_CLASS} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of this service" rows={3} />
+                    {aiVersions.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        <p className="text-[11px] uppercase tracking-[0.14em] text-[#8D6B2F]">Tap one to use it</p>
+                        {aiVersions.map((v, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => { setDescription(v); setAiVersions([]); }}
+                            className="block w-full rounded-lg border border-[#E5DFC6] bg-white px-3 py-2 text-left text-sm leading-snug text-[#0a2225] transition-colors hover:border-[#C7A962] !min-h-0"
+                          >
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">{tier === "on_trip" ? "Day Rate (USD) *" : "Price (USD) *"}</label>
