@@ -69,7 +69,7 @@ export default function CreatorHandbookPage() {
       <Helmet><title>Creator Handbook · Goldsainte</title></Helmet>
       <div className="mx-auto max-w-3xl px-4 pt-14">
         <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">Creator handbook</p>
-        <h1 className="mt-3 font-secondary text-5xl leading-tight text-[#0a2225]">How Goldsainte works for you</h1>
+        <h1 className="mt-3 font-secondary text-[34px] leading-tight text-[#0a2225] md:text-5xl">How Goldsainte works for you</h1>
         <p className="mt-5 text-[18px] leading-relaxed text-[#0a2225]/80">
           You make travel content people love — Goldsainte turns that love into booked trips, and you
           earn from every one. Here's the whole machine, in five minutes.
