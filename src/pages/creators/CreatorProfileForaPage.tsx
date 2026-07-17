@@ -10,6 +10,7 @@ import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 import TravelMap from "@/components/partner/TravelMap";
 import { MessageButton } from "@/components/messaging/MessageButton";
 import FollowButton from "@/components/FollowButton";
+import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 
 // ============================================================================
@@ -289,6 +290,22 @@ export default function CreatorProfileForaPage() {
                 fallbackPhotos={null}
                 instagramHandle={extra?.instagram_handle ?? null}
                 isOwnProfile={user?.id === dir.id}
+              />
+            </section>
+            {/* Services + on-trip hire. Self-fetches creator_services; renders
+                nothing for public visitors when the creator has no active
+                services, so the section can never appear empty. */}
+            <section className="mt-14">
+              <h2 className="mb-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">Hire {firstName}</h2>
+              <p className="mb-6 max-w-2xl leading-relaxed text-[#0a2225]/75">
+                From custom itineraries to having {firstName} join you on your own trip — every
+                hire is booked and escrow-protected through Goldsainte.
+              </p>
+              <CreatorServicesSection
+                creatorId={dir.id}
+                isOwnProfile={user?.id === dir.id}
+                hideLabel
+                requestBaseParams={"fromCreator=" + dir.id}
               />
               <div className="mt-8">
                 <PartnerMediaGallery userId={dir.id} />
