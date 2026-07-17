@@ -71,15 +71,17 @@ export function AnnouncementBanner() {
 
   const isExternal = a.href?.startsWith("http");
   return (
-    <div className="relative z-50 bg-[#0a2225] px-10 py-2.5 text-center">
-      <p className="text-[13px] tracking-wide text-[#f7f3ea]">
+    <div className="relative z-50 flex items-center justify-center gap-2 bg-[#0a2225] px-12 py-2.5">
+      <p className="min-w-0 truncate text-[13px] tracking-wide text-[#f7f3ea]">
         {a.message}
+      </p>
+      <p className="shrink-0 text-[13px]">
         {a.href && (
           <a
             href={a.href}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            className="ml-2 font-medium text-[#C7A962] underline underline-offset-4 hover:text-[#E2C57E]"
+            className="whitespace-nowrap font-medium text-[#C7A962] underline underline-offset-4 hover:text-[#E2C57E]"
           >
             Read more
           </a>
