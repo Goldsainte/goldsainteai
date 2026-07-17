@@ -43,8 +43,6 @@ const CreatorSettingsPage = lazy(() => import('@/pages/creators/CreatorSettingsP
 const CreatorProfileForaPage = lazy(() => import('@/pages/creators/CreatorProfileForaPage'));
 const CreatorHandbookPage = lazy(() => import('@/pages/creators/CreatorHandbookPage'));
 const AgentHandbookPage = lazy(() => import('@/pages/agents/AgentHandbookPage'));
-const NewsroomPage = lazy(() => import('@/pages/newsroom/NewsroomPage'));
-const PressReleasePage = lazy(() => import('@/pages/newsroom/PressReleasePage'));
 const AgentGuidesPage = lazy(() => import('@/pages/agents/AgentGuidesPage'));
 const GuidePage = lazy(() => import('@/pages/guides/GuidePage'));
 const AgentSettingsPage = lazy(() => import('@/pages/agents/AgentSettingsPage'));
@@ -209,8 +207,6 @@ export const AppRoutes = () => (
       <Route path="/creator-settings" element={<RequireAuth><CreatorSettingsPage /></RequireAuth>} />
       <Route path="/creator-handbook" element={<CreatorHandbookPage />} />
       <Route path="/agent-handbook" element={<AgentHandbookPage />} />
-      <Route path="/newsroom" element={<NewsroomPage />} />
-      <Route path="/newsroom/:slug" element={<PressReleasePage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/what-we-do" element={<WhatWeDo />} />
       <Route path="/how-it-works/traveler" element={<HowItWorksTraveler />} />
