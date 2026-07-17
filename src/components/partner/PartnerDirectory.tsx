@@ -136,12 +136,12 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
         <meta name="description" content={copy.subtitle} />
       </Helmet>
 
-      <div className="mx-auto max-w-4xl px-4 pt-16 text-center">
-        <h1 className="font-secondary text-5xl leading-tight text-[#0a2225] md:text-6xl">{copy.title}</h1>
-        <p className="mx-auto mt-6 max-w-2xl text-[18px] leading-relaxed text-[#0a2225]/70">{copy.subtitle}</p>
+      <div className="mx-auto max-w-4xl px-4 pt-10 text-center md:pt-16">
+        <h1 className="font-secondary text-3xl leading-tight text-[#0a2225] sm:text-5xl md:text-6xl">{copy.title}</h1>
+        <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-[#0a2225]/70 md:mt-6 md:text-[18px]">{copy.subtitle}</p>
       </div>
 
-      <div className="mx-auto mt-14 max-w-6xl px-4">
+      <div className="mx-auto mt-8 max-w-6xl px-4 md:mt-14">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#C7A962]" />
@@ -154,29 +154,32 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
             <p className="mt-2 text-sm text-[#6B7280]">Post your trip and we'll match you.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-6 lg:grid-cols-4">
+            {/* Mobile = compact Fora-style 2-up grid (flat rectangular photos,
+                left-aligned name + specialty). sm and up = the original oval-ring
+                editorial cards, unchanged. One markup, responsive classes. */}
             {cards.map((a) => (
               <Link
                 key={a.userId}
                 to={copy.link(a.userId)}
-                className="group rounded-2xl bg-[#F5F0E0]/70 px-6 pb-8 pt-8 text-center transition-shadow hover:shadow-[0_8px_28px_rgba(10,34,37,0.10)]"
+                className="group rounded-2xl bg-transparent px-0 pb-1 pt-0 text-left transition-shadow sm:bg-[#F5F0E0]/70 sm:px-6 sm:pb-8 sm:pt-8 sm:text-center sm:hover:shadow-[0_8px_28px_rgba(10,34,37,0.10)]"
               >
-                <div className="mx-auto w-[72%] rounded-[50%] bg-[#EDE5D1]/80 p-3">
+                <div className="mx-auto w-full rounded-2xl bg-transparent p-0 sm:w-[72%] sm:rounded-[50%] sm:bg-[#EDE5D1]/80 sm:p-3">
                   {a.avatarUrl ? (
-                    <img src={a.avatarUrl} alt={a.name} loading="lazy" className="aspect-[4/5] w-full rounded-[50%] object-cover" />
+                    <img src={a.avatarUrl} alt={a.name} loading="lazy" className="aspect-[4/5] w-full rounded-2xl object-cover sm:rounded-[50%]" />
                   ) : a.logoUrl ? (
-                    <div className="flex aspect-[4/5] w-full items-center justify-center rounded-[50%] bg-white">
+                    <div className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-white sm:rounded-[50%]">
                       <img src={a.logoUrl} alt={a.name} loading="lazy" className="max-h-[60%] max-w-[70%] object-contain" />
                     </div>
                   ) : (
-                    <div className="flex aspect-[4/5] w-full items-center justify-center rounded-[50%] bg-white font-secondary text-4xl text-[#0c4d47]">
+                    <div className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-white font-secondary text-3xl text-[#0c4d47] sm:rounded-[50%] sm:text-4xl">
                       {a.name.replace("@", "").slice(0, 2).toUpperCase()}
                     </div>
                   )}
                 </div>
-                <h2 className="mt-6 font-secondary text-2xl text-[#0a2225]">{a.name}</h2>
+                <h2 className="mt-3 font-secondary text-lg leading-snug text-[#0a2225] sm:mt-6 sm:text-2xl">{a.name}</h2>
                 {specialtyLine(a.tags) && (
-                  <p className="mt-2 text-[15px] leading-snug text-[#0a2225]/60">{specialtyLine(a.tags)}</p>
+                  <p className="mt-1 text-[12px] leading-snug text-[#0a2225]/60 sm:mt-2 sm:text-[15px]">{specialtyLine(a.tags)}</p>
                 )}
               </Link>
             ))}
