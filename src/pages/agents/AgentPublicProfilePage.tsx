@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
+import { MessageButton } from "@/components/messaging/MessageButton";
 
 // ============================================================================
 // AgentPublicProfilePage v2 (Jul 15) — 1:1 Fora advisor-page structure via the
@@ -212,6 +213,17 @@ export default function AgentPublicProfilePage() {
         ctaLabel={"Contact " + (agent?.agency_name || firstName)}
         onCta={() =>
           navigate("/post-trip?agentId=" + profile.id + "&agentName=" + encodeURIComponent(displayName))
+        }
+        belowCta={
+          // Visible to everyone except the owner; MessageButton self-hides for
+          // self and routes signed-out visitors to /auth on tap.
+          <MessageButton
+            recipientId={profile.id}
+            recipientName={displayName}
+            variant="outline"
+            className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
+            label={"Message " + firstName}
+          />
         }
         ownerActions={
           user?.id === profile.id
