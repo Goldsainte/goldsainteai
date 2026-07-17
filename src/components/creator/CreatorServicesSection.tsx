@@ -27,6 +27,9 @@ interface Service {
   revisions: number | null;
   requirements: string[];
   faq: { question: string; answer: string }[];
+  expense_travel: "traveler" | "creator" | "split" | null;
+  expense_lodging: "traveler" | "creator" | "split" | null;
+  expense_meals: "traveler" | "creator" | "split" | null;
 }
 
 interface Props {
@@ -97,7 +100,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
   const fetchServices = useCallback(async () => {
     const { data } = await supabase
       .from("creator_services")
-      .select("id, title, description, starting_price_cents, currency, delivery_days, includes, cover_image_url, service_tier, trip_days, has_priority_support, duration_minutes, file_url, delivery_time_option, revisions, requirements, faq")
+      .select("id, title, description, starting_price_cents, currency, delivery_days, includes, cover_image_url, service_tier, trip_days, has_priority_support, duration_minutes, file_url, delivery_time_option, revisions, requirements, faq, expense_travel, expense_lodging, expense_meals" as any)
       .eq("creator_id", creatorId)
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
@@ -215,8 +218,24 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                 </button>
               )}
             </div>
+            {(hostedService.expense_travel || hostedService.expense_lodging || hostedService.expense_meals) && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {([
+                  ["Flights & transport", hostedService.expense_travel],
+                  ["Lodging", hostedService.expense_lodging],
+                  ["Meals", hostedService.expense_meals],
+                ] as [string, string | null][]).filter(([, v]) => v).map(([label, v]) => (
+                  <span key={label} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-3 text-[12px] text-[#0a2225]">
+                    <span className="text-[#0a2225]/60">{label}:</span>
+                    <span className="font-medium">
+                      {v === "traveler" ? "traveler covers" : v === "creator" ? "in the rate" : "each their own"}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            )}
             <p className="mt-3 text-[12px] leading-relaxed text-[#0a2225]/60">
-              Final price by proposal, including travel &amp; lodging terms — confirmed before you pay.
+              Final price by proposal — confirmed before you pay.
             </p>
 
             <div className="mt-5 flex flex-col gap-3 border-t border-[#E5DFC6] pt-5 sm:flex-row sm:items-baseline sm:gap-8">
