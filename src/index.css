@@ -135,7 +135,19 @@ textarea {
   min-width: 44px;
 }
 
-/* Allow checkboxes and small icon buttons to be their natural size */
+/* Allow checkboxes and small icon buttons to be their natural size.
+   NOTE (Jul 17): native inputs were missing from this exemption, so the 44px
+   touch-target rule above inflated every raw <input type=checkbox|radio> into
+   a 44x44 box (founder report: "the check boxes are huge"). The clickable
+   LABEL row remains the WCAG touch target; the box itself returns to a
+   compact editorial size. */
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 0;
+  min-width: 0;
+  height: 1.05rem;
+  width: 1.05rem;
+}
 button[role="checkbox"],
 button[data-state],
 .btn-icon-sm {
