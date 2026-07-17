@@ -88,7 +88,6 @@ interface CreatorProfile {
   content_style_tags: string[] | null;
   destinations_focus_tags: string[] | null;
   travel_philosophy: string | null;
-  last_seen_at: string | null;
   website: string | null;
   created_at?: string | null;
   creator_tier?: string | null;
@@ -156,7 +155,7 @@ export default function CreatorPublicProfilePage() {
         supabase
           .from("creator_directory" as unknown as "profiles")
           .select(
-            "id, username, featured_tiktok_videos, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, last_seen_at, website, created_at, creator_tier, is_verified"
+            "id, username, featured_tiktok_videos, full_name, display_name, avatar_url, bio, location, tiktok_handle, instagram_handle, creator_niches, creator_avg_views, creator_followers, featured_photos, cover_image_url, content_style_tags, destinations_focus_tags, travel_philosophy, website, created_at, creator_tier, is_verified"
           )
           .eq("id", id)
           .maybeSingle(),
