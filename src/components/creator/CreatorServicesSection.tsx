@@ -40,6 +40,8 @@ interface Props {
       "fromCreator=<userId>" or "agentId=<id>&agentName=<name>". When set (and
       not the owner), every service card gets a working CTA into /post-trip. */
   requestBaseParams?: string;
+  /** For hosted-trip copy ("Request Jordan for your dates"). */
+  firstName?: string;
 }
 
 const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string; cta: string }> = {
@@ -80,7 +82,7 @@ function formatPrice(cents: number, currency: string) {
   }).format(cents / 100);
 }
 
-export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, hideLabel, requestBaseParams }: Props) {
+export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, hideLabel, requestBaseParams, firstName }: Props) {
   const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,6 +135,16 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
 
   const hasAny = services.length > 0;
 
+  // Public profiles: the on_trip service renders as ONE featured hosted-trip
+  // offer (Flytographer-style: outcome, what's included, fee terms up front,
+  // three-step ritual, single CTA) instead of a card lost in the tier grid.
+  // Owners keep the full grid so they can edit every service in place.
+  const hostedService = !isOwnProfile ? services.find((s) => s.service_tier === "on_trip") : undefined;
+  const who = firstName || "your host";
+  const hostedHireUrl = hostedService && requestBaseParams
+    ? `/post-trip?${requestBaseParams}&service=${encodeURIComponent(hostedService.title)}&hire=on-trip&hireRate=${Math.round(hostedService.starting_price_cents / 100)}`
+    : null;
+
   // Public + no services: render nothing at all. Big-tech profiles never
   // show an empty module with an apology — the section simply doesn't exist
   // until there's something to sell. (Owners still see the tier picker.)
@@ -167,8 +179,64 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
       )}
 
       {hasAny ? (
+        <>
+        {hostedService && (
+          <div className="mb-10 rounded-3xl border border-[#E5DFC6] bg-white p-6 md:p-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
+            <h3 className="mt-2 font-secondary text-2xl leading-tight text-[#0a2225] md:text-3xl">{hostedService.title}</h3>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#0a2225]/80">
+              {hostedService.description ||
+                `${who} travels with you \u2014 leading the days and capturing them as you go, so you can put the phone away.`}
+            </p>
+
+            {hostedService.includes.length > 0 && (
+              <ul className="mt-5 grid gap-x-8 gap-y-2 sm:grid-cols-2">
+                {hostedService.includes.slice(0, 4).map((inc) => (
+                  <li key={inc} className="flex items-start gap-2 text-sm text-[#0a2225]">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
+                    <span>{inc}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-[#E5DFC6] pt-5">
+              <p className="font-secondary text-3xl text-[#0a2225]">
+                From {formatPrice(hostedService.starting_price_cents, hostedService.currency)}
+                <span className="ml-1 align-baseline text-base text-[#0a2225]/60">/ day</span>
+              </p>
+              {hostedHireUrl && (
+                <button
+                  type="button"
+                  onClick={() => navigate(hostedHireUrl)}
+                  className="rounded-full bg-[#0c4d47] px-7 py-3.5 text-[15px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225]"
+                >
+                  Request {who} for your dates
+                </button>
+              )}
+            </div>
+            <p className="mt-3 text-[12px] leading-relaxed text-[#0a2225]/60">
+              Final price by proposal, including travel &amp; lodging terms — confirmed before you pay.
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 border-t border-[#E5DFC6] pt-5 sm:flex-row sm:items-baseline sm:gap-8">
+              {[
+                "Request your dates",
+                `${who} replies with a proposal`,
+                "Book \u2014 held in escrow until the trip",
+              ].map((s, i) => (
+                <p key={s} className="flex items-baseline gap-2.5 text-sm text-[#0a2225]/80">
+                  <span className="font-secondary text-xl leading-none text-[#8D6B2F]">{i + 1}</span>
+                  {s}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-8">
           {TIER_ORDER.map((tierKey) => {
+            if (hostedService && tierKey === "on_trip") return null; // featured above
             const items = grouped[tierKey];
             if (items.length === 0) return null;
             const config = TIER_CONFIG[tierKey];
@@ -329,6 +397,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
             );
           })}
         </div>
+        </>
       ) : isOwnProfile ? (
         /* Empty state: clear intro + tier picker */
         <div>
