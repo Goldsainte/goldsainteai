@@ -51,7 +51,9 @@ const FollowButton = ({ targetUserId, onFollowSuccess, className }: FollowButton
 
   const handleFollow = async () => {
     if (!user) {
-      toast.error('Sign in to follow users');
+      // Funnel, not dead end: send signed-out visitors to auth and bring them
+      // back to the profile they were trying to follow.
+      navigate(`/auth?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
 
@@ -122,6 +124,9 @@ const FollowButton = ({ targetUserId, onFollowSuccess, className }: FollowButton
       setActionLoading(false);
     }
   };
+
+  // Don't show a Follow button on your own profile (mirrors MessageButton).
+  if (user?.id === targetUserId) return null;
 
   if (loading) {
     return (
