@@ -86,9 +86,25 @@ export default function PostTripPage() {
   const [preferredAgentUserId, setPreferredAgentUserId] = useState<string | null>(null);
   const [preferredName, setPreferredName] = useState<string | null>(null);
 
+  // On-trip hire: profile "Hire for your trip" CTAs pass ?hire=on-trip plus
+  // the listed service title and day rate. Persisted to sessionStorage (same
+  // pattern as fromCreator/agentId) so the flag survives the auth redirect.
+  const [hireOnTrip, setHireOnTrip] = useState(false);
+  const [hireServiceTitle, setHireServiceTitle] = useState<string | null>(null);
+  const [hireDayRate, setHireDayRate] = useState<string | null>(null);
+
   useEffect(() => {
     const fromCreator = searchParams.get("fromCreator") || sessionStorage.getItem("goldsainte:fromCreator");
     const agentId = searchParams.get("agentId") || sessionStorage.getItem("goldsainte:agentId");
+    const hire = searchParams.get("hire") || sessionStorage.getItem("goldsainte:hireOnTrip");
+    const hireService = searchParams.get("service") || sessionStorage.getItem("goldsainte:hireService");
+    const hireRate = searchParams.get("hireRate") || sessionStorage.getItem("goldsainte:hireRate");
+    if (hire === "on-trip") {
+      setHireOnTrip(true);
+      sessionStorage.setItem("goldsainte:hireOnTrip", "on-trip");
+      if (hireService) { setHireServiceTitle(hireService); sessionStorage.setItem("goldsainte:hireService", hireService); }
+      if (hireRate) { setHireDayRate(hireRate); sessionStorage.setItem("goldsainte:hireRate", hireRate); }
+    }
     if (fromCreator) {
       setPreferredCreatorId(fromCreator);
       setWantsRole("creator");
@@ -240,6 +256,16 @@ export default function PostTripPage() {
         ai_itinerary: itineraryPrefill.itinerary,
       } : {};
 
+      // On-trip hire: mark the request so Pipeline/detail views can show
+      // "hire me ON this trip" rather than a normal plan-my-trip request.
+      // Listed rate is advisory \u2014 the binding price is the proposal.
+      if (hireOnTrip) {
+        sourceMetadata.hire_on_trip = true;
+        if (hireServiceTitle) sourceMetadata.hire_service_title = hireServiceTitle;
+        const rateNum = hireDayRate ? Number(hireDayRate) : NaN;
+        if (Number.isFinite(rateNum) && rateNum > 0) sourceMetadata.hire_day_rate_usd = rateNum;
+      }
+
       const insertPayload: any = {
           user_id: user.id,
           title: title || null,
@@ -273,6 +299,12 @@ export default function PostTripPage() {
         .single();
       if (insertError) throw insertError;
 
+      // The hire flag is one-shot: clear it so the next request this session
+      // doesn't silently inherit an on-trip hire context it didn't ask for.
+      sessionStorage.removeItem("goldsainte:hireOnTrip");
+      sessionStorage.removeItem("goldsainte:hireService");
+      sessionStorage.removeItem("goldsainte:hireRate");
+
       // Notify the chosen creator/agent. This MUST go through the
       // send-notification edge function: RLS (correctly) forbids browsers
       // from inserting notifications for other users, so the previous direct
@@ -287,8 +319,10 @@ export default function PostTripPage() {
           const { data: notifyResult, error: notifyError } = await supabase.functions.invoke("send-notification", {
             body: {
               userId: notifyUserId,
-              title: "New Direct Trip Request",
-              body: `You received a direct trip request for ${destination}`,
+              title: hireOnTrip ? "New On-Trip Hire Request" : "New Direct Trip Request",
+              body: hireOnTrip
+                ? `A traveler wants to hire you to join their trip to ${destination}` + (hireDayRate ? ` at your listed rate of $${hireDayRate}/day` : "")
+                : `You received a direct trip request for ${destination}`,
               type: "direct_trip_request",
               priority: "high",
               actionUrl: `/marketplace/request/${insertedTrip.id}`,
