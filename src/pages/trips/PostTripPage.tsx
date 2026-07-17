@@ -130,6 +130,121 @@ export default function PostTripPage() {
       });
     }
   }, [searchParams]);
+
+  // ==========================================================================
+  // HIRE FAST PATH (Jul 17 PM): "Request {name} for your dates" must NOT dump
+  // the traveler into the 20-question marketplace wizard — the person, the
+  // rate, and the escrow terms are already decided by the card they tapped.
+  // A hire needs exactly: where, when, how many, and a note. Everything else
+  // stays null; the estimate is day-rate math shown live; wants_role is locked
+  // to the hired party by the prefill effect above.
+  // ==========================================================================
+  const isHireFastPath = hireOnTrip && Boolean(preferredCreatorId || preferredAgentId);
+  const hireFirstName = (preferredName || "").split(" ")[0] || "them";
+  const hireRateNum = hireDayRate ? Number(hireDayRate) : NaN;
+  const hireDays =
+    startsOn && endsOn
+      ? Math.max(0, Math.round((new Date(endsOn).getTime() - new Date(startsOn).getTime()) / 86400000))
+      : 0;
+  const hireEstimate =
+    hireDays > 0 && Number.isFinite(hireRateNum) && hireRateNum > 0 ? hireDays * hireRateNum : null;
+
+  async function handleHireSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!destination || !startsOn || !endsOn) {
+      setError("Destination and dates are required.");
+      return;
+    }
+    if (hireDays <= 0) {
+      setError("The end date must be after the start date.");
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+    try {
+      if (!user) {
+        // Same persistence shape the generic wizard uses, so the existing
+        // restore effect brings these fields back after the auth redirect.
+        sessionStorage.setItem('goldsainte:pendingTrip', JSON.stringify({
+          destination, title, startsOn, endsOn, budgetMin, budgetMax,
+          budgetLevel, adults, children, occasion, accommodationStyle,
+          pace, interests, aestheticTags, flexibility, specialNotes,
+          departureCity, wantsRole, currentStep,
+        }));
+        navigate(`/auth?returnTo=${encodeURIComponent('/post-trip')}`);
+        return;
+      }
+
+      const insertPayload: any = {
+        user_id: user.id,
+        title: `Hire ${preferredName || "a host"} \u2014 ${destination}`,
+        destination,
+        start_date: startsOn,
+        end_date: endsOn,
+        travelers_adults: adults ? Number(adults) : 1,
+        travelers_children: children ? Number(children) : 0,
+        special_notes: specialNotes || null,
+        status: "open",
+        wants_role: wantsRole,
+        // The estimate doubles as the budget so downstream views show a sane
+        // number instead of $0 \u2014 clearly marked as an estimate in metadata.
+        budget_min: hireEstimate,
+        budget_max: hireEstimate,
+        source_metadata: {
+          hire_on_trip: true,
+          hire_service_title: hireServiceTitle,
+          hire_day_rate_usd: Number.isFinite(hireRateNum) && hireRateNum > 0 ? hireRateNum : null,
+          estimated_total_usd: hireEstimate,
+          trip_days: hireDays,
+        },
+      };
+      if (preferredCreatorId) insertPayload.preferred_creator_id = preferredCreatorId;
+      if (preferredAgentId) insertPayload.preferred_agent_id = preferredAgentId;
+
+      const { data: insertedTrip, error: insertError } = await supabase
+        .from("trip_requests")
+        .insert(insertPayload)
+        .select("id")
+        .single();
+      if (insertError) throw insertError;
+
+      sessionStorage.removeItem("goldsainte:hireOnTrip");
+      sessionStorage.removeItem("goldsainte:hireService");
+      sessionStorage.removeItem("goldsainte:hireRate");
+
+      const notifyUserId = preferredCreatorId || preferredAgentUserId;
+      if (notifyUserId && insertedTrip?.id) {
+        try {
+          const { data: nr, error: ne } = await supabase.functions.invoke("send-notification", {
+            body: {
+              userId: notifyUserId,
+              title: "New On-Trip Hire Request",
+              body:
+                `A traveler wants to hire you to join their trip to ${destination}` +
+                (Number.isFinite(hireRateNum) && hireRateNum > 0 ? ` at your listed rate of $${hireRateNum}/day` : ""),
+              type: "booking",
+              priority: "high",
+              actionUrl: `/marketplace/request/${insertedTrip.id}`,
+              entityType: "trip_request",
+              entityId: insertedTrip.id,
+            },
+          });
+          if (ne) console.error("send-notification failed:", ne);
+          else if ((nr as any)?.errors) console.error("send-notification channel errors:", (nr as any).errors);
+        } catch (err) {
+          console.error("send-notification threw:", err);
+        }
+      }
+
+      toast.success(`Hire request sent to ${hireFirstName}`);
+      navigate("/my-trip-requests");
+    } catch (err: any) {
+      setError(err.message || "Couldn't send the hire request.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   const interestOptions = [
     "Food & wine", "Design hotels", "Adventure", "Wellness",
     "Nightlife", "Culture & museums", "Family-friendly", "Honeymoon / romance",
@@ -515,6 +630,82 @@ export default function PostTripPage() {
             </p>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (isHireFastPath) {
+    const F = "w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] placeholder:text-[#0a2225]/35 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50";
+    return (
+      <div className="min-h-screen bg-[#FDF9F0] px-4 py-10 md:py-16">
+        <form onSubmit={handleHireSubmit} className="mx-auto max-w-xl rounded-3xl border border-[#E5DFC6] bg-white p-6 md:p-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
+          <h1 className="mt-2 font-secondary text-2xl leading-tight text-[#0a2225] md:text-3xl">
+            Hire {preferredName || "your host"}
+          </h1>
+          {(hireServiceTitle || (Number.isFinite(hireRateNum) && hireRateNum > 0)) && (
+            <p className="mt-2 text-[14px] text-[#0a2225]/70">
+              {hireServiceTitle}
+              {hireServiceTitle && Number.isFinite(hireRateNum) && hireRateNum > 0 ? " \u00b7 " : ""}
+              {Number.isFinite(hireRateNum) && hireRateNum > 0 ? `$${hireRateNum}/day` : ""}
+            </p>
+          )}
+
+          <div className="mt-6 space-y-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#6B7280]">Where is your trip? *</label>
+              <input className={F} value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="e.g. Rome & the Amalfi Coast" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Starts *</label>
+                <input type="date" className={F} value={startsOn} onChange={(e) => setStartsOn(e.target.value)} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Ends *</label>
+                <input type="date" className={F} value={endsOn} onChange={(e) => setEndsOn(e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Adults</label>
+                <input type="number" min="1" className={F} value={adults} onChange={(e) => setAdults(e.target.value)} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Children</label>
+                <input type="number" min="0" className={F} value={children} onChange={(e) => setChildren(e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#6B7280]">
+                Anything {hireFirstName} should know? <span className="text-[#9CA3AF]">(optional)</span>
+              </label>
+              <textarea rows={3} className={F} value={specialNotes} onChange={(e) => setSpecialNotes(e.target.value)}
+                placeholder="Occasion, pace, must-sees, who's coming…" />
+            </div>
+          </div>
+
+          {hireEstimate && (
+            <p className="mt-5 rounded-xl bg-[#0c4d47]/[0.06] px-4 py-3 text-[14px] text-[#0a2225]">
+              ≈ <span className="font-secondary text-lg">${hireEstimate.toLocaleString()}</span>{" "}
+              for {hireDays} {hireDays === 1 ? "day" : "days"} at ${hireRateNum}/day — final total by proposal.
+            </p>
+          )}
+
+          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+          <button type="submit" disabled={submitting}
+            className="mt-6 w-full rounded-full bg-[#0c4d47] px-6 py-4 text-[15px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225] disabled:opacity-60">
+            {submitting ? "Sending\u2026" : `Send hire request to ${hireFirstName}`}
+          </button>
+          <p className="mt-3 text-center text-[12px] leading-relaxed text-[#0a2225]/60">
+            You won't be charged now. {hireFirstName} replies with a proposal; payment is escrow-protected.
+          </p>
+          <button type="button" onClick={() => navigate(-1)}
+            className="mt-4 block w-full text-center text-[13px] text-[#0a2225]/60 hover:text-[#0a2225] !min-h-0">
+            ← Back to profile
+          </button>
+        </form>
       </div>
     );
   }
