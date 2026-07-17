@@ -195,7 +195,7 @@ export default function AgentSettingsPage() {
       <div className="mx-auto max-w-3xl px-4 pt-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-secondary text-4xl text-[#0a2225]">Agent Settings</h1>
+            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Agent Settings</h1>
             <p className="mt-2 text-[15px] text-[#0a2225]/70">
               Everything here appears on your public profile — exactly what travelers see.
             </p>
