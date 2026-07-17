@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
 import { MessageButton } from "@/components/messaging/MessageButton";
+import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 
 // ============================================================================
 // AgentPublicProfilePage v2 (Jul 15) — 1:1 Fora advisor-page structure via the
@@ -232,6 +233,21 @@ export default function AgentPublicProfilePage() {
                 { label: "Travel guides", onClick: () => navigate("/agent-guides") },
               ]
             : undefined
+        }
+        contentSlot={
+          /* Services + on-trip hire — shared with creator profiles. Renders
+             nothing publicly until the specialist lists a service. */
+          <section className="mt-14">
+            <CreatorServicesSection
+              creatorId={profile.id}
+              isOwnProfile={user?.id === profile.id}
+              requestBaseParams={
+                agent
+                  ? "agentId=" + agent.id + "&agentName=" + encodeURIComponent(displayName)
+                  : "agentId=" + profile.id
+              }
+            />
+          </section>
         }
       />
     </div>
