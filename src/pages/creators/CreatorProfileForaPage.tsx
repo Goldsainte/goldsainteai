@@ -296,15 +296,12 @@ export default function CreatorProfileForaPage() {
                 nothing for public visitors when the creator has no active
                 services, so the section can never appear empty. */}
             <section className="mt-14">
-              <h2 className="mb-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">Hire {firstName}</h2>
-              <p className="mb-6 max-w-2xl leading-relaxed text-[#0a2225]/75">
-                From custom itineraries to having {firstName} join you on your own trip — every
-                hire is booked and escrow-protected through Goldsainte.
-              </p>
+              <h2 className="mb-6 font-secondary text-2xl md:text-3xl text-[#0a2225]">Hire {firstName}</h2>
               <CreatorServicesSection
                 creatorId={dir.id}
                 isOwnProfile={user?.id === dir.id}
                 hideLabel
+                firstName={firstName}
                 requestBaseParams={"fromCreator=" + dir.id}
               />
               <div className="mt-8">
