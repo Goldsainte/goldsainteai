@@ -84,7 +84,7 @@ function Body({ text }: { text: string }) {
       }
       flushAll();
       if (l.startsWith("## ")) {
-        nodes.push(<h2 key={k++} className="pt-6 font-secondary text-4xl text-[#0a2225]">{text}</h2>);
+        nodes.push(<h2 key={k++} className="pt-6 font-secondary text-3xl md:text-4xl text-[#0a2225]">{text}</h2>);
       } else {
         nodes.push(<h3 key={k++} className="pt-2 font-secondary text-2xl text-[#0a2225]">{text}</h3>);
       }
@@ -117,7 +117,7 @@ function WhereToStay({ hotels, place }: { hotels: GuideHotel[]; place?: string |
   return (
     <section className="py-6">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-secondary text-4xl text-[#0a2225]">
+        <h2 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">
           Where to stay{place ? ` in ${place}` : ""}
         </h2>
         {hotels.length > 2 && (
@@ -214,7 +214,7 @@ export default function GuidePage() {
   if (!guide)
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#FDF9F0] px-4 text-center">
-        <h1 className="font-secondary text-4xl text-[#0a2225]">Guide not found</h1>
+        <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Guide not found</h1>
         <button type="button" onClick={() => navigate("/agents")}
           className="mt-8 rounded-full bg-[#0c4d47] px-8 py-3.5 text-[14px] text-[#f7f3ea] hover:bg-[#0a2225]">
           Browse specialists
@@ -307,7 +307,7 @@ export default function GuidePage() {
 
           {/* The Goldsainte Difference */}
           <section className="py-14 text-center">
-            <h2 className="font-secondary text-5xl text-[#0a2225]">The Goldsainte Difference</h2>
+            <h2 className="font-secondary text-4xl md:text-5xl text-[#0a2225]">The Goldsainte Difference</h2>
             <p className="mx-auto mt-5 max-w-xl text-[17px] text-[#0a2225]/75">
               Book with {displayAs} for a trip that's verified, personal, and secure.
             </p>
