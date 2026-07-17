@@ -74,13 +74,13 @@ export default function HomePage() {
       <StatsStrip />
       <OneConversationSection />
       <HowItWorksSteps />
-      <FeaturedTripsSection />
-      <DreamTripBand />
-      <TrustPlaque />
       <Suspense fallback={null}>
         <PlatformDemoSection />
       </Suspense>
+      <FeaturedTripsSection />
+      <DreamTripBand />
       <EarnSection />
+      <TrustPlaque />
       <FinalCTABand />
     </main>
   );
