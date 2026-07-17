@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag, Check, ArrowRight } from "lucide-react";
+import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag, Check, ArrowRight, Plane } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
 import { TIER_COMMISSION, type CreatorTier } from "./TierBadge";
 import { toast } from "sonner";
 
-type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on";
+type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on" | "on_trip";
 
 interface Service {
   id: string;
@@ -35,6 +36,10 @@ interface Props {
   creatorTier?: CreatorTier | string | null;
   /** Hide the built-in section label (e.g. inside a dashboard tab that already has one). */
   hideLabel?: boolean;
+  /** Public profiles: base query string for the request/hire CTA, e.g.
+      "fromCreator=<userId>" or "agentId=<id>&agentName=<name>". When set (and
+      not the owner), every service card gets a working CTA into /post-trip. */
+  requestBaseParams?: string;
 }
 
 const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string; cta: string }> = {
@@ -56,9 +61,15 @@ const TIER_CONFIG: Record<ServiceTier, { label: string; icon: any; badge: string
     badge: "bg-[#FDF9F0] text-[#0c4d47] border-[#E5DFC6]",
     cta: "Add",
   },
+  on_trip: {
+    label: "On-Trip \u2014 Travel With You",
+    icon: Plane,
+    badge: "bg-[#0c4d47] text-[#f7f3ea] border-[#0c4d47]",
+    cta: "Hire for your trip",
+  },
 };
 
-const TIER_ORDER: ServiceTier[] = ["custom_itinerary", "full_trip_design", "add_on"];
+const TIER_ORDER: ServiceTier[] = ["on_trip", "custom_itinerary", "full_trip_design", "add_on"];
 
 function formatPrice(cents: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -69,7 +80,8 @@ function formatPrice(cents: number, currency: string) {
   }).format(cents / 100);
 }
 
-export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, hideLabel }: Props) {
+export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, hideLabel, requestBaseParams }: Props) {
+  const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -223,7 +235,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                         {/* Price + meta */}
                         <div className="flex items-center gap-3 mt-4 flex-wrap">
                           <span className="text-base font-semibold text-[#0a2225]">
-                            From {formatPrice(service.starting_price_cents, service.currency)}
+                            From {formatPrice(service.starting_price_cents, service.currency)}{tierKey === "on_trip" ? "/day" : ""}
                           </span>
                           {service.delivery_days && tierKey !== "add_on" && (
                             <span className="flex items-center gap-1 text-xs text-[#9CA3AF]">
@@ -285,9 +297,30 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                           </details>
                         )}
 
-                        <button className="mt-4 text-sm font-medium text-[#0c4d47] flex items-center gap-1 hover:gap-2 transition-all">
-                          {config.cta} <ChevronRight className="h-3.5 w-3.5" />
-                        </button>
+                        {/* CTA — public visitors only. Routes into the trip-request
+                            flow carrying the service context; on_trip additionally
+                            flags the request as an on-trip hire at the listed rate.
+                            (The previous version of this button had no onClick.) */}
+                        {!isOwnProfile && requestBaseParams && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/post-trip?${requestBaseParams}&service=${encodeURIComponent(service.title)}` +
+                                  (tierKey === "on_trip"
+                                    ? `&hire=on-trip&hireRate=${Math.round(service.starting_price_cents / 100)}`
+                                    : "")
+                              )
+                            }
+                            className={
+                              tierKey === "on_trip"
+                                ? "mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225]"
+                                : "mt-4 text-sm font-medium text-[#0c4d47] flex items-center gap-1 hover:gap-2 transition-all"
+                            }
+                          >
+                            {config.cta} <ChevronRight className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -403,6 +436,17 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
 
 // Re-export TIERS for empty state usage
 const TIERS = [
+  {
+    value: "on_trip" as ServiceTier,
+    label: "On-Trip",
+    desc: "Travel with clients, priced per day",
+    icon: Plane,
+    features: [
+      "Join travelers on their own trip as guide and creator",
+      "You set a day rate; final total agreed by proposal",
+      "Escrow-protected \u2014 paid deposit up front, rest after the trip",
+    ],
+  },
   {
     value: "custom_itinerary" as ServiceTier,
     label: "Custom Itinerary",
