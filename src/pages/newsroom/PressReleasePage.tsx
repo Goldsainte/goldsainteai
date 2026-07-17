@@ -48,7 +48,7 @@ function Body({ text }: { text: string }) {
       flushAll();
       nodes.push(
         l.startsWith("## ")
-          ? <h2 key={k++} className="pt-4 font-secondary text-3xl text-[#0a2225]">{t}</h2>
+          ? <h2 key={k++} className="pt-4 font-secondary text-2xl md:text-3xl text-[#0a2225]">{t}</h2>
           : <h3 key={k++} className="pt-1 font-secondary text-xl text-[#0a2225]">{t}</h3>
       );
       continue;
@@ -104,7 +104,7 @@ export default function PressReleasePage() {
   if (!r) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#FDF9F0] px-4 text-center">
-        <h1 className="font-secondary text-4xl text-[#0a2225]">Not found</h1>
+        <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Not found</h1>
         <Link to="/newsroom" className="mt-6 rounded-full bg-[#0c4d47] px-8 py-3.5 text-[14px] text-[#f7f3ea] hover:bg-[#0a2225]">
           Back to Newsroom
         </Link>
@@ -126,7 +126,7 @@ export default function PressReleasePage() {
         <p className="mt-8 text-[12px] uppercase tracking-[0.16em] text-[#8D6B2F]">
           {new Date(r.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} · Newsroom
         </p>
-        <h1 className="mt-3 font-secondary text-5xl leading-tight text-[#0a2225]">{r.title}</h1>
+        <h1 className="mt-3 font-secondary text-[34px] leading-tight text-[#0a2225] md:text-5xl">{r.title}</h1>
         {r.hero_image_url && (
           <img src={r.hero_image_url} alt="" className="mt-8 max-h-[520px] w-full rounded-3xl object-cover" />
         )}
