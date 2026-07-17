@@ -241,6 +241,7 @@ export default function AgentPublicProfilePage() {
             <CreatorServicesSection
               creatorId={profile.id}
               isOwnProfile={user?.id === profile.id}
+              firstName={firstName}
               requestBaseParams={
                 agent
                   ? "agentId=" + agent.id + "&agentName=" + encodeURIComponent(displayName)
