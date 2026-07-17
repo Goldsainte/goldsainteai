@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { MapPin, Moon, Star, Languages, Instagram, Linkedin, Facebook, Link2, Globe, Music2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
+import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 
 // ============================================================================
 // PartnerProfileFora v2 — 1:1 replica of foratravel.com/advisor/{slug},
