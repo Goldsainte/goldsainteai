@@ -248,7 +248,7 @@ export default function AgentGuidesPage() {
       <div className="mx-auto max-w-3xl px-4 pt-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-secondary text-4xl text-[#0a2225]">Travel guides</h1>
+            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Travel guides</h1>
             <p className="mt-2 text-[15px] text-[#0a2225]/70">
               Your stories — they appear as Travel ideas on your public profile.
             </p>
