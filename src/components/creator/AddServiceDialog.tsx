@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { PenLine, Star, CirclePlus, Plus, X, Check } from "lucide-react";
+import { PenLine, Star, CirclePlus, Plus, X, Check, Plane } from "lucide-react";
 
-type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on";
+type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on" | "on_trip";
 
 interface Props {
   open: boolean;
@@ -22,6 +22,7 @@ const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color
   { value: "custom_itinerary", label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: PenLine, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
   { value: "full_trip_design", label: "Full Trip Design", desc: "Premium end-to-end trip planning", icon: Star, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
   { value: "add_on", label: "Add-On", desc: "Optional extras like 1:1 calls", icon: CirclePlus, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "on_trip", label: "On-Trip", desc: "Join the traveler on their trip, priced per day", icon: Plane, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
 ];
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
@@ -100,8 +101,8 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
       currency: "USD",
       includes: includes.length > 0 ? includes : [],
       is_active: true,
-      delivery_time_option: tier !== "add_on" ? deliveryOption : null,
-      delivery_days: tier !== "add_on" ? parseInt(deliveryOption) || null : null,
+      delivery_time_option: tier === "custom_itinerary" || tier === "full_trip_design" ? deliveryOption : null,
+      delivery_days: tier === "custom_itinerary" || tier === "full_trip_design" ? parseInt(deliveryOption) || null : null,
       trip_days: ["custom_itinerary", "full_trip_design"].includes(tier) ? (parseInt(tripDays) || null) : null,
       revisions: ["custom_itinerary", "full_trip_design"].includes(tier) ? (parseInt(revisions) || 0) : null,
       has_priority_support: tier === "full_trip_design" ? hasPriority : false,
@@ -270,8 +271,11 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     <Textarea className={FIELD_CLASS} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of this service" rows={3} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-[#6B7280] mb-1 block">Price (USD) *</label>
-                    <Input className={FIELD_CLASS} type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="99" />
+                    <label className="text-xs font-medium text-[#6B7280] mb-1 block">{tier === "on_trip" ? "Day Rate (USD) *" : "Price (USD) *"}</label>
+                    <Input className={FIELD_CLASS} type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder={tier === "on_trip" ? "450" : "99"} />
+                    {tier === "on_trip" && (
+                      <p className="text-xs text-[#9CA3AF] mt-1">Your rate for each day you travel with the client. The final total (rate × days, plus who covers travel and lodging) is agreed in the proposal before anyone pays.</p>
+                    )}
                   </div>
                 </>
               )}
@@ -325,7 +329,13 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     </div>
                   )}
 
-                  {!isItineraryTier && tier !== "add_on" && (
+                  {tier === "on_trip" && (
+                    <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4 space-y-2">
+                      <p className="text-sm text-[#0a2225] font-medium">How On-Trip pricing works</p>
+                      <p className="text-xs text-[#6B7280]">Travelers hire you at your listed day rate. When a hire request arrives, you reply in Messages and send a proposal with the final total — day rate × trip days, and whether the traveler covers your travel and lodging (say so in your description). Payment goes through Goldsainte escrow: deposit at booking, the rest released after the trip.</p>
+                    </div>
+                  )}
+                  {!isItineraryTier && tier !== "add_on" && tier !== "on_trip" && (
                     <p className="text-sm text-[#9CA3AF]">No additional pricing details needed for this tier.</p>
                   )}
                 </>
