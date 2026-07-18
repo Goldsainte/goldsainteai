@@ -79,8 +79,7 @@ export function CreatorHiresTab() {
                   src={getTripRequestImageUrl(r.destination)}
                   alt={r.destination}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                />
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" onError={(e) => { e.currentTarget.style.display = "none"; }} />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/20 to-transparent" />
               {isHire && (
