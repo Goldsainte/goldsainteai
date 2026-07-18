@@ -17,6 +17,23 @@ export function NotificationBell() {
     fetchUnreadCount().then(setUnread).catch(() => {});
   }, [user]);
 
+  // Resync whenever the tab regains focus — belt-and-braces alongside
+  // realtime, so the badge is correct the moment you switch back.
+  useEffect(() => {
+    if (!user) return;
+    const resync = () => {
+      if (document.visibilityState === "visible") {
+        fetchUnreadCount().then(setUnread).catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", resync);
+    window.addEventListener("focus", resync);
+    return () => {
+      document.removeEventListener("visibilitychange", resync);
+      window.removeEventListener("focus", resync);
+    };
+  }, [user]);
+
   // Real-time subscription
   useEffect(() => {
     if (!user) return;
