@@ -17,6 +17,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { CreatorOverviewTab } from "./creator/components/CreatorOverviewTab";
 import { CreatorProposalsTab } from "./creator/components/CreatorProposalsTab";
+import { CreatorHiresTab } from "./creator/components/CreatorHiresTab";
 import { CreatorTripsTab } from "./creator/components/CreatorTripsTab";
 import { CreatorEarningsTab } from "./creator/components/CreatorEarningsTab";
 import { CreatorSettingsTab } from "./creator/components/CreatorSettingsTab";
@@ -182,6 +183,7 @@ export default function CreatorDashboard() {
   // and must keep working unchanged.
   const LEAF_KEYS = [
     "overview",
+    "requests",
     "proposals",
     "trips",
     "portfolio",
@@ -205,6 +207,7 @@ export default function CreatorDashboard() {
       key: "pipeline",
       label: "Pipeline",
       children: [
+        { key: "requests", label: "Requests" },
         { key: "proposals", label: "Proposals" },
         { key: "trips", label: "Trips" },
       ],
@@ -266,6 +269,8 @@ export default function CreatorDashboard() {
         return <CreatorOverviewTab stats={stats} loading={loading} />;
       case "proposals":
         return <CreatorProposalsTab />;
+      case "requests":
+        return <CreatorHiresTab />;
       case "trips":
         return <CreatorTripsTab />;
       case "guides":
