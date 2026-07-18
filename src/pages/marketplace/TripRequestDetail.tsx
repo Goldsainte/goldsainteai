@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { capLabel } from "@/lib/onTripCapabilities";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -74,6 +75,7 @@ type TripRequest = {
   hireServiceTitle?: string | null;
   hireDayRate?: number | null;
   hireTripDays?: number | null;
+  hireCapabilities?: string[];
 };
 
 type TravelerProfile = {
@@ -177,6 +179,7 @@ export default function TripRequestDetail() {
         hireServiceTitle: sourceMeta.hire_service_title || null,
         hireDayRate: typeof sourceMeta.hire_day_rate_usd === "number" ? sourceMeta.hire_day_rate_usd : null,
         hireTripDays: typeof sourceMeta.trip_days === "number" ? sourceMeta.trip_days : null,
+        hireCapabilities: Array.isArray(sourceMeta.hire_capabilities) ? sourceMeta.hire_capabilities : [],
       };
 
       setRequest(mappedRequest);
@@ -659,6 +662,18 @@ export default function TripRequestDetail() {
                   </div>
                 )}
 
+                {request.hireOnTrip && (request.hireCapabilities?.length ?? 0) > 0 && (
+                  <div className="mb-6">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Hired for</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {request.hireCapabilities!.map((id: string) => (
+                        <span key={id} className="inline-flex h-7 items-center rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 text-[11px] font-medium text-[#0a2225]">
+                          {capLabel(id)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {!isRequestOwner && request.status === "open" && (
                   <>
                     <button
