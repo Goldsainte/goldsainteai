@@ -153,7 +153,7 @@ export default function MyTripRequestsPage() {
                 </Link>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {requests.map((req) => (
                   <TripRequestRow key={req.id} req={req} />
                 ))}
@@ -205,14 +205,15 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
       : "bg-[#8D8D8D]/10 text-[#8D8D8D] ring-[#8D8D8D]/30";
 
   const proposalsCount = Array.isArray((req as any).trip_proposals) ? (req as any).trip_proposals.length : 0;
-  const imgUrl = req.destination ? getTripRequestImageUrl(req.destination) : null;
+  const rawImg = req.destination ? getTripRequestImageUrl(req.destination) : null;
+  const imgUrl = rawImg && String(rawImg).length > 0 ? rawImg : null;
   const isHireReq = Boolean((req as any).source_metadata?.hire_on_trip);
   return (
     <Link
       to={`/trip-request/${req.id}`}
       className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className={`relative overflow-hidden ${imgUrl ? "aspect-[4/3]" : "min-h-[150px]"}`}>
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
           <span className="font-secondary text-xl italic text-[#C7A962]/80">Goldsainte</span>
         </div>
