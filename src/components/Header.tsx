@@ -354,6 +354,15 @@ export const Header = () => {
                                       <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                                       <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
                                     </DropdownMenuItem>
+                                    {isCreator && (
+                                      <DropdownMenuItem
+                                        onClick={() => navigate('/creator-dashboard?tab=requests')}
+                                        className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                                      >
+                                        <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                        <span className="text-[15px] font-medium text-[#0a2225]">Hire Requests</span>
+                                      </DropdownMenuItem>
+                                    )}
                                     <DropdownMenuItem
                                       onClick={() => navigate('/my-proposals')}
                                       className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -742,6 +751,15 @@ export const Header = () => {
                             >
                               <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                            </DropdownMenuItem>
+                          )}
+                          {isCreator && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/creator-dashboard?tab=requests')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
+                            >
+                              <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Hire Requests</span>
                             </DropdownMenuItem>
                           )}
                           {showRequestTrip && (
