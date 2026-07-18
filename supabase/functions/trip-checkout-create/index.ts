@@ -1,3 +1,4 @@
+// trip-checkout-create v1.1 - never regress a confirmed/paid booking to payment_pending (2026-07-18)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
 
@@ -101,6 +102,7 @@ Deno.serve(async (req) => {
         currency,
         total_price,
         deposit_amount,
+        status,
         metadata,
         trip_requests (
           id,
@@ -388,7 +390,13 @@ Deno.serve(async (req) => {
         payment_provider: "stripe",
         stripe_payment_intent_id: (session as any).payment_intent ?? session.id,
         payment_url: session.url,
-        status: "payment_pending",
+        // v1.1: only PRE-payment bookings move to payment_pending. A balance
+        // checkout on a CONFIRMED booking must not regress it — backing out
+        // of Stripe was flipping confirmed bookings to "Awaiting payment"
+        // and re-offering the already-paid deposit (a double-charge trap).
+        ...(["confirmed", "paid_in_full", "completed"].includes(String(booking.status))
+          ? {}
+          : { status: "payment_pending" }),
         metadata: {
           ...((booking.metadata as any) || {}),
           checkout_session_id: session.id,
