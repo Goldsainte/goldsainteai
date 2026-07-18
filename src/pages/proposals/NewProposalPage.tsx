@@ -166,6 +166,8 @@ export default function NewProposalPage() {
     hirePrefilledRef.current = true;
     setHeadline(`${hireMeta.hire_service_title || "On-trip hosting"} \u2014 ${tripData.destination || "your trip"}`);
     setPricingType("total");
+    if ((tripData as any).preferred_creator_id) setProposerRole("creator");
+    else if ((tripData as any).preferred_agent_id) setProposerRole("agent");
     if (hireEstimate) setPriceFrom((cur: any) => cur || hireEstimate);
     (async () => {
       try {
@@ -312,7 +314,7 @@ export default function NewProposalPage() {
     (async () => {
       setLoading(true);
       const [{ data: trip }, { count }] = await Promise.all([
-        supabase.from("trip_requests").select("id, title, destination, start_date, end_date, budget_min, budget_max, user_id, description, interests, travelers_adults, travelers_children, source_metadata" as any).eq("id", tripId).maybeSingle(),
+        supabase.from("trip_requests").select("id, title, destination, start_date, end_date, budget_min, budget_max, user_id, description, interests, travelers_adults, travelers_children, source_metadata, preferred_creator_id, preferred_agent_id" as any).eq("id", tripId).maybeSingle(),
         supabase.from("trip_proposals").select("id", { count: "exact", head: true }).eq("trip_request_id", tripId),
       ]);
       setTripData(trip as any);
@@ -697,9 +699,9 @@ export default function NewProposalPage() {
             </button>
             <div className="min-w-0 flex-1">
               <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">Submit a Proposal</p>
-              <p className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">{tripData.title || "Trip Request"}</p>
+              <p className="truncate font-secondary text-[23px] leading-tight text-white">{tripData.title || "Trip Request"}</p>
             </div>
-            <div className="hidden shrink-0 items-center gap-4 text-[13px] text-[#E5DFC6]/65 md:flex">
+            <div className="hidden shrink-0 items-center gap-4 text-[13px] text-[#f7f3ea] md:flex">
               {tripData.destination && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5" />{tripData.destination}
@@ -781,10 +783,10 @@ export default function NewProposalPage() {
                   <div>
                     <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step One</p>
                     <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Your Pitch</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Describe your proposed itinerary and why you're the best fit.</p>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{isHire ? "Confirm you're available and set your terms \u2014 no itinerary needed." : "Describe your proposed itinerary and why you're the best fit."}</p>
                   </div>
 
-                  <div className="rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/[0.07] p-4">
+                  <div style={isHire ? { display: "none" } : undefined} className="rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/[0.07] p-4">
                     <button
                       type="button"
                       onClick={handleAiDraftAll}
@@ -803,7 +805,7 @@ export default function NewProposalPage() {
                     </p>
                   </div>
 
-                  <div className="space-y-2">
+                  <div style={isHire ? { display: "none" } : undefined} className="space-y-2">
                     <Label className={labelClasses}>Your Role</Label>
                     <div className="flex gap-3">
                       {(["agent", "creator"] as const).map((role) => (
@@ -1817,11 +1819,17 @@ export default function NewProposalPage() {
 
                   {(tripData.budget_min || tripData.budget_max) && (
                     <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
-                      <span className="text-[12.5px] text-[#0a2225]/55">Budget</span>
+                      <span className="text-[12.5px] text-[#0a2225]/55">{isHire ? "Estimate" : "Budget"}</span>
                       <span className="font-secondary text-[15px] text-[#0a2225]">
-                        {tripData.budget_min ? `$${tripData.budget_min.toLocaleString()}` : ""}
-                        {tripData.budget_min && tripData.budget_max ? " – " : ""}
-                        {tripData.budget_max ? `$${tripData.budget_max.toLocaleString()}` : ""}
+                        {isHire && tripData.budget_max ? (
+                          <>{"\u2248 "}${tripData.budget_max.toLocaleString()}</>
+                        ) : (
+                          <>
+                            {tripData.budget_min ? `$${tripData.budget_min.toLocaleString()}` : ""}
+                            {tripData.budget_min && tripData.budget_max ? " – " : ""}
+                            {tripData.budget_max ? `$${tripData.budget_max.toLocaleString()}` : ""}
+                          </>
+                        )}
                       </span>
                     </div>
                   )}
@@ -1831,7 +1839,16 @@ export default function NewProposalPage() {
                     <span className="font-secondary text-[15px] text-[#0a2225]">14 days</span>
                   </div>
 
-                  {commissionCalc.agentPayout > 0 && (
+                  {isHire && Number(priceFrom) > 0 && (
+                    <div className="pb-0.5">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-[12.5px] text-[#0a2225]/55">Your payout</span>
+                        <span className="font-secondary text-[15px] text-[#8D6B2F]">${Math.round(Number(priceFrom) * 0.93).toLocaleString()}</span>
+                      </div>
+                      <p className="mt-0.5 text-right text-[10.5px] text-[#0a2225]/40">after the 7% platform fee</p>
+                    </div>
+                  )}
+                  {!isHire && commissionCalc.agentPayout > 0 && (
                     <div className="flex items-baseline justify-between pb-0.5">
                       <span className="text-[12.5px] text-[#0a2225]/55">Est. payout</span>
                       <span className="font-secondary text-[15px] text-[#8D6B2F]">${commissionCalc.agentPayout.toLocaleString()}</span>
