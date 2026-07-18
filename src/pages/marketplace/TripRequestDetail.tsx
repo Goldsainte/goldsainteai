@@ -73,6 +73,7 @@ type TripRequest = {
   hireOnTrip?: boolean;
   hireServiceTitle?: string | null;
   hireDayRate?: number | null;
+  hireTripDays?: number | null;
 };
 
 type TravelerProfile = {
@@ -175,6 +176,7 @@ export default function TripRequestDetail() {
         hireOnTrip: sourceMeta.hire_on_trip === true,
         hireServiceTitle: sourceMeta.hire_service_title || null,
         hireDayRate: typeof sourceMeta.hire_day_rate_usd === "number" ? sourceMeta.hire_day_rate_usd : null,
+        hireTripDays: typeof sourceMeta.trip_days === "number" ? sourceMeta.trip_days : null,
       };
 
       setRequest(mappedRequest);
@@ -387,7 +389,9 @@ export default function TripRequestDetail() {
                     : "bg-white/40"
                 }`}
               />
-              {request.status === "open" ? "Open Request" : request.status === "in_progress" ? "In Progress" : "Closed"}
+              {request.hireOnTrip
+                ? request.status === "open" ? "Direct hire request" : request.status === "in_progress" ? "In Progress" : "Closed"
+                : request.status === "open" ? "Open Request" : request.status === "in_progress" ? "In Progress" : "Closed"}
             </p>
 
             <h1 className="mt-2 max-w-3xl font-secondary text-3xl leading-[1.05] text-[#fdfaf2] md:text-4xl lg:text-[44px]">
@@ -637,13 +641,21 @@ export default function TripRequestDetail() {
               <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 {(request.budgetMin > 0 || request.budgetMax > 0) && (
                   <div className="mb-6">
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Budget</p>
-                    <p className="mt-2.5 font-secondary text-[27px] leading-none text-[#0a2225]">
-                      {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                      {request.hireOnTrip ? "Estimate" : "Budget"}
                     </p>
-                    {request.budgetPerPerson && (
+                    <p className="mt-2.5 font-secondary text-[27px] leading-none text-[#0a2225]">
+                      {request.hireOnTrip
+                        ? `\u2248 ${formatCurrency(request.budgetMax)}`
+                        : `${formatCurrency(request.budgetMin)} \u2013 ${formatCurrency(request.budgetMax)}`}
+                    </p>
+                    {request.hireOnTrip && request.hireDayRate ? (
+                      <p className="mt-1.5 text-[12px] text-[#0a2225]/50">
+                        {request.hireTripDays ? `${request.hireTripDays} days \u00d7 ` : ""}${request.hireDayRate.toLocaleString()}/day listed rate · final total by your proposal
+                      </p>
+                    ) : request.budgetPerPerson ? (
                       <p className="mt-1.5 text-[12px] text-[#0a2225]/50">per person</p>
-                    )}
+                    ) : null}
                   </div>
                 )}
 
@@ -654,11 +666,13 @@ export default function TripRequestDetail() {
                       onClick={handleSubmitProposal}
                       className="block w-full rounded-full bg-[#0c4d47] py-3.5 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] min-h-[48px]"
                     >
-                      Submit Your Proposal
+                      {request.hireOnTrip ? "Reply With Your Proposal" : "Submit Your Proposal"}
                     </button>
 
                     <p className="mt-3 text-center text-[12px] italic text-[#0a2225]/50">
-                      {proposalsCount === 0
+                      {request.hireOnTrip
+                        ? "This request was sent only to you."
+                        : proposalsCount === 0
                         ? "Be the first to propose"
                         : `${proposalsCount} proposal${proposalsCount === 1 ? "" : "s"} submitted`}
                     </p>
@@ -704,12 +718,20 @@ export default function TripRequestDetail() {
               <div className="rounded-2xl bg-gradient-to-br from-[#0c4d47] to-[#0a2225] p-6">
                 <h3 className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">How it works</h3>
                 <ol className="mt-4 space-y-4">
-                  {[
-                    "Review the traveler's brief and inspiration",
-                    "Submit your proposal with pricing and itinerary",
-                    "The traveler reviews and compares proposals",
-                    "If accepted, it becomes a confirmed booking",
-                  ].map((step, i) => (
+                  {(request.hireOnTrip
+                    ? [
+                        "Review the trip, dates, and party",
+                        `Message ${travelerName.split(" ")[0]} with any questions`,
+                        "Reply with your proposal \u2014 total price and expense terms",
+                        "They accept and pay the deposit \u2014 escrow-protected",
+                      ]
+                    : [
+                        "Review the traveler's brief and inspiration",
+                        "Submit your proposal with pricing and itinerary",
+                        "The traveler reviews and compares proposals",
+                        "If accepted, it becomes a confirmed booking",
+                      ]
+                  ).map((step, i) => (
                     <li key={i} className="flex items-start gap-3.5">
                       <span className="w-6 shrink-0 pt-px text-right font-secondary text-[14px] italic text-[#C7A962]">
                         {["I.", "II.", "III.", "IV."][i]}
