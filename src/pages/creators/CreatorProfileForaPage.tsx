@@ -156,7 +156,7 @@ export default function CreatorProfileForaPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#FDF9F0] px-4 text-center">
         <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Creator not found</h1>
         <button type="button" onClick={() => navigate("/creators")}
-          className="mt-8 rounded-full bg-[#0c4d47] px-8 py-3.5 text-[14px] text-[#f7f3ea] hover:bg-[#0a2225]">
+          className="mt-8 rounded-full bg-[#0c4d47] px-8 py-3.5 text-[15px] text-[#f7f3ea] hover:bg-[#0a2225]">
           Browse creators
         </button>
       </div>
@@ -195,7 +195,7 @@ export default function CreatorProfileForaPage() {
 
       <div className="mx-auto max-w-6xl px-4 pt-6">
         <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/creators"))}
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-[#0a2225]/70 transition-colors hover:text-[#0a2225]">
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[15px] text-[#0a2225]/70 transition-colors hover:text-[#0a2225]">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
       </div>
@@ -238,13 +238,13 @@ export default function CreatorProfileForaPage() {
             <div className="grid grid-cols-2 gap-2">
               <FollowButton
                 targetUserId={dir.id}
-                className="w-full rounded-full py-6 text-[15px]"
+                className="w-full rounded-full py-6 text-[16px]"
               />
               <MessageButton
                 recipientId={dir.id}
                 recipientName={displayName}
                 variant="outline"
-                className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
+                className="w-full rounded-full border-[#0a2225]/25 py-6 text-[16px]"
                 label="Message"
               />
             </div>
@@ -262,10 +262,10 @@ export default function CreatorProfileForaPage() {
           <>
             {extra?.ai_summary && (
               <section className="mt-12 rounded-3xl bg-[#0c4d47]/[0.06] p-6">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                <p className="text-[13.5px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
                   Goldsainte AI on {firstName}
                 </p>
-                <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/85">
+                <p className="mt-3 text-[16px] leading-relaxed text-[#0a2225]/85">
                   {extra.ai_summary}
                 </p>
               </section>
@@ -313,29 +313,31 @@ export default function CreatorProfileForaPage() {
             </section>
             {(extra?.upcoming_trips ?? []).length > 0 && (
               <section className="mt-14">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
-                  Travel with {firstName}
+                <p className="text-[13.5px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                  On location
                 </p>
-                <h2 className="mt-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">Upcoming trips</h2>
-                <p className="mt-3 max-w-2xl leading-relaxed text-[#0a2225]/75">
-                  These are real trips {firstName} is planning to lead — and you can be on them.
-                  Tap Request to join and {firstName} will reply with the full itinerary and price.
-                  If it's a fit, you book right here: your payment stays protected in escrow until
-                  the trip happens.
+                <h2 className="mt-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">
+                  Where {firstName} is headed
+                </h2>
+                <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-[#0a2225]/75">
+                  {firstName} already has these trips on the calendar. Hire them
+                  on location — since they're traveling there anyway, your dates
+                  can line up with theirs, and every booking stays escrow-protected
+                  on Goldsainte.
                 </p>
                 <div className="mt-6 space-y-3">
                   {(extra!.upcoming_trips as { destination: string; timing: string }[]).map((t, i) => (
                     <div key={i} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#F5F0E0]/70 px-6 py-4">
                       <div>
                         <p className="font-secondary text-xl text-[#0a2225]">{t.destination}</p>
-                        {t.timing && <p className="text-[13px] uppercase tracking-[0.12em] text-[#0a2225]/60">{t.timing}</p>}
+                        {t.timing && <p className="text-[14.5px] uppercase tracking-[0.12em] text-[#0a2225]/60">{t.timing}</p>}
                       </div>
                       <button type="button"
                         onClick={() =>
                           navigate("/post-trip?fromCreator=" + dir.id + "&destination=" + encodeURIComponent(t.destination))
                         }
-                        className="rounded-full border border-[#0a2225]/30 px-6 py-2.5 text-[14px] font-medium text-[#0a2225] hover:bg-white">
-                        Request to join
+                        className="rounded-full border border-[#0a2225]/30 px-6 py-2.5 text-[15px] font-medium text-[#0a2225] hover:bg-white">
+                        Hire {firstName} here
                       </button>
                     </div>
                   ))}
@@ -344,7 +346,7 @@ export default function CreatorProfileForaPage() {
             )}
             {extra?.open_to_collabs && (
               <section className="mt-14 rounded-3xl bg-[#F0EADA]/80 p-8">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                <p className="text-[13.5px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
                   For brands & partners
                 </p>
                 <h2 className="mt-2 font-secondary text-2xl md:text-3xl text-[#0a2225]">Work with {firstName}</h2>
@@ -355,13 +357,13 @@ export default function CreatorProfileForaPage() {
                 {(extra.collab_types ?? []).length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-2">
                     {(extra.collab_types as string[]).map((t) => (
-                      <span key={t} className="rounded-full bg-white px-4 py-1.5 text-[13px] text-[#0a2225]">{t}</span>
+                      <span key={t} className="rounded-full bg-white px-4 py-1.5 text-[14.5px] text-[#0a2225]">{t}</span>
                     ))}
                   </div>
                 )}
                 {extra.media_kit_url && (
                   <a href={extra.media_kit_url} target="_blank" rel="noopener noreferrer"
-                    className="mt-6 inline-block rounded-full bg-[#0a2225] px-7 py-3.5 text-[13px] font-medium uppercase tracking-[0.14em] text-[#f7f3ea] hover:bg-[#0c4d47]">
+                    className="mt-6 inline-block rounded-full bg-[#0a2225] px-7 py-3.5 text-[14.5px] font-medium uppercase tracking-[0.14em] text-[#f7f3ea] hover:bg-[#0c4d47]">
                     Download media kit
                   </a>
                 )}
