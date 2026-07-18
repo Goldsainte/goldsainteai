@@ -301,7 +301,7 @@ function PartnerBookingRowCard({ isHireBooking, booking,
         </div>
         {imgUrl && (
           <img src={imgUrl} alt={title} loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" onError={(e) => { e.currentTarget.style.display = "none"; }} />
         )}
         <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {booking.status.replace(/_/g, " ")}
