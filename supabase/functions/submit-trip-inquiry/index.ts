@@ -315,11 +315,15 @@ serve(async (req) => {
         const [p1, p2] = [userId, responderId].sort();
         const preview = question.slice(0, 100);
 
+        // General (non-booking) thread only — since migration 205 a pair can
+        // also own booking-scoped threads; inquiries always land in the
+        // general one.
         const { data: existingConvo } = await supabaseAdmin
           .from('dm_conversations')
           .select('id')
           .eq('participant_1', p1)
           .eq('participant_2', p2)
+          .is('booking_id', null)
           .maybeSingle();
 
         if (existingConvo) {
