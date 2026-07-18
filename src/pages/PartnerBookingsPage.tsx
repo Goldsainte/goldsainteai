@@ -33,6 +33,7 @@ type BookingRow = {
 export default function PartnerBookingsPage() {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [hireProposalIds, setHireProposalIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -57,6 +58,7 @@ export default function PartnerBookingsPage() {
           partner_role,
           traveler_id,
           total_price,
+          proposal_id,
           deposit_amount,
           partner_payout,
           currency,
@@ -82,6 +84,16 @@ export default function PartnerBookingsPage() {
         console.error("Error loading partner bookings:", error);
         setLoadError(error.message || "Unable to load bookings.");
         setBookings([]);
+      try {
+        const ids = (([]) as any[] | null | undefined)?.map((b: any) => b.proposal_id).filter(Boolean) ?? [];
+        if (ids.length) {
+          const { data: props } = await (supabase
+            .from("trip_proposals")
+            .select("id, price_breakdown" as any)
+            .in("id", ids) as any);
+          setHireProposalIds(new Set(((props as any[]) || []).filter((pr) => (pr.price_breakdown as any)?.hire).map((pr) => pr.id)));
+        }
+      } catch { /* hire detection is cosmetic here */ }
       } else {
         const rows = (data ?? []) as BookingRow[];
         setBookings(rows.map((r) => ({ ...r, traveler: null })) as BookingRow[]);
@@ -177,9 +189,9 @@ export default function PartnerBookingsPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid items-start gap-5 lg:grid-cols-2">
+              <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {bookings.map((b) => (
-                  <PartnerBookingRowCard
+                  <PartnerBookingRowCard isHireBooking={hireProposalIds.has((b as any).proposal_id)}
                     key={b.id}
                     booking={b}
                     onStatusChange={(id, status) => {
@@ -200,10 +212,8 @@ export default function PartnerBookingsPage() {
   );
 }
 
-function PartnerBookingRowCard({
-  booking,
-  onStatusChange,
-}: {
+function PartnerBookingRowCard({ isHireBooking, booking,
+  onStatusChange, }: {
   booking: BookingRow;
   onStatusChange?: (id: string, status: string) => void;
 }) {
@@ -240,19 +250,19 @@ function PartnerBookingRowCard({
 
   const total =
     booking.total_price != null
-      ? `$${Number(booking.total_price).toFixed(2)}`
+      ? `$${(Number(booking.total_price) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       : "—";
   // Until release, show the expected 96.5% payout (Goldsainte keeps 3.5%);
   // after release, show the recorded figure.
   const payoutValue =
     booking.partner_payout && booking.partner_payout > 0
-      ? Number(booking.partner_payout)
-      : Math.round(Number(booking.total_price || 0) * 96.5) / 100;
+      ? Number(booking.partner_payout) / 100
+      : Math.round((Number(booking.total_price || 0) / 100) * 96.5) / 100;
   const payoutLabel =
     booking.partner_payout && booking.partner_payout > 0
       ? "Your payout"
       : "Est. payout";
-  const payout = `$${payoutValue.toFixed(2)}`;
+  const payout = `$${payoutValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const title =
     trip?.title ||
@@ -347,6 +357,7 @@ function PartnerBookingRowCard({
         </div>
       </div>
 
+      {!isHireBooking && (
       <ContractStatusCard
         variant="agent"
         bookingId={booking.id}
@@ -357,6 +368,7 @@ function PartnerBookingRowCard({
         startDate={(booking as any).trip_requests?.start_date ?? null}
         endDate={(booking as any).trip_requests?.end_date ?? null}
       />
+      )}
 
       {/* Actions */}
       <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
