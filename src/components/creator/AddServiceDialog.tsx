@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ON_TRIP_CAPABILITIES, capLabel } from "@/lib/onTripCapabilities";
 import { PenLine, Star, CirclePlus, Plus, X, Check, Plane } from "lucide-react";
 
 type ServiceTier = "custom_itinerary" | "full_trip_design" | "add_on" | "on_trip";
@@ -499,6 +500,28 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
               {/* STEP 3: What's Included & FAQ */}
               {step === 3 && (
                 <>
+                  {tier === "on_trip" ? (
+                    <div>
+                      <label className="text-xs font-medium text-[#6B7280] mb-1 block">What can travelers hire you for?</label>
+                      <p className="text-xs text-[#9CA3AF] mb-2">Pick everything you can genuinely do on their trip \u2014 travelers choose from exactly this list when they hire you.</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {ON_TRIP_CAPABILITIES.map((c) => (
+                          <button key={c.id} type="button" title={c.hint}
+                            onClick={() => setIncludes((prev) => prev.includes(c.id) ? prev.filter((x) => x !== c.id) : [...prev, c.id])}
+                            className={`h-9 rounded-lg border px-3 text-[13px] font-medium transition-colors !min-h-0 !min-w-0 ${
+                              includes.includes(c.id)
+                                ? "border-[#0c4d47] bg-[#0c4d47] text-[#f7f3ea]"
+                                : "border-[#E5DFC6] bg-white text-[#0a2225] hover:border-[#C7A962]"
+                            }`}>
+                            {c.label}
+                          </button>
+                        ))}
+                      </div>
+                      {includes.filter((x) => !ON_TRIP_CAPABILITIES.some((c) => c.id === x)).length > 0 && (
+                        <p className="mt-2 text-xs text-[#9CA3AF]">Also listed: {includes.filter((x) => !ON_TRIP_CAPABILITIES.some((c) => c.id === x)).map(capLabel).join(", ")}</p>
+                      )}
+                    </div>
+                  ) : (
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">What's Included</label>
                     <div className="space-y-1.5 mb-2">
@@ -526,6 +549,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     </div>
                   </div>
 
+                  )}
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">FAQ</label>
                     <p className="text-xs text-[#9CA3AF] mb-2">Answer common questions before they're asked.</p>
