@@ -20,10 +20,10 @@ interface Props {
 }
 
 const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color: string }[] = [
-  { value: "custom_itinerary", label: "Custom Itinerary", desc: "Personalized day-by-day plans", icon: PenLine, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
-  { value: "full_trip_design", label: "Full Trip Design", desc: "Premium end-to-end trip planning", icon: Star, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
-  { value: "add_on", label: "Add-On", desc: "Optional extras like 1:1 calls", icon: CirclePlus, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
-  { value: "on_trip", label: "On-Trip", desc: "Join the traveler on their trip, priced per day", icon: Plane, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "custom_itinerary", label: "Custom Itinerary", desc: "A personal, day-by-day plan \u2014 built for one traveler, delivered to keep.", icon: PenLine, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "full_trip_design", label: "Full Trip Design", desc: "The whole trip, designed end to end \u2014 your signature work.", icon: Star, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "add_on", label: "Add-On", desc: "A focused extra \u2014 a call, a review, a list worth paying for.", icon: CirclePlus, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "on_trip", label: "On-Trip", desc: "Travel with them, at your day rate \u2014 content, guiding, hosting, and whatever else you declare.", icon: Plane, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
 ];
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
@@ -270,16 +270,16 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
 
         {/* Tier selection gates entry into the wizard */}
         {!tier && !isEdit && (
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="grid gap-2.5 pt-2 sm:grid-cols-2">
             {TIERS.map((t) => (
               <button
                 key={t.value}
+                type="button"
                 onClick={() => setTier(t.value)}
-                className={`flex flex-col items-start gap-1.5 p-4 rounded-xl border-2 text-left transition-all hover:shadow-md ${t.color}`}
+                className="rounded-2xl border border-[#E5DFC6] bg-white p-4 text-left transition-colors hover:border-[#C7A962] !min-h-0"
               >
-                <t.icon className="h-5 w-5" />
-                <span className="font-semibold text-sm">{t.label}</span>
-                <span className="text-xs opacity-70">{t.desc}</span>
+                <span className="block font-secondary text-[17px] leading-tight text-[#0a2225]">{t.label}</span>
+                <span className="mt-1 block text-[12.5px] leading-relaxed text-[#0a2225]/60">{t.desc}</span>
               </button>
             ))}
           </div>
