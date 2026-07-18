@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
-import { Card } from "@/components/ui/card";
 import { Plus, Pencil, Eye, Trash2, Loader2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
@@ -117,15 +116,15 @@ export function CreatorGuidesTab() {
   return (
     <div>
       {/* Sales analytics */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <Card className="border border-[#E5DFC6] bg-white rounded-2xl p-5">
-          <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium">Guide Sales</p>
-          <p className="font-secondary text-3xl text-[#0a2225] mt-2">{salesCount}</p>
-        </Card>
-        <Card className="border border-[#E5DFC6] bg-white rounded-2xl p-5">
-          <p className="text-xs uppercase tracking-wider text-[#C7A962] font-medium">Guide Revenue</p>
-          <p className="font-secondary text-3xl text-[#0a2225] mt-2">${revenue.toLocaleString()}</p>
-        </Card>
+      <div className="grid grid-cols-2 gap-x-10 mb-8">
+        <div className="border-t border-[#0a2225]/15 pt-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Sales</p>
+          <p className="font-secondary text-[34px] leading-tight text-[#0a2225] mt-1.5">{salesCount}</p>
+        </div>
+        <div className="border-t border-[#0a2225]/15 pt-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Revenue</p>
+          <p className="font-secondary text-[34px] leading-tight text-[#0a2225] mt-1.5">${revenue.toLocaleString()}</p>
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3 mb-6">
@@ -146,17 +145,17 @@ export function CreatorGuidesTab() {
           <Loader2 className="h-4 w-4 animate-spin" /> Loading…
         </div>
       ) : guides.length === 0 ? (
-        <Card className="border-dashed border-2 border-[#E5DFC6] bg-transparent rounded-2xl p-10 text-center">
-          <BookOpen className="h-6 w-6 text-[#C7A962] mx-auto" />
-          <p className="mt-3 font-secondary text-lg text-[#0a2225]">No guides yet</p>
-          <p className="mt-1 text-sm text-[#6B7280]">
+        <div className="border-t border-[#0a2225]/15 pt-6">
+          <BookOpen className="h-6 w-6 text-[#C7A962]" />
+          <p className="mt-3 font-secondary text-[20px] text-[#0a2225]">No guides yet</p>
+          <p className="mt-1 max-w-md text-[15px] leading-relaxed text-[#0a2225]/60">
             Package your travel knowledge into a sellable digital guide.
           </p>
-        </Card>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="divide-y divide-[#0a2225]/10 border-t border-[#0a2225]/15">
           {guides.map((g) => (
-            <Card key={g.id} className="border border-[#E5DFC6] bg-white rounded-2xl p-4 flex items-center gap-4">
+            <div key={g.id} className="flex items-center gap-4 py-4">
               {g.cover_image_url ? (
                 <img
                   src={g.cover_image_url}
@@ -206,17 +205,17 @@ export function CreatorGuidesTab() {
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
 
       {recentPurchases.length > 0 && (
         <div className="mt-10">
-          <h3 className="font-secondary text-lg text-[#0a2225] mb-4">Recent Purchases</h3>
-          <Card className="border border-[#E5DFC6] bg-white rounded-2xl divide-y divide-[#F0EAD6]">
+          <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent Purchases</h3>
+          <div className="divide-y divide-[#0a2225]/10 border-t border-[#0a2225]/15">
             {recentPurchases.map((p) => (
-              <div key={p.id} className="flex items-center justify-between gap-4 p-4">
+              <div key={p.id} className="flex items-center justify-between gap-4 py-4">
                 <div className="min-w-0">
                   <p className="text-sm text-[#0a2225] truncate">
                     <span className="font-medium">{p.buyerName}</span>{" "}
@@ -232,7 +231,7 @@ export function CreatorGuidesTab() {
                 </span>
               </div>
             ))}
-          </Card>
+          </div>
         </div>
       )}
     </div>
