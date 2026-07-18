@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { capLabel } from "@/lib/onTripCapabilities";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
@@ -471,26 +471,26 @@ export default function TripRequestDetail() {
                 <h2 className="mb-4 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                   <div className="border-t border-[#0a2225]/15 pt-3">
-                    <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Listed rate</p>
-                    <p className="font-secondary text-[15.5px] text-[#0a2225]">
+                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Listed rate</p>
+                    <p className="font-secondary text-[17px] text-[#0a2225]">
                       {request.hireDayRate ? `$${request.hireDayRate.toLocaleString()}/day` : "By proposal"}
                     </p>
                   </div>
                   {request.hireTripDays ? (
                     <div className="border-t border-[#0a2225]/15 pt-3">
-                      <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">On-trip days</p>
-                      <p className="font-secondary text-[15.5px] text-[#0a2225]">{request.hireTripDays} days</p>
+                      <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">On-trip days</p>
+                      <p className="font-secondary text-[17px] text-[#0a2225]">{request.hireTripDays} days</p>
                     </div>
                   ) : null}
                   {request.budgetMax > 0 && (
                     <div className="border-t border-[#0a2225]/15 pt-3">
-                      <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Working estimate</p>
-                      <p className="font-secondary text-[15.5px] text-[#0a2225]">{"\u2248"} {formatCurrency(request.budgetMax)}</p>
+                      <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Working estimate</p>
+                      <p className="font-secondary text-[17px] text-[#0a2225]">{formatCurrency(request.budgetMax)}</p>
                     </div>
                   )}
                   <div className="border-t border-[#0a2225]/15 pt-3">
-                    <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Final total</p>
-                    <p className="font-secondary text-[15.5px] text-[#0a2225]">Set by your proposal</p>
+                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Final total</p>
+                    <p className="font-secondary text-[17px] text-[#0a2225]">Set by your proposal</p>
                   </div>
                 </div>
                 {(request.hireCapabilities?.length ?? 0) > 0 && (
@@ -512,7 +512,7 @@ export default function TripRequestDetail() {
             {request.description && (
               <div>
                 <h2 className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">About This Trip</h2>
-                <p className="max-w-2xl text-[15px] leading-[1.75] text-[#0a2225]/80 whitespace-pre-line">
+                <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80 whitespace-pre-line">
                   {request.description}
                 </p>
                 {request.specialRequests && (
@@ -531,8 +531,8 @@ export default function TripRequestDetail() {
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                   {tripDetailsGrid.map((row, i) => (
                     <div key={i} className="border-t border-[#0a2225]/15 pt-3">
-                      <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">{row.label}</p>
-                      <p className="font-secondary text-[15.5px] capitalize text-[#0a2225]">{row.value}</p>
+                      <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">{row.label}</p>
+                      <p className="font-secondary text-[17px] capitalize text-[#0a2225]">{row.value}</p>
                     </div>
                   ))}
                 </div>
@@ -693,12 +693,12 @@ export default function TripRequestDetail() {
                     </p>
                     <p className="mt-3 font-secondary text-[38px] leading-none text-[#0a2225]">
                       {request.hireOnTrip
-                        ? `\u2248 ${formatCurrency(request.budgetMax)}`
+                        ? formatCurrency(request.budgetMax)
                         : `${formatCurrency(request.budgetMin)} \u2013 ${formatCurrency(request.budgetMax)}`}
                     </p>
                     {request.hireOnTrip && request.hireDayRate ? (
                       <p className="mt-1.5 text-[12px] text-[#0a2225]/50">
-                        {request.hireTripDays ? `${request.hireTripDays} days \u00d7 ` : ""}${request.hireDayRate.toLocaleString()}/day listed rate · final total by your proposal
+                        {request.hireTripDays ? `${request.hireTripDays} days \u00d7 ` : ""}${request.hireDayRate.toLocaleString()}/day listed rate \u2014 an estimate. Your proposal sets the final total.
                       </p>
                     ) : request.budgetPerPerson ? (
                       <p className="mt-1.5 text-[12px] text-[#0a2225]/50">per person</p>
@@ -766,32 +766,102 @@ export default function TripRequestDetail() {
         </div>
       </div>
 
-      {/* ============= HOW IT WORKS — full-width, house register ============= */}
+      {/* ============= THE PROCESS — full walkthrough, house register =============
+          Written for someone who has NEVER used Goldsainte: titled steps in
+          plain language, the money facts, and the cancellation policy link. */}
       <div className="mx-auto max-w-5xl px-4 pb-14">
         <div className="border-t border-[#0a2225]/15 pt-8">
-          <h2 className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">How it works</h2>
-          <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2 md:grid-cols-4">
+          <h2 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+            {request.hireOnTrip ? "How this works, start to finish" : "How it works"}
+          </h2>
+          <div className="mt-8 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
             {(request.hireOnTrip
               ? [
-                  "Review the trip, dates, and party",
-                  `Message ${travelerName.split(" ")[0]} with any questions`,
-                  "Reply with your proposal \u2014 total price and expense terms",
-                  "They accept and pay the deposit \u2014 escrow-protected",
+                  {
+                    t: "Review the request",
+                    b: `Look over the dates, the party, and what ${travelerName.split(" ")[0]} hired you for. Nothing is committed yet \u2014 this is just an invitation.`,
+                  },
+                  {
+                    t: "Ask questions first",
+                    b: `Use Messages to ask ${travelerName.split(" ")[0]} anything before you commit. Keep every conversation on Goldsainte \u2014 that's what lets us step in if something goes wrong.`,
+                  },
+                  {
+                    t: "Reply with your proposal",
+                    b: "The proposal form walks you through it: confirm you're available, describe your plan, say who covers your travel and lodging, and set your total price.",
+                  },
+                  {
+                    t: "They accept and pay a deposit",
+                    b: "If they accept, the request becomes a booking and they pay a 25% deposit through secure checkout. You never handle payment yourself.",
+                  },
+                  {
+                    t: "Goldsainte holds the money",
+                    b: "Every payment sits in escrow with Goldsainte \u2014 not with the traveler, not with you \u2014 until the work is done. The balance is due before departure.",
+                  },
+                  {
+                    t: "Deliver the trip",
+                    b: "Travel with them and do exactly what your proposal promised. Day-of coordination happens in Messages.",
+                  },
+                  {
+                    t: "Get paid",
+                    b: "After the traveler confirms the trip went as agreed, escrow releases your payout: 96.5% of your price. Goldsainte's entire fee is a flat 7%, split between both sides.",
+                  },
                 ]
               : [
-                  "Review the traveler's brief and inspiration",
-                  "Submit your proposal with pricing and itinerary",
-                  "The traveler reviews and compares proposals",
-                  "If accepted, it becomes a confirmed booking",
+                  {
+                    t: "Review the brief",
+                    b: "Read the traveler's dates, budget, and inspiration to see if it fits your work.",
+                  },
+                  {
+                    t: "Submit your proposal",
+                    b: "Send your itinerary, pricing, and timeline. The traveler can message you with questions.",
+                  },
+                  {
+                    t: "They compare and accept",
+                    b: "The traveler reviews every proposal and accepts their favorite \u2014 acceptance creates a booking with a 25% deposit into escrow.",
+                  },
+                  {
+                    t: "Deliver, then get paid",
+                    b: "Funds stay in escrow until the traveler confirms the trip. Your payout is 96.5% of your price \u2014 Goldsainte's flat fee is 7% total across both sides.",
+                  },
                 ]
             ).map((step, i) => (
               <div key={i}>
-                <p className="font-secondary text-[18px] italic text-[#C7A962]">
-                  {["I.", "II.", "III.", "IV."][i]}
+                <p className="font-secondary text-[20px] italic text-[#C7A962]">
+                  {["I.", "II.", "III.", "IV.", "V.", "VI.", "VII."][i]}
                 </p>
-                <p className="mt-2 text-[14.5px] leading-[1.7] text-[#0a2225]/75">{step}</p>
+                <p className="mt-1.5 font-secondary text-[19px] text-[#0a2225]">{step.t}</p>
+                <p className="mt-2 text-[15px] leading-[1.75] text-[#0a2225]/75">{step.b}</p>
               </div>
             ))}
+          </div>
+
+          {/* The money, at a glance */}
+          <div className="mt-11 border-t border-[#0a2225]/15 pt-7">
+            <h3 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">The money, at a glance</h3>
+            <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
+              <div className="border-t border-[#0a2225]/15 pt-3">
+                <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Deposit</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">25% at acceptance, held in escrow</p>
+              </div>
+              <div className="border-t border-[#0a2225]/15 pt-3">
+                <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Balance</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">Due before departure, also into escrow</p>
+              </div>
+              <div className="border-t border-[#0a2225]/15 pt-3">
+                <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Your payout</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">96.5% of your price, released after the trip is confirmed</p>
+              </div>
+            </div>
+            <p className="mt-7 text-[15px] leading-relaxed text-[#0a2225]/75">
+              Plans change {"\u2014"} cancellations and refunds follow the Goldsainte policy, which
+              protects both sides of every booking.{" "}
+              <Link
+                to="/cancellation-refund-policy"
+                className="whitespace-nowrap text-[#0c4d47] underline underline-offset-4 decoration-[#C7A962] hover:text-[#0a2225]"
+              >
+                Read the cancellation policy {"\u2192"}
+              </Link>
+            </p>
           </div>
         </div>
       </div>
@@ -807,7 +877,7 @@ export default function TripRequestDetail() {
                 </p>
                 <p className="font-secondary text-[16px] text-[#0a2225] truncate">
                   {request.hireOnTrip
-                    ? `\u2248 ${formatCurrency(request.budgetMax)}`
+                    ? formatCurrency(request.budgetMax)
                     : `${formatCurrency(request.budgetMin)} \u2013 ${formatCurrency(request.budgetMax)}`}
                 </p>
               </div>
