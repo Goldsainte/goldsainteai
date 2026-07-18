@@ -345,7 +345,7 @@ export default function TripRequestDetail() {
       <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea]">
         <div className="text-center px-8 py-12">
           <h2 className="font-secondary text-2xl text-foreground mb-2">Something went wrong</h2>
-          <p className="text-[15px] text-muted-foreground">{error || "Trip request not found."}</p>
+          <p className="text-[16px] text-muted-foreground">{error || "Trip request not found."}</p>
         </div>
       </div>
     );
@@ -371,7 +371,7 @@ export default function TripRequestDetail() {
         <button
           type="button"
           onClick={() => navigate('/marketplace?tab=trip-requests')}
-          className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
+          className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
         >
           ← Trip Requests
         </button>
@@ -388,7 +388,7 @@ export default function TripRequestDetail() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/25 to-transparent" />
 
           <div className="absolute bottom-0 left-0 right-0 px-6 pb-7 md:px-9 md:pb-8">
-            <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#C7A962]/95">
+            <p className="flex items-center gap-2 text-[12px] uppercase tracking-[0.3em] text-[#C7A962]/95">
               <span
                 className={`inline-flex h-1.5 w-1.5 rounded-full ${
                   request.status === "open"
@@ -408,7 +408,7 @@ export default function TripRequestDetail() {
             </h1>
 
             {request.hireOnTrip && (
-              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0a2225]">
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#C7A962] px-4 py-1.5 text-[12.5px] font-semibold uppercase tracking-[0.14em] text-[#0a2225]">
                 On-trip hire
                 {request.hireDayRate ? ` \u00b7 listed at $${request.hireDayRate.toLocaleString()}/day` : ""}
                 {request.hireServiceTitle ? ` \u00b7 ${request.hireServiceTitle}` : ""}
@@ -417,19 +417,19 @@ export default function TripRequestDetail() {
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {request.destination && request.destination !== "Not specified" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[#E5DFC6]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[12px] uppercase tracking-[0.14em] text-[#E5DFC6]">
                   <MapPin className="h-3 w-3" />
                   {request.destination}
                 </span>
               )}
               {request.dateRangeLabel && request.dateRangeLabel !== "Dates TBD" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[#E5DFC6]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[12px] uppercase tracking-[0.14em] text-[#E5DFC6]">
                   <Calendar className="h-3 w-3" />
                   {request.dateRangeLabel}
                 </span>
               )}
               {request.travelers > 0 && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[#E5DFC6]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[12px] uppercase tracking-[0.14em] text-[#E5DFC6]">
                   <Users className="h-3 w-3" />
                   {request.travelers} {request.travelers === 1 ? "traveler" : "travelers"}
                 </span>
@@ -453,15 +453,15 @@ export default function TripRequestDetail() {
                   {travelerProfile.avatar_url ? (
                     <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
                   ) : null}
-                  <AvatarFallback className="bg-[#0c4d47] text-white text-sm font-semibold">
+                  <AvatarFallback className="bg-[#0c4d47] text-white text-[15px] font-semibold">
                     {travelerName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-[14.5px] text-[#0a2225]">
-                    Posted by <span className="font-secondary text-[15.5px]">{travelerName}</span>
+                  <p className="text-[15.5px] text-[#0a2225]">
+                    Posted by <span className="font-secondary text-[16px]">{travelerName}</span>
                     {travelerProfile.created_at && (
-                      <span className="text-[13px] text-[#0a2225]/50">
+                      <span className="text-[14.5px] text-[#0a2225]/50">
                         {" "}· Member since {new Date(travelerProfile.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                       </span>
                     )}
@@ -475,7 +475,7 @@ export default function TripRequestDetail() {
                 chips beneath. All money lives in the rail — stated once. */}
             {request.hireOnTrip && (
               <div>
-                <h2 className="mb-5 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
+                <h2 className="mb-5 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
                   {[
                     { label: "Destination", value: request.destination !== "Not specified" ? request.destination : null },
@@ -486,17 +486,17 @@ export default function TripRequestDetail() {
                     .filter((c) => c.value)
                     .map((c, i) => (
                       <div key={i} className="border-t border-[#0a2225]/15 pt-3">
-                        <p className="mb-1.5 whitespace-nowrap text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">{c.label}</p>
+                        <p className="mb-1.5 whitespace-nowrap text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">{c.label}</p>
                         <p className="font-secondary text-[18px] text-[#0a2225]">{c.value}</p>
                       </div>
                     ))}
                 </div>
                 {(request.hireCapabilities?.length ?? 0) > 0 && (
                   <div className="mt-7">
-                    <p className="mb-2.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Hired for</p>
+                    <p className="mb-2.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Hired for</p>
                     <div className="flex flex-wrap gap-2">
                       {request.hireCapabilities!.map((id: string) => (
-                        <span key={id} className="inline-flex h-9 items-center rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 text-[14px] font-medium text-[#0a2225]">
+                        <span key={id} className="inline-flex h-9 items-center rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 text-[15px] font-medium text-[#0a2225]">
                           {capLabel(id)}
                         </span>
                       ))}
@@ -509,14 +509,14 @@ export default function TripRequestDetail() {
             {/* Description */}
             {request.description && (
               <div>
-                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">About This Trip</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">About This Trip</h2>
                 <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80 whitespace-pre-line">
                   {request.description}
                 </p>
                 {request.specialRequests && (
                   <div className="mt-4">
-                    <p className="mb-1 text-[12px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/45">Special requests</p>
-                    <p className="max-w-2xl text-[15px] leading-[1.75] text-[#0a2225]/80">{request.specialRequests}</p>
+                    <p className="mb-1 text-[13.5px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/45">Special requests</p>
+                    <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80">{request.specialRequests}</p>
                   </div>
                 )}
               </div>
@@ -525,11 +525,11 @@ export default function TripRequestDetail() {
             {/* Trip Details Grid — clean, no cards */}
             {!request.hireOnTrip && tripDetailsGrid.length > 0 && (
               <div>
-                <h2 className="mb-5 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip Details</h2>
+                <h2 className="mb-5 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip Details</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                   {tripDetailsGrid.map((row, i) => (
                     <div key={i} className="border-t border-[#0a2225]/15 pt-3">
-                      <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">{row.label}</p>
+                      <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">{row.label}</p>
                       <p className="font-secondary text-[17px] capitalize text-[#0a2225]">{row.value}</p>
                     </div>
                   ))}
@@ -540,10 +540,10 @@ export default function TripRequestDetail() {
             {/* Interests */}
             {request.interests && request.interests.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Interests</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Interests</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.interests.map(tag => (
-                    <span key={tag} className="inline-flex h-8 items-center rounded-full border border-[#0a2225]/15 bg-white px-3.5 text-[13px] text-[#0a2225]">
+                    <span key={tag} className="inline-flex h-8 items-center rounded-full border border-[#0a2225]/15 bg-white px-3.5 text-[14.5px] text-[#0a2225]">
                       {tag}
                     </span>
                   ))}
@@ -554,10 +554,10 @@ export default function TripRequestDetail() {
             {/* Must-Haves */}
             {request.mustHaves && request.mustHaves.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Must-Haves</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Must-Haves</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.mustHaves.map(item => (
-                    <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#0c4d47]/25 bg-[#0c4d47]/[0.06] px-3.5 text-[13px] text-[#0c4d47]">
+                    <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#0c4d47]/25 bg-[#0c4d47]/[0.06] px-3.5 text-[14.5px] text-[#0c4d47]">
                       <span className="text-[#C7A962]">✓</span> {item}
                     </span>
                   ))}
@@ -568,10 +568,10 @@ export default function TripRequestDetail() {
             {/* Dealbreakers */}
             {request.dealbreakers && request.dealbreakers.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Dealbreakers</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Dealbreakers</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.dealbreakers.map(item => (
-                    <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#8b3a3a]/25 bg-[#8b3a3a]/[0.05] px-3.5 text-[13px] text-[#8b3a3a]">
+                    <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#8b3a3a]/25 bg-[#8b3a3a]/[0.05] px-3.5 text-[14.5px] text-[#8b3a3a]">
                       ✗ {item}
                     </span>
                   ))}
@@ -582,7 +582,7 @@ export default function TripRequestDetail() {
             {/* Visual Brief — only if content exists */}
             {hasStoryboard && (
               <div>
-                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Visual Brief</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Visual Brief</h2>
                 <TripStoryboardViewer tripId={request.id} variant="gallery" />
               </div>
             )}
@@ -591,8 +591,8 @@ export default function TripRequestDetail() {
             {isRequestOwner && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals Received</h2>
-                  <span className="inline-flex items-center rounded-full border border-[#C7A962]/50 bg-[#C7A962]/15 px-2.5 py-0.5 text-[12px] font-medium text-[#8D6B2F]">
+                  <h2 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals Received</h2>
+                  <span className="inline-flex items-center rounded-full border border-[#C7A962]/50 bg-[#C7A962]/15 px-2.5 py-0.5 text-[13.5px] font-medium text-[#8D6B2F]">
                     {proposals.length}
                   </span>
                 </div>
@@ -600,7 +600,7 @@ export default function TripRequestDetail() {
                 {proposals.length === 0 ? (
                   <div className="border-t border-[#0a2225]/15 pt-6">
                     <p className="font-secondary text-[20px] text-[#0a2225]">No proposals yet</p>
-                    <p className="mt-1.5 max-w-md text-[14px] leading-relaxed text-[#0a2225]/55">
+                    <p className="mt-1.5 max-w-md text-[15px] leading-relaxed text-[#0a2225]/55">
                       As agents and creators respond, their proposals will appear here.
                     </p>
                   </div>
@@ -641,7 +641,7 @@ export default function TripRequestDetail() {
                                 toast.error(err.message || "Failed to open conversation.");
                               }
                             }}
-                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#0a2225]/20 bg-white px-6 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a2225] transition-colors hover:border-[#C7A962]"
+                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#0a2225]/20 bg-white px-6 text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#0a2225] transition-colors hover:border-[#C7A962]"
                           >
                             Message
                           </button>
@@ -649,7 +649,7 @@ export default function TripRequestDetail() {
                             type="button"
                             onClick={() => handleAcceptProposal(proposal.id)}
                             disabled={proposal.status === "accepted" || proposal.status === "declined"}
-                            className={`inline-flex min-h-[44px] items-center rounded-full px-6 text-[12px] font-medium uppercase tracking-[0.12em] transition-colors ${
+                            className={`inline-flex min-h-[44px] items-center rounded-full px-6 text-[13.5px] font-medium uppercase tracking-[0.12em] transition-colors ${
                               proposal.status === "accepted" || proposal.status === "declined"
                                 ? "cursor-not-allowed bg-[#0a2225]/10 text-[#0a2225]/40"
                                 : "bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#0a2225]"
@@ -660,7 +660,7 @@ export default function TripRequestDetail() {
                         </div>
 
                         {proposal.status !== "accepted" && proposal.status !== "declined" && (
-                          <div className="mx-1 border-l-2 border-[#C7A962] py-1 pl-4 text-[13px] leading-relaxed text-[#0a2225]/70">
+                          <div className="mx-1 border-l-2 border-[#C7A962] py-1 pl-4 text-[14.5px] leading-relaxed text-[#0a2225]/70">
                             <p>
                               <span className="font-semibold">By accepting this proposal</span>, your trip and payments stay protected by Goldsainte.
                             </p>
@@ -686,7 +686,7 @@ export default function TripRequestDetail() {
               <div className="border-t border-[#0a2225]/15 pt-6">
                 {(request.budgetMin > 0 || request.budgetMax > 0) && (
                   <div className="mb-6">
-                    <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                    <p className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                       {request.hireOnTrip ? "Estimate" : "Budget"}
                     </p>
                     <p className="mt-3 font-secondary text-[38px] leading-none text-[#0a2225]">
@@ -695,11 +695,11 @@ export default function TripRequestDetail() {
                         : `${formatCurrency(request.budgetMin)} \u2013 ${formatCurrency(request.budgetMax)}`}
                     </p>
                     {request.hireOnTrip && request.hireDayRate ? (
-                      <p className="mt-1.5 text-[12px] text-[#0a2225]/50">
+                      <p className="mt-1.5 text-[13.5px] text-[#0a2225]/50">
                         {request.hireTripDays ? `${request.hireTripDays} days \u00d7 ` : ""}${request.hireDayRate.toLocaleString()}/day listed rate {"\u2014"} an estimate. Your proposal sets the final total.
                       </p>
                     ) : request.budgetPerPerson ? (
-                      <p className="mt-1.5 text-[12px] text-[#0a2225]/50">per person</p>
+                      <p className="mt-1.5 text-[13.5px] text-[#0a2225]/50">per person</p>
                     ) : null}
                   </div>
                 )}
@@ -709,12 +709,12 @@ export default function TripRequestDetail() {
                     <button
                       type="button"
                       onClick={handleSubmitProposal}
-                      className="block w-full rounded-full bg-[#0c4d47] py-3.5 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] min-h-[48px]"
+                      className="block w-full rounded-full bg-[#0c4d47] py-3.5 text-center text-[14.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] min-h-[48px]"
                     >
                       {request.hireOnTrip ? "Reply With Your Proposal" : "Submit Your Proposal"}
                     </button>
 
-                    <p className="mt-3 text-center text-[12px] italic text-[#0a2225]/50">
+                    <p className="mt-3 text-center text-[13.5px] italic text-[#0a2225]/50">
                       {request.hireOnTrip
                         ? "This request was sent only to you."
                         : proposalsCount === 0
@@ -727,7 +727,7 @@ export default function TripRequestDetail() {
                     no submit button, mirroring the own-trip message pattern. */}
                 {isRequestOwner && request.status === "open" && (
                   <div className="space-y-4">
-                    <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                    <p className="text-center text-[14.5px] leading-relaxed text-[#0a2225]/60">
                       This is your trip request — you can't submit a proposal to
                       yourself. Proposals from agents and creators will appear
                       below as they come in.
@@ -735,25 +735,25 @@ export default function TripRequestDetail() {
                     <button
                       type="button"
                       onClick={handleCloseRequest}
-                      className="block w-full rounded-full border border-[#0a2225]/15 py-3 text-center text-[12px] font-medium uppercase tracking-[0.12em] text-[#8b3a2e] transition-colors hover:border-[#8b3a2e]/40 hover:bg-[#8b3a2e]/5 min-h-[44px]"
+                      className="block w-full rounded-full border border-[#0a2225]/15 py-3 text-center text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#8b3a2e] transition-colors hover:border-[#8b3a2e]/40 hover:bg-[#8b3a2e]/5 min-h-[44px]"
                     >
                       Close This Request
                     </button>
                   </div>
                 )}
                 {isRequestOwner && request.status === "cancelled" && (
-                  <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                  <p className="text-center text-[14.5px] leading-relaxed text-[#0a2225]/60">
                     You closed this request — it's no longer visible on the open
                     marketplace.
                   </p>
                 )}
                 {isRequestOwner && request.status !== "open" && request.status !== "cancelled" && (
-                  <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                  <p className="text-center text-[14.5px] leading-relaxed text-[#0a2225]/60">
                     Proposals are closed while this trip is underway.
                   </p>
                 )}
                 {!isRequestOwner && request.status !== "open" && (
-                  <p className="text-center text-[13px] leading-relaxed text-[#0a2225]/60">
+                  <p className="text-center text-[14.5px] leading-relaxed text-[#0a2225]/60">
                     This request is no longer accepting proposals.
                   </p>
                 )}
@@ -769,7 +769,7 @@ export default function TripRequestDetail() {
           plain language, the money facts, and the cancellation policy link. */}
       <div className="mx-auto max-w-5xl px-4 pb-14">
         <div className="border-t border-[#0a2225]/15 pt-8">
-          <h2 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+          <h2 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">
             {request.hireOnTrip ? "How this works, start to finish" : "How it works"}
           </h2>
           <div className="mt-8 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
@@ -828,29 +828,29 @@ export default function TripRequestDetail() {
                   {["I.", "II.", "III.", "IV.", "V.", "VI.", "VII."][i]}
                 </p>
                 <p className="mt-1.5 font-secondary text-[19px] text-[#0a2225]">{step.t}</p>
-                <p className="mt-2 text-[15px] leading-[1.75] text-[#0a2225]/75">{step.b}</p>
+                <p className="mt-2 text-[16px] leading-[1.75] text-[#0a2225]/75">{step.b}</p>
               </div>
             ))}
           </div>
 
           {/* The money, at a glance */}
           <div className="mt-11 border-t border-[#0a2225]/15 pt-7">
-            <h3 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">The money, at a glance</h3>
+            <h3 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">The money, at a glance</h3>
             <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
               <div className="border-t border-[#0a2225]/15 pt-3">
-                <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Deposit</p>
+                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Deposit</p>
                 <p className="font-secondary text-[17px] text-[#0a2225]">25% at acceptance, held in escrow</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
-                <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Balance</p>
+                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Balance</p>
                 <p className="font-secondary text-[17px] text-[#0a2225]">Due before departure, also into escrow</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
-                <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Your payout</p>
+                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Your payout</p>
                 <p className="font-secondary text-[17px] text-[#0a2225]">96.5% of your price, released after the trip is confirmed</p>
               </div>
             </div>
-            <p className="mt-7 text-[15px] leading-relaxed text-[#0a2225]/75">
+            <p className="mt-7 text-[16px] leading-relaxed text-[#0a2225]/75">
               Plans change {"\u2014"} cancellations and refunds follow the Goldsainte policy, which
               protects both sides of every booking.{" "}
               <Link
@@ -870,7 +870,7 @@ export default function TripRequestDetail() {
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-3">
             {(request.budgetMin > 0 || request.budgetMax > 0) && (
               <div className="min-w-0">
-                <p className="text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
                   {request.hireOnTrip ? "Estimate" : "Budget"}
                 </p>
                 <p className="font-secondary text-[16px] text-[#0a2225] truncate">
@@ -883,7 +883,7 @@ export default function TripRequestDetail() {
             <button
               type="button"
               onClick={handleSubmitProposal}
-              className="inline-flex items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] min-h-[44px]"
+              className="inline-flex items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] min-h-[44px]"
             >
               {request.hireOnTrip ? "Reply With Proposal" : "Submit Proposal"}
             </button>
