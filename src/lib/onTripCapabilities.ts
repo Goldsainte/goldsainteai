@@ -46,3 +46,68 @@ export function capHint(id: string): string | undefined {
 export function isCapabilityId(v: string): boolean {
   return byId.has(v);
 }
+
+
+// ---------------------------------------------------------------------------
+// PROPOSAL FIELDS — the questions a hire proposal asks, PER CAPABILITY.
+// This is what makes a content-creation reply ask content questions and a
+// photography reply ask photography questions. Founder-editable: add/remove
+// fields here and the hire composer updates everywhere.
+// ---------------------------------------------------------------------------
+export interface ProposalField {
+  id: string;
+  label: string;
+  type: "number" | "text" | "select";
+  options?: string[];
+  placeholder?: string;
+  suffix?: string; // e.g. "days", "sessions"
+}
+
+export const CAPABILITY_PROPOSAL_FIELDS: Record<string, ProposalField[]> = {
+  content: [
+    { id: "photos", label: "Edited photos delivered", type: "number", placeholder: "200" },
+    { id: "videos", label: "Videos / reels delivered", type: "number", placeholder: "5" },
+    { id: "delivery_days", label: "Delivery after the trip", type: "number", placeholder: "10", suffix: "days" },
+    { id: "usage", label: "Usage rights", type: "select", options: ["Personal use only", "Personal + my social channels", "Full commercial rights"] },
+  ],
+  photography: [
+    { id: "sessions", label: "Dedicated shoot sessions", type: "number", placeholder: "4" },
+    { id: "edited_images", label: "Edited images delivered", type: "number", placeholder: "150" },
+    { id: "locations", label: "Shoot locations", type: "text", placeholder: "Colosseum at dawn, Trastevere\u2026" },
+    { id: "delivery_days", label: "Delivery after the trip", type: "number", placeholder: "14", suffix: "days" },
+  ],
+  guide: [
+    { id: "coverage", label: "Guiding coverage", type: "select", options: ["Full days", "Half days", "Flexible / on-call"] },
+  ],
+  host: [
+    { id: "coverage", label: "Hosting coverage", type: "select", options: ["Full days", "Half days", "Flexible / on-call"] },
+    { id: "handles", label: "What I'll handle", type: "text", placeholder: "Reservations, replanning, the ground game" },
+  ],
+  translator: [
+    { id: "coverage", label: "Translation coverage", type: "select", options: ["Throughout the day", "Key moments only"] },
+  ],
+  driver: [
+    { id: "vehicle", label: "Vehicle", type: "text", placeholder: "Mercedes V-Class, seats 6" },
+    { id: "coverage", label: "Driving coverage", type: "select", options: ["Full days", "Airport + day trips"] },
+  ],
+  family: [
+    { id: "ages", label: "Children's ages", type: "text", placeholder: "4 and 7" },
+    { id: "hours", label: "Hours per day", type: "number", placeholder: "6", suffix: "hrs/day" },
+  ],
+  companion: [],
+  coach: [
+    { id: "skill", label: "Skill", type: "text", placeholder: "Surfing" },
+    { id: "sessions", label: "Coaching sessions", type: "number", placeholder: "6" },
+  ],
+  food: [
+    { id: "experiences", label: "Food & wine experiences led", type: "number", placeholder: "5" },
+    { id: "focus", label: "Focus", type: "text", placeholder: "Roman trattorias, natural wine" },
+  ],
+  shopping: [
+    { id: "focus", label: "Shopping focus", type: "text", placeholder: "Vintage, ateliers, markets" },
+  ],
+  occasion: [
+    { id: "occasion", label: "The occasion", type: "text", placeholder: "Proposal at sunset" },
+    { id: "scope", label: "What I'll produce", type: "text", placeholder: "Location, florist, photographer, timing" },
+  ],
+};
