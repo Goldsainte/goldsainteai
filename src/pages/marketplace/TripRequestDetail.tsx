@@ -433,15 +433,15 @@ export default function TripRequestDetail() {
       </div>
 
       {/* ===================== TWO-COLUMN BODY ===================== */}
-      <div className="mx-auto max-w-5xl px-4 py-8 md:py-10">
+      <div className="mx-auto max-w-5xl px-4 py-7 md:py-9">
         <div className="flex flex-col gap-10 lg:flex-row">
 
           {/* ===== MAIN COLUMN ===== */}
-          <div className="flex-1 min-w-0 space-y-8">
+          <div className="flex-1 min-w-0 space-y-7">
 
             {/* Traveler identity — inline, not a card */}
             {travelerProfile && (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 border-b border-[#0a2225]/10 pb-5">
                 <Avatar className="h-11 w-11">
                   {travelerProfile.avatar_url ? (
                     <AvatarImage src={travelerProfile.avatar_url} alt={travelerName} />
@@ -460,6 +460,51 @@ export default function TripRequestDetail() {
                     )}
                   </p>
                 </div>
+              </div>
+            )}
+
+            {/* The engagement — hire requests carry their scope in the MAIN
+                column so the page reads as a dense brief, not an empty field
+                with a busy rail (founder: "Big Tech" density). */}
+            {request.hireOnTrip && (
+              <div>
+                <h2 className="mb-4 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
+                  <div className="border-t border-[#0a2225]/15 pt-3">
+                    <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Listed rate</p>
+                    <p className="font-secondary text-[15.5px] text-[#0a2225]">
+                      {request.hireDayRate ? `$${request.hireDayRate.toLocaleString()}/day` : "By proposal"}
+                    </p>
+                  </div>
+                  {request.hireTripDays ? (
+                    <div className="border-t border-[#0a2225]/15 pt-3">
+                      <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">On-trip days</p>
+                      <p className="font-secondary text-[15.5px] text-[#0a2225]">{request.hireTripDays} days</p>
+                    </div>
+                  ) : null}
+                  {request.budgetMax > 0 && (
+                    <div className="border-t border-[#0a2225]/15 pt-3">
+                      <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Working estimate</p>
+                      <p className="font-secondary text-[15.5px] text-[#0a2225]">{"\u2248"} {formatCurrency(request.budgetMax)}</p>
+                    </div>
+                  )}
+                  <div className="border-t border-[#0a2225]/15 pt-3">
+                    <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Final total</p>
+                    <p className="font-secondary text-[15.5px] text-[#0a2225]">Set by your proposal</p>
+                  </div>
+                </div>
+                {(request.hireCapabilities?.length ?? 0) > 0 && (
+                  <div className="mt-5">
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Hired for</p>
+                    <div className="flex flex-wrap gap-2">
+                      {request.hireCapabilities!.map((id: string) => (
+                        <span key={id} className="inline-flex h-8 items-center rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-3.5 text-[13px] font-medium text-[#0a2225]">
+                          {capLabel(id)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -483,11 +528,11 @@ export default function TripRequestDetail() {
             {tripDetailsGrid.length > 0 && (
               <div>
                 <h2 className="mb-5 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip Details</h2>
-                <div className="grid grid-cols-2 gap-x-10 gap-y-5 md:grid-cols-3">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                   {tripDetailsGrid.map((row, i) => (
-                    <div key={i} className="border-b border-[#0a2225]/10 pb-3.5">
-                      <p className="mb-1 text-[11px] uppercase tracking-[0.12em] text-[#0a2225]/45">{row.label}</p>
-                      <p className="font-secondary text-[16px] capitalize text-[#0a2225]">{row.value}</p>
+                    <div key={i} className="border-t border-[#0a2225]/15 pt-3">
+                      <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">{row.label}</p>
+                      <p className="font-secondary text-[15.5px] capitalize text-[#0a2225]">{row.value}</p>
                     </div>
                   ))}
                 </div>
@@ -661,18 +706,6 @@ export default function TripRequestDetail() {
                   </div>
                 )}
 
-                {request.hireOnTrip && (request.hireCapabilities?.length ?? 0) > 0 && (
-                  <div className="mb-6">
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Hired for</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {request.hireCapabilities!.map((id: string) => (
-                        <span key={id} className="inline-flex h-7 items-center rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 text-[11px] font-medium text-[#0a2225]">
-                          {capLabel(id)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 {!isRequestOwner && request.status === "open" && (
                   <>
                     <button
@@ -766,9 +799,13 @@ export default function TripRequestDetail() {
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-3">
             {(request.budgetMin > 0 || request.budgetMax > 0) && (
               <div className="min-w-0">
-                <p className="text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">Budget</p>
+                <p className="text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  {request.hireOnTrip ? "Estimate" : "Budget"}
+                </p>
                 <p className="font-secondary text-[16px] text-[#0a2225] truncate">
-                  {formatCurrency(request.budgetMin)} – {formatCurrency(request.budgetMax)}
+                  {request.hireOnTrip
+                    ? `\u2248 ${formatCurrency(request.budgetMax)}`
+                    : `${formatCurrency(request.budgetMin)} \u2013 ${formatCurrency(request.budgetMax)}`}
                 </p>
               </div>
             )}
@@ -777,7 +814,7 @@ export default function TripRequestDetail() {
               onClick={handleSubmitProposal}
               className="inline-flex items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] min-h-[44px]"
             >
-              Submit Proposal
+              {request.hireOnTrip ? "Reply With Proposal" : "Submit Proposal"}
             </button>
           </div>
         </div>
