@@ -52,11 +52,18 @@ import {
 type AccountType = "traveler" | "creator" | "agent" | "admin" | null;
 
 function formatMoney(amount: number | null | undefined, currency = "USD") {
-  if (!amount) return "—";
+  if (amount == null) return "\u2014";
+  // Cents matter at the money moment: a $2.50 deposit must never read "$3".
+  const whole = Number.isInteger(amount);
   try {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: whole ? 0 : 2,
+      maximumFractionDigits: whole ? 0 : 2,
+    }).format(amount);
   } catch {
-    return `${currency} ${amount.toFixed(0)}`;
+    return `${currency} ${amount.toFixed(whole ? 0 : 2)}`;
   }
 }
 
