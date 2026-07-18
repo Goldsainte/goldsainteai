@@ -51,11 +51,16 @@ export function BookingConversation({
     }
     try {
       const [p1, p2] = [user.id, recipientId].sort();
-      const { data: convo } = await supabase
+      // Booking-scoped thread (dm_conversations.booking_id, migration 205):
+      // this page only ever loads THE thread for this booking. The pair's
+      // general/inquiry history stays in the inbox — no more cross-booking
+      // leakage. Cast: booking_id postdates the generated types.
+      const { data: convo } = await (supabase as any)
         .from("dm_conversations")
         .select("id")
         .eq("participant_1", p1)
         .eq("participant_2", p2)
+        .eq("booking_id", bookingId)
         .maybeSingle();
 
       if (convo?.id) {
@@ -77,7 +82,7 @@ export function BookingConversation({
     } finally {
       setLoading(false);
     }
-  }, [user, recipientId]);
+  }, [user, recipientId, bookingId]);
 
   useEffect(() => {
     loadThread();
@@ -116,6 +121,9 @@ export function BookingConversation({
           recipientId,
           message: text,
           conversationId: conversationId ?? undefined,
+          // Scopes the thread to this booking (v2.0 edge fn verifies
+          // membership and derives the recipient + label server-side).
+          bookingId,
         },
       });
       if (error) throw error;
@@ -185,7 +193,7 @@ export function BookingConversation({
 
       {!loading && !hasMessages && (
         <p className="text-sm italic text-[#0a2225]/50 mb-4">
-          No messages yet — start the conversation. It'll appear in your inbox too.
+          No messages yet for this booking — start the conversation. It'll appear in your inbox too.
         </p>
       )}
 
