@@ -159,7 +159,7 @@ export function CreatorAffiliateTab() {
 
       <div className="border-t border-[#0a2225]/15 pt-6">
         <h3 className="mb-1 font-secondary text-lg text-[#0a2225]">Generate referral link</h3>
-        <p className="mb-3 text-sm text-[#6B7280]">
+        <p className="mb-3 text-[16px] text-[#6B7280]">
           Earn 10% of platform commission on every booking driven through your link.
         </p>
         <Input
@@ -176,33 +176,33 @@ export function CreatorAffiliateTab() {
               className="flex items-center justify-between rounded-xl border border-[#E5DFC6] bg-white p-3 text-left transition hover:border-[#0c4d47]"
             >
               <div>
-                <p className="line-clamp-1 text-sm text-[#0a2225]">{p.title}</p>
-                <p className="text-[11px] uppercase tracking-wider text-[#7A7151]">{p.kind}</p>
+                <p className="line-clamp-1 text-[16px] text-[#0a2225]">{p.title}</p>
+                <p className="text-[14px] uppercase tracking-wider text-[#7A7151]">{p.kind}</p>
               </div>
               <Link2 className="h-4 w-4 text-[#0c4d47]" />
             </button>
           ))}
           {filtered.length === 0 && (
-            <p className="col-span-full text-sm text-[#6B7280]">No products match.</p>
+            <p className="col-span-full text-[16px] text-[#6B7280]">No products match.</p>
           )}
         </div>
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your referral links</h3>
+        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your referral links</h3>
         {loading ? (
-          <p className="text-sm text-[#7A7151]">Loading…</p>
+          <p className="text-[16px] text-[#7A7151]">Loading…</p>
         ) : links.length === 0 ? (
-          <p className="text-sm text-[#6B7280]">You haven't created any links yet.</p>
+          <p className="text-[16px] text-[#6B7280]">You haven't created any links yet.</p>
         ) : (
           <ul className="divide-y divide-[#E5DFC6]/60">
             {links.map((l) => (
               <li key={l.id} className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-[#0a2225]">{l.product_name}</p>
-                  <p className="truncate font-mono text-[11px] text-[#6B7280]">{l.product_url}</p>
+                  <p className="truncate text-[16px] font-medium text-[#0a2225]">{l.product_name}</p>
+                  <p className="truncate font-mono text-[14px] text-[#6B7280]">{l.product_url}</p>
                 </div>
-                <div className="flex items-center gap-3 text-[12px] text-[#7A7151]">
+                <div className="flex items-center gap-3 text-[15px] text-[#7A7151]">
                   <span>{l.clicks ?? 0} clicks</span>
                   <span>·</span>
                   <span>{l.conversions ?? 0} sales</span>
@@ -224,18 +224,18 @@ export function CreatorAffiliateTab() {
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent commissions</h3>
+        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent commissions</h3>
         {commissions.length === 0 ? (
-          <p className="text-sm text-[#6B7280]">No commissions yet.</p>
+          <p className="text-[16px] text-[#6B7280]">No commissions yet.</p>
         ) : (
           <ul className="divide-y divide-[#E5DFC6]/60">
             {commissions.map((c) => (
-              <li key={c.id} className="flex items-center justify-between py-2 text-sm">
+              <li key={c.id} className="flex items-center justify-between py-2 text-[16px]">
                 <span className="text-[#7A7151]">{new Date(c.created_at).toLocaleDateString()}</span>
                 <span className="text-[#0a2225]">
                   {c.currency} {Number(c.commission_amount).toFixed(2)}
                 </span>
-                <span className="rounded-full bg-[#FDF9F0] px-2 py-0.5 text-[11px] uppercase tracking-wider text-[#0c4d47]">
+                <span className="rounded-full bg-[#FDF9F0] px-2 py-0.5 text-[14px] uppercase tracking-wider text-[#0c4d47]">
                   {c.status}
                 </span>
               </li>
@@ -245,14 +245,14 @@ export function CreatorAffiliateTab() {
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Earnings by product</h3>
+        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Earnings by product</h3>
         {productBreakdown.length === 0 ? (
-          <p className="text-sm text-[#6B7280]">No referral activity yet.</p>
+          <p className="text-[16px] text-[#6B7280]">No referral activity yet.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-[16px]">
               <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider text-[#7A7151]">
+                <tr className="text-left text-[14px] uppercase tracking-wider text-[#7A7151]">
                   <th className="py-2 pr-3 font-normal">Product</th>
                   <th className="py-2 pr-3 text-right font-normal">Clicks</th>
                   <th className="py-2 pr-3 text-right font-normal">Conversions</th>
@@ -280,7 +280,7 @@ export function CreatorAffiliateTab() {
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="border-t border-[#0a2225]/15 pt-5">
-      <div className="mb-1 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[#7A7151]">
+      <div className="mb-1 flex items-center gap-1.5 text-[14px] uppercase tracking-wider text-[#7A7151]">
         {icon}
         {label}
       </div>
