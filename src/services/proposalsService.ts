@@ -236,7 +236,16 @@ export async function acceptProposal(proposalId: string) {
 
   if (error) {
     console.error("Error accepting proposal", error);
-    throw new Error("We couldn't accept this proposal just now.");
+    // Surface the REAL reason (RAISE messages from accept_proposal_rpc arrive
+    // in error.message). A generic platitude at the money moment hides the
+    // one fact needed to fix it.
+    const detail =
+      (error as any)?.message || (error as any)?.details || (error as any)?.hint || "";
+    throw new Error(
+      detail
+        ? `We couldn't accept this proposal: ${detail}`
+        : "We couldn't accept this proposal just now."
+    );
   }
 
   return data as { booking_id: string };
