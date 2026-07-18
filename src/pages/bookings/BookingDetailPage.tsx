@@ -538,7 +538,7 @@ export default function BookingDetailPage() {
   // balance both land there). Bookings from before that tracking existed
   // won't have it — for those, a confirmed booking means the deposit was
   // paid. paid_in_full / completed always mean the full total.
-  const collected = Number((booking?.metadata as any)?.amount_collected ?? 0) / 100; // webhook writes cents
+  const collected = Number((booking?.metadata as any)?.amount_collected ?? 0); // fee-stripped DOLLARS (payoutMath boundary standard) — dividing by 100 here is what showed $0.03 for a $2.50 deposit
   const amountPaid =
     booking?.status === "paid_in_full" || booking?.status === "completed"
       ? total
