@@ -517,7 +517,7 @@ export function DirectMessageInbox() {
               placeholder="Search"
               aria-label="Search messages"
               style={{ fontFamily: "Inter, sans-serif" }}
-              className="w-full rounded-xl border-0 bg-[#F2F0EA] py-2.5 pl-10 pr-4 text-[15px] text-[#0a2225] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#C7A962]/50"
+              className="w-full rounded-xl border-0 bg-[#F2F0EA] py-2.5 pl-10 pr-4 text-[16px] text-[#0a2225] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#C7A962]/50"
             />
           </div>
         </div>
@@ -535,7 +535,7 @@ export function DirectMessageInbox() {
               key={t.key}
               onClick={() => setActiveTab(t.key)}
               aria-pressed={activeTab === t.key}
-              className={`px-1 py-1.5 text-[15px] transition-colors ${
+              className={`px-1 py-1.5 text-[16px] transition-colors ${
                 activeTab === t.key
                   ? "font-bold text-[#0a2225]"
                   : "font-medium text-[#0a2225]/45 hover:text-[#0a2225]/70"
@@ -561,7 +561,7 @@ export function DirectMessageInbox() {
                       ? "Nothing in General"
                       : "No conversations yet"}
                   </p>
-                  <p className="text-sm text-[#5a6c6e] mt-2 max-w-[220px] mx-auto leading-relaxed">
+                  <p className="text-[15px] text-[#5a6c6e] mt-2 max-w-[220px] mx-auto leading-relaxed">
                     {activeTab === "primary" 
                       ? "Start a conversation with a creator or travel agent"
                       : activeTab === "requests"
@@ -632,7 +632,7 @@ export function DirectMessageInbox() {
                       <Shield className="h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
                     )}
                   </div>
-                  <span className="text-xs text-[#5a6c6e] capitalize">
+                  <span className="text-[13px] text-[#5a6c6e] capitalize">
                     {selectedConversation.otherParticipant.accountType === "travel_agent"
                       ? "Certified Travel Agent"
                       : selectedConversation.otherParticipant.accountType === "creator"
@@ -640,7 +640,7 @@ export function DirectMessageInbox() {
                       : selectedConversation.otherParticipant.accountType || "Member"}
                   </span>
                   {selectedConversation.tripTitle && (
-                    <p className="truncate text-[10px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                    <p className="truncate text-[12px] uppercase tracking-[0.18em] text-[#8D6B2F]">
                       {selectedConversation.tripTitle}
                     </p>
                   )}
@@ -704,7 +704,7 @@ export function DirectMessageInbox() {
             {/* Request Banner */}
             {isRequest && (
               <div className="p-5 bg-[#F6F0E4]/60 border-b border-[#E5DFC6]/40 transition-all duration-200">
-                <div className="flex items-center gap-2.5 text-sm mb-4">
+                <div className="flex items-center gap-2.5 text-[15px] mb-4">
                   <Shield className="h-4 w-4 text-[#C7A962] flex-shrink-0" />
                   <span className="text-[#0a2225]">
                     This member would like to connect with you. Accept to begin the conversation.
@@ -754,7 +754,7 @@ export function DirectMessageInbox() {
               ) : messages.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="font-secondary text-[#0a2225] text-base">No messages yet</p>
-                  <p className="text-sm text-[#5a6c6e] mt-2">
+                  <p className="text-[15px] text-[#5a6c6e] mt-2">
                     Say hello to start the conversation
                   </p>
                 </div>
@@ -764,7 +764,7 @@ export function DirectMessageInbox() {
                     <div key={gi}>
                       {/* Date separator */}
                       <div className="flex items-center justify-center my-5">
-                        <span className="text-[11px] text-[#9CA3AF] bg-white px-3 font-medium tracking-wide uppercase">
+                        <span className="text-[12.5px] text-[#9CA3AF] bg-white px-3 font-medium tracking-wide uppercase">
                           {formatDateLabel(group.date)}
                         </span>
                       </div>
@@ -805,7 +805,7 @@ export function DirectMessageInbox() {
                   ))}
                   {otherTyping && (
                     <div className="flex justify-start">
-                      <div className="bg-[#F6F0E4] rounded-[1.25rem] px-4 py-3 text-sm text-[#5a6c6e] italic">
+                      <div className="bg-[#F6F0E4] rounded-[1.25rem] px-4 py-3 text-[15px] text-[#5a6c6e] italic">
                         typing…
                       </div>
                     </div>
@@ -832,7 +832,7 @@ export function DirectMessageInbox() {
                     {pendingAttachments.map((att) => (
                       <span
                         key={att.path}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FDFBF7] px-3 py-1.5 text-xs text-[#0a2225]"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-[#FDFBF7] px-3 py-1.5 text-[13px] text-[#0a2225]"
                       >
                         <FileTextIcon className="h-3.5 w-3.5 text-[#C7A962]" />
                         <span className="max-w-[160px] truncate">{att.name}</span>
@@ -897,7 +897,7 @@ export function DirectMessageInbox() {
                       title="Send a Proposal"
                     >
                       <HandCoins className="h-4 w-4 md:mr-1" />
-                      <span className="hidden md:inline text-xs">Send a Proposal</span>
+                      <span className="hidden md:inline text-[13px]">Send a Proposal</span>
                     </Button>
                   )}
                   <Input
@@ -912,7 +912,7 @@ export function DirectMessageInbox() {
                     type="submit" 
                     disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
                     variant="ghost"
-                    className="rounded-full px-4 h-11 text-[15px] font-semibold text-[#0c4d47] hover:bg-transparent hover:text-[#0a2225] disabled:opacity-0"
+                    className="rounded-full px-4 h-11 text-[16px] font-semibold text-[#0c4d47] hover:bg-transparent hover:text-[#0a2225] disabled:opacity-0"
                   >
                     Send
                   </Button>
@@ -924,7 +924,7 @@ export function DirectMessageInbox() {
           <div className="flex-1 flex items-center justify-center bg-white">
             <div className="text-center max-w-xs">
               <h3 className="font-secondary text-xl text-[#0a2225] mb-2">Your conversations</h3>
-              <p className="text-sm text-[#5a6c6e] leading-relaxed">
+              <p className="text-[15px] text-[#5a6c6e] leading-relaxed">
                 Pick up where you left off, or start something new.
               </p>
             </div>
@@ -996,20 +996,20 @@ function ConversationItem({
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0" style={{ fontFamily: "Inter, sans-serif" }}>
-            <p className={`truncate text-[15px] leading-5 ${unread ? "font-semibold text-[#0a2225]" : "font-normal text-[#0a2225]"}`}>
+            <p className={`truncate text-[16px] leading-5 ${unread ? "font-semibold text-[#0a2225]" : "font-normal text-[#0a2225]"}`}>
               {conversation.otherParticipant.displayName}
             </p>
             {conversation.tripTitle && (
-              <p className="truncate text-[10px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+              <p className="truncate text-[12px] uppercase tracking-[0.18em] text-[#8D6B2F]">
                 {conversation.tripTitle}
               </p>
             )}
             <div className="mt-0.5 flex items-baseline min-w-0">
-              <p className={`truncate text-[14px] leading-5 ${unread ? "font-medium text-[#0a2225]" : "text-[#6B7280]"}`}>
+              <p className={`truncate text-[15px] leading-5 ${unread ? "font-medium text-[#0a2225]" : "text-[#6B7280]"}`}>
                 {conversation.lastMessagePreview || "No messages yet"}
               </p>
               {conversation.lastMessageAt && (
-                <span className="shrink-0 whitespace-pre text-[14px] leading-5 text-[#6B7280]"> · {compactTime(conversation.lastMessageAt)}</span>
+                <span className="shrink-0 whitespace-pre text-[15px] leading-5 text-[#6B7280]"> · {compactTime(conversation.lastMessageAt)}</span>
               )}
             </div>
           </div>
@@ -1176,7 +1176,7 @@ function MessageBubble({
                   e.stopPropagation();
                   onOpenAttachment?.(att);
                 }}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#C7A962]/40 bg-white/60 px-2.5 py-1.5 text-left text-[13px] text-[#0c4d47] hover:bg-white"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#C7A962]/40 bg-white/60 px-2.5 py-1.5 text-left text-[14.5px] text-[#0c4d47] hover:bg-white"
                 title={`Open ${att.name}`}
               >
                 <FileTextIcon className="h-4 w-4 shrink-0 text-[#C7A962]" />
@@ -1237,7 +1237,7 @@ function MessageBubble({
               key={emoji}
               onClick={() => toggleReaction(emoji)}
               className={cn(
-                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition-colors",
+                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[13px] border transition-colors",
                 info.mine
                   ? "bg-[#FDF9F0] border-[#C7A962]/60 text-[#0a2225]"
                   : "bg-white border-[#E5DFC6] text-[#5a6c6e] hover:bg-[#F6F0E4]"
