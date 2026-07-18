@@ -114,7 +114,7 @@ export function CreatorProposalsTab() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {rows.map((r) => {
         const submitted = new Date(r.created_at).toLocaleDateString("en-US", {
           month: "short",
@@ -129,7 +129,7 @@ export function CreatorProposalsTab() {
           >
             {/* Photo IS the card — same destination imagery as the
                 marketplace request cards, gradient beneath as fallback */}
-            <div className="relative h-44 overflow-hidden md:h-48">
+            <div className="relative aspect-[4/3] overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
                 <span className="font-secondary text-xl italic text-[#C7A962]/80">
                   {r.trip_request?.destination || "Goldsainte"}
@@ -156,7 +156,7 @@ export function CreatorProposalsTab() {
                     {r.trip_request.title}
                   </p>
                 )}
-                <p className="mt-1.5 font-secondary text-[21px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
+                <p className="mt-1 font-secondary text-[17px] leading-[1.15] text-[#fdfaf2] line-clamp-2">
                   {r.headline || "Untitled proposal"}
                 </p>
                 <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
@@ -166,7 +166,7 @@ export function CreatorProposalsTab() {
             </div>
 
             {/* Slim footer strip */}
-            <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center justify-between px-4 py-3">
               <span className="text-[11.5px] text-[#0a2225]/50">
                 {typeof r.price_from === "number"
                   ? `from $${Number(r.price_from).toLocaleString()}`
