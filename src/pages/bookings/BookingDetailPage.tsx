@@ -495,8 +495,8 @@ export default function BookingDetailPage() {
   }
 
   const currency = booking?.currency || "USD";
-  const total = booking?.total_price ?? 0;
-  const deposit = booking?.deposit_amount ?? 0;
+  const total = (booking?.total_price ?? 0) / 100; // column stores cents
+  const deposit = (booking?.deposit_amount ?? 0) / 100;
   const balance = Math.max(0, total - deposit);
   const reference = booking ? `GS-${booking.id.slice(0, 8).toUpperCase()}` : "";
   const title =
@@ -522,7 +522,7 @@ export default function BookingDetailPage() {
   // balance both land there). Bookings from before that tracking existed
   // won't have it — for those, a confirmed booking means the deposit was
   // paid. paid_in_full / completed always mean the full total.
-  const collected = Number((booking?.metadata as any)?.amount_collected ?? 0);
+  const collected = Number((booking?.metadata as any)?.amount_collected ?? 0) / 100; // webhook writes cents
   const amountPaid =
     booking?.status === "paid_in_full" || booking?.status === "completed"
       ? total
