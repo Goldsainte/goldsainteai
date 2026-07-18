@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { HireProposalComposer } from "@/components/proposals/HireProposalComposer";
 import { capLabel } from "@/lib/onTripCapabilities";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -685,6 +686,23 @@ export default function NewProposalPage() {
   const priceVsBudget = budgetMid && typeof priceFrom === "number" && priceFrom > 0
     ? priceFrom <= (tripData.budget_max || Infinity) ? "within" : "above"
     : null;
+
+  // Hires get their own composer — capability-tailored questions, same
+  // proposal row, zero itinerary machinery. The wizard remains untouched
+  // for ordinary marketplace proposals. (Edits of existing proposals still
+  // open the wizard for now.)
+  if (isHire && !editId && tripData && user) {
+    return (
+      <HireProposalComposer
+        tripData={tripData}
+        userId={user.id}
+        hireCaps={hireCaps}
+        hireRate={hireRate}
+        hireDays={hireDays}
+        hireEstimate={hireEstimate}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f3ea] text-[#0a2225] flex flex-col">
