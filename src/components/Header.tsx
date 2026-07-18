@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText, Compass, Globe } from "lucide-react";
+import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText, Compass, Globe, Send } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
@@ -273,6 +273,13 @@ export const Header = () => {
                             >
                               <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/my-trip-requests')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">My Requests</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/following')}
@@ -697,6 +704,13 @@ export const Header = () => {
                             <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                             <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
                           </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate('/my-trip-requests')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                            >
+                              <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">My Requests</span>
+                            </DropdownMenuItem>
                           {(isAgentAccount || isCreator || isAdmin || isBrand) && (
                             <DropdownMenuItem
                               onClick={() => navigate('/partner-bookings')}
