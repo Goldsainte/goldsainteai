@@ -52,6 +52,15 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         "Travelers book it directly — no proposal needed, you wake up to bookings.",
       ],
     },
+    {
+      n: "03",
+      title: "Get hired on-trip",
+      steps: [
+        "Declare what you can do — content, guiding, hosting — and set your day rate.",
+        "Travelers hire you onto their own trip: their dates, your named scope.",
+        "You confirm the total; escrow releases your payout after the trip.",
+      ],
+    },
   ];
   const romans = ["i.", "ii.", "iii."];
 
@@ -106,10 +115,10 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
           How Goldsainte works for creators
         </p>
         <h2 className="mt-3 font-secondary text-3xl md:text-4xl text-[#0a2225]">
-          Two ways to earn
+          Three ways to earn
         </h2>
 
-        <div className="mt-7 grid grid-cols-1 gap-y-10 gap-x-12 md:grid-cols-2">
+        <div className="mt-7 grid grid-cols-1 gap-y-10 gap-x-12 md:grid-cols-3">
           {earningPaths.map((path) => (
             <div key={path.n}>
               <p className="font-secondary text-2xl text-[#c7a962]">{path.n}</p>
