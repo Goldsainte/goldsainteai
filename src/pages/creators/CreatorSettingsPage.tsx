@@ -18,10 +18,10 @@ import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 // Route: /creator-settings — Header sends creators' Account Settings here.
 // ============================================================================
 
-const label = "block text-[15px] font-semibold text-[#0a2225]";
-const hint = "mt-1 text-[13px] text-[#6B7280]";
+const label = "block text-[16px] font-semibold text-[#0a2225]";
+const hint = "mt-1 text-[14.5px] text-[#6B7280]";
 const input =
-  "mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]";
+  "mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[16px] text-[#0a2225] outline-none focus:border-[#C7A962]";
 
 export default function CreatorSettingsPage() {
   const { user } = useAuth();
@@ -293,19 +293,19 @@ export default function CreatorSettingsPage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Creator Settings</h1>
-            <p className="mt-2 text-[15px] text-[#0a2225]/70">
+            <p className="mt-2 text-[16px] text-[#0a2225]/70">
               Everything here appears on your public profile — exactly what travelers see.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {user && (
               <button type="button" onClick={() => navigate(`/creators/${user.id}`)}
-                className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0c4d47] px-3.5 text-[13px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225]">
+                className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#0c4d47] px-3.5 text-[14.5px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225]">
                 <ExternalLink className="h-3.5 w-3.5" /> View public profile
               </button>
             )}
             <button type="button" onClick={() => navigate("/creator-handbook")}
-              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#C7A962]/50 px-3.5 text-[13px] font-medium text-[#8D6B2F] transition-colors hover:bg-white">
+              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#C7A962]/50 px-3.5 text-[14.5px] font-medium text-[#8D6B2F] transition-colors hover:bg-white">
               How it works
             </button>
             <span className="mx-1 hidden h-5 w-px bg-[#E5DFC6] sm:block" />
@@ -316,7 +316,7 @@ export default function CreatorSettingsPage() {
               { label: "Content tools", to: "/creator-dashboard?tab=content" },
             ].map((l) => (
               <button key={l.label} type="button" onClick={() => navigate(l.to)}
-                className="inline-flex h-9 items-center whitespace-nowrap rounded-lg border border-transparent px-3 text-[13px] text-[#0a2225]/70 transition-colors hover:border-[#E5DFC6] hover:bg-white hover:text-[#0a2225]">
+                className="inline-flex h-9 items-center whitespace-nowrap rounded-lg border border-transparent px-3 text-[14.5px] text-[#0a2225]/70 transition-colors hover:border-[#E5DFC6] hover:bg-white hover:text-[#0a2225]">
                 {l.label}
               </button>
             ))}
@@ -326,14 +326,14 @@ export default function CreatorSettingsPage() {
         {/* Profile strength */}
         <section className="mt-8 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6">
           <div className="flex items-baseline justify-between gap-4">
-            <p className="text-[15px] font-semibold text-[#0a2225]">Profile strength</p>
+            <p className="text-[16px] font-semibold text-[#0a2225]">Profile strength</p>
             <p className="font-secondary text-2xl text-[#0c4d47]">{strength}%</p>
           </div>
           <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[#EDE5D1]">
             <div className="h-full rounded-full bg-[#C7A962] transition-all" style={{ width: `${strength}%` }} />
           </div>
           {missing.length > 0 && (
-            <p className="mt-3 text-[13px] text-[#6B7280]">
+            <p className="mt-3 text-[14.5px] text-[#6B7280]">
               To strengthen your profile: {missing.slice(0, 3).join(" · ")}
               {missing.length > 3 ? ` · +${missing.length - 3} more` : ""}
             </p>
@@ -355,7 +355,7 @@ export default function CreatorSettingsPage() {
                 </div>
               )}
               <button type="button" onClick={() => avatarInput.current?.click()} disabled={uploading === "avatar"}
-                className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#0c4d47] underline underline-offset-4">
+                className="mt-3 inline-flex items-center gap-1.5 text-[14.5px] font-medium text-[#0c4d47] underline underline-offset-4">
                 {uploading === "avatar" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
                 Your photo
               </button>
@@ -366,12 +366,12 @@ export default function CreatorSettingsPage() {
               {form.logo_url ? (
                 <img src={form.logo_url} alt="" className="h-36 w-28 rounded-2xl border border-[#E5DFC6] bg-white object-contain p-2" />
               ) : (
-                <div className="flex h-36 w-28 items-center justify-center rounded-2xl border border-dashed border-[#C7B892] bg-white text-[12px] text-[#6B7280]">
+                <div className="flex h-36 w-28 items-center justify-center rounded-2xl border border-dashed border-[#C7B892] bg-white text-[13.5px] text-[#6B7280]">
                   Brand logo
                 </div>
               )}
               <button type="button" onClick={() => logoInput.current?.click()} disabled={uploading === "logo"}
-                className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#0c4d47] underline underline-offset-4">
+                className="mt-3 inline-flex items-center gap-1.5 text-[14.5px] font-medium text-[#0c4d47] underline underline-offset-4">
                 {uploading === "logo" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
                 Brand logo
               </button>
@@ -415,7 +415,7 @@ export default function CreatorSettingsPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-secondary text-2xl text-[#0a2225]">Content</h2>
             <button type="button" onClick={() => navigate("/profile/media")}
-              className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] hover:bg-white">
+              className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[15px] text-[#0a2225] hover:bg-white">
               Manage photos & video →
             </button>
           </div>
@@ -470,7 +470,7 @@ export default function CreatorSettingsPage() {
                   />
                 </div>
                 <button type="button" onClick={addRegion}
-                  className="shrink-0 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] hover:bg-white">
+                  className="shrink-0 rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[15px] text-[#0a2225] hover:bg-white">
                   Add
                 </button>
               </div>
@@ -478,7 +478,7 @@ export default function CreatorSettingsPage() {
                 <div className="mt-3 flex flex-wrap gap-2">
                   {regionList.map((r) => (
                     <button key={r} type="button" onClick={() => removeRegion(r)} title="Remove"
-                      className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[13px] text-[#0a2225] hover:bg-[#C7A962]/35">
+                      className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[14.5px] text-[#0a2225] hover:bg-[#C7A962]/35">
                       {r} ×
                     </button>
                   ))}
@@ -511,7 +511,7 @@ export default function CreatorSettingsPage() {
                   key={c.name}
                   type="button"
                   onClick={() => { toggleCountry(c.name); setCountryQuery(""); }}
-                  className={`rounded-full px-4 py-2 text-[14px] transition-colors ${
+                  className={`rounded-full px-4 py-2 text-[15px] transition-colors ${
                     visited.includes(c.name)
                       ? "bg-[#0c4d47] text-[#f7f3ea]"
                       : "border border-[#E5DFC6] bg-white text-[#0a2225] hover:border-[#C7A962]"
@@ -524,7 +524,7 @@ export default function CreatorSettingsPage() {
           )}
           {visited.length > 0 && (
             <>
-              <p className="mt-5 text-[15px] font-semibold text-[#0a2225]">
+              <p className="mt-5 text-[16px] font-semibold text-[#0a2225]">
                 {visited.length} {visited.length === 1 ? "country" : "countries"}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -534,7 +534,7 @@ export default function CreatorSettingsPage() {
                     type="button"
                     onClick={() => toggleCountry(name)}
                     title="Remove"
-                    className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[13px] text-[#0a2225] hover:bg-[#C7A962]/35"
+                    className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[14.5px] text-[#0a2225] hover:bg-[#C7A962]/35"
                   >
                     {name} ×
                   </button>
@@ -547,23 +547,23 @@ export default function CreatorSettingsPage() {
         {/* Upcoming trips */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <div className="flex items-center justify-between">
-            <h2 className="font-secondary text-2xl text-[#0a2225]">Upcoming trips</h2>
+            <h2 className="font-secondary text-2xl text-[#0a2225]">Where you're headed</h2>
             <button type="button"
               onClick={() => setUpcoming((u) => [...u, { destination: "", timing: "" }])}
-              className="rounded-full border border-[#0a2225]/25 px-4 py-2 text-[13px] text-[#0a2225] hover:bg-white">
-              + Add trip
+              className="rounded-full border border-[#0a2225]/25 px-4 py-2 text-[14.5px] text-[#0a2225] hover:bg-white">
+              + Add a destination
             </button>
           </div>
-          <p className={hint}>Travelers can request to join — every request lands in your trip funnel. Include the year (e.g. "December 2026") so travelers know exactly when.</p>
+          <p className={hint}>Your travel calendar, shown on your profile as "Where you're headed." Travelers can hire you on location for these dates — since you're already going, these are your highest-margin bookings. Include the year (e.g. "December 2026") so dates can line up.</p>
           <div className="mt-4 space-y-3">
             {upcoming.map((t, i) => (
               <div key={i} className="flex flex-col gap-3 md:flex-row">
-                <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]"
+                <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[16px] text-[#0a2225] outline-none focus:border-[#C7A962]"
                   value={t.destination} onChange={(e) => updateUpcoming(i, "destination", e.target.value)} placeholder="Patagonia" />
-                <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962] md:w-44"
+                <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[16px] text-[#0a2225] outline-none focus:border-[#C7A962] md:w-44"
                   value={t.timing} onChange={(e) => updateUpcoming(i, "timing", e.target.value)} placeholder="August 2026" />
                 <button type="button" onClick={() => setUpcoming((u) => u.filter((_, j) => j !== i))}
-                  className="shrink-0 rounded-full border border-[#0a2225]/20 px-3 py-2 text-[12px] text-[#0a2225]/70 hover:bg-white">
+                  className="shrink-0 rounded-full border border-[#0a2225]/20 px-3 py-2 text-[13.5px] text-[#0a2225]/70 hover:bg-white">
                   Remove
                 </button>
               </div>
@@ -574,7 +574,7 @@ export default function CreatorSettingsPage() {
         {/* Collaborations */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <h2 className="font-secondary text-2xl text-[#0a2225]">Work with brands</h2>
-          <label className="mt-5 flex items-center gap-3 text-[15px] text-[#0a2225]">
+          <label className="mt-5 flex items-center gap-3 text-[16px] text-[#0a2225]">
             <input type="checkbox" checked={collab.open}
               onChange={(e) => setCollab((cb) => ({ ...cb, open: e.target.checked }))}
               className="h-5 w-5 accent-[#0c4d47]" />
@@ -594,12 +594,12 @@ export default function CreatorSettingsPage() {
             <div className="mt-2 flex items-center gap-3">
               <button type="button"
                 onClick={() => (document.getElementById("mediakit-input") as HTMLInputElement)?.click()}
-                className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[14px] text-[#0a2225] hover:bg-white">
+                className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[15px] text-[#0a2225] hover:bg-white">
                 Upload media kit (PDF)
               </button>
               {collab.media_kit_url && (
                 <a href={collab.media_kit_url} target="_blank" rel="noopener noreferrer"
-                  className="text-[13px] font-medium text-[#0c4d47] underline underline-offset-4">
+                  className="text-[14.5px] font-medium text-[#0c4d47] underline underline-offset-4">
                   View current
                 </a>
               )}
@@ -619,7 +619,7 @@ export default function CreatorSettingsPage() {
             onChange={(e) => setAiSummary(e.target.value)}
             placeholder="Generate below — then edit to taste and Save." />
           <button type="button" onClick={generateSummary} disabled={summarizing}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-[14px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] disabled:opacity-50">
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-[15px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] disabled:opacity-50">
             {summarizing && <Loader2 className="h-4 w-4 animate-spin" />}
             {summarizing ? "Writing…" : aiSummary ? "Regenerate" : "Generate my AI summary"}
           </button>
@@ -658,7 +658,7 @@ export default function CreatorSettingsPage() {
 
         <div className="mt-8 flex justify-end">
           <button type="button" onClick={save} disabled={saving || uploading !== null}
-            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-10 py-4 text-[15px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225] disabled:opacity-50">
+            className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-10 py-4 text-[16px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225] disabled:opacity-50">
             {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save public profile
           </button>
         </div>
