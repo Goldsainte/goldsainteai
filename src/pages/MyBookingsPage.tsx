@@ -291,8 +291,7 @@ function BookingCard({
             src={trip!.cover_image_url!}
             alt={title}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-          />
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" onError={(e) => { e.currentTarget.style.display = "none"; }} />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
             <span className="font-secondary text-xl italic text-[#C7A962]/80">
