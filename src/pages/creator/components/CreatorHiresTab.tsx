@@ -103,7 +103,7 @@ export function CreatorHiresTab() {
                   ? `\u2248 $${Number(r.budget_max).toLocaleString()}`
                   : r.status ?? ""}
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[#0c4d47] transition-colors group-hover:text-[#0a2225]">
+              <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#0c4d47] transition-colors group-hover:text-[#0a2225]">
                 View request →
               </span>
             </div>
