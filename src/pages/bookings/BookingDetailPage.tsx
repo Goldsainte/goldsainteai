@@ -53,14 +53,17 @@ type TripRow = {
 function formatMoney(amount: number | null | undefined, currency?: string | null) {
   if (amount == null) return "—";
   const cur = currency || "USD";
+  // Show cents when they exist: a $562.50 deposit must read $562.50, not $563.
+  const whole = Number.isInteger(amount);
   try {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: cur,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: whole ? 0 : 2,
+      maximumFractionDigits: whole ? 0 : 2,
     }).format(amount);
   } catch {
-    return `${cur} ${amount.toFixed(0)}`;
+    return `${cur} ${amount.toFixed(whole ? 0 : 2)}`;
   }
 }
 
@@ -443,29 +446,35 @@ export default function BookingDetailPage() {
 
   const [payingBalance, setPayingBalance] = useState(false);
   const [contractGate, setContractGate] = useState<{ contractId: string | null } | null>(null);
+  const [payError, setPayError] = useState<string | null>(null);
 
   async function handlePayBalance() {
     if (!booking || payingBalance) return;
     // Unpaid booking (e.g. arrived via a signed contract's "Continue to
     // deposit") → collect the DEPOSIT; confirmed booking → collect the balance.
     const isDepositStage = booking.status !== "confirmed";
-    const balanceDue = isDepositStage
+    // MONEY IS INTEGER CENTS: deposit_amount / total_price are cents columns.
+    // The old code here treated them as dollars and re-multiplied by 100 —
+    // the exact unit bug behind the $58,218.75 checkout. The server guard
+    // refused those requests, which made this button look dead.
+    const balanceDueCents = isDepositStage
       ? booking.deposit_amount ?? 0
       : Math.max(0, (booking.total_price ?? 0) - (booking.deposit_amount ?? 0));
-    if (balanceDue <= 0) return;
+    if (balanceDueCents <= 0) return;
     setContractGate(null);
+    setPayError(null);
     setPayingBalance(true);
     try {
-      // Traveler-side 3.5% service fee applies to the amount being collected,
-      // mirroring the deposit path. 7% total platform standard.
-      const fee = Math.round(balanceDue * 0.035 * 100) / 100;
-      const chargeTotal = Math.round((balanceDue + fee) * 100) / 100;
+      // Traveler-side 3.5% service fee on the amount collected, computed in
+      // cents — matches the guard's withFee(): Math.round(c * 1.035).
+      const feeCents = Math.round(balanceDueCents * 0.035);
+      const amountTotalCents = balanceDueCents + feeCents;
       const { data, error: fnError } = await supabase.functions.invoke(
         "trip-checkout-create",
         {
           body: {
             tripBookingId: booking.id,
-            amountTotalCents: Math.round(chargeTotal * 100),
+            amountTotalCents,
             currency: (booking.currency || "usd").toLowerCase(),
             // trip-checkout-create appends `&session_id=...`, so the URL must
             // already contain a query string (learned the hard way).
@@ -479,17 +488,24 @@ export default function BookingDetailPage() {
       window.location.href = data.paymentUrl;
     } catch (e: any) {
       console.error("Pay balance failed", e);
+      let msg =
+        "We couldn't start checkout. Please try again — if it persists, contact support.";
       try {
         const resp = e?.context;
         if (resp && typeof resp.json === "function") {
           const body = await resp.json();
           if (body?.code === "CONTRACT_NOT_EXECUTED") {
             setContractGate({ contractId: body.contractId ?? null });
+            setPayingBalance(false);
+            return;
           }
+          if (typeof body?.error === "string" && body.error) msg = body.error;
         }
       } catch {
         /* ignore parse errors */
       }
+      // Never fail silently at the money moment.
+      setPayError(msg);
       setPayingBalance(false);
     }
   }
@@ -738,6 +754,11 @@ export default function BookingDetailPage() {
                           ? "Preparing checkout…"
                           : `Pay balance · ${formatMoney(balance, currency)} + 3.5% fee`}
                       </button>
+                    )}
+                    {payError && (
+                      <p className="mt-3 rounded-2xl border border-[#b3452f]/30 bg-[#b3452f]/5 px-4 py-2.5 text-center text-[12px] leading-relaxed text-[#b3452f]">
+                        {payError}
+                      </p>
                     )}
                     {booking.status === "paid_in_full" && (
                       <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[12px] uppercase tracking-[0.14em] text-[#0a2225]/60">
