@@ -118,11 +118,11 @@ export function CreatorGuidesTab() {
       {/* Sales analytics */}
       <div className="grid grid-cols-2 gap-x-10 mb-8">
         <div className="border-t border-[#0a2225]/15 pt-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Sales</p>
+          <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Sales</p>
           <p className="font-secondary text-[34px] leading-tight text-[#0a2225] mt-1.5">{salesCount}</p>
         </div>
         <div className="border-t border-[#0a2225]/15 pt-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Revenue</p>
+          <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Revenue</p>
           <p className="font-secondary text-[34px] leading-tight text-[#0a2225] mt-1.5">${revenue.toLocaleString()}</p>
         </div>
       </div>
@@ -132,7 +132,7 @@ export function CreatorGuidesTab() {
         <Button
           onClick={() => navigate("/itinerary-builder")}
           size="sm"
-          className="rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white shrink-0 h-9 px-4 text-xs sm:text-sm sm:h-10 sm:px-5"
+          className="rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white shrink-0 h-9 px-4 text-[14.5px] sm:text-[16px] sm:h-10 sm:px-5"
         >
           <Plus className="h-4 w-4 sm:mr-1.5" />
           <span className="hidden sm:inline">Create New Guide</span>
@@ -141,14 +141,14 @@ export function CreatorGuidesTab() {
       </div>
 
       {loading ? (
-        <div className="flex items-center gap-2 text-[#6B7280] text-sm">
+        <div className="flex items-center gap-2 text-[#6B7280] text-[16px]">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading…
         </div>
       ) : guides.length === 0 ? (
         <div className="border-t border-[#0a2225]/15 pt-6">
           <BookOpen className="h-6 w-6 text-[#C7A962]" />
           <p className="mt-3 font-secondary text-[20px] text-[#0a2225]">No guides yet</p>
-          <p className="mt-1 max-w-md text-[15px] leading-relaxed text-[#0a2225]/60">
+          <p className="mt-1 max-w-md text-[16px] leading-relaxed text-[#0a2225]/60">
             Package your travel knowledge into a sellable digital guide.
           </p>
         </div>
@@ -167,14 +167,14 @@ export function CreatorGuidesTab() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-[#0a2225] truncate">{g.title || "Untitled"}</p>
-                <p className="text-xs text-[#6B7280] mt-0.5 truncate">{g.destination}</p>
+                <p className="text-[14.5px] text-[#6B7280] mt-0.5 truncate">{g.destination}</p>
                 <div className="mt-1.5 flex items-center gap-2">
-                  <span className="text-sm text-[#0a2225]">
+                  <span className="text-[16px] text-[#0a2225]">
                     {g.currency === "USD" ? "$" : ""}{Number(g.price).toFixed(0)} {g.currency}
                   </span>
                   <span
                     className={
-                      "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wider " +
+                      "inline-flex items-center rounded-full px-2 py-0.5 text-[13.5px] uppercase tracking-wider " +
                       (g.status === "published"
                         ? "bg-[#0c4d47]/10 text-[#0c4d47]"
                         : "bg-[#E5DFC6]/60 text-[#6B7280]")
@@ -212,21 +212,21 @@ export function CreatorGuidesTab() {
 
       {recentPurchases.length > 0 && (
         <div className="mt-10">
-          <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent Purchases</h3>
+          <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent Purchases</h3>
           <div className="divide-y divide-[#0a2225]/10 border-t border-[#0a2225]/15">
             {recentPurchases.map((p) => (
               <div key={p.id} className="flex items-center justify-between gap-4 py-4">
                 <div className="min-w-0">
-                  <p className="text-sm text-[#0a2225] truncate">
+                  <p className="text-[16px] text-[#0a2225] truncate">
                     <span className="font-medium">{p.buyerName}</span>{" "}
                     <span className="text-[#6B7280]">purchased</span>{" "}
                     <span className="italic">{p.guideTitle}</span>
                   </p>
-                  <p className="text-xs text-[#9A9384] mt-0.5">
+                  <p className="text-[14.5px] text-[#9A9384] mt-0.5">
                     {new Date(p.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                   </p>
                 </div>
-                <span className="text-sm font-medium text-[#0c4d47] whitespace-nowrap">
+                <span className="text-[16px] font-medium text-[#0c4d47] whitespace-nowrap">
                   ${p.amount_paid.toLocaleString()} {p.currency}
                 </span>
               </div>
