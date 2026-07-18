@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
@@ -274,7 +275,15 @@ export default function PartnerBookingDetailPage() {
 
       <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 md:px-6">
         {/* Cover */}
-        <div className="relative h-28 overflow-hidden rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+        <div className="relative h-40 overflow-hidden rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+          {(cover || trip?.destination) && (
+            <img
+              src={cover || getTripRequestImageUrl(trip!.destination!)}
+              alt={trip?.destination || "Trip"}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/80 via-[#0a2225]/20 to-transparent" />
           {cover ? (
             <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" />
           ) : (
@@ -300,24 +309,24 @@ export default function PartnerBookingDetailPage() {
           </h2>
           <div className="mt-5 divide-y divide-[#0a2225]/8">
             <div className="flex items-baseline justify-between py-3">
-              <span className="text-[14px] text-[#0a2225]/60">Trip total</span>
+              <span className="text-[15px] text-[#0a2225]/65">Trip total</span>
               <span className="font-secondary text-[19px] text-[#0a2225]">
                 {money(booking.total_price)}
               </span>
             </div>
             <div className="flex items-baseline justify-between py-3">
-              <span className="text-[14px] text-[#0a2225]/60">Deposit</span>
-              <span className="font-secondary text-[17px] text-[#0a2225]">
+              <span className="text-[15px] text-[#0a2225]/65">Deposit</span>
+              <span className="font-secondary text-[19px] text-[#0a2225]">
                 {money(booking.deposit_amount)}
               </span>
             </div>
             <div className="flex items-baseline justify-between py-3">
-              <span className="text-[14px] text-[#0a2225]/60">Balance</span>
-              <span className="font-secondary text-[17px] text-[#0a2225]">{money(balance)}</span>
+              <span className="text-[15px] text-[#0a2225]/65">Balance</span>
+              <span className="font-secondary text-[19px] text-[#0a2225]">{money(balance)}</span>
             </div>
             <div className="flex items-baseline justify-between py-3">
-              <span className="text-[14px] text-[#0a2225]/60">{payoutLabel}</span>
-              <span className="font-secondary text-[19px] text-[#0c4d47]">
+              <span className="text-[15px] text-[#0a2225]/65">{payoutLabel}</span>
+              <span className="font-secondary text-[21px] text-[#0c4d47]">
                 ${payoutValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
