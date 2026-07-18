@@ -463,42 +463,33 @@ export default function TripRequestDetail() {
               </div>
             )}
 
-            {/* The engagement — hire requests carry their scope in the MAIN
-                column so the page reads as a dense brief, not an empty field
-                with a busy rail (founder: "Big Tech" density). */}
+            {/* THE ENGAGEMENT — one unified brief. Four short trip facts in a
+                single aligned row (no wrapping labels, no sentence-values),
+                chips beneath. All money lives in the rail — stated once. */}
             {request.hireOnTrip && (
               <div>
-                <h2 className="mb-4 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
-                <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
-                  <div className="border-t border-[#0a2225]/15 pt-3">
-                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Listed rate</p>
-                    <p className="font-secondary text-[17px] text-[#0a2225]">
-                      {request.hireDayRate ? `$${request.hireDayRate.toLocaleString()}/day` : "By proposal"}
-                    </p>
-                  </div>
-                  {request.hireTripDays ? (
-                    <div className="border-t border-[#0a2225]/15 pt-3">
-                      <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">On-trip days</p>
-                      <p className="font-secondary text-[17px] text-[#0a2225]">{request.hireTripDays} days</p>
-                    </div>
-                  ) : null}
-                  {request.budgetMax > 0 && (
-                    <div className="border-t border-[#0a2225]/15 pt-3">
-                      <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Working estimate</p>
-                      <p className="font-secondary text-[17px] text-[#0a2225]">{formatCurrency(request.budgetMax)}</p>
-                    </div>
-                  )}
-                  <div className="border-t border-[#0a2225]/15 pt-3">
-                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Final total</p>
-                    <p className="font-secondary text-[17px] text-[#0a2225]">Set by your proposal</p>
-                  </div>
+                <h2 className="mb-5 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
+                  {[
+                    { label: "Destination", value: request.destination !== "Not specified" ? request.destination : null },
+                    { label: "Dates", value: request.dateRangeLabel !== "Dates TBD" ? request.dateRangeLabel : null },
+                    { label: "On-trip days", value: request.hireTripDays ? `${request.hireTripDays} days` : null },
+                    { label: "Travelers", value: request.travelers > 0 ? `${request.travelers} ${request.travelers === 1 ? "person" : "people"}` : null },
+                  ]
+                    .filter((c) => c.value)
+                    .map((c, i) => (
+                      <div key={i} className="border-t border-[#0a2225]/15 pt-3">
+                        <p className="mb-1.5 whitespace-nowrap text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">{c.label}</p>
+                        <p className="font-secondary text-[18px] text-[#0a2225]">{c.value}</p>
+                      </div>
+                    ))}
                 </div>
                 {(request.hireCapabilities?.length ?? 0) > 0 && (
-                  <div className="mt-5">
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]/45">Hired for</p>
+                  <div className="mt-7">
+                    <p className="mb-2.5 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/50">Hired for</p>
                     <div className="flex flex-wrap gap-2">
                       {request.hireCapabilities!.map((id: string) => (
-                        <span key={id} className="inline-flex h-8 items-center rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-3.5 text-[13px] font-medium text-[#0a2225]">
+                        <span key={id} className="inline-flex h-9 items-center rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 text-[14px] font-medium text-[#0a2225]">
                           {capLabel(id)}
                         </span>
                       ))}
@@ -511,7 +502,7 @@ export default function TripRequestDetail() {
             {/* Description */}
             {request.description && (
               <div>
-                <h2 className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">About This Trip</h2>
+                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">About This Trip</h2>
                 <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80 whitespace-pre-line">
                   {request.description}
                 </p>
@@ -525,9 +516,9 @@ export default function TripRequestDetail() {
             )}
 
             {/* Trip Details Grid — clean, no cards */}
-            {tripDetailsGrid.length > 0 && (
+            {!request.hireOnTrip && tripDetailsGrid.length > 0 && (
               <div>
-                <h2 className="mb-5 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip Details</h2>
+                <h2 className="mb-5 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip Details</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                   {tripDetailsGrid.map((row, i) => (
                     <div key={i} className="border-t border-[#0a2225]/15 pt-3">
@@ -542,7 +533,7 @@ export default function TripRequestDetail() {
             {/* Interests */}
             {request.interests && request.interests.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Interests</h2>
+                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Interests</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.interests.map(tag => (
                     <span key={tag} className="inline-flex h-8 items-center rounded-full border border-[#0a2225]/15 bg-white px-3.5 text-[13px] text-[#0a2225]">
@@ -556,7 +547,7 @@ export default function TripRequestDetail() {
             {/* Must-Haves */}
             {request.mustHaves && request.mustHaves.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Must-Haves</h2>
+                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Must-Haves</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.mustHaves.map(item => (
                     <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#0c4d47]/25 bg-[#0c4d47]/[0.06] px-3.5 text-[13px] text-[#0c4d47]">
@@ -570,7 +561,7 @@ export default function TripRequestDetail() {
             {/* Dealbreakers */}
             {request.dealbreakers && request.dealbreakers.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Dealbreakers</h2>
+                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Dealbreakers</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.dealbreakers.map(item => (
                     <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#8b3a3a]/25 bg-[#8b3a3a]/[0.05] px-3.5 text-[13px] text-[#8b3a3a]">
@@ -584,7 +575,7 @@ export default function TripRequestDetail() {
             {/* Visual Brief — only if content exists */}
             {hasStoryboard && (
               <div>
-                <h2 className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Visual Brief</h2>
+                <h2 className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Visual Brief</h2>
                 <TripStoryboardViewer tripId={request.id} variant="gallery" />
               </div>
             )}
@@ -593,7 +584,7 @@ export default function TripRequestDetail() {
             {isRequestOwner && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals Received</h2>
+                  <h2 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals Received</h2>
                   <span className="inline-flex items-center rounded-full border border-[#C7A962]/50 bg-[#C7A962]/15 px-2.5 py-0.5 text-[12px] font-medium text-[#8D6B2F]">
                     {proposals.length}
                   </span>
@@ -688,7 +679,7 @@ export default function TripRequestDetail() {
               <div className="border-t border-[#0a2225]/15 pt-6">
                 {(request.budgetMin > 0 || request.budgetMax > 0) && (
                   <div className="mb-6">
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                    <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                       {request.hireOnTrip ? "Estimate" : "Budget"}
                     </p>
                     <p className="mt-3 font-secondary text-[38px] leading-none text-[#0a2225]">
@@ -698,7 +689,7 @@ export default function TripRequestDetail() {
                     </p>
                     {request.hireOnTrip && request.hireDayRate ? (
                       <p className="mt-1.5 text-[12px] text-[#0a2225]/50">
-                        {request.hireTripDays ? `${request.hireTripDays} days \u00d7 ` : ""}${request.hireDayRate.toLocaleString()}/day listed rate \u2014 an estimate. Your proposal sets the final total.
+                        {request.hireTripDays ? `${request.hireTripDays} days \u00d7 ` : ""}${request.hireDayRate.toLocaleString()}/day listed rate {"\u2014"} an estimate. Your proposal sets the final total.
                       </p>
                     ) : request.budgetPerPerson ? (
                       <p className="mt-1.5 text-[12px] text-[#0a2225]/50">per person</p>
