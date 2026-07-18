@@ -144,7 +144,7 @@ export function BookingConversation({
   // (e.g. platform-owned). Show a gentle note rather than a broken box.
   if (user && travelerId && partnerId && !recipientId) {
     return (
-      <p className="text-sm italic text-[#0a2225]/50">
+      <p className="text-[15px] italic text-[#0a2225]/50">
         Messaging opens once a specialist is assigned to this booking.
       </p>
     );
@@ -165,7 +165,7 @@ export function BookingConversation({
                     : "bg-white border border-[#E5DFC6]"
                 }`}
               >
-                <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45 mb-1">
+                <p className="text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/45 mb-1">
                   {isSelf ? "You" : "Your travel professional"} ·{" "}
                   {new Date(msg.created_at).toLocaleString([], {
                     month: "short",
@@ -192,12 +192,12 @@ export function BookingConversation({
       )}
 
       {!loading && !hasMessages && (
-        <p className="text-sm italic text-[#0a2225]/50 mb-4">
+        <p className="text-[15px] italic text-[#0a2225]/50 mb-4">
           No messages yet for this booking — start the conversation. It'll appear in your inbox too.
         </p>
       )}
 
-      {loading && <p className="text-[11px] text-[#0a2225]/40 mb-4">Loading…</p>}
+      {loading && <p className="text-[12.5px] text-[#0a2225]/40 mb-4">Loading…</p>}
 
       <div className="flex gap-2">
         <input
@@ -206,7 +206,7 @@ export function BookingConversation({
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Type a message…"
-          className="flex-1 rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#0c4d47] focus:ring-1 focus:ring-[#0c4d47]/20"
+          className="flex-1 rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[15px] focus:outline-none focus:border-[#0c4d47] focus:ring-1 focus:ring-[#0c4d47]/20"
           disabled={sending}
         />
         <button
