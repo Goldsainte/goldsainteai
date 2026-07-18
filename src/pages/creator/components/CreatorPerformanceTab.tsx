@@ -141,7 +141,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded-full px-3 py-1.5 text-[12px] whitespace-nowrap transition ${
+              className={`rounded-full px-3 py-1.5 text-[15px] whitespace-nowrap transition ${
                 range === r ? "bg-[#0c4d47] text-white" : "text-[#0a2225]"
               }`}
             >
@@ -169,7 +169,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <p className="mb-3 text-[12px] uppercase tracking-wider text-[#7A7151]">Sales by day</p>
+        <p className="mb-3 text-[15px] uppercase tracking-wider text-[#7A7151]">Sales by day</p>
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
@@ -189,15 +189,15 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <p className="mb-3 text-[12px] uppercase tracking-wider text-[#7A7151]">Traffic sources (UTM)</p>
+        <p className="mb-3 text-[15px] uppercase tracking-wider text-[#7A7151]">Traffic sources (UTM)</p>
         {sources.length === 0 ? (
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-[16px] text-[#6B7280]">
             No traffic data yet. Share links with <code>?utm_source=...</code> to track.
           </p>
         ) : (
           <ul className="divide-y divide-[#E5DFC6]/60">
             {sources.map(([src, count]) => (
-              <li key={src} className="flex items-center justify-between py-2 text-sm">
+              <li key={src} className="flex items-center justify-between py-2 text-[16px]">
                 <span className="capitalize text-[#0a2225]">{src}</span>
                 <span className="text-[#6B7280]">{count} sale{count === 1 ? "" : "s"}</span>
               </li>
@@ -206,7 +206,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
         )}
       </div>
 
-      {loading && <p className="text-xs text-[#7A7151]">Loading…</p>}
+      {loading && <p className="text-[14.5px] text-[#7A7151]">Loading…</p>}
     </div>
   );
 }
@@ -226,12 +226,12 @@ function Stat({
 }) {
   return (
     <div className="border-t border-[#0a2225]/15 pt-5">
-      <div className="mb-1 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[#7A7151]">
+      <div className="mb-1 flex items-center gap-1.5 text-[14px] uppercase tracking-wider text-[#7A7151]">
         {icon}
         {label}
       </div>
       <p className={`font-secondary text-lg text-[#0a2225] ${truncate ? "truncate" : ""}`}>{value}</p>
-      {subtitle && <p className="mt-0.5 text-[11px] text-[#7A7151]">{subtitle}</p>}
+      {subtitle && <p className="mt-0.5 text-[14px] text-[#7A7151]">{subtitle}</p>}
     </div>
   );
 }
