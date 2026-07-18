@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag, Check, ArrowRight, Plane } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { capLabel } from "@/lib/onTripCapabilities";
+import { capLabel, isCapabilityId } from "@/lib/onTripCapabilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
@@ -278,6 +278,8 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         <div className="space-y-8">
           {TIER_ORDER.map((tierKey) => {
             if (hostedServices.length > 0 && tierKey === "on_trip") return null; // featured above
+            const groupNeedsCaps = isOwnProfile && tierKey === "on_trip" &&
+              grouped[tierKey]?.some((s) => !s.includes.some((x) => isCapabilityId(x)));
             const items = grouped[tierKey];
             if (items.length === 0) return null;
             const config = TIER_CONFIG[tierKey];
@@ -295,7 +297,23 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
 
                 {/* Cards row */}
                 <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-                  {items.map((service) => (
+                  {groupNeedsCaps && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const svc = grouped["on_trip"].find((s) => !s.includes.some((x) => isCapabilityId(x)));
+                      if (svc) { setEditService(svc); setDialogOpen(true); }
+                    }}
+                    className="mb-1 flex w-full items-center justify-between rounded-xl border border-[#C7A962]/60 bg-[#FDF9F0] px-4 py-3 text-left transition-colors hover:border-[#C7A962] !min-h-0"
+                  >
+                    <span className="text-[13px] text-[#0a2225]">
+                      <span className="font-medium">Declare what travelers can hire you for</span>
+                      <span className="text-[#0a2225]/60"> — your hire form is generic until you do.</span>
+                    </span>
+                    <span className="font-secondary text-lg leading-none text-[#8D6B2F]">→</span>
+                  </button>
+                )}
+                {items.map((service) => (
                     <div
                       key={service.id}
                       className="snap-start shrink-0 w-[300px] md:w-[320px] bg-white rounded-xl border border-[#E5DFC6] overflow-hidden group hover:shadow-md transition-shadow relative"
