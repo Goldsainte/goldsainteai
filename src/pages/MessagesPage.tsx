@@ -33,7 +33,21 @@ function MessagesRail() {
         ]
       : []),
   ];
-  const initial = (user?.email?.[0] || "G").toUpperCase();
+  const [me, setMe] = useState<{ avatar_url: string | null; display_name: string | null } | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data } = await (supabase
+          .from("profiles")
+          .select("avatar_url, display_name" as any)
+          .eq("id", user.id)
+          .maybeSingle() as any);
+        setMe((data as any) ?? null);
+      } catch { /* avatar is cosmetic */ }
+    })();
+  }, [user]);
+  const initial = (me?.display_name?.[0] || user?.email?.[0] || "G").toUpperCase();
   return (
     <div className="relative hidden w-[76px] shrink-0 lg:block">
       <aside
@@ -66,9 +80,13 @@ function MessagesRail() {
             expanded ? "px-3" : "justify-center px-0"
           }`}
         >
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0c4d47] text-[11px] font-semibold text-[#E5DFC6]">
-            {initial}
-          </span>
+          {me?.avatar_url ? (
+            <img src={me.avatar_url} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0c4d47] text-[12px] font-semibold text-[#E5DFC6]">
+              {initial}
+            </span>
+          )}
           {expanded && <span className="whitespace-nowrap">Profile</span>}
         </button>
       </nav>
