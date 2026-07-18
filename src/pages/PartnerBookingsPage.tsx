@@ -303,20 +303,20 @@ function PartnerBookingRowCard({ isHireBooking, booking,
           <img src={imgUrl} alt={title} loading="lazy"
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
         )}
-        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {booking.status.replace(/_/g, " ")}
         </span>
         {isHireBooking && (
-          <span className="absolute left-3.5 top-3.5 rounded bg-[#C7A962] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
+          <span className="absolute left-3.5 top-3.5 rounded bg-[#C7A962] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
             On-trip hire
           </span>
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
           {trip?.destination && (
-            <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">{trip.destination}</p>
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#C7A962]/95">{trip.destination}</p>
           )}
           <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">{title}</p>
-          <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+          <p className="mt-1.5 text-[12.5px] text-[#fdfaf2]/80">
             Booked {booked}
             {travelerName ? ` \u00b7 ${travelerName}` : ""}
             {travelers ? ` \u00b7 ${travelers} traveler${travelers === 1 ? "" : "s"}` : ""}
@@ -325,12 +325,12 @@ function PartnerBookingRowCard({ isHireBooking, booking,
       </div>
       {/* Slim footer strip */}
       <div className="flex items-center justify-between px-5 py-3.5">
-        <span className="text-[11.5px] text-[#0a2225]/50">
-          <span className="font-mono text-[10.5px] tracking-wide">{reference}</span>
+        <span className="text-[12.5px] text-[#0a2225]/55">
+          <span className="font-mono text-[11.5px] tracking-wide">{reference}</span>
           {" \u00b7 "}
           {payoutLabel.toLowerCase()} {payout}
         </span>
-        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47]">
+        <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#0c4d47]">
           View details
           <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
         </span>
