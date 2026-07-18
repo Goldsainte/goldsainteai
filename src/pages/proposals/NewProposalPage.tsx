@@ -84,6 +84,18 @@ export default function NewProposalPage() {
   const [aiScoping, setAiScoping] = useState(false);
   const [aiRefiningTerms, setAiRefiningTerms] = useState(false);
   const [tripData, setTripData] = useState<TripRequestData | null>(null);
+  // ---- On-trip HIRE awareness (v2): a hire reply is a quote to show up,
+  // not an itinerary pitch. Same submit, same row \u2014 the machine sections
+  // below simply don't render for hires and their fields are auto-filled. ----
+  const hireMeta: any = (tripData as any)?.source_metadata || {};
+  const isHire = Boolean(hireMeta.hire_on_trip);
+  const hireRate = typeof hireMeta.hire_day_rate_usd === "number" ? hireMeta.hire_day_rate_usd : null;
+  const hireDays = typeof hireMeta.trip_days === "number" ? hireMeta.trip_days :
+    (tripData?.start_date && tripData?.end_date
+      ? Math.max(0, Math.round((new Date(tripData.end_date).getTime() - new Date(tripData.start_date).getTime()) / 86400000))
+      : 0);
+  const hireEstimate = typeof hireMeta.estimated_total_usd === "number" ? hireMeta.estimated_total_usd :
+    (hireRate && hireDays > 0 ? hireRate * hireDays : null);
   const [proposalCount, setProposalCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -148,6 +160,39 @@ export default function NewProposalPage() {
   // button has ALWAYS navigated here with ?edit=<id>; the wizard just never
   // read it — agents had to start over. Now it loads their work back. ──
   const prefilledRef = useRef(false);
+  const hirePrefilledRef = useRef(false);
+  useEffect(() => {
+    if (!isHire || editId || hirePrefilledRef.current || !tripData) return;
+    hirePrefilledRef.current = true;
+    setHeadline(`${hireMeta.hire_service_title || "On-trip hosting"} \u2014 ${tripData.destination || "your trip"}`);
+    setPricingType("total");
+    if (hireEstimate) setPriceFrom((cur: any) => cur || hireEstimate);
+    (async () => {
+      try {
+        const { data: u } = await supabase.auth.getUser();
+        if (!u?.user) return;
+        const { data: svc } = await (supabase
+          .from("creator_services")
+          .select("expense_travel, expense_lodging, expense_meals" as any)
+          .eq("creator_id", u.user.id)
+          .eq("service_tier", "on_trip")
+          .limit(1) as any);
+        const s: any = (svc as any)?.[0];
+        const covered: string[] = ["My hosted days, start to finish"];
+        const notCovered: string[] = [];
+        const place = (v: string | null | undefined, label: string) => {
+          if (v === "creator") covered.push(`${label} \u2014 in my rate`);
+          else if (v === "traveler") notCovered.push(`${label} \u2014 traveler covers`);
+          else if (v === "split") notCovered.push(`${label} \u2014 each our own`);
+        };
+        place(s?.expense_travel, "Flights & transport");
+        place(s?.expense_lodging, "Lodging");
+        place(s?.expense_meals, "Meals");
+        setInclusionsText((cur) => cur || covered.join("\n"));
+        setExclusionsText((cur) => cur || notCovered.join("\n"));
+      } catch { /* prefills are best-effort */ }
+    })();
+  }, [isHire, editId, tripData]);
   useEffect(() => {
     if (!editId || prefilledRef.current) return;
     (async () => {
@@ -267,10 +312,10 @@ export default function NewProposalPage() {
     (async () => {
       setLoading(true);
       const [{ data: trip }, { count }] = await Promise.all([
-        supabase.from("trip_requests").select("id, title, destination, start_date, end_date, budget_min, budget_max, user_id, description, interests").eq("id", tripId).maybeSingle(),
+        supabase.from("trip_requests").select("id, title, destination, start_date, end_date, budget_min, budget_max, user_id, description, interests, travelers_adults, travelers_children, source_metadata" as any).eq("id", tripId).maybeSingle(),
         supabase.from("trip_proposals").select("id", { count: "exact", head: true }).eq("trip_request_id", tripId),
       ]);
-      setTripData(trip);
+      setTripData(trip as any);
       setProposalCount(count ?? 0);
       setLoading(false);
     })();
@@ -718,6 +763,18 @@ export default function NewProposalPage() {
           <div className="lg:col-span-2">
 
             {/* STEP 0: Pitch */}
+            {isHire && (
+              <div className="mb-5 rounded-2xl border border-[#C7A962]/50 bg-[#FDF9F0] p-5">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">On-trip hire</p>
+                <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]">
+                  You're being hired to join this trip — {tripData?.destination}
+                  {hireDays > 0 ? `, ${hireDays} days` : ""}
+                  {hireRate ? ` \u00b7 your listed rate $${hireRate}/day` : ""}
+                  {hireEstimate ? ` \u00b7 \u2248 $${hireEstimate.toLocaleString()} total` : ""}.
+                </p>
+                <p className="mt-1 text-[12.5px] text-[#0a2225]/60">No itinerary needed — confirm your price and terms; the trip is theirs, the days are yours to host.</p>
+              </div>
+            )}
             {step === 0 && (
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
@@ -766,7 +823,7 @@ export default function NewProposalPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2" style={isHire ? { display: "none" } : undefined}>
                     <Label className={labelClasses} htmlFor="headline">Headline <span className="text-destructive">*</span></Label>
                     <Input
                       className={inputClasses}
@@ -782,10 +839,10 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="message">Your Proposal <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="message">{isHire ? "Your reply" : "Your Proposal"} <span className="text-destructive">*</span></Label>
                     <Textarea
                       id="message"
-                      placeholder="Describe your proposed itinerary, unique experiences, and why you're the best fit for this trip…"
+                      placeholder={isHire ? "Confirm you're free for these dates and how you'll host the days\u2026" : "Describe your proposed itinerary, unique experiences, and why you're the best fit for this trip…"}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       className={`${textareaClasses} min-h-[180px]`}
@@ -816,7 +873,7 @@ export default function NewProposalPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2" style={isHire ? { display: "none" } : undefined}>
                     <Label className={labelClasses} htmlFor="itinerary-summary">Itinerary Summary <span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <Textarea
                       id="itinerary-summary"
@@ -842,7 +899,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="inclusions">What's Included <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="inclusions">{isHire ? "What your rate covers" : "What's Included"} <span className="text-destructive">*</span></Label>
                     <Textarea
                       id="inclusions"
                       placeholder={"Airport transfers\nHotel bookings (4-star+)\n2 guided excursions\nTravel insurance coordination\nRestaurant reservations"}
@@ -854,7 +911,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="exclusions">What's Not Included</Label>
+                    <Label className={labelClasses} htmlFor="exclusions">{isHire ? "What the traveler covers" : "What's Not Included"}</Label>
                     <Textarea
                       id="exclusions"
                       placeholder={"International flights\nMeals not specified in itinerary\nPersonal expenses\nVisa fees\nTravel insurance premiums"}
@@ -878,7 +935,7 @@ export default function NewProposalPage() {
                     </button>
                   </div>
 
-                  <div className="space-y-3">
+                  <div style={isHire ? { display: "none" } : undefined} className="space-y-3">
                     <Label className={labelClasses}>Service Level</Label>
                     <RadioGroup value={serviceLevel} onValueChange={setServiceLevel} className="space-y-2">
                       {[
@@ -897,8 +954,8 @@ export default function NewProposalPage() {
                     </RadioGroup>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                  <div style={isHire ? { display: "none" } : undefined} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div style={isHire ? { display: "none" } : undefined} className="space-y-2">
                       <Label className={labelClasses}>Itinerary Revisions Included</Label>
                       <Select value={revisionCount} onValueChange={setRevisionCount}>
                         <SelectTrigger className={selectTriggerClasses}><SelectValue /></SelectTrigger>
@@ -931,7 +988,7 @@ export default function NewProposalPage() {
                       onCheckedChange={(c) => setHandlesSupplierPayments(!!c)}
                       className="mt-0.5"
                     />
-                    <div>
+                    <div style={isHire ? { display: "none" } : undefined}>
                       <Label htmlFor="supplier-payments" className={`${labelClasses} cursor-pointer font-medium`}>I handle payments to suppliers</Label>
                       <p className="text-xs text-muted-foreground mt-0.5">I will process payments to hotels, tours, and other suppliers on behalf of the traveler.</p>
                     </div>
@@ -950,7 +1007,7 @@ export default function NewProposalPage() {
                     <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define your pricing structure and payment terms.</p>
                   </div>
 
-                  <div className="space-y-3">
+                  <div style={isHire ? { display: "none" } : undefined} className="space-y-3">
                     <Label className={labelClasses}>Pricing Type</Label>
                     <RadioGroup value={pricingType} onValueChange={setPricingType} className="flex gap-3">
                       <label className={`flex-1 flex items-center gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${pricingType === "per_person" ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
@@ -965,7 +1022,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="price">Trip Cost ({pricingType === "per_person" ? "per person" : "total"}) <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="price">{isHire ? `Total for the trip${hireDays > 0 && hireRate ? ` (\u2248 ${hireDays} days \u00d7 $${hireRate}/day)` : ""}` : `Trip Cost (${pricingType === "per_person" ? "per person" : "total"})`} <span className="text-destructive">*</span></Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -982,7 +1039,7 @@ export default function NewProposalPage() {
 
                   {/* Commission Pricing Model */}
                   <div className="space-y-4">
-                    <div>
+                    <div style={isHire ? { display: "none" } : undefined}>
                       <Label className="text-sm font-semibold">How You Earn</Label>
                       <p className="text-xs text-muted-foreground mt-0.5">Select how your commission is structured for this trip.</p>
                     </div>
