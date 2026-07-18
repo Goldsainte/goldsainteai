@@ -284,11 +284,15 @@ const AuthCallback = () => {
             // one (which posts the question) if none exists yet.
             if (inquiry?.partner_id) {
               const [pa, pb] = [session.user.id, inquiry.partner_id].sort();
-              const { data: existingConvo } = await supabase
+              // General (non-booking) thread only — booking-scoped threads exist
+              // since migration 205, so the pair can own several rows now.
+              // Cast: booking_id postdates the generated types.
+              const { data: existingConvo } = await (supabase as any)
                 .from('dm_conversations')
                 .select('id')
                 .eq('participant_1', pa)
                 .eq('participant_2', pb)
+                .is('booking_id', null)
                 .maybeSingle();
 
               if (existingConvo) {
