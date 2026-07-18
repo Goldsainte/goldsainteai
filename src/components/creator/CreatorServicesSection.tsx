@@ -148,6 +148,9 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
   const hostedServices = !isOwnProfile ? services.filter((s) => s.service_tier === "on_trip") : [];
   const hostedService = hostedServices[Math.min(hostedIdx, Math.max(0, hostedServices.length - 1))];
   const who = firstName || "your host";
+  const undeclaredOnTrip = isOwnProfile
+    ? services.find((s) => s.service_tier === "on_trip" && !s.includes.some((x) => isCapabilityId(x)))
+    : undefined;
   const hostedHireUrl = hostedService && requestBaseParams
     ? `/post-trip?${requestBaseParams}&service=${encodeURIComponent(hostedService.title)}&hire=on-trip&hireRate=${Math.round(hostedService.starting_price_cents / 100)}&serviceId=${hostedService.id}`
     : null;
@@ -187,6 +190,22 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
 
       {hasAny ? (
         <>
+        {undeclaredOnTrip && (
+          <div className="mb-8 border-t border-[#E5DFC6] pt-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Finish your setup</p>
+            <h3 className="mt-2 font-secondary text-xl leading-snug text-[#0a2225] md:text-2xl">Declare what travelers can hire you for</h3>
+            <p className="mt-1.5 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/70">
+              Your On-Trip offer doesn't list capabilities yet, so travelers see a generic hire form. Pick from the list once {"\u2014"} your profile, the hire form, and proposals all update together.
+            </p>
+            <button
+              type="button"
+              onClick={() => { setEditService(undeclaredOnTrip); setDialogOpen(true); }}
+              className="mt-2.5 inline-flex items-center gap-1.5 text-[14px] text-[#0c4d47] underline underline-offset-4 decoration-[#0a2225]/25 transition-colors hover:decoration-[#C7A962] !min-h-0 !min-w-0"
+            >
+              Declare now<span className="font-secondary">{"\u2192"}</span>
+            </button>
+          </div>
+        )}
         {hostedService && (
           <div className="mb-8 rounded-3xl border border-[#E5DFC6] bg-white p-5 md:p-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
@@ -278,8 +297,6 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         <div className="space-y-8">
           {TIER_ORDER.map((tierKey) => {
             if (hostedServices.length > 0 && tierKey === "on_trip") return null; // featured above
-            const groupNeedsCaps = isOwnProfile && tierKey === "on_trip" &&
-              grouped[tierKey]?.some((s) => !s.includes.some((x) => isCapabilityId(x)));
             const items = grouped[tierKey];
             if (items.length === 0) return null;
             const config = TIER_CONFIG[tierKey];
@@ -297,23 +314,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
 
                 {/* Cards row */}
                 <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-                  {groupNeedsCaps && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const svc = grouped["on_trip"].find((s) => !s.includes.some((x) => isCapabilityId(x)));
-                      if (svc) { setEditService(svc); setDialogOpen(true); }
-                    }}
-                    className="mb-1 flex w-full items-center justify-between rounded-xl border border-[#C7A962]/60 bg-[#FDF9F0] px-4 py-3 text-left transition-colors hover:border-[#C7A962] !min-h-0"
-                  >
-                    <span className="text-[13px] text-[#0a2225]">
-                      <span className="font-medium">Declare what travelers can hire you for</span>
-                      <span className="text-[#0a2225]/60"> — your hire form is generic until you do.</span>
-                    </span>
-                    <span className="font-secondary text-lg leading-none text-[#8D6B2F]">→</span>
-                  </button>
-                )}
-                {items.map((service) => (
+                  {items.map((service) => (
                     <div
                       key={service.id}
                       className="snap-start shrink-0 w-[300px] md:w-[320px] bg-white rounded-xl border border-[#E5DFC6] overflow-hidden group hover:shadow-md transition-shadow relative"
