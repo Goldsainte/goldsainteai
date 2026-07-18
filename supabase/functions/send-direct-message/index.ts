@@ -1,3 +1,5 @@
+// send-direct-message
+// v2.0 - booking-scoped threads: bookingId param, server-derived recipient+label, participant guard on supplied conversationId (2026-07-18)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import * as React from "npm:react@18.3.1";
@@ -107,13 +109,55 @@ serve(async (req) => {
       );
     }
 
-    let { recipientId, message, conversationId, tripId, tripTitle, attachments } = await req.json();
+    let { recipientId, message, conversationId, tripId, tripTitle, attachments, bookingId } = await req.json();
 
     if (!message) {
       return new Response(
         JSON.stringify({ error: "message is required" }),
         { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
+    }
+
+    // BOOKING-SCOPED THREAD (v2.0): when the client passes a bookingId, the
+    // conversation is scoped to that booking. Membership is verified against
+    // the live booking row and the recipient + thread label are derived
+    // SERVER-SIDE (any client-supplied recipientId is ignored), so nobody can
+    // stamp a thread onto a booking they're not a party to.
+    let bookingLabel: string | null = null;
+    if (bookingId) {
+      const { data: bookingRow } = await supabase
+        .from("trip_bookings")
+        .select("id, traveler_id, partner_id, metadata")
+        .eq("id", bookingId)
+        .maybeSingle();
+      if (!bookingRow) {
+        return new Response(
+          JSON.stringify({ error: "Booking not found" }),
+          { status: 404, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+      if (bookingRow.traveler_id !== user.id && bookingRow.partner_id !== user.id) {
+        return new Response(
+          JSON.stringify({ error: "You are not a party to this booking" }),
+          { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+      const otherParty = bookingRow.traveler_id === user.id ? bookingRow.partner_id : bookingRow.traveler_id;
+      if (!otherParty) {
+        return new Response(
+          JSON.stringify({ error: "This booking has no assigned partner yet" }),
+          { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+      recipientId = otherParty;
+      const meta = (bookingRow.metadata ?? {}) as Record<string, unknown>;
+      const ref =
+        (typeof meta.booking_reference === "string" && meta.booking_reference) ||
+        "GS-" + String(bookingRow.id).slice(0, 8).toUpperCase();
+      bookingLabel =
+        typeof meta.destination === "string" && meta.destination
+          ? meta.destination + " \u00b7 " + ref
+          : ref;
     }
 
     // Resolve the responder from the package when the caller didn't supply one
@@ -274,18 +318,46 @@ serve(async (req) => {
     let targetConversationId = conversationId;
     let isNewConversation = false;
 
-    // Find or create conversation
+    // v2.0 guard: when the client supplies a conversationId directly, verify
+    // the sender is actually a participant (inserts run with the service role
+    // and bypass RLS, so without this check any authed user could inject a
+    // message into any thread by guessing its uuid).
+    if (targetConversationId) {
+      const { data: convoCheck } = await supabase
+        .from("dm_conversations")
+        .select("id, participant_1, participant_2, status")
+        .eq("id", targetConversationId)
+        .maybeSingle();
+      if (!convoCheck || (convoCheck.participant_1 !== user.id && convoCheck.participant_2 !== user.id)) {
+        return new Response(
+          JSON.stringify({ error: "Not a participant in this conversation" }),
+          { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+      if (convoCheck.status === "blocked") {
+        return new Response(
+          JSON.stringify({ error: "This conversation has been blocked" }),
+          { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Find or create conversation — scoped by booking when bookingId is given.
+    // Each booking owns its own thread; general DMs live where booking_id is null.
     if (!targetConversationId) {
       // Order participants consistently
       const [p1, p2] = [user.id, recipientId].sort();
 
-      // Check for existing conversation
-      const { data: existingConversation } = await supabase
+      // Check for existing conversation in the SAME scope
+      let convoQuery = supabase
         .from("dm_conversations")
         .select("*")
         .eq("participant_1", p1)
-        .eq("participant_2", p2)
-        .single();
+        .eq("participant_2", p2);
+      convoQuery = bookingId
+        ? convoQuery.eq("booking_id", bookingId)
+        : convoQuery.is("booking_id", null);
+      const { data: existingConversation } = await convoQuery.maybeSingle();
 
       if (existingConversation) {
         if (existingConversation.status === "blocked") {
@@ -302,14 +374,20 @@ serve(async (req) => {
           .insert({
             participant_1: p1,
             participant_2: p2,
-            status: "request",
+            // Booking threads start "active": the parties are already in a
+            // contracted relationship — no accept-gate. General DMs keep the
+            // request flow.
+            status: bookingId ? "active" : "request",
             initiated_by: user.id,
             last_message_at: new Date().toISOString(),
             last_message_preview: filteredMessage.substring(0, 100),
             // Optional trip context (e.g. from an "Ask a Question" inquiry) so
             // the conversation shows "Re: <trip>" and links back to the package.
             trip_id: tripId ?? null,
-            trip_title: tripTitle ?? null,
+            // Booking label ("Tulum · GS-1D4E07FE") wins over package title so
+            // the inbox can tell sibling threads apart.
+            trip_title: bookingLabel ?? tripTitle ?? null,
+            booking_id: bookingId ?? null,
           })
           .select()
           .single();
