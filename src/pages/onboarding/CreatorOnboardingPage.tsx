@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator";
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
+import { TravelMap } from "@/components/partner/TravelMap";
+import { WORLD_COUNTRIES } from "@/components/partner/worldCountries";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { DestinationAutocomplete } from "@/components/preferences/DestinationAutocomplete";
 import { FeaturedPhotosUploader } from "@/components/onboarding/FeaturedPhotosUploader";
@@ -24,8 +26,7 @@ import {
   TrendingUp, Instagram, Youtube, Video, Shield,
   MessageCircle, Clock, Wallet, Heart,
   DollarSign, FileText, Star, Building2, Image,
-  ArrowRight
-} from "lucide-react";
+  ArrowRight, Plane } from "lucide-react";
 
 // Step 4 (Portfolio) is HIDDEN for the press launch — see todo.md B5b. It was the
 // longest, all-optional step and its brand/pricing fields are read nowhere yet.
@@ -37,11 +38,13 @@ const STEPS = [
   { title: "Social Profile", icon: Globe },
   { title: "Your Niche", icon: Sparkles },
   ...(SHOW_PORTFOLIO_STEP ? [{ title: "Portfolio", icon: Image }] : []),
+  { title: "Get Hired", icon: Plane },
   { title: "Standards", icon: Shield },
 ];
 // Step indices shift when Portfolio is hidden, so derive them from the flag.
 const PORTFOLIO_STEP_INDEX = 3;
-const STANDARDS_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 4 : 3;
+const GET_HIRED_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 4 : 3;
+const STANDARDS_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 5 : 4;
 
 const TRAVEL_NICHES = [
   { value: "luxury", label: "Luxury & Ultra-Luxury", description: "5-star resorts, private villas, exclusive experiences" },
@@ -111,6 +114,20 @@ export default function CreatorOnboardingPage() {
   const [homeBase, setHomeBase] = useState("");
   const [primaryPlatform, setPrimaryPlatform] = useState("");
   const [tiktokHandle, setTiktokHandle] = useState("");
+  // Your World additions (v2): languages + lit-map countries
+  const [languagesInput, setLanguagesInput] = useState("");
+  const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
+  const [countrySearch, setCountrySearch] = useState("");
+  // Get Hired (v2): creates the on_trip service so new creators leave
+  // onboarding already hireable. Skippable \u2014 supply is the scarce resource.
+  type ExpenseWho = "traveler" | "creator" | "split";
+  const [hostTitle, setHostTitle] = useState("Travel With Me");
+  const [hostRate, setHostRate] = useState("");
+  const [hostDesc, setHostDesc] = useState("");
+  const [expenseTravel, setExpenseTravel] = useState<ExpenseWho | null>(null);
+  const [expenseLodging, setExpenseLodging] = useState<ExpenseWho | null>(null);
+  const [expenseMeals, setExpenseMeals] = useState<ExpenseWho | null>(null);
+  const [skippedHire, setSkippedHire] = useState(false);
   const [instagramHandle, setInstagramHandle] = useState("");
   const [website, setWebsite] = useState("");
 
@@ -257,6 +274,13 @@ export default function CreatorOnboardingPage() {
     if (SHOW_PORTFOLIO_STEP && currentStep === PORTFOLIO_STEP_INDEX) {
       return true; // Portfolio — all optional
     }
+    if (currentStep === GET_HIRED_STEP_INDEX) {
+      if (skippedHire || !hostRate.trim()) return true; // fully skippable
+      const r = parseFloat(hostRate);
+      if (!Number.isFinite(r) || r <= 0) return false;
+      // A rate without expense terms would publish a half-configured offer.
+      return Boolean(expenseTravel && expenseLodging && expenseMeals && hostTitle.trim());
+    }
     if (currentStep === STANDARDS_STEP_INDEX) {
       return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
     }
@@ -348,7 +372,7 @@ export default function CreatorOnboardingPage() {
           tiktok_verified: false,
           tiktok_follower_count: null,
           tiktok_verified_at: null,
-          languages: null,
+          languages: (() => { const a = languagesInput.split(",").map((s) => s.trim()).filter(Boolean); return a.length ? a : null; })(),
           creator_pov: null,
           ai_persona_tone: null,
           ai_persona_audience: null,
@@ -364,6 +388,56 @@ export default function CreatorOnboardingPage() {
         .eq("id", user.id);
 
       if (error) throw error;
+
+      // ---- v2: creator_profiles (map + languages, the public-profile stores) ----
+      const langsArr = languagesInput.split(",").map((s) => s.trim()).filter(Boolean);
+      try {
+        const { data: cpRow } = await supabase
+          .from("creator_profiles").select("user_id").eq("user_id", user.id).maybeSingle();
+        const cpFields: Record<string, any> = { visited_countries: visitedCountries, languages: langsArr };
+        if (cpRow) {
+          await supabase.from("creator_profiles").update(cpFields as any).eq("user_id", user.id);
+        } else {
+          await supabase.from("creator_profiles").insert({ user_id: user.id, ...cpFields } as any);
+        }
+      } catch (cpErr) {
+        console.error("creator_profiles save failed:", cpErr);
+      }
+
+      // ---- v2: Get Hired \u2014 create the on_trip service so they finish hireable ----
+      let hiredLive = false;
+      const hostRateNum = parseFloat(hostRate);
+      if (!skippedHire && Number.isFinite(hostRateNum) && hostRateNum > 0 &&
+          expenseTravel && expenseLodging && expenseMeals && hostTitle.trim()) {
+        try {
+          const { data: existing } = await supabase
+            .from("creator_services").select("id")
+            .eq("creator_id", user.id).eq("service_tier", "on_trip").limit(1);
+          if (!existing || existing.length === 0) {
+            const { error: svcErr } = await supabase.from("creator_services").insert({
+              creator_id: user.id,
+              service_tier: "on_trip",
+              title: hostTitle.trim(),
+              description: hostDesc.trim() || null,
+              starting_price_cents: Math.round(hostRateNum * 100),
+              currency: "USD",
+              includes: [],
+              is_active: true,
+              expense_travel: expenseTravel,
+              expense_lodging: expenseLodging,
+              expense_meals: expenseMeals,
+            } as any);
+            if (svcErr) throw svcErr;
+          }
+          hiredLive = true;
+        } catch (svcErr: any) {
+          console.error("on_trip service creation failed:", svcErr);
+          toast.error("Profile saved, but your hosted offer didn't publish" + (svcErr?.message ? ": " + svcErr.message : "") + " \u2014 add it anytime in Services.");
+        }
+      }
+      toast.success(hiredLive
+        ? `You're live \u2014 hireable at $${hostRateNum}/day`
+        : "You're live \u2014 welcome to Goldsainte");
 
       // Save creator media items
       if (creatorMedia.length > 0) {
@@ -759,6 +833,62 @@ export default function CreatorOnboardingPage() {
                     inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                   />
                 </div>
+
+                <div>
+                  <Label className="text-[#0a2225]">Languages you speak</Label>
+                  <Input
+                    value={languagesInput}
+                    onChange={(e) => setLanguagesInput(e.target.value)}
+                    placeholder="English, Spanish, Portuguese"
+                    className="mt-1.5 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                  />
+                  <p className="mt-1 text-xs text-[#9CA3AF]">Shown on your public profile. Separate with commas.</p>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225]">Light up your map</Label>
+                  <p className="mt-0.5 text-xs text-[#9CA3AF]">Tap at least 3 countries you know firsthand — travelers see this map on your profile.</p>
+                  <Input
+                    value={countrySearch}
+                    onChange={(e) => setCountrySearch(e.target.value)}
+                    placeholder="Search countries…"
+                    className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
+                  />
+                  {countrySearch.trim().length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {WORLD_COUNTRIES.filter((c) => c.name.toLowerCase().includes(countrySearch.trim().toLowerCase()))
+                        .slice(0, 8)
+                        .map((c) => (
+                          <button key={c.name} type="button"
+                            onClick={() => {
+                              setVisitedCountries((prev) =>
+                                prev.includes(c.name) ? prev.filter((n) => n !== c.name) : [...prev, c.name]
+                              );
+                              setCountrySearch("");
+                            }}
+                            className="h-8 rounded-lg border border-[#E5DFC6] bg-white px-3 text-[13px] text-[#0a2225] transition-colors hover:border-[#C7A962] !min-h-0 !min-w-0">
+                            {c.name}
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                  {visitedCountries.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {visitedCountries.map((name) => (
+                        <span key={name} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#C7A962]/60 bg-[#FDF9F0] pl-3 pr-1.5 text-[13px] text-[#0a2225]">
+                          {name}
+                          <button type="button" onClick={() => setVisitedCountries((prev) => prev.filter((n) => n !== name))}
+                            className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-transparent text-[#9CA3AF] transition-colors hover:border-[#E5DFC6] hover:bg-white hover:text-[#0a2225] !min-h-0 !min-w-0">
+                            <span aria-hidden>×</span>
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-3 rounded-xl border border-[#E5DFC6] bg-white p-2">
+                    <TravelMap visited={visitedCountries} />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -897,6 +1027,75 @@ export default function CreatorOnboardingPage() {
             )}
 
             {/* ── Step 5: Standards & Legal (index 3 when Portfolio is hidden) ── */}
+            {/* \u2500\u2500 Get Hired (v2): the step that makes a new creator hireable \u2500\u2500 */}
+            {currentStep === GET_HIRED_STEP_INDEX && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="font-secondary text-2xl text-[#0a2225]">Get hired onto trips</h2>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[#0a2225]/70">
+                    Travelers can hire you to join their own trip — you host the days, they cover it at your rate, and payment is escrow-protected. Set your rate now and you're hireable the moment you finish.
+                  </p>
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225]">Offer title</Label>
+                  <Input value={hostTitle} onChange={(e) => setHostTitle(e.target.value)}
+                    placeholder="Travel With Me"
+                    className="mt-1.5 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[#0a2225]">What it's like to travel with you <span className="text-[#9CA3AF]">(optional)</span></Label>
+                    <AIRewriteButton value={hostDesc} onRewrite={setHostDesc} fieldLabel="Hosted-trip description" />
+                  </div>
+                  <Textarea value={hostDesc} onChange={(e) => setHostDesc(e.target.value)} rows={3}
+                    placeholder="I plan the days, lead the way, and capture it all so you can put your phone away…"
+                    className="mt-1.5 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225]">Your day rate (USD)</Label>
+                  <Input type="number" min="0" value={hostRate} onChange={(e) => setHostRate(e.target.value)}
+                    placeholder="450"
+                    className="mt-1.5 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                  <p className="mt-1 text-xs text-[#9CA3AF]">Final totals are agreed per trip by proposal — this is your listed rate.</p>
+                </div>
+
+                {hostRate.trim() !== "" && (
+                  <div className="space-y-2.5">
+                    <p className="text-sm font-medium text-[#0a2225]">Who covers what <span className="text-[#9CA3AF] font-normal">— shown on your profile</span></p>
+                    {([
+                      ["Flights & transport", expenseTravel, setExpenseTravel],
+                      ["Lodging", expenseLodging, setExpenseLodging],
+                      ["Meals", expenseMeals, setExpenseMeals],
+                    ] as [string, ExpenseWho | null, (v: ExpenseWho) => void][]).map(([label, value, set]) => (
+                      <div key={label} className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-sm text-[#0a2225]">{label}</span>
+                        <div className="inline-flex rounded-lg border border-[#E5DFC6] bg-white p-0.5">
+                          {([["traveler", "Traveler covers"], ["creator", "In my rate"], ["split", "Each our own"]] as [ExpenseWho, string][]).map(([v, l]) => (
+                            <button key={v} type="button" onClick={() => set(v)}
+                              className={`h-8 rounded-md px-3 text-[12px] font-medium transition-colors !min-h-0 !min-w-0 ${
+                                value === v ? "bg-[#0c4d47] text-[#f7f3ea]" : "text-[#0a2225]/70 hover:bg-[#f7f3ea]"
+                              }`}>
+                              {l}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button type="button"
+                  onClick={() => { setSkippedHire(true); setHostRate(""); setCurrentStep(STANDARDS_STEP_INDEX); }}
+                  className="text-[13px] text-[#0a2225]/60 underline-offset-2 hover:underline !min-h-0 !min-w-0">
+                  I'll set this up later
+                </button>
+                <p className="text-xs text-[#9CA3AF] -mt-2">Everything here can be changed anytime in your Services.</p>
+              </div>
+            )}
+
             {currentStep === STANDARDS_STEP_INDEX && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
