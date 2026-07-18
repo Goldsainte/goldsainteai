@@ -1,3 +1,5 @@
+// get-conversations
+// v1.1 - exposes bookingId for booking-scoped threads (2026-07-18)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
@@ -79,6 +81,7 @@ serve(async (req) => {
         isInitiator,
         tripId: conv.trip_id ?? null,
         tripTitle: conv.trip_title ?? null,
+        bookingId: conv.booking_id ?? null,
         otherParticipant: {
           id: otherParticipant?.id,
           // Fall back through name fields before a generic role label — inquiry
