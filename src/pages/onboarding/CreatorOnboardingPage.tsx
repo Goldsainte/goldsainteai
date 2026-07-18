@@ -12,6 +12,7 @@ import { LuxuryStepIndicator } from "@/components/onboarding/LuxuryStepIndicator
 import { LuxurySelectionCard } from "@/components/onboarding/LuxurySelectionCard";
 import { TravelMap } from "@/components/partner/TravelMap";
 import { WORLD_COUNTRIES } from "@/components/partner/worldCountries";
+import { ON_TRIP_CAPABILITIES } from "@/lib/onTripCapabilities";
 import { ProfilePhotoUploader } from "@/pages/traveler/components/ProfilePhotoUploader";
 import { DestinationAutocomplete } from "@/components/preferences/DestinationAutocomplete";
 import { FeaturedPhotosUploader } from "@/components/onboarding/FeaturedPhotosUploader";
@@ -128,6 +129,7 @@ export default function CreatorOnboardingPage() {
   const [expenseLodging, setExpenseLodging] = useState<ExpenseWho | null>(null);
   const [expenseMeals, setExpenseMeals] = useState<ExpenseWho | null>(null);
   const [skippedHire, setSkippedHire] = useState(false);
+  const [hostCapabilities, setHostCapabilities] = useState<string[]>([]);
   const [instagramHandle, setInstagramHandle] = useState("");
   const [website, setWebsite] = useState("");
 
@@ -279,7 +281,7 @@ export default function CreatorOnboardingPage() {
       const r = parseFloat(hostRate);
       if (!Number.isFinite(r) || r <= 0) return false;
       // A rate without expense terms would publish a half-configured offer.
-      return Boolean(expenseTravel && expenseLodging && expenseMeals && hostTitle.trim());
+      return Boolean(expenseTravel && expenseLodging && expenseMeals && hostTitle.trim() && hostCapabilities.length > 0);
     }
     if (currentStep === STANDARDS_STEP_INDEX) {
       return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
@@ -421,7 +423,7 @@ export default function CreatorOnboardingPage() {
               description: hostDesc.trim() || null,
               starting_price_cents: Math.round(hostRateNum * 100),
               currency: "USD",
-              includes: [],
+              includes: hostCapabilities,
               is_active: true,
               expense_travel: expenseTravel,
               expense_lodging: expenseLodging,
@@ -1052,6 +1054,24 @@ export default function CreatorOnboardingPage() {
                   <Textarea value={hostDesc} onChange={(e) => setHostDesc(e.target.value)} rows={3}
                     placeholder="I plan the days, lead the way, and capture it all so you can put your phone away…"
                     className="mt-1.5 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                </div>
+
+                <div>
+                  <Label className="text-[#0a2225]">What can travelers hire you for?</Label>
+                  <p className="mt-0.5 text-xs text-[#9CA3AF]">Travelers pick from exactly this list when they hire you.</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {ON_TRIP_CAPABILITIES.map((c) => (
+                      <button key={c.id} type="button" title={c.hint}
+                        onClick={() => setHostCapabilities((prev) => prev.includes(c.id) ? prev.filter((x) => x !== c.id) : [...prev, c.id])}
+                        className={`h-9 rounded-lg border px-3 text-[13px] font-medium transition-colors !min-h-0 !min-w-0 ${
+                          hostCapabilities.includes(c.id)
+                            ? "border-[#0c4d47] bg-[#0c4d47] text-[#f7f3ea]"
+                            : "border-[#E5DFC6] bg-white text-[#0a2225] hover:border-[#C7A962]"
+                        }`}>
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
