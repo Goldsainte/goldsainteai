@@ -166,7 +166,7 @@ export default function MyBookingsPage() {
           </header>
 
           {loading ? (
-            <div className="mt-14 grid gap-5 md:grid-cols-2">
+            <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 2 }).map((_, idx) => (
                 <div
                   key={idx}
@@ -188,7 +188,7 @@ export default function MyBookingsPage() {
                   marketplace.
                 </p>
               ) : (
-                <div className="mt-6 grid gap-5 md:grid-cols-2">
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {upcoming.map((b) => (
                     <BookingCard key={b.id} booking={b} />
                   ))}
@@ -201,7 +201,7 @@ export default function MyBookingsPage() {
                   <div className="mt-14">
                     <SectionRule left="Past journeys" right="" />
                   </div>
-                  <div className="mt-6 grid gap-5 md:grid-cols-2">
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {past.map((b) => (
                       <BookingCard key={b.id} booking={b} muted />
                     ))}
@@ -265,8 +265,8 @@ function BookingCard({
   const title =
     trip?.title || (booking.metadata as any)?.trip_title || "Goldsainte Trip";
   const hasImage = !!trip?.cover_image_url;
-  const total = booking.total_price ?? 0;
-  const deposit = booking.deposit_amount ?? 0;
+  const total = (booking.total_price ?? 0) / 100; // column stores cents
+  const deposit = (booking.deposit_amount ?? 0) / 100;
   const balance = Math.max(0, total - deposit);
   const balanceLine =
     booking.status === "paid_in_full" || (total > 0 && balance === 0)
@@ -285,7 +285,7 @@ function BookingCard({
       }`}
     >
       {/* Photo IS the card */}
-      <div className="relative h-56 overflow-hidden md:h-60">
+      <div className="relative aspect-[4/3] overflow-hidden">
         {hasImage ? (
           <img
             src={trip!.cover_image_url!}
