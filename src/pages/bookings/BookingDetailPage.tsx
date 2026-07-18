@@ -101,6 +101,7 @@ export default function BookingDetailPage() {
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingRow | null>(null);
   const [isHireBooking, setIsHireBooking] = useState(false);
+  const [hireHeadline, setHireHeadline] = useState<string | null>(null);
   const [trip, setTrip] = useState<TripRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -282,10 +283,12 @@ export default function BookingDetailPage() {
           if (pid) {
             const { data: pr } = await (supabase
               .from("trip_proposals")
-              .select("price_breakdown" as any)
+              .select("price_breakdown, headline" as any)
               .eq("id", pid)
               .maybeSingle() as any);
-            setIsHireBooking(Boolean((pr as any)?.price_breakdown?.hire));
+            const hire = Boolean((pr as any)?.price_breakdown?.hire);
+            setIsHireBooking(hire);
+            if (hire && (pr as any)?.headline) setHireHeadline((pr as any).headline);
           }
         } catch { /* hire detection is presentational */ }
           setTrip(tripRow);
@@ -497,6 +500,7 @@ export default function BookingDetailPage() {
   const balance = Math.max(0, total - deposit);
   const reference = booking ? `GS-${booking.id.slice(0, 8).toUpperCase()}` : "";
   const title =
+    hireHeadline ||
     trip?.title ||
     (booking?.metadata as any)?.trip_title ||
     trip?.destination ||
