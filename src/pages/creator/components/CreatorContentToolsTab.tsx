@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,7 +42,7 @@ export function CreatorContentToolsTab() {
   }, [user?.id]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div className="flex items-center gap-2">
         <h2 className="font-secondary text-xl text-[#0a2225]">Content tools</h2>
       </div>
@@ -94,7 +93,7 @@ function CaptionGenerator({ products }: { products: Product[] }) {
   }
 
   return (
-    <Card className="p-5">
+    <div className="border-t border-[#0a2225]/15 pt-6">
       <div className="mb-3 flex items-center gap-2">
         <PenLine className="h-4 w-4 text-[#0c4d47]" />
         <h3 className="font-secondary text-lg text-[#0a2225]">Caption generator</h3>
@@ -125,7 +124,7 @@ function CaptionGenerator({ products }: { products: Product[] }) {
         {loading ? "Generating…" : "Generate 3 captions"}
       </Button>
       {results.length > 0 && <ResultBlock items={results} />}
-    </Card>
+    </div>
   );
 }
 
@@ -148,7 +147,7 @@ function HashtagSuggester() {
   }
 
   return (
-    <Card className="p-5">
+    <div className="border-t border-[#0a2225]/15 pt-6">
       <div className="mb-3 flex items-center gap-2">
         <Hash className="h-4 w-4 text-[#0c4d47]" />
         <h3 className="font-secondary text-lg text-[#0a2225]">Hashtag suggester</h3>
@@ -180,7 +179,7 @@ function HashtagSuggester() {
           ))}
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -206,7 +205,7 @@ function DescriptionRewriter({ products }: { products: Product[] }) {
   }
 
   return (
-    <Card className="p-5">
+    <div className="border-t border-[#0a2225]/15 pt-6">
       <div className="mb-3 flex items-center gap-2">
         <h3 className="font-secondary text-lg text-[#0a2225]">Description rewriter</h3>
       </div>
@@ -229,6 +228,6 @@ function DescriptionRewriter({ products }: { products: Product[] }) {
         {loading ? "Rewriting…" : "Generate 3 versions"}
       </Button>
       {results.length > 0 && <ResultBlock items={results} />}
-    </Card>
+    </div>
   );
 }
