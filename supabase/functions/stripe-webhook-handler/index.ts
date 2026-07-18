@@ -1,3 +1,4 @@
+// stripe-webhook-handler v3.1 - cents-true seams for total_price at the payoutMath boundary (2026-07-18)
 import "../_shared/resend-guard.ts";
 import { accumulateCollected, isFullyPaid, stripTravelerFee } from '../_shared/payoutMath.ts';
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
@@ -127,7 +128,8 @@ async function handleCheckoutCompleted(session: any) {
           Number((prevMeta as any).amount_collected ?? 0),
           session.amount_total ?? 0
         );
-        const total = Number(tb.total_price ?? 0);
+        // SEAM: total_price is INTEGER CENTS; collected/payoutMath are dollars.
+        const total = Number(tb.total_price ?? 0) / 100;
         if (isFullyPaid(collected, total)) {
           newStatus = 'paid_in_full';
         }
@@ -649,7 +651,9 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
     // already includes this charge. chargedNow is what actually hit the
     // card (incl. the traveler-side 3.5% fee) — that's what a receipt must
     // say to match their statement.
-    const totalPrice = Number(bookingData.total_price ?? 0);
+    // SEAM: total_price is INTEGER CENTS -> dollars once, here. (This email
+    // used to print a $10 trip as "$1,000.00" with a "$997.50" balance.)
+    const totalPrice = Number(bookingData.total_price ?? 0) / 100;
     const collected = Number((bookingData.metadata as any)?.amount_collected ?? 0);
     const chargedNow = (session?.amount_total ?? 0) / 100;
     const contributionNow = stripTravelerFee(session?.amount_total ?? 0);
