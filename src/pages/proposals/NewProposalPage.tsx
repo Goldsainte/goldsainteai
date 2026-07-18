@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { capLabel } from "@/lib/onTripCapabilities";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -94,6 +95,7 @@ export default function NewProposalPage() {
     (tripData?.start_date && tripData?.end_date
       ? Math.max(0, Math.round((new Date(tripData.end_date).getTime() - new Date(tripData.start_date).getTime()) / 86400000))
       : 0);
+  const hireCaps: string[] = Array.isArray(hireMeta.hire_capabilities) ? hireMeta.hire_capabilities : [];
   const hireEstimate = typeof hireMeta.estimated_total_usd === "number" ? hireMeta.estimated_total_usd :
     (hireRate && hireDays > 0 ? hireRate * hireDays : null);
   const [proposalCount, setProposalCount] = useState(0);
@@ -180,7 +182,7 @@ export default function NewProposalPage() {
           .eq("service_tier", "on_trip")
           .limit(1) as any);
         const s: any = (svc as any)?.[0];
-        const covered: string[] = ["My hosted days, start to finish"];
+        const covered: string[] = [...(hireCaps.length ? hireCaps.map(capLabel) : ["My hosted days, start to finish"])];
         const notCovered: string[] = [];
         const place = (v: string | null | undefined, label: string) => {
           if (v === "creator") covered.push(`${label} \u2014 in my rate`);
@@ -774,7 +776,16 @@ export default function NewProposalPage() {
                   {hireRate ? ` \u00b7 your listed rate $${hireRate}/day` : ""}
                   {hireEstimate ? ` \u00b7 \u2248 $${hireEstimate.toLocaleString()} total` : ""}.
                 </p>
-                <p className="mt-1 text-[12.5px] text-[#0a2225]/60">No itinerary needed — confirm your price and terms; the trip is theirs, the days are yours to host.</p>
+                {hireCaps.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {hireCaps.map((id) => (
+                      <span key={id} className="inline-flex h-7 items-center rounded-lg border border-[#C7A962]/60 bg-white px-2.5 text-[11px] font-medium text-[#0a2225]">
+                        {capLabel(id)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="mt-1.5 text-[12.5px] text-[#0a2225]/60">No itinerary needed — confirm your price and terms; the trip is theirs, the days are yours to host.</p>
               </div>
             )}
             {step === 0 && (
