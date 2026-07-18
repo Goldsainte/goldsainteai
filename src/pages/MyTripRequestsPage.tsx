@@ -25,6 +25,7 @@ export default function MyTripRequestsPage() {
   const { user } = useAuth();
   const [requests, setRequests] = useState<TripRequestWithProposals[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -59,9 +60,17 @@ export default function MyTripRequestsPage() {
       if (!isMounted) return;
 
       if (error) {
+        // A failed load must LOOK like a failure — not like an empty account.
         console.error("Error loading my trip_requests:", error);
-        {
-        const rows: any[] = ([] as any[]) || [];
+        setLoadError(true);
+        setRequests([]);
+      } else {
+        setLoadError(false);
+        const rows: any[] = (data ?? []) as any[];
+        // Enrich hire-style requests with the addressee's name ("Request to
+        // Jordan Woods"). An enhancement, never fatal — and it now runs on the
+        // REAL rows (it was previously trapped in the error branch iterating
+        // a hardcoded empty array).
         try {
           const ids = Array.from(new Set(rows.map((r) => r.preferred_creator_id).filter(Boolean)));
           if (ids.length) {
@@ -79,9 +88,6 @@ export default function MyTripRequestsPage() {
           }
         } catch { /* names are an enhancement */ }
         setRequests(rows as any);
-      }
-      } else {
-        setRequests((data ?? []) as any);
       }
 
       setLoading(false);
@@ -140,6 +146,11 @@ export default function MyTripRequestsPage() {
                     className="h-40 rounded-3xl bg-[#0a2225]/60 animate-pulse"
                   />
                 ))}
+              </div>
+            ) : loadError ? (
+              <div className="rounded-3xl border border-dashed border-[#b3452f]/30 bg-white/70 px-4 py-8 text-center text-xs text-[#b3452f]">
+                We couldn't load your requests just now — please refresh to try
+                again. If it keeps happening, contact support.
               </div>
             ) : requests.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-4 py-8 text-center text-xs text-[#4a4a4a]">
