@@ -41,7 +41,7 @@ export function CreatorEarningsTab() {
   const total = (snapshot?.pending || 0) + (snapshot?.released || 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Stripe Connect setup card — always mounted. The card handles all
           three states itself (not connected / pending "Continue Setup" /
           active), and mounting it is what triggers check-creator-stripe-status,
@@ -51,7 +51,7 @@ export function CreatorEarningsTab() {
       <CreatorStripeOnboarding />
 
       {/* Summary cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-x-10 gap-y-6 md:grid-cols-3">
         <SummaryCard
           label="Released"
           value={snapshot ? formatMoney(snapshot.released, currency) : "—"}
@@ -71,12 +71,12 @@ export function CreatorEarningsTab() {
       </div>
 
       {/* Booking payouts */}
-      <div className="rounded-2xl bg-white border border-[#E5DFC6] p-5 md:p-6 space-y-4">
+      <div className="border-t border-[#0a2225]/15 pt-6 space-y-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] font-medium text-[#C7A962]">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
             Booking payouts
           </p>
-          <p className="text-base font-secondary font-semibold text-[#0a2225] mt-1">
+          <p className="font-secondary text-[20px] text-[#0a2225] mt-1.5">
             Latest activity
           </p>
         </div>
@@ -91,12 +91,12 @@ export function CreatorEarningsTab() {
         )}
 
         {!loading && !error && snapshot && snapshot.bookings.length > 0 && (
-          <div className="space-y-3">
+          <div className="divide-y divide-[#0a2225]/10 border-t border-[#0a2225]/10">
             {snapshot.bookings.map((booking) => (
               <Link
                 key={booking.id}
                 to={`/bookings/${booking.id}`}
-                className="flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] px-4 py-3 hover:border-[#C7A962] transition-colors"
+                className="flex flex-col md:flex-row md:items-center justify-between gap-3 py-4 transition-colors hover:bg-[#F6F0E4]/40"
               >
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-[#0a2225]">
@@ -143,24 +143,16 @@ function SummaryCard({
   highlight?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl border p-4 space-y-2 ${
-      highlight
-        ? "bg-[#0c4d47] border-[#0c4d47] text-white"
-        : "bg-white border-[#E5DFC6]"
-    }`}>
-      <p className={`text-xs uppercase tracking-[0.15em] font-medium ${
-        highlight ? "text-white/70" : "text-[#6B7280]"
-      }`}>
+    <div className="border-t border-[#0a2225]/15 pt-3">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
         {label}
       </p>
-      <p className={`text-xl font-secondary font-semibold ${
-        highlight ? "text-white" : "text-[#C7A962]"
+      <p className={`mt-1.5 font-secondary text-[30px] leading-tight ${
+        highlight ? "text-[#0c4d47]" : "text-[#0a2225]"
       }`}>
         {value}
       </p>
-      <p className={`text-xs ${
-        highlight ? "text-white/70" : "text-[#6B7280]"
-      }`}>
+      <p className="mt-1 text-[13px] text-[#0a2225]/55">
         {description}
       </p>
     </div>
