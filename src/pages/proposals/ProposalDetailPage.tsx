@@ -227,6 +227,9 @@ export default function ProposalDetailPage() {
   const trip = proposal?.trip_request;
   const title = proposal?.headline || trip?.title || trip?.destination || "Trip Proposal";
   const pb = proposal?.price_breakdown;
+  const hireInfo: any = (pb as any)?.hire ?? null;
+  const isHireProposal = Boolean(hireInfo);
+  const hirePartnerFirst = (proposal?.proposer?.display_name || "your host").split(" ")[0];
   const depositAmount = proposal?.price_from && proposal?.deposit_percentage
     ? Math.round(proposal.price_from * proposal.deposit_percentage / 100)
     : null;
@@ -803,7 +806,15 @@ export default function ProposalDetailPage() {
                   <p className="text-sm text-muted-foreground mb-3">If the traveler accepts this proposal:</p>
                   <ol className="space-y-2.5">
                     {(isProposer
-                      ? [
+                      ? isHireProposal
+                        ? [
+                            "The proposal becomes an active booking \u2014 no contract step for hires; the scope you sent is the agreement.",
+                            `The traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 held in escrow from day one.`,
+                            "Coordinate the days in Messages; the balance lands in escrow before departure.",
+                            "Travel with them and deliver everything in your scope.",
+                            "When the traveler confirms the trip went as agreed, your payout is released \u2014 your total minus the 7% platform fee.",
+                          ]
+                        : [
                           "The proposal becomes an active booking — and the first move is YOURS: open the booking and hit Create contract (Goldsainte AI can draft it for you), then send it. Both of you sign; nothing moves until it's fully executed.",
                           `Once both signatures are in, the traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow — not released to you yet.`,
                           "You secure the reservations and share the confirmations with the traveler in Messages.",
@@ -811,7 +822,16 @@ export default function ProposalDetailPage() {
                           "The traveler pays the balance before departure; it stays in escrow through the trip.",
                           "After the trip, the traveler confirms completion and your final payout is released.",
                         ]
-                      : [
+                      : isHireProposal
+                        ? [
+                            "Accepting creates your booking. The scope above is what you've both agreed to \u2014 no separate contract step for hires.",
+                            `You pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow and stays protected until after the trip.`,
+                            `${hirePartnerFirst} plans around your dates and stays in touch in Messages.`,
+                            "The balance is due before departure and stays in escrow through your trip.",
+                            `${hirePartnerFirst} joins your trip and delivers everything in the scope.`,
+                            `When you confirm the trip went as agreed, the payout is released to ${hirePartnerFirst}.`,
+                          ]
+                        : [
                           "Accepting creates your booking. Your specialist prepares and sends the contract for both of you to sign — nothing is owed until it's fully executed.",
                           `Once both signatures are in, you pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow and stays under your control.`,
                           "Your specialist secures the reservations and shares the confirmations with you in Messages.",
