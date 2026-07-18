@@ -143,13 +143,13 @@ export default function MyTripRequestsPage() {
               </div>
             ) : requests.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/70 px-4 py-8 text-center text-xs text-[#4a4a4a]">
-                You haven't posted any trips yet.
+                No requests from this account yet.
                 <br />
                 <Link
                   to="/post-trip"
                   className="mt-2 inline-block text-[#0c4d47] underline"
                 >
-                  Post your first trip to the marketplace
+                  Post a trip — or hire a creator from their profile
                 </Link>
               </div>
             ) : (
@@ -220,34 +220,34 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
           <img src={imgUrl} alt={req.destination || "Trip"} loading="lazy"
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
         )}
-        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {statusLabel}
         </span>
         {isHireReq && (
-          <span className="absolute left-3.5 top-3.5 rounded bg-[#C7A962] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
+          <span className="absolute left-3.5 top-3.5 rounded bg-[#C7A962] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
             On-trip hire
           </span>
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
           {req.destination && (
-            <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">{req.destination}</p>
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#C7A962]/95">{req.destination}</p>
           )}
           <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
             {req.title || `Trip to ${req.destination || "somewhere special"}`}
           </p>
-          <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+          <p className="mt-1.5 text-[12.5px] text-[#fdfaf2]/80">
             Posted {new Date(req.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             {(req as any).addresseeName ? ` \u00b7 Sent to ${(req as any).addresseeName}` : ""}
           </p>
         </div>
       </div>
       <div className="flex items-center justify-between px-5 py-3.5">
-        <span className="text-[11.5px] text-[#0a2225]/50">
+        <span className="text-[12.5px] text-[#0a2225]/55">
           {dates}
           {" \u00b7 "}
           {proposalsCount} proposal{proposalsCount === 1 ? "" : "s"}
         </span>
-        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47]">
+        <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#0c4d47]">
           View request
           <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
         </span>
