@@ -639,6 +639,11 @@ export function DirectMessageInbox() {
                       ? "Creator"
                       : selectedConversation.otherParticipant.accountType || "Member"}
                   </span>
+                  {selectedConversation.tripTitle && (
+                    <p className="truncate text-[10px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                      {selectedConversation.tripTitle}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -994,6 +999,11 @@ function ConversationItem({
             <p className={`truncate text-[15px] leading-5 ${unread ? "font-semibold text-[#0a2225]" : "font-normal text-[#0a2225]"}`}>
               {conversation.otherParticipant.displayName}
             </p>
+            {conversation.tripTitle && (
+              <p className="truncate text-[10px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                {conversation.tripTitle}
+              </p>
+            )}
             <div className="mt-0.5 flex items-baseline min-w-0">
               <p className={`truncate text-[14px] leading-5 ${unread ? "font-medium text-[#0a2225]" : "text-[#6B7280]"}`}>
                 {conversation.lastMessagePreview || "No messages yet"}
