@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, Users, HandCoins, Sparkles } from "lucide-react";
+import { Calendar, MapPin, Users, HandCoins, Sparkles, ArrowRight } from "lucide-react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { useAuth } from "@/contexts/AuthContext";
 
 type TripRequestWithProposals = {
@@ -132,7 +133,7 @@ export default function MyTripRequestsPage() {
           {/* Content */}
           <section className="mt-6">
             {loading ? (
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 4 }).map((_, idx) => (
                   <div
                     key={idx}
@@ -203,74 +204,53 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
       ? "bg-[#0c4d47]/10 text-[#0c4d47] ring-[#0c4d47]/30"
       : "bg-[#8D8D8D]/10 text-[#8D8D8D] ring-[#8D8D8D]/30";
 
+  const proposalsCount = Array.isArray((req as any).trip_proposals) ? (req as any).trip_proposals.length : 0;
+  const imgUrl = req.destination ? getTripRequestImageUrl(req.destination) : null;
+  const isHireReq = Boolean((req as any).source_metadata?.hire_on_trip);
   return (
     <Link
       to={`/trip-request/${req.id}`}
-      className="flex flex-col gap-3 rounded-3xl bg-white/95 p-4 text-xs text-[#0a2225] shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72]"
+      className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-xs text-[#8D8D8D]">
-            Posted {new Date(req.created_at).toLocaleDateString()}
-          </p>
-          {(req as any).addresseeName && (
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#0a2225]">
-              <span className="font-medium">Sent directly to {(req as any).addresseeName}</span>
-              {Boolean((req as any).source_metadata?.hire_on_trip) && (
-                <span className="rounded bg-[#C7A962] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#0a2225]">
-                  On-trip hire
-                </span>
-              )}
-            </p>
-          )}
-          <h2 className="mt-1 line-clamp-2 text-sm font-semibold">
-            {req.title || `Trip to ${req.destination || "somewhere special"}`}
-          </h2>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+          <span className="font-secondary text-xl italic text-[#C7A962]/80">Goldsainte</span>
         </div>
-        <span
-          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusColor}`}
-        >
+        {imgUrl && (
+          <img src={imgUrl} alt={req.destination || "Trip"} loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+        )}
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {statusLabel}
         </span>
-      </div>
-
-      <div className="grid gap-3 md:grid-cols-3">
-        <div className="space-y-1 text-sm text-[#4a4a4a]">
-          <p className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-[#8D8D8D]" />
-            <span>{req.destination || "Destination TBD"}</span>
-          </p>
-          <p className="flex items-center gap-1">
-            <Calendar className="h-3 w-3 text-[#8D8D8D]" />
-            <span className="line-clamp-1">{dates}</span>
-          </p>
-        </div>
-        <div className="space-y-1 text-sm text-[#4a4a4a]">
-          <p className="flex items-center gap-1">
-            <Users className="h-3 w-3 text-[#8D8D8D]" />
-            <span>{travelers || "Unknown"} travelers</span>
-          </p>
-          <p className="flex items-center gap-1">
-            <HandCoins className="h-3 w-3 text-[#8D8D8D]" />
-            <span>{budget}</span>
-          </p>
-        </div>
-        <div className="space-y-1 text-sm text-[#4a4a4a]">
-          <p>
-            <span className="font-medium">{proposalCount}</span> proposal
-            {proposalCount === 1 ? "" : "s"} received
-          </p>
-          {acceptedCount > 0 && (
-            <p className="text-emerald-700">
-              {acceptedCount} proposal
-              {acceptedCount === 1 ? "" : "s"} marked as accepted
-            </p>
+        {isHireReq && (
+          <span className="absolute left-3.5 top-3.5 rounded bg-[#C7A962] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
+            On-trip hire
+          </span>
+        )}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
+          {req.destination && (
+            <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">{req.destination}</p>
           )}
+          <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
+            {req.title || `Trip to ${req.destination || "somewhere special"}`}
+          </p>
+          <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+            Posted {new Date(req.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            {(req as any).addresseeName ? ` \u00b7 Sent to ${(req as any).addresseeName}` : ""}
+          </p>
         </div>
       </div>
-
-      <div className="flex items-center justify-between text-sm text-[#0c4d47]">
-        <span>View full brief & proposals →</span>
+      <div className="flex items-center justify-between px-5 py-3.5">
+        <span className="text-[11.5px] text-[#0a2225]/50">
+          {dates}
+          {" \u00b7 "}
+          {proposalsCount} proposal{proposalsCount === 1 ? "" : "s"}
+        </span>
+        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47]">
+          View request
+          <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </span>
       </div>
     </Link>
   );
