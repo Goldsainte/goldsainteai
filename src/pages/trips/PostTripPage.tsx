@@ -84,7 +84,6 @@ export default function PostTripPage() {
   const [preferredAgentId, setPreferredAgentId] = useState<string | null>(null);
   // travel_agents.id is NOT a user id — notifications must target the agent's
   // auth account, resolved from travel_agents.user_id.
-  const [preferredAgentUserId, setPreferredAgentUserId] = useState<string | null>(null);
   const [preferredName, setPreferredName] = useState<string | null>(null);
 
   // On-trip hire: profile "Hire for your trip" CTAs pass ?hire=on-trip plus
@@ -241,7 +240,7 @@ export default function PostTripPage() {
       sessionStorage.removeItem("goldsainte:hireRate");
       sessionStorage.removeItem("goldsainte:hireServiceId");
 
-      const notifyUserId = preferredCreatorId || preferredAgentUserId;
+      const notifyUserId = preferredCreatorId || preferredAgentId;
       if (notifyUserId && insertedTrip?.id) {
         try {
           const { data: nr, error: ne } = await supabase.functions.invoke("send-notification", {
@@ -459,7 +458,7 @@ export default function PostTripPage() {
       // Goldsainte Concierge desks (whose emails route to the team inbox)
       // learn about direct requests. Fire-and-forget: a notification failure
       // should not break a successfully posted trip.
-      const notifyUserId = preferredCreatorId || preferredAgentUserId;
+      const notifyUserId = preferredCreatorId || preferredAgentId;
       if (notifyUserId && insertedTrip?.id) {
         try {
           const { data: notifyResult, error: notifyError } = await supabase.functions.invoke("send-notification", {
