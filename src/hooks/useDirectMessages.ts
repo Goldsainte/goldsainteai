@@ -11,6 +11,7 @@ export interface Conversation {
   isInitiator: boolean;
   tripId: string | null;
   tripTitle: string | null;
+  bookingId: string | null;
   otherParticipant: {
     id: string;
     displayName: string;
