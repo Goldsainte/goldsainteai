@@ -600,9 +600,9 @@ export default function TripRequestDetail() {
                 </div>
 
                 {proposals.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-[#0a2225]/15 bg-white px-6 py-12 text-center">
+                  <div className="border-t border-[#0a2225]/15 pt-6">
                     <p className="font-secondary text-[20px] text-[#0a2225]">No proposals yet</p>
-                    <p className="mt-1.5 text-[14px] text-[#0a2225]/55">
+                    <p className="mt-1.5 max-w-md text-[14px] leading-relaxed text-[#0a2225]/55">
                       As agents and creators respond, their proposals will appear here.
                     </p>
                   </div>
@@ -662,7 +662,7 @@ export default function TripRequestDetail() {
                         </div>
 
                         {proposal.status !== "accepted" && proposal.status !== "declined" && (
-                          <div className="mx-1 rounded-xl border border-[#C7A962]/30 bg-[#C7A962]/[0.08] p-4 text-[13px] leading-relaxed text-[#0a2225]/75">
+                          <div className="mx-1 border-l-2 border-[#C7A962] py-1 pl-4 text-[13px] leading-relaxed text-[#0a2225]/70">
                             <p>
                               <span className="font-semibold">By accepting this proposal</span>, your trip and payments stay protected by Goldsainte.
                             </p>
@@ -685,13 +685,13 @@ export default function TripRequestDetail() {
             <div className="sticky top-20 space-y-6">
 
               {/* Budget + CTA Card */}
-              <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+              <div className="border-t border-[#0a2225]/15 pt-6">
                 {(request.budgetMin > 0 || request.budgetMax > 0) && (
                   <div className="mb-6">
                     <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                       {request.hireOnTrip ? "Estimate" : "Budget"}
                     </p>
-                    <p className="mt-2.5 font-secondary text-[27px] leading-none text-[#0a2225]">
+                    <p className="mt-3 font-secondary text-[38px] leading-none text-[#0a2225]">
                       {request.hireOnTrip
                         ? `\u2248 ${formatCurrency(request.budgetMax)}`
                         : `${formatCurrency(request.budgetMin)} \u2013 ${formatCurrency(request.budgetMax)}`}
@@ -761,35 +761,38 @@ export default function TripRequestDetail() {
                 )}
               </div>
 
-              {/* How it works — editorial dark card */}
-              <div className="rounded-2xl bg-gradient-to-br from-[#0c4d47] to-[#0a2225] p-6">
-                <h3 className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">How it works</h3>
-                <ol className="mt-4 space-y-4">
-                  {(request.hireOnTrip
-                    ? [
-                        "Review the trip, dates, and party",
-                        `Message ${travelerName.split(" ")[0]} with any questions`,
-                        "Reply with your proposal \u2014 total price and expense terms",
-                        "They accept and pay the deposit \u2014 escrow-protected",
-                      ]
-                    : [
-                        "Review the traveler's brief and inspiration",
-                        "Submit your proposal with pricing and itinerary",
-                        "The traveler reviews and compares proposals",
-                        "If accepted, it becomes a confirmed booking",
-                      ]
-                  ).map((step, i) => (
-                    <li key={i} className="flex items-start gap-3.5">
-                      <span className="w-6 shrink-0 pt-px text-right font-secondary text-[14px] italic text-[#C7A962]">
-                        {["I.", "II.", "III.", "IV."][i]}
-                      </span>
-                      <span className="text-[13.5px] leading-relaxed text-[#fdfaf2]/85">{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
             </div>
           </aside>
+        </div>
+      </div>
+
+      {/* ============= HOW IT WORKS — full-width, house register ============= */}
+      <div className="mx-auto max-w-5xl px-4 pb-14">
+        <div className="border-t border-[#0a2225]/15 pt-8">
+          <h2 className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">How it works</h2>
+          <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2 md:grid-cols-4">
+            {(request.hireOnTrip
+              ? [
+                  "Review the trip, dates, and party",
+                  `Message ${travelerName.split(" ")[0]} with any questions`,
+                  "Reply with your proposal \u2014 total price and expense terms",
+                  "They accept and pay the deposit \u2014 escrow-protected",
+                ]
+              : [
+                  "Review the traveler's brief and inspiration",
+                  "Submit your proposal with pricing and itinerary",
+                  "The traveler reviews and compares proposals",
+                  "If accepted, it becomes a confirmed booking",
+                ]
+            ).map((step, i) => (
+              <div key={i}>
+                <p className="font-secondary text-[18px] italic text-[#C7A962]">
+                  {["I.", "II.", "III.", "IV."][i]}
+                </p>
+                <p className="mt-2 text-[14.5px] leading-[1.7] text-[#0a2225]/75">{step}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
