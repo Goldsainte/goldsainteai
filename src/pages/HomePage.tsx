@@ -6,6 +6,7 @@ import { EarnSection } from "@/components/home/EarnSection";
 import { lazy, Suspense } from "react";
 const PlatformDemoSection = lazy(() => import("@/components/home/PlatformDemoSection"));
 import { OneConversationSection } from "@/components/home/OneConversationSection";
+import { CreatorShowcaseSection } from "@/components/home/CreatorShowcaseSection";
 import { TrustPlaque } from "@/components/home/TrustPlaque";
 import { FinalCTABand } from "@/components/home/FinalCTABand";
 import { useQuery } from "@tanstack/react-query";
@@ -77,6 +78,7 @@ export default function HomePage() {
       <Suspense fallback={null}>
         <PlatformDemoSection />
       </Suspense>
+      <CreatorShowcaseSection />
       <FeaturedTripsSection />
       <DreamTripBand />
       <EarnSection />
