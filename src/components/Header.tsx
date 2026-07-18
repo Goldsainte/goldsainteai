@@ -242,13 +242,7 @@ export const Header = () => {
                               Every destination kept; only the grouping changed. */}
                           <div className="pb-1 pt-2">
                             <p className="px-6 pb-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#BFAD72]">Explore</p>
-                            <DropdownMenuItem
-                              onClick={() => navigate('/marketplace')}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                            >
-                              <ShoppingCart className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Travel Marketplace</span>
-                            </DropdownMenuItem>
+
                             <DropdownMenuItem
                               onClick={() => navigate('/creators')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -267,6 +261,8 @@ export const Header = () => {
 
                           <div className="pb-1 pt-1">
                             <p className="px-6 pb-1 pt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#BFAD72]">My Travel</p>
+                            {/* — Traveling — */}
+                            <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Traveling</div>
                             <DropdownMenuItem
                               onClick={() => navigate(primaryBookingsPath)}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -323,6 +319,27 @@ export const Header = () => {
                           </div>
 
                           {(isAgentAccount || isCreator || isAdmin || isBrand) && (
+                            <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
+                          )}
+                            {isCreator && (
+                              <DropdownMenuItem
+                                onClick={() => navigate('/creator-dashboard')}
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                              >
+                                <BarChart3 className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                <span className="text-[15px] font-medium text-[#0a2225]">Creator Dashboard</span>
+                              </DropdownMenuItem>
+                            )}
+                            {isAgentAccount && (
+                              <DropdownMenuItem
+                                onClick={() => navigate('/agent-dashboard')}
+                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
+                              >
+                                <LayoutDashboard className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                                <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
+                              </DropdownMenuItem>
+                            )}
+                          {(isAgentAccount || isCreator || isAdmin || isBrand) && (
                             <Accordion type="multiple" className="w-full">
                               <AccordionItem value="work" className="border-b-0">
                                 <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/5">
@@ -372,6 +389,7 @@ export const Header = () => {
 
                           {/* Account */}
                           <div className="py-2">
+                            <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Account</div>
                             <DropdownMenuItem
                               onClick={() => navigate(getProfilePath())}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -379,24 +397,8 @@ export const Header = () => {
                               <User className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">My Profile</span>
                             </DropdownMenuItem>
-                            {isCreator && (
-                              <DropdownMenuItem
-                                onClick={() => navigate('/creator-dashboard')}
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                              >
-                                <BarChart3 className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Creator Dashboard</span>
-                              </DropdownMenuItem>
-                            )}
-                            {isAgentAccount && (
-                              <DropdownMenuItem
-                                onClick={() => navigate('/agent-dashboard')}
-                                className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
-                              >
-                                <LayoutDashboard className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
-                              </DropdownMenuItem>
-                            )}
+
+
                             <DropdownMenuItem
                               onClick={() => navigate(isAgentAccount ? '/agent-settings' : isCreator ? '/creator-settings' : '/travel-settings')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -697,6 +699,7 @@ export const Header = () => {
                             <Users className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                             <span className="text-[15px] font-medium text-[#0a2225]">Saved &amp; Following</span>
                           </DropdownMenuItem>
+                          <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Traveling</div>
                           <DropdownMenuItem
                             onClick={() => navigate(primaryBookingsPath)}
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
@@ -711,6 +714,27 @@ export const Header = () => {
                               <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                               <span className="text-[15px] font-medium text-[#0a2225]">My Requests</span>
                             </DropdownMenuItem>
+                        {(isAgentAccount || isCreator || isAdmin || isBrand) && (
+                          <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
+                        )}
+                          {isCreator && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/creator-dashboard')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
+                            >
+                              <BarChart3 className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Creator Dashboard</span>
+                            </DropdownMenuItem>
+                          )}
+                          {isAgentAccount && (
+                            <DropdownMenuItem
+                              onClick={() => navigate('/agent-dashboard')}
+                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
+                            >
+                              <LayoutDashboard className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
+                              <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
+                            </DropdownMenuItem>
+                          )}
                           {(isAgentAccount || isCreator || isAdmin || isBrand) && (
                             <DropdownMenuItem
                               onClick={() => navigate('/partner-bookings')}
@@ -776,6 +800,7 @@ export const Header = () => {
 
                         {/* Account */}
                         <div className="py-2">
+                          <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Account</div>
                           <DropdownMenuItem
                             onClick={() => navigate(getProfilePath())}
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
@@ -783,24 +808,8 @@ export const Header = () => {
                             <User className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                             <span className="text-[15px] font-medium text-[#0a2225]">My Profile</span>
                           </DropdownMenuItem>
-                          {isCreator && (
-                            <DropdownMenuItem
-                              onClick={() => navigate('/creator-dashboard')}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
-                            >
-                              <BarChart3 className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Creator Dashboard</span>
-                            </DropdownMenuItem>
-                          )}
-                          {isAgentAccount && (
-                            <DropdownMenuItem
-                              onClick={() => navigate('/agent-dashboard')}
-                              className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
-                            >
-                              <LayoutDashboard className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
-                            </DropdownMenuItem>
-                          )}
+
+
                             <DropdownMenuItem
                               onClick={() => navigate(isAgentAccount ? '/agent-settings' : isCreator ? '/creator-settings' : '/travel-settings')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
