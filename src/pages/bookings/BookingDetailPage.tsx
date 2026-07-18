@@ -1002,16 +1002,25 @@ export default function BookingDetailPage() {
                   )}
 
                   <div className="mt-4 border-t border-[#E5DFC6] pt-4">
-                    <p className="flex items-center justify-between text-[14px] text-[#0a2225]/60">
-                      <span>Balance remaining</span>
-                      <span className="font-secondary text-[16px] text-[#0a2225]">
-                        {formatMoney(balance, currency)}
-                      </span>
-                    </p>
-                    <p className="mt-2 flex items-center justify-between text-[14px] text-[#0a2225]/60">
-                      <span>Due</span>
-                      <span className="text-[#0a2225]">Before departure</span>
-                    </p>
+                    {/* Restate the outstanding balance ONLY when money is
+                        genuinely still owed. On a paid-in-full booking the
+                        ledger above already shows Balance paid — printing
+                        "Balance remaining / before departure" here too is the
+                        contradiction (paid AND due). */}
+                    {!fullyPaid && balance > 0 && (
+                      <>
+                        <p className="flex items-center justify-between text-[14px] text-[#0a2225]/60">
+                          <span>Balance remaining</span>
+                          <span className="font-secondary text-[16px] text-[#0a2225]">
+                            {formatMoney(balance, currency)}
+                          </span>
+                        </p>
+                        <p className="mt-2 flex items-center justify-between text-[14px] text-[#0a2225]/60">
+                          <span>Due</span>
+                          <span className="text-[#0a2225]">Before departure</span>
+                        </p>
+                      </>
+                    )}
                     {!fullyPaid &&
                       !depositPaid &&
                       booking.status !== "cancelled" &&
@@ -1044,7 +1053,7 @@ export default function BookingDetailPage() {
                         {payError}
                       </p>
                     )}
-                    {booking.status === "paid_in_full" && (
+                    {fullyPaid && (
                       <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[13.5px] uppercase tracking-[0.14em] text-[#0a2225]/60">
                         Paid in full — nothing further due
                       </p>
