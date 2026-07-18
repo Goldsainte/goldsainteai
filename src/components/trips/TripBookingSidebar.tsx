@@ -93,8 +93,8 @@ export function TripBookingSidebar({
           traveler_id: user.id,
           partner_id: resolvedPartnerId,
           partner_role: agentId ? "agent" : "creator",
-          total_price: pricePerPerson,
-          deposit_amount: depositAmount,
+          total_price: Math.round(pricePerPerson * 100), // cents — column standard
+          deposit_amount: Math.round(depositAmount * 100), // cents
           deposit_percentage: depositPercentage,
           currency: currency || "USD",
           status: "deposit_pending",
