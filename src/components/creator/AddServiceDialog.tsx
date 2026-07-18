@@ -17,6 +17,8 @@ interface Props {
   onCreated: () => void;
   editService?: any;
   initialTier?: ServiceTier | null;
+  /** Open directly on a step (e.g. 3 = the capabilities/description step). */
+  initialStep?: number;
 }
 
 const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color: string }[] = [
@@ -40,11 +42,11 @@ const PRESET_REQUIREMENTS = [
 // Matches the mockup's .field input styling exactly: cream bg, tan border, 10px radius
 const FIELD_CLASS = "bg-[#FDF9F0] border-[#E5DFC6] rounded-[10px] focus-visible:ring-[#0c4d47]/30";
 
-export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService, initialTier }: Props) {
+export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService, initialTier, initialStep }: Props) {
   const isEdit = !!editService;
   const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || initialTier || null);
   const [saving, setSaving] = useState(false);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(initialStep ?? 0);
   const STEPS = ["Overview", "Pricing", "Requirements", "Description"];
 
   useEffect(() => {
