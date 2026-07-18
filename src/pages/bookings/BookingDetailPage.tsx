@@ -943,49 +943,47 @@ export default function BookingDetailPage() {
               {/* RIGHT column */}
               <div className="space-y-5 md:sticky md:top-6 md:self-start">
                 <div className="border-t border-[#0a2225]/15 pt-6">
-                  <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                  <p className="text-[13px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                     Payment
                   </p>
-                  <p className="mt-3 font-secondary text-[26px] text-[#0a2225]">
-                    {formatMoney(amountPaid, currency)}{" "}
-                    <span className="text-[15px] text-[#0a2225]/45">
-                      of {formatMoney(total, currency)} paid
-                    </span>
+                  {/* Hero price — the number leads, context sits beneath. */}
+                  <p className="mt-4 font-secondary text-[40px] leading-none text-[#0a2225]">
+                    {formatMoney(amountPaid, currency)}
                   </p>
-                  <div className="mt-3.5 h-[5px] overflow-hidden rounded-full bg-[#EFE8D6]">
+                  <p className="mt-2 text-[15px] text-[#0a2225]/50">
+                    of {formatMoney(total, currency)} · {progressPct}% held in escrow
+                  </p>
+                  <div className="mt-5 h-[8px] overflow-hidden rounded-full bg-[#EFE8D6]">
                     <span
                       className="block h-full rounded-full bg-[#C7A962] transition-all"
                       style={{ width: `${progressPct}%` }}
                     />
                   </div>
                   {/* Ledger: each money line answers "did this happen yet". */}
-                  <div className="mt-4 space-y-1.5 border-t border-[#0a2225]/10 pt-3.5 text-[14.5px]">
-                    <p className="flex items-center justify-between">
+                  <div className="mt-6 border-t border-[#0a2225]/10 text-[16px]">
+                    <p className="flex items-center justify-between border-b border-[#0a2225]/10 py-3.5">
                       <span className="text-[#0a2225]/60">Deposit</span>
-                      <span className="inline-flex items-center gap-1.5 text-[#0a2225]">
+                      <span className="inline-flex items-center gap-2 font-secondary text-[18px] text-[#0a2225]">
                         {formatMoney(deposit, currency)}
                         {depositPaid ? (
-                          <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
+                          <CheckCircle2 className="h-[18px] w-[18px] text-[#0c4d47]" />
                         ) : (
-                          <span className="text-[12.5px] uppercase tracking-[0.1em] text-[#8D6B2F]">due</span>
+                          <span className="text-[13px] uppercase tracking-[0.1em] text-[#8D6B2F]">due</span>
                         )}
                       </span>
                     </p>
-                    <p className="flex items-center justify-between">
+                    <p className="flex items-center justify-between py-3.5">
                       <span className="text-[#0a2225]/60">Balance</span>
-                      <span className="inline-flex items-center gap-1.5 text-[#0a2225]">
+                      <span className="inline-flex items-center gap-2 font-secondary text-[18px] text-[#0a2225]">
                         {formatMoney(balance, currency)}
                         {fullyPaid ? (
-                          <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
+                          <CheckCircle2 className="h-[18px] w-[18px] text-[#0c4d47]" />
                         ) : (
-                          <span className="text-[12.5px] uppercase tracking-[0.1em] text-[#0a2225]/45">before departure</span>
+                          <span className="text-[13px] uppercase tracking-[0.1em] text-[#0a2225]/45">before departure</span>
                         )}
                       </span>
                     </p>
                   </div>
-                  <p className="mt-1.5 text-[12.5px] text-[#0a2225]/45">
-                    {progressPct}% paid · held in escrow
-                  </p>
                   {contractGate && (
                     <div className="mt-4 rounded-xl border border-[#C7A962]/50 bg-[#C7A962]/10 p-3.5">
                       <p className="text-[14.5px] leading-relaxed text-[#8D6B2F]">
