@@ -73,7 +73,7 @@ export function CreatorEarningsTab() {
       {/* Booking payouts */}
       <div className="border-t border-[#0a2225]/15 pt-6 space-y-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+          <p className="text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">
             Booking payouts
           </p>
           <p className="font-secondary text-[20px] text-[#0a2225] mt-1.5">
@@ -81,11 +81,11 @@ export function CreatorEarningsTab() {
           </p>
         </div>
 
-        {loading && <p className="text-sm text-[#6B7280]">Loading…</p>}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {loading && <p className="text-[16px] text-[#6B7280]">Loading…</p>}
+        {error && <p className="text-[16px] text-red-600">{error}</p>}
 
         {!loading && !error && snapshot && snapshot.bookings.length === 0 && (
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-[16px] text-[#6B7280]">
             Once travelers confirm bookings with you, each payout will appear here.
           </p>
         )}
@@ -99,10 +99,10 @@ export function CreatorEarningsTab() {
                 className="flex flex-col md:flex-row md:items-center justify-between gap-3 py-4 transition-colors hover:bg-[#F6F0E4]/40"
               >
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold text-[#0a2225]">
+                  <p className="text-[16px] font-semibold text-[#0a2225]">
                     Booking #{booking.id.slice(0, 6)}
                   </p>
-                  <p className="text-xs text-[#6B7280]">
+                  <p className="text-[14.5px] text-[#6B7280]">
                     Status: {booking.status} · Payout: {booking.payout_status || "pending"}
                   </p>
                 </div>
@@ -110,10 +110,10 @@ export function CreatorEarningsTab() {
                   <p className="text-base font-semibold text-[#C7A962]">
                     {formatMoney(booking.amount_cents, booking.currency || currency)}
                   </p>
-                  <p className="text-xs text-[#6B7280]">
+                  <p className="text-[14.5px] text-[#6B7280]">
                     {new Date(booking.created_at).toLocaleDateString()}
                   </p>
-                  <div className="inline-flex items-center gap-1 text-xs text-[#0c4d47] font-medium">
+                  <div className="inline-flex items-center gap-1 text-[14.5px] text-[#0c4d47] font-medium">
                     View booking
                     <ArrowRight className="h-3 w-3" />
                   </div>
@@ -124,7 +124,7 @@ export function CreatorEarningsTab() {
         )}
       </div>
 
-      <p className="text-xs text-[#6B7280] max-w-2xl leading-relaxed">
+      <p className="text-[14.5px] text-[#6B7280] max-w-2xl leading-relaxed">
         Goldsainte holds traveler funds for a short protected window before releasing payouts to you and your partners. Need help? Reach out via support@goldsainte.com.
       </p>
     </div>
@@ -144,7 +144,7 @@ function SummaryCard({
 }) {
   return (
     <div className="border-t border-[#0a2225]/15 pt-3">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+      <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">
         {label}
       </p>
       <p className={`mt-1.5 font-secondary text-[30px] leading-tight ${
@@ -152,7 +152,7 @@ function SummaryCard({
       }`}>
         {value}
       </p>
-      <p className="mt-1 text-[13px] text-[#0a2225]/55">
+      <p className="mt-1 text-[15.5px] text-[#0a2225]/55">
         {description}
       </p>
     </div>
