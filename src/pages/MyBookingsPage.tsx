@@ -302,21 +302,21 @@ function BookingCard({
         )}
 
         {/* Status pill on the photo */}
-        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {statusLabel(booking.status)}
         </span>
 
         {/* Bottom scrim with serif title */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
           {trip?.destination && (
-            <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#C7A962]/95">
               {trip.destination}
             </p>
           )}
           <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
             {title}
           </p>
-          <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+          <p className="mt-1.5 text-[12.5px] text-[#fdfaf2]/80">
             {trip?.duration_days
               ? `${trip.duration_days} ${trip.duration_days === 1 ? "day" : "days"} · `
               : ""}
@@ -332,14 +332,14 @@ function BookingCard({
 
       {/* Slim footer strip */}
       <div className="flex items-center justify-between px-5 py-3.5">
-        <span className="text-[11.5px] text-[#0a2225]/50">
-          <span className="font-mono text-[10.5px] tracking-wide">
+        <span className="text-[12.5px] text-[#0a2225]/55">
+          <span className="font-mono text-[11.5px] tracking-wide">
             {reference}
           </span>
           {" · "}
           {balanceLine}
         </span>
-        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47]">
+        <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#0c4d47]">
           View journey
           <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
         </span>
