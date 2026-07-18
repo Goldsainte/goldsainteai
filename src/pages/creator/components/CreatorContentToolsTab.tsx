@@ -46,7 +46,7 @@ export function CreatorContentToolsTab() {
       <div className="flex items-center gap-2">
         <h2 className="font-secondary text-xl text-[#0a2225]">Content tools</h2>
       </div>
-      <p className="text-sm text-[#6B7280]">
+      <p className="text-[16px] text-[#6B7280]">
         AI-generated copy to help you market your trips. Powered by Goldsainte AI.
       </p>
 
@@ -62,7 +62,7 @@ function ResultBlock({ items }: { items: string[] }) {
     <div className="mt-4 space-y-2">
       {items.map((t, i) => (
         <div key={i} className="flex items-start justify-between gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-3">
-          <p className="whitespace-pre-wrap text-sm text-[#0a2225]">{t}</p>
+          <p className="whitespace-pre-wrap text-[16px] text-[#0a2225]">{t}</p>
           <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(t).then(() => toast.success("Copied"))}>
             <Copy className="h-3 w-3" />
           </Button>
@@ -163,13 +163,13 @@ function HashtagSuggester() {
         <div className="mt-4 space-y-3">
           {(["broad", "medium", "niche"] as const).map((g) => (
             <div key={g}>
-              <p className="mb-1 text-[11px] uppercase tracking-wider text-[#7A7151]">{g} reach</p>
+              <p className="mb-1 text-[14px] uppercase tracking-wider text-[#7A7151]">{g} reach</p>
               <div className="flex flex-wrap gap-2">
                 {(groups[g] || []).map((h) => (
                   <button
                     key={h}
                     onClick={() => navigator.clipboard.writeText(h).then(() => toast.success("Copied"))}
-                    className="rounded-full bg-[#FDF9F0] px-3 py-1 text-[12px] text-[#0c4d47] ring-1 ring-[#E5DFC6] hover:bg-white"
+                    className="rounded-full bg-[#FDF9F0] px-3 py-1 text-[15px] text-[#0c4d47] ring-1 ring-[#E5DFC6] hover:bg-white"
                   >
                     {h}
                   </button>
