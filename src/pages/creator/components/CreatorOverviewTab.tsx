@@ -81,13 +81,13 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
     <div className="space-y-12">
       {/* Editorial hero */}
       <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
-        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+        <p className="text-[12px] md:text-[12.5px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
           Start here
         </p>
         <h2 className="mt-3 md:mt-4 font-secondary text-[28px] md:text-5xl leading-[1.15] text-[#0a2225] max-w-2xl">
           Find a brief, design the trip, get paid.
         </h2>
-        <p className="mt-4 md:mt-5 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/65">
+        <p className="mt-4 md:mt-5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/65">
           The marketplace is full of travelers waiting for the right specialist. Send a proposal or
           publish a packaged trip ready to book.
         </p>
@@ -95,13 +95,13 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         <div className="mt-7 md:mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-x-8">
           <Button
             asChild
-            className="rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-7 h-12 text-sm tracking-wide w-full sm:w-auto"
+            className="rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-7 h-12 text-[15px] tracking-wide w-full sm:w-auto"
           >
             <Link to="/marketplace?tab=trip-requests">Browse trip requests</Link>
           </Button>
           <Link
             to="/trip-builder"
-            className="group inline-flex items-center justify-center sm:justify-start text-sm text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
+            className="group inline-flex items-center justify-center sm:justify-start text-[15px] text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
           >
             Or package a new trip
             <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-0.5" />
@@ -111,7 +111,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
 
       {/* How it works — two earning paths, editorial */}
       <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
-        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+        <p className="text-[12px] md:text-[12.5px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
           How Goldsainte works for creators
         </p>
         <h2 className="mt-3 font-secondary text-3xl md:text-4xl text-[#0a2225]">
@@ -131,7 +131,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
                     <span className="w-6 shrink-0 font-secondary text-base italic text-[#c7a962]">
                       {romans[i]}
                     </span>
-                    <p className="text-[15px] leading-relaxed text-[#0a2225]/65">
+                    <p className="text-[16px] leading-relaxed text-[#0a2225]/65">
                       {step}
                     </p>
                   </div>
@@ -144,10 +144,10 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         {/* How you get paid */}
         <div className="mt-9 flex flex-col gap-6 border-t border-[#0a2225]/10 pt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+            <p className="text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
               How you get paid
             </p>
-            <p className="mt-2.5 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/65">
+            <p className="mt-2.5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/65">
               You set your price — your costs and your margin are yours to
               build in. Travelers pay a 3.5% service fee on top; a matching
               3.5% platform fee comes out of your payout. That is
@@ -160,7 +160,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             <p className="font-secondary text-3xl md:text-4xl text-[#0a2225]">
               7<span className="text-2xl">%</span>
             </p>
-            <p className="mt-1.5 text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55">
+            <p className="mt-1.5 text-[12.5px] uppercase tracking-[0.2em] text-[#0a2225]/55">
               Total · 3.5 + 3.5
             </p>
           </div>
@@ -168,15 +168,15 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
 
         {/* New here — quiet guide signpost */}
         <div className="mt-7 flex flex-col gap-3 border-t border-[#0a2225]/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-[15px] text-[#0a2225]/60">
-            <span className="mr-3.5 text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+          <span className="text-[16px] text-[#0a2225]/60">
+            <span className="mr-3.5 text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
               New here?
             </span>
             The full guide to proposals, payouts, and fees.
           </span>
           <Link
             to="/how-it-works/creator"
-            className="shrink-0 text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+            className="shrink-0 text-[15px] text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
           >
             Read the guide →
           </Link>
@@ -189,25 +189,25 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
           to="/marketplace?tab=trip-requests"
           className="flex items-center justify-between rounded-2xl border border-[#0a2225]/10 bg-white/70 px-6 py-4 hover:bg-white transition-colors"
         >
-          <span className="text-sm text-[#0a2225]">
+          <span className="text-[15px] text-[#0a2225]">
             <span className="font-secondary text-base">{stats.openTripRequests}</span>{" "}
             open trip request{stats.openTripRequests !== 1 ? "s" : ""} in the marketplace right now
           </span>
-          <span className="text-sm text-[#0c4d47] font-medium">View all →</span>
+          <span className="text-[15px] text-[#0c4d47] font-medium">View all →</span>
         </Link>
       )}
 
       {/* Quiet stats — only once there's activity */}
       {hasActivity && (
         <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
-          <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-5">
+          <p className="text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-5">
             Your studio, at a glance
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-8">
             {statItems.map((item) => (
               <div key={item.label}>
                 <p className="font-secondary text-2xl md:text-3xl text-[#0a2225]">{item.value}</p>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-1.5">
+                <p className="text-[12.5px] uppercase tracking-[0.2em] text-[#0a2225]/55 mt-1.5">
                   {item.label}
                 </p>
               </div>
@@ -221,14 +221,14 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
+              <p className="text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
                 Latest activity
               </p>
               <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">Recent proposals</h2>
             </div>
             <Link
               to="/my-proposals"
-              className="text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
+              className="text-[15px] text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
             >
               View all →
             </Link>
@@ -245,7 +245,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
                   <h3 className="font-secondary text-base text-[#0a2225] truncate">
                     {proposal.tripTitle}
                   </h3>
-                  <p className="text-xs text-[#0a2225]/55 mt-1">
+                  <p className="text-[13px] text-[#0a2225]/55 mt-1">
                     {proposal.destination} ·{" "}
                     {new Date(proposal.createdAt).toLocaleDateString("en-US", {
                       month: "short",
