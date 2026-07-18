@@ -572,7 +572,7 @@ export default function BookingDetailPage() {
             <p className="font-secondary text-[17px] text-[#0a2225]">
               Payment received — thank you.
             </p>
-            <p className="mt-1 text-[13px] leading-relaxed text-[#0a2225]/65">
+            <p className="mt-1 text-[14.5px] leading-relaxed text-[#0a2225]/65">
               {booking?.status === "paid_in_full" || booking?.status === "completed"
                 ? "Your trip is paid in full. Your specialist will confirm the remaining details — keep an eye on your Messages, and a receipt is on its way to your email."
                 : "A receipt is on its way to your email, and the numbers below may take a few seconds to update. Next: your specialist secures your reservations and shares them in Messages — you release the deposit only after you've seen them."}
@@ -583,7 +583,7 @@ export default function BookingDetailPage() {
       <section className="mx-auto max-w-6xl px-6 pt-8 pb-2">
         <Link
           to="/my-bookings"
-          className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
+          className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
         >
           <ArrowLeft className="h-3 w-3" />
           Back to My Bookings
@@ -600,7 +600,7 @@ export default function BookingDetailPage() {
         </section>
       ) : error ? (
         <section className="mx-auto max-w-6xl px-6 pb-16 pt-6">
-          <p className="text-sm text-red-700">{error}</p>
+          <p className="text-[15px] text-red-700">{error}</p>
         </section>
       ) : (
         booking && (
@@ -618,13 +618,13 @@ export default function BookingDetailPage() {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/85 via-[#061418]/20 to-[#061418]/30" />
               <div className="absolute inset-x-0 bottom-0 px-7 pb-14 md:px-10">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962]/95">
+                <p className="text-[12px] uppercase tracking-[0.3em] text-[#C7A962]/95">
                   Your journey · {reference}
                 </p>
                 <h1 className="mt-2 max-w-3xl font-secondary text-3xl leading-[1.05] text-[#fdfaf2] md:text-4xl">
                   {title}
                 </h1>
-                <p className="mt-2.5 text-[13px] text-[#fdfaf2]/80">
+                <p className="mt-2.5 text-[14.5px] text-[#fdfaf2]/80">
                   {trip?.destination && (
                     <span className="font-secondary italic">
                       {trip.destination}
@@ -636,7 +636,7 @@ export default function BookingDetailPage() {
                         trip.duration_days === 1 ? "day" : "days"
                       } · `
                     : ""}
-                  <span className="inline-flex items-center rounded-full bg-[#0c4d47]/95 px-2.5 py-0.5 align-[2px] text-[9px] uppercase tracking-[0.14em] text-[#E5DFC6]">
+                  <span className="inline-flex items-center rounded-full bg-[#0c4d47]/95 px-2.5 py-0.5 align-[2px] text-[12px] uppercase tracking-[0.14em] text-[#E5DFC6]">
                     {humanBookingStatus(booking.status)}
                   </span>
                 </p>
@@ -737,7 +737,7 @@ export default function BookingDetailPage() {
                   const currentIdx = steps.findIndex((st) => !st.done);
                   return (
                     <div className="border-t border-[#0a2225]/15 pt-6">
-                      <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                      <p className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                         Your trip, start to finish
                       </p>
 
@@ -750,7 +750,7 @@ export default function BookingDetailPage() {
                                 <CheckCircle2 className="mx-auto h-6 w-6 text-[#0c4d47]" />
                               ) : (
                                 <span
-                                  className={`mx-auto flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-semibold ${
+                                  className={`mx-auto flex h-6 w-6 items-center justify-center rounded-full text-[13.5px] font-semibold ${
                                     state === "current"
                                       ? "border-2 border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
                                       : "border border-[#0a2225]/20 text-[#0a2225]/40"
@@ -760,14 +760,14 @@ export default function BookingDetailPage() {
                                 </span>
                               )}
                               <p
-                                className={`mt-2 text-[13px] leading-snug ${
+                                className={`mt-2 text-[14.5px] leading-snug ${
                                   state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
                                 } ${state === "current" ? "font-medium" : ""}`}
                               >
                                 {st.label}
                               </p>
                               {state === "current" && (
-                                <p className="mt-0.5 text-[11px] uppercase tracking-[0.12em] text-[#8D6B2F]">
+                                <p className="mt-0.5 text-[12.5px] uppercase tracking-[0.12em] text-[#8D6B2F]">
                                   You're here
                                 </p>
                               )}
@@ -785,7 +785,7 @@ export default function BookingDetailPage() {
                                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#0c4d47]" />
                               ) : (
                                 <span
-                                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold ${
+                                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[12.5px] font-semibold ${
                                     state === "current"
                                       ? "border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
                                       : "border-[#0a2225]/20 text-[#0a2225]/40"
@@ -795,7 +795,7 @@ export default function BookingDetailPage() {
                                 </span>
                               )}
                               <p
-                                className={`text-[15px] leading-snug ${
+                                className={`text-[16px] leading-snug ${
                                   state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
                                 } ${state === "current" ? "font-medium" : ""}`}
                               >
@@ -807,10 +807,10 @@ export default function BookingDetailPage() {
                       </ol>
 
                       <div className="mt-7 rounded-2xl bg-[#F6F0E4]/80 px-5 py-4">
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                        <p className="text-[12.5px] uppercase tracking-[0.18em] text-[#8D6B2F]">
                           Next step
                         </p>
-                        <p className="mt-1 text-[15px] leading-relaxed text-[#0a2225]">
+                        <p className="mt-1 text-[16px] leading-relaxed text-[#0a2225]">
                           {currentIdx === -1
                             ? "All settled \u2014 nothing left to do. We wish you many more journeys."
                             : steps[currentIdx].sub}
@@ -830,11 +830,11 @@ export default function BookingDetailPage() {
                   className="border-t border-[#0a2225]/15 pt-6"
                 >
                   <header className="mb-5 flex items-baseline justify-between gap-3">
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                    <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                       Messages
                     </p>
-                    <p className="text-right text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
-                      Your direct line to your specialist
+                    <p className="text-right text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/40">
+                      Your direct line to {specialistName || "your specialist"}
                     </p>
                   </header>
                   <BookingConversation
@@ -843,17 +843,93 @@ export default function BookingDetailPage() {
                     partnerId={booking.partner_id}
                   />
                 </div>
+
+                {(canReleaseDeposit ||
+                  canConfirmComplete ||
+                  booking.status === "completed" ||
+                  (depositReleased && booking.status !== "cancelled")) && (
+                  <div className="border-t border-[#0a2225]/15 pt-6">
+                    <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                      Your escrow
+                    </p>
+                    {booking.status === "completed" ? (
+                      <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
+                        Payment has been released to your specialist. Thank you
+                        for traveling with Goldsainte — we hope it was
+                        unforgettable.
+                      </p>
+                    ) : canConfirmComplete ? (
+                      <>
+                        <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
+                          Trip complete? Confirming releases the remaining
+                          payment from escrow to your specialist — like
+                          accepting a finished job.
+                        </p>
+                        {releaseError && (
+                          <p className="mt-3 text-[15px] text-red-700">{releaseError}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleReleaseMilestone("release_final")}
+                          disabled={releasingFinal}
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        >
+                          {releasingFinal
+                            ? "Releasing payment…"
+                            : "Confirm trip complete"}
+                        </button>
+                        <p className="mt-2.5 text-[12.5px] leading-relaxed text-[#0a2225]/45">
+                          If something went wrong, don't confirm — file a claim
+                          below and Goldsainte holds the funds while we review.
+                        </p>
+                      </>
+                    ) : canReleaseDeposit ? (
+                      <>
+                        <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
+                          Once your specialist shares your confirmed
+                          reservations in Messages, release their working
+                          capital — 96.5% of your deposit — so they can secure
+                          your trip.
+                        </p>
+                        {releaseError && (
+                          <p className="mt-3 text-[15px] text-red-700">{releaseError}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleReleaseMilestone("release_deposit")}
+                          disabled={releasingFinal}
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        >
+                          {releasingFinal
+                            ? "Releasing…"
+                            : "Release working capital"}
+                        </button>
+                        <p className="mt-2.5 text-[12.5px] leading-relaxed text-[#0a2225]/45">
+                          Only release after you've seen your confirmations.
+                          The remaining balance stays in escrow until your
+                          trip is complete.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
+                        Working capital released — your specialist is securing
+                        your reservations. The rest of your payment stays in
+                        escrow until you confirm the trip is complete.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* RIGHT column */}
               <div className="space-y-5 md:sticky md:top-6 md:self-start">
                 <div className="border-t border-[#0a2225]/15 pt-6">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                  <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                     Payment
                   </p>
                   <p className="mt-3 font-secondary text-[26px] text-[#0a2225]">
                     {formatMoney(amountPaid, currency)}{" "}
-                    <span className="text-[14px] text-[#0a2225]/45">
+                    <span className="text-[15px] text-[#0a2225]/45">
                       of {formatMoney(total, currency)} paid
                     </span>
                   </p>
@@ -864,7 +940,7 @@ export default function BookingDetailPage() {
                     />
                   </div>
                   {/* Ledger: each money line answers "did this happen yet". */}
-                  <div className="mt-4 space-y-1.5 border-t border-[#0a2225]/10 pt-3.5 text-[13px]">
+                  <div className="mt-4 space-y-1.5 border-t border-[#0a2225]/10 pt-3.5 text-[14.5px]">
                     <p className="flex items-center justify-between">
                       <span className="text-[#0a2225]/60">Deposit</span>
                       <span className="inline-flex items-center gap-1.5 text-[#0a2225]">
@@ -872,7 +948,7 @@ export default function BookingDetailPage() {
                         {depositPaid ? (
                           <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
                         ) : (
-                          <span className="text-[11px] uppercase tracking-[0.1em] text-[#8D6B2F]">due</span>
+                          <span className="text-[12.5px] uppercase tracking-[0.1em] text-[#8D6B2F]">due</span>
                         )}
                       </span>
                     </p>
@@ -883,24 +959,24 @@ export default function BookingDetailPage() {
                         {fullyPaid ? (
                           <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
                         ) : (
-                          <span className="text-[11px] uppercase tracking-[0.1em] text-[#0a2225]/45">before departure</span>
+                          <span className="text-[12.5px] uppercase tracking-[0.1em] text-[#0a2225]/45">before departure</span>
                         )}
                       </span>
                     </p>
                   </div>
-                  <p className="mt-1.5 text-[11px] text-[#0a2225]/45">
+                  <p className="mt-1.5 text-[12.5px] text-[#0a2225]/45">
                     {progressPct}% paid · held in escrow
                   </p>
                   {contractGate && (
                     <div className="mt-4 rounded-xl border border-[#C7A962]/50 bg-[#C7A962]/10 p-3.5">
-                      <p className="text-[13px] leading-relaxed text-[#8D6B2F]">
+                      <p className="text-[14.5px] leading-relaxed text-[#8D6B2F]">
                         Your trip contract needs a signature before payment can proceed.
                       </p>
                       {contractGate.contractId && (
                         <button
                           type="button"
                           onClick={() => navigate(`/contract/${contractGate.contractId}/sign?type=traveler`)}
-                          className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                          className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[12.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
                         >
                           Review &amp; sign contract
                         </button>
@@ -909,13 +985,13 @@ export default function BookingDetailPage() {
                   )}
 
                   <div className="mt-4 border-t border-[#E5DFC6] pt-4">
-                    <p className="flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
+                    <p className="flex items-center justify-between text-[14px] text-[#0a2225]/60">
                       <span>Balance remaining</span>
-                      <span className="font-secondary text-[15px] text-[#0a2225]">
+                      <span className="font-secondary text-[16px] text-[#0a2225]">
                         {formatMoney(balance, currency)}
                       </span>
                     </p>
-                    <p className="mt-2 flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
+                    <p className="mt-2 flex items-center justify-between text-[14px] text-[#0a2225]/60">
                       <span>Due</span>
                       <span className="text-[#0a2225]">Before departure</span>
                     </p>
@@ -927,7 +1003,7 @@ export default function BookingDetailPage() {
                           type="button"
                           onClick={handlePayBalance}
                           disabled={payingBalance}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[14.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
                         >
                           {payingBalance
                             ? "Preparing checkout…"
@@ -939,7 +1015,7 @@ export default function BookingDetailPage() {
                         type="button"
                         onClick={handlePayBalance}
                         disabled={payingBalance}
-                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[14.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
                       >
                         {payingBalance
                           ? "Preparing checkout…"
@@ -947,12 +1023,12 @@ export default function BookingDetailPage() {
                       </button>
                     )}
                     {payError && (
-                      <p className="mt-3 rounded-2xl border border-[#b3452f]/30 bg-[#b3452f]/5 px-4 py-2.5 text-center text-[12px] leading-relaxed text-[#b3452f]">
+                      <p className="mt-3 rounded-2xl border border-[#b3452f]/30 bg-[#b3452f]/5 px-4 py-2.5 text-center text-[13.5px] leading-relaxed text-[#b3452f]">
                         {payError}
                       </p>
                     )}
                     {booking.status === "paid_in_full" && (
-                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[12px] uppercase tracking-[0.14em] text-[#0a2225]/60">
+                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[13.5px] uppercase tracking-[0.14em] text-[#0a2225]/60">
                         Paid in full — nothing further due
                       </p>
                     )}
@@ -965,122 +1041,13 @@ export default function BookingDetailPage() {
                   <ContractStatusCard variant="traveler" bookingId={booking.id} />
                 )}
 
-                {(canReleaseDeposit ||
-                  canConfirmComplete ||
-                  booking.status === "completed" ||
-                  (depositReleased && booking.status !== "cancelled")) && (
-                  <div className="border-t border-[#0a2225]/15 pt-6">
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                      Your escrow
-                    </p>
-                    {booking.status === "completed" ? (
-                      <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
-                        Payment has been released to your specialist. Thank you
-                        for traveling with Goldsainte — we hope it was
-                        unforgettable.
-                      </p>
-                    ) : canConfirmComplete ? (
-                      <>
-                        <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
-                          Trip complete? Confirming releases the remaining
-                          payment from escrow to your specialist — like
-                          accepting a finished job.
-                        </p>
-                        {releaseError && (
-                          <p className="mt-3 text-sm text-red-700">{releaseError}</p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleReleaseMilestone("release_final")}
-                          disabled={releasingFinal}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                        >
-                          {releasingFinal
-                            ? "Releasing payment…"
-                            : "Confirm trip complete"}
-                        </button>
-                        <p className="mt-2.5 text-[11px] leading-relaxed text-[#0a2225]/45">
-                          If something went wrong, don't confirm — file a claim
-                          below and Goldsainte holds the funds while we review.
-                        </p>
-                      </>
-                    ) : canReleaseDeposit ? (
-                      <>
-                        <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
-                          Once your specialist shares your confirmed
-                          reservations in Messages, release their working
-                          capital — 96.5% of your deposit — so they can secure
-                          your trip.
-                        </p>
-                        {releaseError && (
-                          <p className="mt-3 text-sm text-red-700">{releaseError}</p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleReleaseMilestone("release_deposit")}
-                          disabled={releasingFinal}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                        >
-                          {releasingFinal
-                            ? "Releasing…"
-                            : "Release working capital"}
-                        </button>
-                        <p className="mt-2.5 text-[11px] leading-relaxed text-[#0a2225]/45">
-                          Only release after you've seen your confirmations.
-                          The remaining balance stays in escrow until your
-                          trip is complete.
-                        </p>
-                      </>
-                    ) : (
-                      <p className="mt-3 text-[13.5px] leading-relaxed text-[#0a2225]/70">
-                        Working capital released — your specialist is securing
-                        your reservations. The rest of your payment stays in
-                        escrow until you confirm the trip is complete.
-                      </p>
-                    )}
-                  </div>
-                )}
 
-                <div className="rounded-2xl bg-[#0c4d47] px-6 py-5">
-                  <div className="flex items-center gap-3">
-                    {partnerProfile?.avatar_url ? (
-                      <img
-                        src={partnerProfile.avatar_url}
-                        alt={specialistName}
-                        className="h-11 w-11 rounded-full border border-[#C7A962]/50 object-cover"
-                      />
-                    ) : (
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#C7A962]/50 bg-[#C7A962]/25 font-secondary text-[15px] text-[#E5DFC6]">
-                        {specialistInitials}
-                      </span>
-                    )}
-                    <span>
-                      <span className="block text-[9px] uppercase tracking-[0.22em] text-[#C7A962]/90">
-                        Your specialist
-                      </span>
-                      <span className="mt-0.5 block font-secondary text-[16px] text-[#fdfaf2]">
-                        {specialistName}
-                      </span>
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      document
-                        .getElementById("booking-messages")
-                        ?.scrollIntoView({ behavior: "smooth", block: "start" })
-                    }
-                    className="mt-4 block w-full rounded-full border border-[#C7A962]/55 py-2.5 text-center text-[10px] uppercase tracking-[0.2em] text-[#E5DFC6] transition-colors hover:bg-[#C7A962]/15"
-                  >
-                    Message your specialist
-                  </button>
-                </div>
               </div>
             </div>
 
             {/* ── Policies ── */}
             <section className="mt-14 md:px-3">
-              <p className="mb-5 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+              <p className="mb-5 text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                 Policies
               </p>
               <TripPoliciesPanel
@@ -1092,10 +1059,10 @@ export default function BookingDetailPage() {
             {/* ── Claims / disputes ── */}
             <section className="mt-14 border-t border-[#E5DFC6] pt-8 md:px-3">
               <header className="mb-6 flex items-baseline justify-between">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                   Something wrong?
                 </p>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
+                <p className="text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/40">
                   File a claim about this booking
                 </p>
               </header>
@@ -1108,7 +1075,7 @@ export default function BookingDetailPage() {
                       className="rounded-2xl border border-[#E5DFC6] bg-white p-4"
                     >
                       <div className="flex items-center justify-between gap-4">
-                        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] text-[#8D6B2F]">
+                        <span className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.16em] text-[#8D6B2F]">
                           <ShieldAlert className="h-3.5 w-3.5" />
                           Claim ·{" "}
                           {new Date(d.created_at).toLocaleDateString("en-US", {
@@ -1117,11 +1084,11 @@ export default function BookingDetailPage() {
                             year: "numeric",
                           })}
                         </span>
-                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]">
+                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[12px] uppercase tracking-[0.14em] text-[#0a2225]">
                           {d.status.replace(/_/g, " ")}
                         </span>
                       </div>
-                      <p className="mt-2 break-words text-sm leading-relaxed text-[#0a2225]/80">
+                      <p className="mt-2 break-words text-[15px] leading-relaxed text-[#0a2225]/80">
                         {d.reason}
                       </p>
                     </li>
@@ -1130,7 +1097,7 @@ export default function BookingDetailPage() {
               )}
 
               {hasOpenClaim ? (
-                <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
                   You have an open claim on this booking. Our team is reviewing
                   it and will reach out through your booking messages. You can
                   add details any time in the Messages section above.
@@ -1139,7 +1106,7 @@ export default function BookingDetailPage() {
                 <form onSubmit={handleFileClaim} className="space-y-4">
                   <label
                     htmlFor="claim-reason"
-                    className="block text-sm text-[#0a2225]/70"
+                    className="block text-[15px] text-[#0a2225]/70"
                   >
                     Tell us what went wrong. Be as specific as you can — dates,
                     amounts, and what you expected all help us resolve it
@@ -1152,16 +1119,16 @@ export default function BookingDetailPage() {
                     rows={5}
                     maxLength={2000}
                     placeholder="Describe the issue with this booking…"
-                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-sm leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
+                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-[15px] leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
                   />
                   {claimError && (
-                    <p className="text-sm text-red-700">{claimError}</p>
+                    <p className="text-[15px] text-red-700">{claimError}</p>
                   )}
                   <div className="flex items-center gap-3">
                     <button
                       type="submit"
                       disabled={claimSubmitting || !claimReason.trim()}
-                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {claimSubmitting ? "Filing…" : "Submit claim"}
                     </button>
@@ -1172,7 +1139,7 @@ export default function BookingDetailPage() {
                         setClaimReason("");
                         setClaimError(null);
                       }}
-                      className="text-sm text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
+                      className="text-[15px] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
                     >
                       Cancel
                     </button>
@@ -1180,7 +1147,7 @@ export default function BookingDetailPage() {
                 </form>
               ) : (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="max-w-xl text-sm leading-relaxed text-[#0a2225]/60">
+                  <p className="max-w-xl text-[15px] leading-relaxed text-[#0a2225]/60">
                     If something went wrong with this trip, you can file a claim
                     and our team will step in. Most issues are resolved fastest
                     by messaging your travel professional first.
@@ -1188,7 +1155,7 @@ export default function BookingDetailPage() {
                   <button
                     type="button"
                     onClick={() => setShowClaimForm(true)}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
                   >
                     <ShieldAlert className="h-4 w-4" />
                     File a claim
@@ -1200,10 +1167,10 @@ export default function BookingDetailPage() {
             {/* ── Cancellation ── */}
             <section className="mt-14 border-t border-[#E5DFC6] pt-8 md:px-3">
               <header className="mb-6 flex items-baseline justify-between">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                   Change of plans?
                 </p>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
+                <p className="text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/40">
                   Request a cancellation
                 </p>
               </header>
@@ -1216,7 +1183,7 @@ export default function BookingDetailPage() {
                       className="rounded-2xl border border-[#E5DFC6] bg-white p-4"
                     >
                       <div className="flex items-center justify-between gap-4">
-                        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] text-[#8D6B2F]">
+                        <span className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.16em] text-[#8D6B2F]">
                           <CalendarX className="h-3.5 w-3.5" />
                           Cancellation ·{" "}
                           {new Date(c.created_at).toLocaleDateString("en-US", {
@@ -1225,16 +1192,16 @@ export default function BookingDetailPage() {
                             year: "numeric",
                           })}
                         </span>
-                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#0a2225]">
+                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[12px] uppercase tracking-[0.14em] text-[#0a2225]">
                           {humanCancellationStatus(c.status)}
                         </span>
                       </div>
-                      <p className="mt-2 break-words text-sm leading-relaxed text-[#0a2225]/80">
+                      <p className="mt-2 break-words text-[15px] leading-relaxed text-[#0a2225]/80">
                         {c.reason}
                       </p>
                       {(c.status === "approved" || c.status === "refunded") &&
                         (c.refund_amount ?? 0) > 0 && (
-                          <p className="mt-2 text-sm text-[#0a2225]/60">
+                          <p className="mt-2 text-[15px] text-[#0a2225]/60">
                             Refund: {formatMoney(c.refund_amount, c.currency || currency)}
                           </p>
                         )}
@@ -1245,7 +1212,7 @@ export default function BookingDetailPage() {
 
               {activeCancellation ? (
                 activeCancellation.status === "pending" ? (
-                  <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                  <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
                     Your cancellation request is with our team. We'll confirm
                     the outcome here and in your notifications.
                   </p>
@@ -1254,7 +1221,7 @@ export default function BookingDetailPage() {
                 <form onSubmit={handleRequestCancellation} className="space-y-4">
                   <label
                     htmlFor="cancel-reason"
-                    className="block text-sm text-[#0a2225]/70"
+                    className="block text-[15px] text-[#0a2225]/70"
                   >
                     Tell us why you need to cancel. Refunds are reviewed case
                     by case against your trip's policies.
@@ -1266,16 +1233,16 @@ export default function BookingDetailPage() {
                     rows={5}
                     maxLength={2000}
                     placeholder="Describe why you're cancelling…"
-                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-sm leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
+                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-[15px] leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
                   />
                   {cancelRequestError && (
-                    <p className="text-sm text-red-700">{cancelRequestError}</p>
+                    <p className="text-[15px] text-red-700">{cancelRequestError}</p>
                   )}
                   <div className="flex items-center gap-3">
                     <button
                       type="submit"
                       disabled={cancelSubmitting || !cancelReason.trim()}
-                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {cancelSubmitting ? "Submitting…" : "Submit request"}
                     </button>
@@ -1286,7 +1253,7 @@ export default function BookingDetailPage() {
                         setCancelReason("");
                         setCancelRequestError(null);
                       }}
-                      className="text-sm text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
+                      className="text-[15px] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
                     >
                       Never mind
                     </button>
@@ -1294,7 +1261,7 @@ export default function BookingDetailPage() {
                 </form>
               ) : canRequestCancellation ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="max-w-xl text-sm leading-relaxed text-[#0a2225]/60">
+                  <p className="max-w-xl text-[15px] leading-relaxed text-[#0a2225]/60">
                     Plans change. Request a cancellation and our team will
                     review it against your trip's policies — refunds are
                     decided case by case.
@@ -1302,18 +1269,18 @@ export default function BookingDetailPage() {
                   <button
                     type="button"
                     onClick={() => setShowCancelForm(true)}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-sm font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
                   >
                     <CalendarX className="h-4 w-4" />
                     Request cancellation
                   </button>
                 </div>
               ) : booking.status === "cancelled" ? (
-                <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
                   This booking has been cancelled.
                 </p>
               ) : (
-                <p className="text-sm leading-relaxed text-[#0a2225]/60">
+                <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
                   This trip is completed, so cancellation no longer applies. If
                   something went wrong, you can file a claim above.
                 </p>
@@ -1329,7 +1296,7 @@ export default function BookingDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#0a2225]/10 bg-[#fdfaf2]/95 px-4 py-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden">
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+              <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
                 {depositPaid ? "Balance" : "Deposit"}
               </p>
               <p className="truncate font-secondary text-[16px] text-[#0a2225]">
@@ -1340,7 +1307,7 @@ export default function BookingDetailPage() {
               type="button"
               onClick={handlePayBalance}
               disabled={payingBalance}
-              className="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+              className="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
             >
               {payingBalance ? "Preparing\u2026" : depositPaid ? "Pay balance" : "Pay deposit"}
             </button>
@@ -1363,7 +1330,7 @@ function TimelineItem({
       <span className="w-6 shrink-0 font-secondary text-[16px] italic text-[#8a7a3f]">
         {n}
       </span>
-      <p className="text-[13.5px] leading-relaxed text-[#0a2225]/75">
+      <p className="text-[15px] leading-relaxed text-[#0a2225]/75">
         {children}
       </p>
     </div>
