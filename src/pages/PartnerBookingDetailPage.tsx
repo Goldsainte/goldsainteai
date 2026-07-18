@@ -280,12 +280,11 @@ export default function PartnerBookingDetailPage() {
             <img
               src={cover || getTripRequestImageUrl(trip!.destination!)}
               alt={trip?.destination || "Trip"}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+              className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/80 via-[#0a2225]/20 to-transparent" />
           {cover ? (
-            <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" />
+            <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
           )}
