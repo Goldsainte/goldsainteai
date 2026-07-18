@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag, Check, ArrowRight, Plane } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { capLabel } from "@/lib/onTripCapabilities";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AddServiceDialog } from "./AddServiceDialog";
@@ -148,7 +149,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
   const hostedService = hostedServices[Math.min(hostedIdx, Math.max(0, hostedServices.length - 1))];
   const who = firstName || "your host";
   const hostedHireUrl = hostedService && requestBaseParams
-    ? `/post-trip?${requestBaseParams}&service=${encodeURIComponent(hostedService.title)}&hire=on-trip&hireRate=${Math.round(hostedService.starting_price_cents / 100)}`
+    ? `/post-trip?${requestBaseParams}&service=${encodeURIComponent(hostedService.title)}&hire=on-trip&hireRate=${Math.round(hostedService.starting_price_cents / 100)}&serviceId=${hostedService.id}`
     : null;
 
   // Public + no services: render nothing at all. Big-tech profiles never
@@ -218,7 +219,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                 {hostedService.includes.slice(0, 3).map((inc) => (
                   <li key={inc} className="flex items-start gap-2 text-[13px] text-[#0a2225]">
                     <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
-                    <span>{inc}</span>
+                    <span>{capLabel(inc)}</span>
                   </li>
                 ))}
               </ul>
