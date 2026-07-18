@@ -166,13 +166,13 @@ export function CreatorPortfolioTab() {
       {/* Media Gallery */}
       <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
         <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">Trip Highlights</h3>
-        <p className="text-sm text-[#6B7280] mb-2">
+        <p className="text-[15px] text-[#6B7280] mb-2">
           Featured content shown at the top of your public profile — photos, videos, and Instagram or TikTok reels. Set any photo as your cover image.
         </p>
         <button
           type="button"
           onClick={() => (window.location.href = "/profile/media")}
-          className="mb-4 inline-flex items-center gap-1.5 text-sm text-[#8D6B2F] transition-colors hover:text-[#0a2225]"
+          className="mb-4 inline-flex items-center gap-1.5 text-[15px] text-[#8D6B2F] transition-colors hover:text-[#0a2225]"
         >
           Managing your main gallery? Photos & video →
         </button>
@@ -187,7 +187,7 @@ export function CreatorPortfolioTab() {
       {/* Social Accounts */}
       <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
         <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">Social Accounts</h3>
-        <p className="text-sm text-[#6B7280] mb-4">
+        <p className="text-[15px] text-[#6B7280] mb-4">
           Add your social profiles and follower counts. This builds credibility and helps travelers trust your expertise.
         </p>
         <CreatorSocialAccountsEditor accounts={socials} onChange={(s) => { setSocials(s); setDirty(true); }} />
@@ -196,7 +196,7 @@ export function CreatorPortfolioTab() {
       {/* Save */}
       <div className="flex items-center justify-end gap-3">
         {dirty && (
-          <p className="text-xs text-[#C7A962] font-medium">
+          <p className="text-[13px] text-[#C7A962] font-medium">
             Unsaved changes — click Save Portfolio or they'll be lost
           </p>
         )}
