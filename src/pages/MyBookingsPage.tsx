@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight } from "lucide-react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
  
 type TripMeta = {
   id: string;
@@ -150,7 +151,7 @@ export default function MyBookingsPage() {
           {/* Editorial header */}
           <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#8D6B2F]">
+              <p className="text-[12px] uppercase tracking-[0.3em] text-[#8D6B2F]">
                 Your journeys
               </p>
               <h1 className="mt-3 font-secondary text-4xl leading-[1.02] text-[#0a2225] md:text-5xl">
@@ -159,7 +160,7 @@ export default function MyBookingsPage() {
                 headed next
               </h1>
             </div>
-            <p className="max-w-xs text-[13px] leading-relaxed text-[#0a2225]/55 md:text-right">
+            <p className="max-w-xs text-[14.5px] leading-relaxed text-[#0a2225]/55 md:text-right">
               Payments, contracts, and your specialist — every detail, held in
               one place.
             </p>
@@ -183,7 +184,7 @@ export default function MyBookingsPage() {
               {/* Upcoming */}
               <SectionRule left="Upcoming" right={past.length > 0 ? "" : "Past journeys"} />
               {upcoming.length === 0 ? (
-                <p className="mt-6 text-sm italic text-[#0a2225]/50">
+                <p className="mt-6 text-[15px] italic text-[#0a2225]/50">
                   No upcoming journeys yet — your next one starts in the
                   marketplace.
                 </p>
@@ -219,12 +220,12 @@ export default function MyBookingsPage() {
 function SectionRule({ left, right }: { left: string; right: string }) {
   return (
     <div className="mt-12 flex items-center gap-4">
-      <span className="text-[10px] uppercase tracking-[0.24em] text-[#0a2225]">
+      <span className="text-[12px] uppercase tracking-[0.24em] text-[#0a2225]">
         {left}
       </span>
       <span className="h-px flex-1 bg-[#E5DFC6]" />
       {right ? (
-        <span className="text-[10px] uppercase tracking-[0.24em] text-[#0a2225]/35">
+        <span className="text-[12px] uppercase tracking-[0.24em] text-[#0a2225]/35">
           {right}
         </span>
       ) : null}
@@ -238,14 +239,14 @@ function EmptyState() {
       <h2 className="font-secondary text-3xl text-[#0a2225]">
         Your first journey awaits
       </h2>
-      <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-[#0a2225]/60">
+      <p className="mx-auto mt-4 max-w-md text-[16px] leading-relaxed text-[#0a2225]/60">
         Explore trips curated by our creators and travel agents. When you book,
         it'll live here — with every detail and a direct line to your
         specialist.
       </p>
       <Link
         to="/marketplace"
-        className="mt-8 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-7 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+        className="mt-8 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-7 py-3 text-[12.5px] font-medium uppercase tracking-[0.18em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
       >
         Explore the marketplace
       </Link>
@@ -264,7 +265,12 @@ function BookingCard({
   const reference = bookingReference(booking.id);
   const title =
     trip?.title || (booking.metadata as any)?.trip_title || "Goldsainte Trip";
-  const hasImage = !!trip?.cover_image_url;
+  // Hire bookings have no packaged_trips row (cover_image_url null), so fall
+  // back to the destination image library — same source the detail page uses.
+  // This is why the card was empty but the detail page had a photo.
+  const cardDestination =
+    trip?.destination || (booking.metadata as any)?.destination || (booking.metadata as any)?.trip_title || null;
+  const cardImage = trip?.cover_image_url || getTripRequestImageUrl(cardDestination);
   const total = (booking.total_price ?? 0) / 100; // column stores cents
   const deposit = (booking.deposit_amount ?? 0) / 100;
   const balance = Math.max(0, total - deposit);
@@ -286,36 +292,37 @@ function BookingCard({
     >
       {/* Photo IS the card */}
       <div className="relative aspect-[4/3] overflow-hidden">
-        {hasImage ? (
-          <img
-            src={trip!.cover_image_url!}
-            alt={title}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
-            <span className="font-secondary text-xl italic text-[#C7A962]/80">
-              Goldsainte
-            </span>
-          </div>
-        )}
+        {/* Placeholder sits BEHIND the image so if the image ever 404s and
+            hides itself, the branded fallback shows through — never an empty box. */}
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+          <span className="font-secondary text-xl italic text-[#C7A962]/80">
+            Goldsainte
+          </span>
+        </div>
+        <img
+          src={cardImage}
+          alt={title}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
 
         {/* Status pill on the photo */}
-        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[12px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {statusLabel(booking.status)}
         </span>
 
         {/* Bottom scrim with serif title */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
           {trip?.destination && (
-            <p className="text-[10px] uppercase tracking-[0.24em] text-[#C7A962]/95">
+            <p className="text-[12px] uppercase tracking-[0.24em] text-[#C7A962]/95">
               {trip.destination}
             </p>
           )}
           <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">
             {title}
           </p>
-          <p className="mt-1.5 text-[12.5px] text-[#fdfaf2]/80">
+          <p className="mt-1.5 text-[14px] text-[#fdfaf2]/80">
             {trip?.duration_days
               ? `${trip.duration_days} ${trip.duration_days === 1 ? "day" : "days"} · `
               : ""}
@@ -331,14 +338,14 @@ function BookingCard({
 
       {/* Slim footer strip */}
       <div className="flex items-center justify-between px-5 py-3.5">
-        <span className="text-[12.5px] text-[#0a2225]/55">
-          <span className="font-mono text-[11.5px] tracking-wide">
+        <span className="text-[14px] text-[#0a2225]/55">
+          <span className="font-mono text-[13px] tracking-wide">
             {reference}
           </span>
           {" · "}
           {balanceLine}
         </span>
-        <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#0c4d47]">
+        <span className="inline-flex items-center gap-1 text-[12.5px] uppercase tracking-[0.18em] text-[#0c4d47]">
           View journey
           <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
         </span>
