@@ -91,6 +91,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [declareJump, setDeclareJump] = useState(false);
   const [editService, setEditService] = useState<Service | null>(null);
   const [pendingTier, setPendingTier] = useState<ServiceTier | null>(null);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
@@ -180,7 +181,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setEditService(null); setPendingTier(null); setDialogOpen(true); }}
+            onClick={() => { setEditService(null); setPendingTier(null); setDeclareJump(false); setDialogOpen(true); }}
             className="border-[#E5DFC6] text-[#0a2225] rounded-full"
           >
             <Plus className="h-4 w-4 mr-1.5" /> Add Service
@@ -199,7 +200,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
             </p>
             <button
               type="button"
-              onClick={() => { setEditService(undeclaredOnTrip); setDialogOpen(true); }}
+              onClick={() => { setEditService(undeclaredOnTrip); setDeclareJump(true); setDialogOpen(true); }}
               className="mt-2.5 inline-flex items-center gap-1.5 text-[14px] text-[#0c4d47] underline underline-offset-4 decoration-[#0a2225]/25 transition-colors hover:decoration-[#C7A962] !min-h-0 !min-w-0"
             >
               Declare now<span className="font-secondary">{"\u2192"}</span>
@@ -300,17 +301,13 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
             const items = grouped[tierKey];
             if (items.length === 0) return null;
             const config = TIER_CONFIG[tierKey];
-            const TierIcon = config.icon;
 
             return (
               <div key={tierKey}>
                 {/* Tier header */}
-                <div className="flex items-center gap-2 mb-4">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${config.badge}`}>
-                    <TierIcon className="h-3.5 w-3.5" />
-                    {config.label}
-                  </span>
-                </div>
+                <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">
+                  {config.label}
+                </p>
 
                 {/* Cards row */}
                 <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
@@ -331,7 +328,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                           {menuOpen === service.id && (
                             <div className="absolute right-0 mt-1 bg-white border border-[#E5DFC6] rounded-lg shadow-lg py-1 w-32 z-20">
                               <button
-                                onClick={() => { setEditService(service); setDialogOpen(true); setMenuOpen(null); }}
+                                onClick={() => { setEditService(service); setDeclareJump(false); setDialogOpen(true); setMenuOpen(null); }}
                                 className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#0a2225] hover:bg-[#FDF9F0]"
                               >
                                 <Pencil className="h-3.5 w-3.5" /> Edit
@@ -534,7 +531,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                   </ul>
 
                   <button
-                    onClick={() => { setEditService(null); setPendingTier(t.value); setDialogOpen(true); }}
+                    onClick={() => { setEditService(null); setPendingTier(t.value); setDeclareJump(false); setDialogOpen(true); }}
                     className={`flex items-center justify-center gap-1.5 w-full rounded-full py-2.5 text-sm font-semibold transition-all ${
                       isFlagship
                         ? "bg-[#0c4d47] text-white hover:bg-[#0a3d39]"
@@ -552,12 +549,14 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
 
       {/* Add/Edit dialog */}
       <AddServiceDialog
+        key={editService ? `edit-${editService.id}` : `new-${pendingTier ?? "pick"}`}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         creatorId={creatorId}
         onCreated={fetchServices}
         editService={editService}
         initialTier={pendingTier}
+        initialStep={declareJump ? 3 : 0}
       />
     </div>
   );
