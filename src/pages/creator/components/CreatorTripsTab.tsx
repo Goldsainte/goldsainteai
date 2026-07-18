@@ -68,7 +68,7 @@ export function CreatorTripsTab() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h2 className="font-secondary text-2xl text-[#0a2225]">My Trip Packages</h2>
-          <p className="mt-1 text-sm text-[#6B7280] max-w-md">
+          <p className="mt-1 text-[15px] text-[#6B7280] max-w-md">
             Create and manage curated trips. New trips go to review before they're bookable on the
             marketplace — they appear here straight away.
           </p>
@@ -90,7 +90,7 @@ export function CreatorTripsTab() {
 
       {!loading && trips.length === 0 && (
         <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-          <p className="text-sm text-[#6B7280]">You haven't created any trips yet.</p>
+          <p className="text-[15px] text-[#6B7280]">You haven't created any trips yet.</p>
           <Button
             onClick={() => navigate("/trip-builder")}
             className="mt-4 rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white"
@@ -128,16 +128,16 @@ export function CreatorTripsTab() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="font-secondary text-lg truncate">{trip.title || "Untitled trip"}</h3>
-                      <p className="text-xs text-[#6B7280] truncate">{trip.destination || "Destination TBD"}</p>
+                      <p className="text-[13px] text-[#6B7280] truncate">{trip.destination || "Destination TBD"}</p>
                     </div>
                     <Badge
-                      className={`${statusStyles[status] ?? statusStyles.draft} rounded-full text-[10px] uppercase tracking-wider px-2.5 py-0.5`}
+                      className={`${statusStyles[status] ?? statusStyles.draft} rounded-full text-[12px] uppercase tracking-wider px-2.5 py-0.5`}
                     >
                       {statusLabel[status] ?? status}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs text-[#6B7280]">
+                  <div className="flex items-center gap-4 text-[13px] text-[#6B7280]">
                     <span>
                       <strong className="text-[#0a2225]">{trip.booking_count ?? 0}</strong> bookings
                     </span>
