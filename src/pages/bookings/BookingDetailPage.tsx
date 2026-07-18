@@ -606,7 +606,7 @@ export default function BookingDetailPage() {
         booking && (
           <article className="mx-auto max-w-6xl px-6 pb-24 pt-4">
             {/* ── Hero: full-bleed image with serif title overlaid ── */}
-            <div className="relative h-[280px] overflow-hidden rounded-2xl md:h-[340px]">
+            <div className="relative h-[170px] overflow-hidden rounded-2xl md:h-[200px]">
               {trip?.cover_image_url ? (
                 <TripCoverImage
                   src={trip.cover_image_url}
@@ -644,13 +644,8 @@ export default function BookingDetailPage() {
             </div>
 
             {/* ── Content overlapping the hero ── */}
-            <div className="relative mt-8 grid gap-x-10 gap-y-8 px-0 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:px-3">
-              {/* LEFT column */}
-              <div className="space-y-8">
-                {/* The full flow lives at the TOP now — the "instructions
-                    at the bottom" complaint, answered. Same status-aware
-                    steps, promoted to the page's spine. */}
-                {/* ── Escrow journey tracker: the arc, with live truth ── */}
+            <div className="mt-8 px-0 md:px-3">
+                                {/* ── Escrow journey tracker: the arc, with live truth ── */}
                 {booking.status !== "cancelled" && (() => {
                   const contractExecuted = contractStatus === "fully_executed";
                   const depositPaid =
@@ -745,16 +740,52 @@ export default function BookingDetailPage() {
                       <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                         Your trip, start to finish
                       </p>
-                      <ol className="mt-4 space-y-4">
+
+                      <div className="mt-7 hidden md:flex items-start">
                         {steps.map((st, i) => {
                           const state = st.done ? "done" : i === currentIdx ? "current" : "upcoming";
                           return (
-                            <li key={st.label} className="flex items-start gap-3.5">
+                            <div key={st.label} className="flex-1 px-2 text-center">
                               {state === "done" ? (
-                                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5 text-[#0c4d47]" />
+                                <CheckCircle2 className="mx-auto h-6 w-6 text-[#0c4d47]" />
                               ) : (
                                 <span
-                                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold mt-0.5 ${
+                                  className={`mx-auto flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-semibold ${
+                                    state === "current"
+                                      ? "border-2 border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
+                                      : "border border-[#0a2225]/20 text-[#0a2225]/40"
+                                  }`}
+                                >
+                                  {i + 1}
+                                </span>
+                              )}
+                              <p
+                                className={`mt-2 text-[13px] leading-snug ${
+                                  state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
+                                } ${state === "current" ? "font-medium" : ""}`}
+                              >
+                                {st.label}
+                              </p>
+                              {state === "current" && (
+                                <p className="mt-0.5 text-[11px] uppercase tracking-[0.12em] text-[#8D6B2F]">
+                                  You're here
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <ol className="mt-5 space-y-3.5 md:hidden">
+                        {steps.map((st, i) => {
+                          const state = st.done ? "done" : i === currentIdx ? "current" : "upcoming";
+                          return (
+                            <li key={st.label} className="flex items-start gap-3">
+                              {state === "done" ? (
+                                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#0c4d47]" />
+                              ) : (
+                                <span
+                                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold ${
                                     state === "current"
                                       ? "border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
                                       : "border-[#0a2225]/20 text-[#0a2225]/40"
@@ -763,29 +794,36 @@ export default function BookingDetailPage() {
                                   {i + 1}
                                 </span>
                               )}
-                              <div className="min-w-0">
-                                <p
-                                  className={`text-[16px] leading-snug ${
-                                    state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
-                                  } ${state === "current" ? "font-medium" : ""}`}
-                                >
-                                  {st.label}
-                                </p>
-                                <p
-                                  className={`mt-0.5 text-[13.5px] leading-relaxed ${
-                                    state === "upcoming" ? "text-[#0a2225]/35" : "text-[#0a2225]/65"
-                                  }`}
-                                >
-                                  {st.sub}
-                                </p>
-                              </div>
+                              <p
+                                className={`text-[15px] leading-snug ${
+                                  state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
+                                } ${state === "current" ? "font-medium" : ""}`}
+                              >
+                                {st.label}
+                              </p>
                             </li>
                           );
                         })}
                       </ol>
+
+                      <div className="mt-7 rounded-2xl bg-[#F6F0E4]/80 px-5 py-4">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                          Next step
+                        </p>
+                        <p className="mt-1 text-[15px] leading-relaxed text-[#0a2225]">
+                          {currentIdx === -1
+                            ? "All settled \u2014 nothing left to do. We wish you many more journeys."
+                            : steps[currentIdx].sub}
+                        </p>
+                      </div>
                     </div>
                   );
                 })()}
+            </div>
+
+            <div className="relative mt-9 grid gap-x-10 gap-y-8 px-0 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:px-3">
+              {/* LEFT column */}
+              <div className="space-y-8">
 
                 <div
                   id="booking-messages"
@@ -824,6 +862,31 @@ export default function BookingDetailPage() {
                       className="block h-full rounded-full bg-[#C7A962] transition-all"
                       style={{ width: `${progressPct}%` }}
                     />
+                  </div>
+                  {/* Ledger: each money line answers "did this happen yet". */}
+                  <div className="mt-4 space-y-1.5 border-t border-[#0a2225]/10 pt-3.5 text-[13px]">
+                    <p className="flex items-center justify-between">
+                      <span className="text-[#0a2225]/60">Deposit</span>
+                      <span className="inline-flex items-center gap-1.5 text-[#0a2225]">
+                        {formatMoney(deposit, currency)}
+                        {depositPaid ? (
+                          <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
+                        ) : (
+                          <span className="text-[11px] uppercase tracking-[0.1em] text-[#8D6B2F]">due</span>
+                        )}
+                      </span>
+                    </p>
+                    <p className="flex items-center justify-between">
+                      <span className="text-[#0a2225]/60">Balance</span>
+                      <span className="inline-flex items-center gap-1.5 text-[#0a2225]">
+                        {formatMoney(balance, currency)}
+                        {fullyPaid ? (
+                          <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
+                        ) : (
+                          <span className="text-[11px] uppercase tracking-[0.1em] text-[#0a2225]/45">before departure</span>
+                        )}
+                      </span>
+                    </p>
                   </div>
                   <p className="mt-1.5 text-[11px] text-[#0a2225]/45">
                     {progressPct}% paid · held in escrow
@@ -1258,6 +1321,31 @@ export default function BookingDetailPage() {
             </section>
           </article>
         )
+      )}
+
+      {/* Sticky mobile pay bar: whenever money is due, the primary action is
+          pinned within thumb reach. Absent when nothing is owed. */}
+      {booking && !fullyPaid && booking.status !== "cancelled" && (deposit > 0 || balance > 0) && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#0a2225]/10 bg-[#fdfaf2]/95 px-4 py-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden">
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[9px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                {depositPaid ? "Balance" : "Deposit"}
+              </p>
+              <p className="truncate font-secondary text-[16px] text-[#0a2225]">
+                {formatMoney(depositPaid ? balance : deposit, currency)} + 3.5% fee
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handlePayBalance}
+              disabled={payingBalance}
+              className="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+            >
+              {payingBalance ? "Preparing\u2026" : depositPaid ? "Pay balance" : "Pay deposit"}
+            </button>
+          </div>
+        </div>
       )}
     </main>
   );
