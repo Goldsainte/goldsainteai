@@ -190,7 +190,7 @@ export function CreatorSettingsTab() {
         title="Account & Profile"
         description="Manage your username, avatar, and bio"
       >
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-[15px] text-[#6B7280]">
           Edit your public creator profile, display name, and personal details.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -227,7 +227,7 @@ export function CreatorSettingsTab() {
       >
         {stripeStatus?.connected ? (
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-[15px]">
               {stripeStatus.payouts_enabled ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
@@ -259,7 +259,7 @@ export function CreatorSettingsTab() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-[#6B7280]">
+            <p className="text-[15px] text-[#6B7280]">
               Connect your Stripe account to receive payouts from bookings and
               sales.
             </p>
@@ -288,7 +288,7 @@ export function CreatorSettingsTab() {
             <p className="text-2xl font-secondary text-[#0a2225]">
               {tier.name}
             </p>
-            <p className="text-sm text-[#6B7280]">
+            <p className="text-[15px] text-[#6B7280]">
               Platform commission: {(tier.commissionRate * 100).toFixed(0)}%
             </p>
           </div>
@@ -298,7 +298,7 @@ export function CreatorSettingsTab() {
         </div>
         {tier.next ? (
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-[#6B7280]">
+            <div className="flex justify-between text-[13px] text-[#6B7280]">
               <span>Progress to {tier.next.name}</span>
               <span>
                 ${tier.current.toLocaleString()} / $
@@ -308,7 +308,7 @@ export function CreatorSettingsTab() {
             <Progress value={tier.progress} className="h-2" />
           </div>
         ) : (
-          <p className="text-sm text-[#0c4d47] font-medium">
+          <p className="text-[15px] text-[#0c4d47] font-medium">
             You've reached the top tier. Thank you for being a top creator!
           </p>
         )}
@@ -338,7 +338,7 @@ export function CreatorSettingsTab() {
                 <span className="font-secondary text-2xl">
                   {aiUsage.used}
                 </span>{" "}
-                <span className="text-sm text-[#6B7280]">
+                <span className="text-[15px] text-[#6B7280]">
                   of {aiUsage.limit} generations this month
                 </span>
               </p>
@@ -351,13 +351,13 @@ export function CreatorSettingsTab() {
               className="h-2"
             />
             {aiUsage.remaining <= 5 && (
-              <p className="text-sm text-amber-600">
+              <p className="text-[15px] text-amber-600">
                 You're running low. Consider upgrading for more capacity.
               </p>
             )}
           </div>
         ) : (
-          <p className="text-sm text-[#6B7280]">Loading usage…</p>
+          <p className="text-[15px] text-[#6B7280]">Loading usage…</p>
         )}
       </SettingsSectionCard>
 
@@ -367,7 +367,7 @@ export function CreatorSettingsTab() {
         title="Tax Information"
         description="Tax forms, thresholds, and reporting"
       >
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-[15px] text-[#6B7280]">
           Review tax requirements for creators and submit required forms.
         </p>
         <Button
@@ -391,7 +391,7 @@ export function CreatorSettingsTab() {
         title="Content Guidelines"
         description="Standards for creator content on Goldsainte"
       >
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-[15px] text-[#6B7280]">
           Review our community guidelines to keep your content compliant and
           discoverable.
         </p>
