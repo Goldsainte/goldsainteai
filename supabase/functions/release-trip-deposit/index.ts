@@ -1,5 +1,5 @@
 // ============================================================================
-// release-trip-deposit v5.1 — MILESTONE ESCROW
+// release-trip-deposit v5.2 — MILESTONE ESCROW (cents-true seam 2026-07-18)
 // ============================================================================
 // v5.1 (Jul 15, later that night) — restores the literal `amount:
 //   toCents(payout)` in transfers.create; v5 had refactored it to a const,
@@ -141,8 +141,12 @@ Deno.serve(async (req) => {
       return json(req, { error: "action required: release_deposit | release_final | request_release" }, 400);
     }
 
-    const total = Number(booking.total_price);
-    const deposit = Number(booking.deposit_amount ?? 0);
+    // SEAM: trip_bookings money columns are INTEGER CENTS; payoutMath is
+    // dollars-native. Convert exactly once, here. (v5.1 fed cents straight
+    // into dollar math — a $562.50 deposit release would have computed a
+    // $54,281.25 transfer.)
+    const total = Number(booking.total_price) / 100;
+    const deposit = Number(booking.deposit_amount ?? 0) / 100;
     const currency = (booking.currency || "usd").toLowerCase();
     const meta = (booking.metadata as Record<string, unknown>) ?? {};
     const tripTitle = (meta as any)?.trip_title || "the trip";
