@@ -33,6 +33,7 @@ export default function PartnerBookingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingRow | null>(null);
+  const [isHireBooking, setIsHireBooking] = useState(false);
   const [travelerName, setTravelerName] = useState<string | null>(null);
   const [cover, setCover] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +55,7 @@ export default function PartnerBookingDetailPage() {
           .select(
             `
             id, status, partner_role, traveler_id, partner_id,
-            total_price, deposit_amount, partner_payout, currency,
+            total_price, proposal_id, deposit_amount, partner_payout, currency,
             created_at, metadata,
             trip_requests:trip_request_id (
               id, title, destination, start_date, end_date,
@@ -77,6 +78,17 @@ export default function PartnerBookingDetailPage() {
         }
         if (!alive) return;
         setBooking(data as BookingRow);
+        try {
+          const pid = ((data as BookingRow) as any)?.proposal_id;
+          if (pid) {
+            const { data: pr } = await (supabase
+              .from("trip_proposals")
+              .select("price_breakdown" as any)
+              .eq("id", pid)
+              .maybeSingle() as any);
+            setIsHireBooking(Boolean((pr as any)?.price_breakdown?.hire));
+          }
+        } catch { /* hire detection is cosmetic */ }
 
         // Non-fatal enrichments
         const [{ data: prof }, coverRes] = await Promise.all([
@@ -150,11 +162,13 @@ export default function PartnerBookingDetailPage() {
     "Goldsainte Trip";
   const initial = (travelerName || "T").trim().charAt(0).toUpperCase();
   const money = (v: number | null | undefined) =>
-    v != null ? `$${Number(v).toFixed(2)}` : "—";
+    v != null
+      ? `$${(Number(v) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : "—";
   const payoutValue =
     booking.partner_payout && booking.partner_payout > 0
-      ? Number(booking.partner_payout)
-      : Math.round(Number(booking.total_price || 0) * 96.5) / 100;
+      ? Number(booking.partner_payout) / 100
+      : Math.round((Number(booking.total_price || 0) / 100) * 96.5) / 100;
   const payoutLabel =
     booking.partner_payout && booking.partner_payout > 0
       ? "Your payout"
@@ -229,14 +243,14 @@ export default function PartnerBookingDetailPage() {
         </div>
         <div className="border-t border-white/10 bg-[#083530]">
           <div className="mx-auto flex h-[46px] max-w-3xl items-center gap-5 px-4 md:px-6">
-            <span className="flex items-center gap-2.5 text-[13px] text-[#E5DFC6]/78">
+            <span className="flex items-center gap-2.5 text-[13px] text-[#f7f3ea]">
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
                 {initial}
               </span>
               {travelerName || "Traveler"}
             </span>
             {dates && (
-              <span className="hidden text-[13px] text-[#E5DFC6]/60 sm:inline">{dates}</span>
+              <span className="hidden text-[13px] text-[#f7f3ea] sm:inline">{dates}</span>
             )}
             <div className="flex-1" />
             <div className="hidden items-center gap-3 md:flex">
@@ -247,20 +261,20 @@ export default function PartnerBookingDetailPage() {
                       d.on ? "bg-[#C7A962]" : "border border-[#E5DFC6]/45 bg-transparent"
                     }`}
                   />
-                  <span className={`text-[11.5px] ${d.on ? "text-[#E5DFC6]/85" : "text-[#E5DFC6]/45"}`}>
+                  <span className={`text-[11.5px] ${d.on ? "text-[#f7f3ea]" : "text-[#E5DFC6]/65"}`}>
                     {d.label}
                   </span>
                 </span>
               ))}
             </div>
-            <span className="text-[12.5px] text-[#E5DFC6]/78">{journeyLabel}</span>
+            <span className="text-[13px] font-medium text-white">{journeyLabel}</span>
           </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 md:px-6">
         {/* Cover */}
-        <div className="relative h-56 overflow-hidden rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
+        <div className="relative h-28 overflow-hidden rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
           {cover ? (
             <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" />
           ) : (
@@ -304,7 +318,7 @@ export default function PartnerBookingDetailPage() {
             <div className="flex items-baseline justify-between py-3">
               <span className="text-[14px] text-[#0a2225]/60">{payoutLabel}</span>
               <span className="font-secondary text-[19px] text-[#0c4d47]">
-                ${payoutValue.toFixed(2)}
+                ${payoutValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
           </div>
@@ -316,6 +330,7 @@ export default function PartnerBookingDetailPage() {
         </div>
 
         {/* Contract */}
+        {!isHireBooking && (
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Agreement</p>
           <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
@@ -332,6 +347,7 @@ export default function PartnerBookingDetailPage() {
             endDate={trip?.end_date ?? null}
           />
         </div>
+        )}
 
         {/* Actions */}
         <div className="flex flex-wrap items-center justify-end gap-3 pb-6">
