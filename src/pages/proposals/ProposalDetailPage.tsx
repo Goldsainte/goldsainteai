@@ -102,6 +102,7 @@ function cancellationTierColor(label: string) {
 
 export default function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
+  const [proposal, setProposal] = useState<ProposalDetail | null>(null);
   const [acceptedBooking, setAcceptedBooking] = useState<{ id: string; status: string | null } | null>(null);
   useEffect(() => {
     if (!proposalId) return;
@@ -117,7 +118,6 @@ export default function ProposalDetailPage() {
       } catch { /* CTA is an enhancement */ }
     })();
   }, [proposalId, proposal?.status]);
-  const [proposal, setProposal] = useState<ProposalDetail | null>(null);
   const [accountType, setAccountType] = useState<AccountType>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
