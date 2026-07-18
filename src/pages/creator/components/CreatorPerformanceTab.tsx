@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
 import { TrendingUp, Eye, MousePointerClick, Trophy } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -134,7 +133,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
   }, [sales]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h2 className="font-secondary text-xl text-[#0a2225]">Performance</h2>
         <div className="flex gap-1 rounded-full bg-[#FDF9F0] p-1 ring-1 ring-[#E5DFC6] self-start sm:self-auto">
@@ -169,7 +168,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
         />
       </div>
 
-      <Card className="p-5">
+      <div className="border-t border-[#0a2225]/15 pt-6">
         <p className="mb-3 text-[12px] uppercase tracking-wider text-[#7A7151]">Sales by day</p>
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -187,9 +186,9 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-5">
+      <div className="border-t border-[#0a2225]/15 pt-6">
         <p className="mb-3 text-[12px] uppercase tracking-wider text-[#7A7151]">Traffic sources (UTM)</p>
         {sources.length === 0 ? (
           <p className="text-sm text-[#6B7280]">
@@ -205,7 +204,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
             ))}
           </ul>
         )}
-      </Card>
+      </div>
 
       {loading && <p className="text-xs text-[#7A7151]">Loading…</p>}
     </div>
@@ -226,13 +225,13 @@ function Stat({
   subtitle?: string;
 }) {
   return (
-    <Card className="p-4">
+    <div className="border-t border-[#0a2225]/15 pt-5">
       <div className="mb-1 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[#7A7151]">
         {icon}
         {label}
       </div>
       <p className={`font-secondary text-lg text-[#0a2225] ${truncate ? "truncate" : ""}`}>{value}</p>
       {subtitle && <p className="mt-0.5 text-[11px] text-[#7A7151]">{subtitle}</p>}
-    </Card>
+    </div>
   );
 }
