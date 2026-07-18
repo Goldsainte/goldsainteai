@@ -116,6 +116,41 @@ Deno.serve(async (req) => {
       throw bookingError ?? new Error("Booking not found");
     }
 
+    // ------------------------------------------------------------------
+    // MONEY GUARD (Jul 18): never trust a client-supplied amount. The
+    // column standard is integer CENTS. The requested charge must match
+    // the booking's own deposit, balance, or total — each optionally plus
+    // the 3.5% traveler service fee — within $1. A client-side unit bug
+    // once produced a $58,218.75 checkout for a $562.50 deposit; this
+    // makes that class of error impossible regardless of caller.
+    // ------------------------------------------------------------------
+    {
+      const totalCents = Math.max(0, Math.round(Number(booking.total_price ?? 0)));
+      const depositCents = Math.max(0, Math.round(Number(booking.deposit_amount ?? 0)));
+      const balanceCents = Math.max(0, totalCents - depositCents);
+      const withFee = (c: number) => Math.round(c * 1.035);
+      const allowed = [
+        depositCents, withFee(depositCents),
+        balanceCents, withFee(balanceCents),
+        totalCents, withFee(totalCents),
+      ].filter((c) => c > 0);
+      const TOLERANCE_CENTS = 100;
+      const ok = allowed.some((c) => Math.abs(c - Number(amountTotalCents)) <= TOLERANCE_CENTS);
+      if (!ok) {
+        console.error(
+          `[trip-checkout-create] REFUSED amount ${amountTotalCents}c for booking ${tripBookingId}; ` +
+          `allowed (±$1): ${allowed.join(", ")}c (deposit=${depositCents}, balance=${balanceCents}, total=${totalCents})`
+        );
+        return new Response(
+          JSON.stringify({
+            error: "Payment amount does not match this booking. Please refresh the page and try again — if it persists, contact support.",
+          }),
+          { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+
     const tripRequest = (booking as any).trip_requests
       ? ((booking as any).trip_requests as any)
       : null;
