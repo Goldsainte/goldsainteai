@@ -280,12 +280,19 @@ export default function TripRequestDetail() {
     }
     if (!id) return;
     try {
-      const { createBookingFromProposal } = await import("@/services/bookingService");
+      // Route through the ONE real accept path (accept_proposal_rpc). The old
+      // bookingService.createBookingFromProposal was a stub that always threw
+      // "temporarily disabled" — this button has never worked.
+      const { acceptProposal } = await import("@/services/proposalsService");
       const proposal = proposals.find(p => p.id === proposalId);
       if (!proposal) throw new Error("Proposal not found");
-      await createBookingFromProposal({ tripId: id, proposalId });
-      toast.success("Proposal accepted! Booking created successfully.");
-      setTimeout(() => navigate("/bookings"), 1000);
+      const result = await acceptProposal(proposalId);
+      toast.success("Proposal accepted! Booking created.");
+      if (result?.booking_id) {
+        setTimeout(() => navigate(`/bookings/${result.booking_id}`), 600);
+      } else {
+        setTimeout(() => navigate("/my-bookings"), 800);
+      }
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Failed to accept proposal");
