@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight, X, Sparkles, ChevronDown, ChevronUp } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { TrustSafetyModal } from "@/components/trust/TrustSafetyModal";
 import { toast } from "sonner";
+import { capLabel } from "@/lib/onTripCapabilities";
 import { useAuth } from "@/contexts/AuthContext";
 import { useItineraryPrefill } from "@/hooks/useItineraryPrefill";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,11 @@ export default function PostTripPage() {
   const [hireOnTrip, setHireOnTrip] = useState(false);
   const [hireServiceTitle, setHireServiceTitle] = useState<string | null>(null);
   const [hireDayRate, setHireDayRate] = useState<string | null>(null);
+  const [hireServiceId, setHireServiceId] = useState<string | null>(null);
+  // The hired service's declared capabilities — the traveler chooses their
+  // scope from exactly this list (same vocabulary end to end).
+  const [serviceCaps, setServiceCaps] = useState<string[]>([]);
+  const [chosenCaps, setChosenCaps] = useState<string[]>([]);
 
   useEffect(() => {
     const fromCreator = searchParams.get("fromCreator") || sessionStorage.getItem("goldsainte:fromCreator");
@@ -103,6 +109,8 @@ export default function PostTripPage() {
       setHireOnTrip(true);
       sessionStorage.setItem("goldsainte:hireOnTrip", "on-trip");
       if (hireService) { setHireServiceTitle(hireService); sessionStorage.setItem("goldsainte:hireService", hireService); }
+      const sid = searchParams.get("serviceId") || sessionStorage.getItem("goldsainte:hireServiceId");
+      if (sid) { setHireServiceId(sid); sessionStorage.setItem("goldsainte:hireServiceId", sid); }
       if (hireRate) { setHireDayRate(hireRate); sessionStorage.setItem("goldsainte:hireRate", hireRate); }
     }
     if (fromCreator) {
@@ -146,6 +154,20 @@ export default function PostTripPage() {
     startsOn && endsOn
       ? Math.max(0, Math.round((new Date(endsOn).getTime() - new Date(startsOn).getTime()) / 86400000))
       : 0;
+  useEffect(() => {
+    if (!isHireFastPath) return;
+    (async () => {
+      try {
+        let q: any = supabase.from("creator_services").select("id, includes" as any).eq("service_tier", "on_trip");
+        if (hireServiceId) q = q.eq("id", hireServiceId);
+        else if (preferredCreatorId) q = q.eq("creator_id", preferredCreatorId);
+        const { data } = await (q.limit(1) as any);
+        setServiceCaps((((data as any)?.[0]?.includes as string[]) || []));
+      } catch { /* capability list is an enhancement, not a gate */ }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hireServiceId, preferredCreatorId, preferredAgentId, hireOnTrip]);
+
   const hireEstimate =
     hireDays > 0 && Number.isFinite(hireRateNum) && hireRateNum > 0 ? hireDays * hireRateNum : null;
 
@@ -157,6 +179,10 @@ export default function PostTripPage() {
     }
     if (hireDays <= 0) {
       setError("The end date must be after the start date.");
+      return;
+    }
+    if (serviceCaps.length > 0 && chosenCaps.length === 0) {
+      setError(`Choose at least one thing you're hiring ${hireFirstName} for.`);
       return;
     }
     setError(null);
@@ -196,6 +222,8 @@ export default function PostTripPage() {
           hire_day_rate_usd: Number.isFinite(hireRateNum) && hireRateNum > 0 ? hireRateNum : null,
           estimated_total_usd: hireEstimate,
           trip_days: hireDays,
+          hire_service_id: hireServiceId,
+          hire_capabilities: chosenCaps,
         },
       };
       if (preferredCreatorId) insertPayload.preferred_creator_id = preferredCreatorId;
@@ -211,6 +239,7 @@ export default function PostTripPage() {
       sessionStorage.removeItem("goldsainte:hireOnTrip");
       sessionStorage.removeItem("goldsainte:hireService");
       sessionStorage.removeItem("goldsainte:hireRate");
+      sessionStorage.removeItem("goldsainte:hireServiceId");
 
       const notifyUserId = preferredCreatorId || preferredAgentUserId;
       if (notifyUserId && insertedTrip?.id) {
@@ -221,6 +250,7 @@ export default function PostTripPage() {
               title: "New On-Trip Hire Request",
               body:
                 `A traveler wants to hire you to join their trip to ${destination}` +
+                (chosenCaps.length ? ` for ${chosenCaps.map(capLabel).join(", ").toLowerCase()}` : "") +
                 (Number.isFinite(hireRateNum) && hireRateNum > 0 ? ` at your listed rate of $${hireRateNum}/day` : ""),
               type: "booking",
               priority: "high",
@@ -419,6 +449,7 @@ export default function PostTripPage() {
       sessionStorage.removeItem("goldsainte:hireOnTrip");
       sessionStorage.removeItem("goldsainte:hireService");
       sessionStorage.removeItem("goldsainte:hireRate");
+      sessionStorage.removeItem("goldsainte:hireServiceId");
 
       // Notify the chosen creator/agent. This MUST go through the
       // send-notification edge function: RLS (correctly) forbids browsers
@@ -676,6 +707,24 @@ export default function PostTripPage() {
                 <input type="number" min="0" className={F} value={children} onChange={(e) => setChildren(e.target.value)} />
               </div>
             </div>
+            {serviceCaps.length > 0 && (
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[#6B7280]">What do you need {hireFirstName} for? *</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {serviceCaps.map((id) => (
+                    <button key={id} type="button"
+                      onClick={() => setChosenCaps((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])}
+                      className={`h-9 rounded-lg border px-3 text-[13px] font-medium transition-colors !min-h-0 !min-w-0 ${
+                        chosenCaps.includes(id)
+                          ? "border-[#0c4d47] bg-[#0c4d47] text-[#f7f3ea]"
+                          : "border-[#E5DFC6] bg-white text-[#0a2225] hover:border-[#C7A962]"
+                      }`}>
+                      {capLabel(id)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-xs font-medium text-[#6B7280]">
                 Anything {hireFirstName} should know? <span className="text-[#9CA3AF]">(optional)</span>
