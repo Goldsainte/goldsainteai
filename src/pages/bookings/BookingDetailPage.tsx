@@ -100,6 +100,7 @@ export default function BookingDetailPage() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingRow | null>(null);
+  const [isHireBooking, setIsHireBooking] = useState(false);
   const [trip, setTrip] = useState<TripRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -181,7 +182,7 @@ export default function BookingDetailPage() {
         const { data: bookingRow, error: bookingErr } = await supabase
           .from("trip_bookings")
           .select(
-            "id, status, traveler_id, partner_id, partner_role, total_price, deposit_amount, currency, created_at, metadata, stripe_payment_intent_id"
+            "id, status, traveler_id, partner_id, partner_role, total_price, proposal_id, deposit_amount, currency, created_at, metadata, stripe_payment_intent_id"
           )
           .eq("id", bookingId)
           .single();
@@ -276,6 +277,17 @@ export default function BookingDetailPage() {
 
         if (!cancelled) {
           setBooking(bookingRow as BookingRow);
+        try {
+          const pid = (bookingRow as any)?.proposal_id;
+          if (pid) {
+            const { data: pr } = await (supabase
+              .from("trip_proposals")
+              .select("price_breakdown" as any)
+              .eq("id", pid)
+              .maybeSingle() as any);
+            setIsHireBooking(Boolean((pr as any)?.price_breakdown?.hire));
+          }
+        } catch { /* hire detection is presentational */ }
           setTrip(tripRow);
           setDisputes(disputeRows);
           setCancellations(cancellationRows);
@@ -610,7 +622,9 @@ export default function BookingDetailPage() {
                   </p>
                   <div className="mt-5 space-y-4">
                     <TimelineItem n="i.">
-                      Your specialist confirms trip details within 24 hours.
+                      {isHireBooking
+                        ? `${specialistName || "Your host"} plans around your dates \u2014 keep an eye on Messages.`
+                        : "Your specialist confirms trip details within 24 hours."}
                     </TimelineItem>
                     <TimelineItem n="ii.">
                       {balance > 0
@@ -618,8 +632,9 @@ export default function BookingDetailPage() {
                         : "Your trip is paid in full — nothing further is due."}
                     </TimelineItem>
                     <TimelineItem n="iii.">
-                      Funds stay in escrow, released to your specialist on
-                      agreed milestones.
+                      {isHireBooking
+                        ? "Funds stay in escrow \u2014 released after you confirm the trip went as agreed."
+                        : "Funds stay in escrow, released to your specialist on agreed milestones."}
                     </TimelineItem>
                   </div>
                 </div>
@@ -783,14 +798,48 @@ export default function BookingDetailPage() {
                         : "After your trip, confirm it went as agreed — that releases the final payment to your specialist.",
                     },
                   ];
-                  const currentIdx = journey.findIndex((st) => !st.done);
+                  const hireJourney = [
+                    {
+                      label: "Booking created",
+                      done: true,
+                      sub: "Escrow protects every payment from here.",
+                    },
+                    {
+                      label: "Deposit paid into escrow",
+                      done: depositPaid,
+                      sub: depositPaid
+                        ? `${formatMoney(deposit, currency)} secured \u2014 protected until after the trip.`
+                        : "Pay the deposit \u2014 held in escrow, protected until after the trip.",
+                    },
+                    {
+                      label: "Balance paid",
+                      done: balancePaid,
+                      sub: balancePaid
+                        ? "Paid in full \u2014 held in escrow through your trip."
+                        : `Due before departure${balance > 0 ? ` (${formatMoney(balance, currency)})` : ""}.`,
+                    },
+                    {
+                      label: `${specialistName || "Your host"} joins your trip`,
+                      done: tripDone,
+                      sub: "The scope you accepted is the agreement \u2014 no contract step for hires.",
+                    },
+                    {
+                      label: "Trip complete \u2014 payout released",
+                      done: tripDone,
+                      sub: tripDone
+                        ? "All settled. We wish you many more journeys."
+                        : "After your trip, confirm it went as agreed \u2014 that releases the payout.",
+                    },
+                  ];
+                  const steps = isHireBooking ? hireJourney : journey;
+                  const currentIdx = steps.findIndex((st) => !st.done);
                   return (
                     <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6">
                       <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                         Your trip, step by step
                       </p>
                       <ol className="mt-4 space-y-4">
-                        {journey.map((st, i) => {
+                        {steps.map((st, i) => {
                           const state = st.done ? "done" : i === currentIdx ? "current" : "upcoming";
                           return (
                             <li key={st.label} className="flex items-start gap-3.5">
@@ -831,7 +880,9 @@ export default function BookingDetailPage() {
                   );
                 })()}
 
-                <ContractStatusCard variant="traveler" bookingId={booking.id} />
+                {!isHireBooking && (
+                  <ContractStatusCard variant="traveler" bookingId={booking.id} />
+                )}
 
                 {(canReleaseDeposit ||
                   canConfirmComplete ||
