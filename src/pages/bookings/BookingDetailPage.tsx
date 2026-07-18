@@ -1,13 +1,14 @@
 // src/pages/bookings/BookingDetailPage.tsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ShieldAlert, CalendarX, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldAlert, CalendarX, CheckCircle2, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
 import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { createDispute, getBookingDisputes } from "@/services/disputeService";
 
 type DisputeRow = {
@@ -105,6 +106,8 @@ export default function BookingDetailPage() {
   const [booking, setBooking] = useState<BookingRow | null>(null);
   const [isHireBooking, setIsHireBooking] = useState(false);
   const [hireHeadline, setHireHeadline] = useState<string | null>(null);
+  const [hasUnread, setHasUnread] = useState(false);
+  const [messagesOpen, setMessagesOpen] = useState(false);
   const [trip, setTrip] = useState<TripRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -518,6 +521,45 @@ export default function BookingDetailPage() {
   const deposit = (booking?.deposit_amount ?? 0) / 100;
   const balance = Math.max(0, total - deposit);
   const reference = booking ? `GS-${booking.id.slice(0, 8).toUpperCase()}` : "";
+  // Destination for the hero. Hire bookings have no packaged_trips row, so
+  // cover_image_url is null — fall back to the destination image library
+  // (same source every other surface uses) so the hero is never a flat box.
+  const heroDestination =
+    trip?.destination ||
+    (booking?.metadata as any)?.destination ||
+    (booking?.metadata as any)?.trip_title ||
+    null;
+  const heroImage = trip?.cover_image_url || getTripRequestImageUrl(heroDestination);
+
+  // Auto-expand Messages only when there's something unread for this booking;
+  // otherwise it stays collapsed so money/next-step lead the page.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (!booking?.id) return;
+      try {
+        const { data: sess } = await supabase.auth.getUser();
+        const uid = sess?.user?.id;
+        if (!uid || !booking.traveler_id || !booking.partner_id) return;
+        const [p1, p2] = [booking.traveler_id, booking.partner_id].sort();
+        const { data: convo } = await (supabase as any)
+          .from("dm_conversations")
+          .select("unread_count_p1, unread_count_p2, participant_1")
+          .eq("participant_1", p1)
+          .eq("participant_2", p2)
+          .eq("booking_id", booking.id)
+          .maybeSingle();
+        if (!alive || !convo) return;
+        const mine =
+          convo.participant_1 === uid ? convo.unread_count_p1 : convo.unread_count_p2;
+        if ((mine ?? 0) > 0) {
+          setHasUnread(true);
+          setMessagesOpen(true);
+        }
+      } catch { /* unread is an enhancement */ }
+    })();
+    return () => { alive = false; };
+  }, [booking?.id, booking?.traveler_id, booking?.partner_id]);
   const title =
     hireHeadline ||
     trip?.title ||
@@ -604,24 +646,21 @@ export default function BookingDetailPage() {
         </section>
       ) : (
         booking && (
-          <article className="mx-auto max-w-6xl px-6 pb-24 pt-4">
-            {/* ── Hero: full-bleed image with serif title overlaid ── */}
-            <div className="relative h-[170px] overflow-hidden rounded-2xl md:h-[200px]">
-              {trip?.cover_image_url ? (
-                <TripCoverImage
-                  src={trip.cover_image_url}
-                  alt={title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/85 via-[#061418]/20 to-[#061418]/30" />
-              <div className="absolute inset-x-0 bottom-0 px-7 pb-14 md:px-10">
+          <article className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-6">
+            {/* ── Hero: destination image with serif title overlaid. Image
+                 always resolves (packaged cover OR destination library). ── */}
+            <div className="relative h-[210px] overflow-hidden rounded-2xl md:h-[240px]">
+              <TripCoverImage
+                src={heroImage}
+                alt={title}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/90 via-[#061418]/25 to-[#061418]/20" />
+              <div className="absolute inset-x-0 bottom-0 px-6 pb-6 md:px-10 md:pb-8">
                 <p className="text-[12px] uppercase tracking-[0.3em] text-[#C7A962]/95">
                   Your journey · {reference}
                 </p>
-                <h1 className="mt-2 max-w-3xl font-secondary text-3xl leading-[1.05] text-[#fdfaf2] md:text-4xl">
+                <h1 className="mt-2 max-w-3xl font-secondary text-[26px] leading-[1.1] text-[#fdfaf2] md:text-4xl">
                   {title}
                 </h1>
                 <p className="mt-2.5 text-[14.5px] text-[#fdfaf2]/80">
@@ -824,26 +863,6 @@ export default function BookingDetailPage() {
             <div className="relative mt-9 grid gap-x-10 gap-y-8 px-0 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:px-3">
               {/* LEFT column */}
               <div className="space-y-8">
-
-                <div
-                  id="booking-messages"
-                  className="border-t border-[#0a2225]/15 pt-6"
-                >
-                  <header className="mb-5 flex items-baseline justify-between gap-3">
-                    <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                      Messages
-                    </p>
-                    <p className="text-right text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/40">
-                      Your direct line to {specialistName || "your specialist"}
-                    </p>
-                  </header>
-                  <BookingConversation
-                    bookingId={booking.id}
-                    travelerId={booking.traveler_id}
-                    partnerId={booking.partner_id}
-                  />
-                </div>
-
                 {(canReleaseDeposit ||
                   canConfirmComplete ||
                   booking.status === "completed" ||
@@ -1042,6 +1061,43 @@ export default function BookingDetailPage() {
                 )}
 
 
+                {/* Messages — collapsed by default, auto-expanded on unread.
+                     Lives near the bottom so money + next-step lead the page. */}
+                <div id="booking-messages" className="border-t border-[#0a2225]/15 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => setMessagesOpen((o) => !o)}
+                    className="flex w-full items-center justify-between gap-3"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                        Messages
+                      </span>
+                      {hasUnread && (
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#0c4d47] px-1.5 text-[12px] font-semibold text-[#E5DFC6]">
+                          New
+                        </span>
+                      )}
+                    </span>
+                    <span className="flex items-center gap-2 text-[12px] uppercase tracking-[0.16em] text-[#0a2225]/40">
+                      <span className="hidden sm:inline">
+                        {specialistName || "your specialist"}
+                      </span>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${messagesOpen ? "rotate-180" : ""}`}
+                      />
+                    </span>
+                  </button>
+                  {messagesOpen && (
+                    <div className="mt-5">
+                      <BookingConversation
+                        bookingId={booking.id}
+                        travelerId={booking.traveler_id}
+                        partnerId={booking.partner_id}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
