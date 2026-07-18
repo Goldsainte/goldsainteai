@@ -57,18 +57,40 @@ export function isCapabilityId(v: string): boolean {
 export interface ProposalField {
   id: string;
   label: string;
-  type: "number" | "text" | "select";
+  type: "number" | "text" | "textarea" | "select" | "radio" | "multiselect" | "date";
   options?: string[];
   placeholder?: string;
   suffix?: string; // e.g. "days", "sessions"
+  /** Section eyebrow rendered when it changes from the previous field. */
+  section?: string;
+  /** Attach the AI rewrite assistant (text/textarea fields). */
+  withAI?: boolean;
 }
 
 export const CAPABILITY_PROPOSAL_FIELDS: Record<string, ProposalField[]> = {
   content: [
-    { id: "photos", label: "Edited photos delivered", type: "number", placeholder: "200" },
-    { id: "videos", label: "Videos / reels delivered", type: "number", placeholder: "5" },
-    { id: "delivery_days", label: "Delivery after the trip", type: "number", placeholder: "10", suffix: "days" },
-    { id: "usage", label: "Usage rights", type: "select", options: ["Personal use only", "Personal + my social channels", "Full commercial rights"] },
+    // 3. Content style — sets expectations
+    { id: "content_style", label: "Content style", type: "multiselect", section: "Content style",
+      options: ["Lifestyle", "Luxury", "Adventure", "Food", "Couple", "Family", "Editorial", "Documentary", "Social-first", "Cinematic"] },
+    // 4. Shooting schedule — no surprise all-day cameras
+    { id: "shooting", label: "Typical filming commitment", type: "radio", section: "Shooting schedule",
+      options: ["2\u20133 hours/day", "Half day", "Full day", "Flexible"] },
+    // 5. Deliverables breakdown
+    { id: "photos", label: "Edited photos", type: "number", placeholder: "200", section: "Deliverables" },
+    { id: "reels", label: "Instagram Reels", type: "number", placeholder: "5", section: "Deliverables" },
+    { id: "stories", label: "Stories", type: "number", placeholder: "10", section: "Deliverables" },
+    { id: "recap", label: "Cinematic recap videos", type: "number", placeholder: "1", section: "Deliverables" },
+    { id: "extras", label: "Also included", type: "multiselect", section: "Deliverables",
+      options: ["Drone footage", "Raw files on request", "Same-day social edits", "Behind-the-scenes"] },
+    { id: "delivery_days", label: "Delivery after the trip", type: "number", placeholder: "10", suffix: "days", section: "Deliverables" },
+    { id: "usage", label: "Usage rights", type: "select", section: "Deliverables",
+      options: ["Personal use only", "Personal + my social channels", "Full commercial rights"] },
+    // 6. Editing style
+    { id: "editing", label: "Editing style", type: "select", section: "Editing style",
+      options: ["Natural", "Luxury editorial", "Bright & airy", "Moody", "Documentary", "Creator's signature style"] },
+    // 7. Equipment
+    { id: "equipment", label: "I'll be bringing", type: "multiselect", section: "Equipment",
+      options: ["Professional camera", "Drone", "GoPro / action cam", "Gimbal", "Lighting", "Audio kit"] },
   ],
   photography: [
     { id: "sessions", label: "Dedicated shoot sessions", type: "number", placeholder: "4" },
