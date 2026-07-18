@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, Check, Link2, DollarSign, MousePointer, ShoppingBag } from "lucide-react";
@@ -151,14 +150,14 @@ export function CreatorAffiliateTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Stat icon={<DollarSign className="h-4 w-4" />} label="Referral earnings" value={`$${totalEarnings.toFixed(2)}`} />
         <Stat icon={<MousePointer className="h-4 w-4" />} label="Clicks" value={totalClicks.toLocaleString()} />
         <Stat icon={<ShoppingBag className="h-4 w-4" />} label="Conversions" value={totalConv.toLocaleString()} />
       </div>
 
-      <Card className="p-5">
+      <div className="border-t border-[#0a2225]/15 pt-6">
         <h3 className="mb-1 font-secondary text-lg text-[#0a2225]">Generate referral link</h3>
         <p className="mb-3 text-sm text-[#6B7280]">
           Earn 10% of platform commission on every booking driven through your link.
@@ -187,10 +186,10 @@ export function CreatorAffiliateTab() {
             <p className="col-span-full text-sm text-[#6B7280]">No products match.</p>
           )}
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-5">
-        <h3 className="mb-3 font-secondary text-lg text-[#0a2225]">Your referral links</h3>
+      <div className="border-t border-[#0a2225]/15 pt-6">
+        <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your referral links</h3>
         {loading ? (
           <p className="text-sm text-[#7A7151]">Loading…</p>
         ) : links.length === 0 ? (
@@ -222,10 +221,10 @@ export function CreatorAffiliateTab() {
             ))}
           </ul>
         )}
-      </Card>
+      </div>
 
-      <Card className="p-5">
-        <h3 className="mb-3 font-secondary text-lg text-[#0a2225]">Recent commissions</h3>
+      <div className="border-t border-[#0a2225]/15 pt-6">
+        <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent commissions</h3>
         {commissions.length === 0 ? (
           <p className="text-sm text-[#6B7280]">No commissions yet.</p>
         ) : (
@@ -243,10 +242,10 @@ export function CreatorAffiliateTab() {
             ))}
           </ul>
         )}
-      </Card>
+      </div>
 
-      <Card className="p-5">
-        <h3 className="mb-3 font-secondary text-lg text-[#0a2225]">Earnings by product</h3>
+      <div className="border-t border-[#0a2225]/15 pt-6">
+        <h3 className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Earnings by product</h3>
         {productBreakdown.length === 0 ? (
           <p className="text-sm text-[#6B7280]">No referral activity yet.</p>
         ) : (
@@ -273,19 +272,19 @@ export function CreatorAffiliateTab() {
             </table>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <Card className="p-4">
+    <div className="border-t border-[#0a2225]/15 pt-5">
       <div className="mb-1 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[#7A7151]">
         {icon}
         {label}
       </div>
       <p className="font-secondary text-lg text-[#0a2225]">{value}</p>
-    </Card>
+    </div>
   );
 }
