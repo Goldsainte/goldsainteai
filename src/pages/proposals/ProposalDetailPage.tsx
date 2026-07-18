@@ -102,6 +102,21 @@ function cancellationTierColor(label: string) {
 
 export default function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
+  const [acceptedBooking, setAcceptedBooking] = useState<{ id: string; status: string | null } | null>(null);
+  useEffect(() => {
+    if (!proposalId) return;
+    (async () => {
+      try {
+        const { data } = await (supabase
+          .from("trip_bookings")
+          .select("id, status" as any)
+          .eq("proposal_id", proposalId)
+          .limit(1) as any);
+        const row: any = (data as any)?.[0];
+        setAcceptedBooking(row ? { id: row.id, status: row.status ?? null } : null);
+      } catch { /* CTA is an enhancement */ }
+    })();
+  }, [proposalId, proposal?.status]);
   const [proposal, setProposal] = useState<ProposalDetail | null>(null);
   const [accountType, setAccountType] = useState<AccountType>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -995,11 +1010,24 @@ export default function ProposalDetailPage() {
                       )}
 
                       {proposal.status === "accepted" && (
-                        <div className="bg-primary/10 rounded-lg p-4 space-y-1">
-                          <p className="text-sm font-semibold text-primary">Your booking is confirmed</p>
+                        <div className="bg-primary/10 rounded-lg p-4 space-y-2">
+                          <p className="text-sm font-semibold text-primary">
+                            {acceptedBooking?.status === "deposit_pending"
+                              ? "Accepted \u2014 your deposit locks it in"
+                              : "Your booking is confirmed"}
+                          </p>
                           <p className="text-sm text-muted-foreground">
                             All future changes, questions, and approvals should be handled inside Goldsainte to keep your trip protected.
                           </p>
+                          {acceptedBooking && (
+                            <Link
+                              to={`/bookings/${acceptedBooking.id}`}
+                              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-[#0c4d47] underline underline-offset-4 decoration-[#0a2225]/25 transition-colors hover:decoration-[#C7A962]"
+                            >
+                              {acceptedBooking.status === "deposit_pending" ? "Continue to your booking \u2014 pay the deposit" : "View your booking"}
+                              <span className="font-secondary">{"\u2192"}</span>
+                            </Link>
+                          )}
                         </div>
                       )}
 
