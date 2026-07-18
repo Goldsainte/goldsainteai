@@ -47,6 +47,8 @@ export default function MyTripRequestsPage() {
           travelers_adults,
           travelers_children,
           created_at,
+          source_metadata,
+          preferred_creator_id,
           trip_proposals ( status )
         `
         )
@@ -57,7 +59,26 @@ export default function MyTripRequestsPage() {
 
       if (error) {
         console.error("Error loading my trip_requests:", error);
-        setRequests([]);
+        {
+        const rows: any[] = ([] as any[]) || [];
+        try {
+          const ids = Array.from(new Set(rows.map((r) => r.preferred_creator_id).filter(Boolean)));
+          if (ids.length) {
+            const { data: profs } = await (supabase
+              .from("profiles")
+              .select("id, display_name, full_name, first_name" as any)
+              .in("id", ids) as any);
+            const nameById: Record<string, string> = {};
+            for (const pr of ((profs as any[]) || [])) {
+              nameById[pr.id] = pr.display_name || pr.full_name || pr.first_name || "your host";
+            }
+            for (const r of rows) {
+              if (r.preferred_creator_id) (r as any).addresseeName = nameById[r.preferred_creator_id];
+            }
+          }
+        } catch { /* names are an enhancement */ }
+        setRequests(rows as any);
+      }
       } else {
         setRequests((data ?? []) as any);
       }
@@ -192,6 +213,16 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
           <p className="text-xs text-[#8D8D8D]">
             Posted {new Date(req.created_at).toLocaleDateString()}
           </p>
+          {(req as any).addresseeName && (
+            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#0a2225]">
+              <span className="font-medium">Sent directly to {(req as any).addresseeName}</span>
+              {Boolean((req as any).source_metadata?.hire_on_trip) && (
+                <span className="rounded bg-[#C7A962] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#0a2225]">
+                  On-trip hire
+                </span>
+              )}
+            </p>
+          )}
           <h2 className="mt-1 line-clamp-2 text-sm font-semibold">
             {req.title || `Trip to ${req.destination || "somewhere special"}`}
           </h2>
