@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
-import { MapPin, HandCoins, Users } from "lucide-react";
+import { MapPin, HandCoins, Users, ArrowRight } from "lucide-react";
+import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { Button } from "@/components/ui/button";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
@@ -84,18 +85,20 @@ export default function PartnerBookingsPage() {
         console.error("Error loading partner bookings:", error);
         setLoadError(error.message || "Unable to load bookings.");
         setBookings([]);
-      try {
-        const ids = (([]) as any[] | null | undefined)?.map((b: any) => b.proposal_id).filter(Boolean) ?? [];
-        if (ids.length) {
-          const { data: props } = await (supabase
-            .from("trip_proposals")
-            .select("id, price_breakdown" as any)
-            .in("id", ids) as any);
-          setHireProposalIds(new Set(((props as any[]) || []).filter((pr) => (pr.price_breakdown as any)?.hire).map((pr) => pr.id)));
-        }
-      } catch { /* hire detection is cosmetic here */ }
       } else {
         const rows = (data ?? []) as BookingRow[];
+        try {
+          const pids = Array.from(new Set(rows.map((r: any) => r.proposal_id).filter(Boolean)));
+          if (pids.length) {
+            const { data: props } = await (supabase
+              .from("trip_proposals")
+              .select("id, price_breakdown" as any)
+              .in("id", pids) as any);
+            if (isMounted) {
+              setHireProposalIds(new Set(((props as any[]) || []).filter((pr) => (pr.price_breakdown as any)?.hire).map((pr) => pr.id)));
+            }
+          }
+        } catch { /* hire badge is cosmetic */ }
         setBookings(rows.map((r) => ({ ...r, traveler: null })) as BookingRow[]);
 
         // Traveler names + trip cover images load separately — if either
@@ -282,110 +285,55 @@ function PartnerBookingRowCard({ isHireBooking, booking,
       ? `${fmt(trip.start_date)} – ${fmt(trip.end_date)}`
       : fmt(trip?.start_date) || null;
 
+  const reference = `GS-${booking.id.slice(0, 8).toUpperCase()}`;
+  const booked = new Date(booking.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const imgUrl = trip?.destination ? getTripRequestImageUrl(trip.destination) : null;
+  void onStatusChange; void handleRelease; void initial; void total;
   return (
     <Link
       to={`/booking/${booking.id}`}
-      className="block overflow-hidden rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] ring-1 ring-transparent transition hover:ring-[#C7A962]/60"
+      className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
     >
-      {/* Cover */}
-      <div className="relative h-44 w-full">
-        {(booking as any).cover ? (
-          <img
-            src={(booking as any).cover}
-            alt=""
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
+      {/* Photo IS the card */}
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+          <span className="font-secondary text-xl italic text-[#C7A962]/80">Goldsainte</span>
+        </div>
+        {imgUrl && (
+          <img src={imgUrl} alt={title} loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/20 to-transparent" />
-        <span className="absolute right-3 top-3 rounded-full bg-[#0a2225]/55 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6] backdrop-blur-sm">
+        <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6]">
           {booking.status.replace(/_/g, " ")}
         </span>
-        <div className="absolute inset-x-4 bottom-3">
-          <p className="text-[9.5px] uppercase tracking-[0.22em] text-[#E5DFC6]/75">
-            GS-{booking.id.slice(0, 8).toUpperCase()} · Booked{" "}
-            {new Date(booking.created_at).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}
+        {isHireBooking && (
+          <span className="absolute left-3.5 top-3.5 rounded bg-[#C7A962] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#0a2225]">
+            On-trip hire
+          </span>
+        )}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#061418]/85 to-transparent px-5 pb-4 pt-12">
+          {trip?.destination && (
+            <p className="text-[9px] uppercase tracking-[0.24em] text-[#C7A962]/95">{trip.destination}</p>
+          )}
+          <p className="mt-1.5 font-secondary text-[22px] leading-[1.1] text-[#fdfaf2] line-clamp-2">{title}</p>
+          <p className="mt-1.5 text-[11.5px] text-[#fdfaf2]/75">
+            Booked {booked}
+            {travelerName ? ` \u00b7 ${travelerName}` : ""}
+            {travelers ? ` \u00b7 ${travelers} traveler${travelers === 1 ? "" : "s"}` : ""}
           </p>
-          <h2 className="mt-1 truncate font-secondary text-[21px] leading-tight text-[#fdfaf2]">
-            {title}
-          </h2>
         </div>
       </div>
-
-      <div className="p-4 md:p-5">
-      {/* Traveler + meta */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0c4d47] text-[11px] font-medium text-[#E5DFC6]">
-            {initial}
-          </span>
-          <span className="text-[13.5px] text-[#0a2225]/75">
-            {travelerName || "Traveler"}
-          </span>
+      {/* Slim footer strip */}
+      <div className="flex items-center justify-between px-5 py-3.5">
+        <span className="text-[11.5px] text-[#0a2225]/50">
+          <span className="font-mono text-[10.5px] tracking-wide">{reference}</span>
+          {" \u00b7 "}
+          {payoutLabel.toLowerCase()} {payout}
         </span>
-        {dates && (
-          <span className="text-[13px] text-[#0a2225]/50">· {dates}</span>
-        )}
-        {travelers > 0 && (
-          <span className="text-[13px] text-[#0a2225]/50">
-            · {travelers} traveler{travelers === 1 ? "" : "s"}
-          </span>
-        )}
-      </div>
-
-      {/* Money */}
-      <div className="mt-4 grid grid-cols-2 gap-4 rounded-xl bg-[#fdfaf2] px-4 py-3">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45">
-            Trip total
-          </p>
-          <p className="mt-0.5 font-secondary text-[17px] text-[#0a2225]">{total}</p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/45">
-            {payoutLabel}
-          </p>
-          <p className="mt-0.5 font-secondary text-[17px] text-[#0c4d47]">{payout}</p>
-          <p className="text-[10.5px] text-[#0a2225]/40">
-            96.5% after Goldsainte's 3.5%
-          </p>
-        </div>
-      </div>
-
-      {!isHireBooking && (
-      <ContractStatusCard
-        variant="agent"
-        bookingId={booking.id}
-        travelerId={(booking as any).traveler_id ?? null}
-        partnerRole={booking.partner_role ?? null}
-        tripTitle={(booking as any).trip_requests?.title || (booking.metadata as any)?.trip_title || null}
-        destination={(booking as any).trip_requests?.destination ?? null}
-        startDate={(booking as any).trip_requests?.start_date ?? null}
-        endDate={(booking as any).trip_requests?.end_date ?? null}
-      />
-      )}
-
-      {/* Actions */}
-      <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
-        <span className="rounded-full border border-[#0a2225]/15 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/60 transition-colors group-hover:border-[#C7A962]">
+        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-[#0c4d47]">
           View details
+          <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
         </span>
-        {["confirmed", "paid_in_full"].includes(booking.status) && (
-          <button
-            type="button"
-            onClick={handleRelease}
-            disabled={releasing}
-            className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-          >
-            {releasing ? "Sending…" : "Request release"}
-          </button>
-        )}
-      </div>
       </div>
     </Link>
   );
