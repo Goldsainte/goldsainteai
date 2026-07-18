@@ -270,16 +270,19 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
 
         {/* Tier selection gates entry into the wizard */}
         {!tier && !isEdit && (
-          <div className="grid gap-2.5 pt-2 sm:grid-cols-2">
+          <div className="grid gap-x-10 gap-y-7 border-t border-[#E5DFC6] pt-6 sm:grid-cols-2">
             {TIERS.map((t) => (
               <button
                 key={t.value}
                 type="button"
                 onClick={() => setTier(t.value)}
-                className="rounded-2xl border border-[#E5DFC6] bg-white p-4 text-left transition-colors hover:border-[#C7A962] !min-h-0"
+                className="group text-left !min-h-0 !min-w-0"
               >
-                <span className="block font-secondary text-[17px] leading-tight text-[#0a2225]">{t.label}</span>
-                <span className="mt-1 block text-[12.5px] leading-relaxed text-[#0a2225]/60">{t.desc}</span>
+                <span className="block font-secondary text-[20px] leading-snug text-[#0a2225]">{t.label}</span>
+                <span className="mt-1.5 block text-[13.5px] leading-relaxed text-[#0a2225]/60">{t.desc}</span>
+                <span className="mt-2.5 inline-flex items-center gap-1.5 text-[13.5px] text-[#0c4d47] underline underline-offset-4 decoration-[#0a2225]/25 transition-colors group-hover:decoration-[#C7A962]">
+                  Create<span className="font-secondary">{"\u2192"}</span>
+                </span>
               </button>
             ))}
           </div>
