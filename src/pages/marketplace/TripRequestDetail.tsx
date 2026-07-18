@@ -377,8 +377,7 @@ export default function TripRequestDetail() {
             src={getTripRequestImageUrl(request.destination)}
             alt={request.destination || request.tripTitle}
             className="h-full w-full object-cover"
-            loading="eager"
-          />
+            loading="eager" onError={(e) => { e.currentTarget.style.display = "none"; }} />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/25 to-transparent" />
 
           <div className="absolute bottom-0 left-0 right-0 px-6 pb-7 md:px-9 md:pb-8">
