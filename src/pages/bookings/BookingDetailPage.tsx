@@ -452,7 +452,10 @@ export default function BookingDetailPage() {
     if (!booking || payingBalance) return;
     // Unpaid booking (e.g. arrived via a signed contract's "Continue to
     // deposit") → collect the DEPOSIT; confirmed booking → collect the balance.
-    const isDepositStage = booking.status !== "confirmed";
+    const collectedCentsNow = Math.round(
+      Number((booking.metadata as any)?.amount_collected ?? 0) * 100
+    );
+    const isDepositStage = collectedCentsNow < (booking.deposit_amount ?? 0) - 1;
     // MONEY IS INTEGER CENTS: deposit_amount / total_price are cents columns.
     // The old code here treated them as dollars and re-multiplied by 100 —
     // the exact unit bug behind the $58,218.75 checkout. The server guard
@@ -547,6 +550,14 @@ export default function BookingDetailPage() {
         : booking?.status === "confirmed"
           ? deposit
           : 0;
+  // Money-truth payment stage: what's actually in escrow decides which button
+  // shows. Status alone lied today — a balance checkout regressed a confirmed
+  // booking to payment_pending and re-offered the already-paid deposit.
+  const depositPaid = deposit > 0 && collected >= deposit - 0.01;
+  const fullyPaid =
+    booking?.status === "paid_in_full" ||
+    booking?.status === "completed" ||
+    (total > 0 && collected >= total - 0.01);
   const paidPct =
     total > 0 ? Math.min(100, Math.round((amountPaid / total) * 100)) : 0;
   const progressPct = booking?.status === "paid_in_full" ? 100 : paidPct;
@@ -633,141 +644,12 @@ export default function BookingDetailPage() {
             </div>
 
             {/* ── Content overlapping the hero ── */}
-            <div className="relative -mt-8 grid gap-6 px-0 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:px-3">
+            <div className="relative mt-8 grid gap-x-10 gap-y-8 px-0 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:px-3">
               {/* LEFT column */}
-              <div className="space-y-5">
-                <div className="rounded-2xl border border-[#E5DFC6] bg-white px-7 py-6">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                    What happens next
-                  </p>
-                  <div className="mt-5 space-y-4">
-                    <TimelineItem n="i.">
-                      {isHireBooking
-                        ? `${specialistName || "Your host"} plans around your dates \u2014 keep an eye on Messages.`
-                        : "Your specialist confirms trip details within 24 hours."}
-                    </TimelineItem>
-                    <TimelineItem n="ii.">
-                      {balance > 0
-                        ? `Your ${formatMoney(balance, currency)} balance is due before departure.`
-                        : "Your trip is paid in full — nothing further is due."}
-                    </TimelineItem>
-                    <TimelineItem n="iii.">
-                      {isHireBooking
-                        ? "Funds stay in escrow \u2014 released after you confirm the trip went as agreed."
-                        : "Funds stay in escrow, released to your specialist on agreed milestones."}
-                    </TimelineItem>
-                  </div>
-                </div>
-
-                <div
-                  id="booking-messages"
-                  className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6 md:px-7"
-                >
-                  <header className="mb-5 flex items-baseline justify-between gap-3">
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                      Messages
-                    </p>
-                    <p className="text-right text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
-                      Your direct line to your specialist
-                    </p>
-                  </header>
-                  <BookingConversation
-                    bookingId={booking.id}
-                    travelerId={booking.traveler_id}
-                    partnerId={booking.partner_id}
-                  />
-                </div>
-              </div>
-
-              {/* RIGHT column */}
-              <div className="space-y-5 md:sticky md:top-6 md:self-start">
-                <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                    Payment
-                  </p>
-                  <p className="mt-3 font-secondary text-[26px] text-[#0a2225]">
-                    {formatMoney(amountPaid, currency)}{" "}
-                    <span className="text-[14px] text-[#0a2225]/45">
-                      of {formatMoney(total, currency)} paid
-                    </span>
-                  </p>
-                  <div className="mt-3.5 h-[5px] overflow-hidden rounded-full bg-[#EFE8D6]">
-                    <span
-                      className="block h-full rounded-full bg-[#C7A962] transition-all"
-                      style={{ width: `${progressPct}%` }}
-                    />
-                  </div>
-                  <p className="mt-1.5 text-[11px] text-[#0a2225]/45">
-                    {progressPct}% paid · held in escrow
-                  </p>
-                  {contractGate && (
-                    <div className="mt-4 rounded-xl border border-[#C7A962]/50 bg-[#C7A962]/10 p-3.5">
-                      <p className="text-[13px] leading-relaxed text-[#8D6B2F]">
-                        Your trip contract needs a signature before payment can proceed.
-                      </p>
-                      {contractGate.contractId && (
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/contract/${contractGate.contractId}/sign?type=traveler`)}
-                          className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
-                        >
-                          Review &amp; sign contract
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="mt-4 border-t border-[#E5DFC6] pt-4">
-                    <p className="flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
-                      <span>Balance remaining</span>
-                      <span className="font-secondary text-[15px] text-[#0a2225]">
-                        {formatMoney(balance, currency)}
-                      </span>
-                    </p>
-                    <p className="mt-2 flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
-                      <span>Due</span>
-                      <span className="text-[#0a2225]">Before departure</span>
-                    </p>
-                    {["deposit_pending", "pending", "payment_pending"].includes(
-                      booking.status
-                    ) &&
-                      (booking.deposit_amount ?? 0) > 0 && (
-                        <button
-                          type="button"
-                          onClick={handlePayBalance}
-                          disabled={payingBalance}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                        >
-                          {payingBalance
-                            ? "Preparing checkout…"
-                            : `Pay deposit · ${formatMoney(deposit, currency)} + 3.5% fee`}
-                        </button>
-                      )}
-                    {booking.status === "confirmed" && balance > 0 && (
-                      <button
-                        type="button"
-                        onClick={handlePayBalance}
-                        disabled={payingBalance}
-                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                      >
-                        {payingBalance
-                          ? "Preparing checkout…"
-                          : `Pay balance · ${formatMoney(balance, currency)} + 3.5% fee`}
-                      </button>
-                    )}
-                    {payError && (
-                      <p className="mt-3 rounded-2xl border border-[#b3452f]/30 bg-[#b3452f]/5 px-4 py-2.5 text-center text-[12px] leading-relaxed text-[#b3452f]">
-                        {payError}
-                      </p>
-                    )}
-                    {booking.status === "paid_in_full" && (
-                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[12px] uppercase tracking-[0.14em] text-[#0a2225]/60">
-                        Paid in full — nothing further due
-                      </p>
-                    )}
-                  </div>
-                </div>
-
+              <div className="space-y-8">
+                {/* The full flow lives at the TOP now — the "instructions
+                    at the bottom" complaint, answered. Same status-aware
+                    steps, promoted to the page's spine. */}
                 {/* ── Escrow journey tracker: the arc, with live truth ── */}
                 {booking.status !== "cancelled" && (() => {
                   const contractExecuted = contractStatus === "fully_executed";
@@ -859,9 +741,9 @@ export default function BookingDetailPage() {
                   const steps = isHireBooking ? hireJourney : journey;
                   const currentIdx = steps.findIndex((st) => !st.done);
                   return (
-                    <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6">
-                      <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                        Your trip, step by step
+                    <div className="border-t border-[#0a2225]/15 pt-6">
+                      <p className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                        Your trip, start to finish
                       </p>
                       <ol className="mt-4 space-y-4">
                         {steps.map((st, i) => {
@@ -883,14 +765,14 @@ export default function BookingDetailPage() {
                               )}
                               <div className="min-w-0">
                                 <p
-                                  className={`text-[15px] leading-snug ${
+                                  className={`text-[16px] leading-snug ${
                                     state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
                                   } ${state === "current" ? "font-medium" : ""}`}
                                 >
                                   {st.label}
                                 </p>
                                 <p
-                                  className={`mt-0.5 text-[12.5px] leading-relaxed ${
+                                  className={`mt-0.5 text-[13.5px] leading-relaxed ${
                                     state === "upcoming" ? "text-[#0a2225]/35" : "text-[#0a2225]/65"
                                   }`}
                                 >
@@ -905,6 +787,117 @@ export default function BookingDetailPage() {
                   );
                 })()}
 
+                <div
+                  id="booking-messages"
+                  className="border-t border-[#0a2225]/15 pt-6"
+                >
+                  <header className="mb-5 flex items-baseline justify-between gap-3">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                      Messages
+                    </p>
+                    <p className="text-right text-[10px] uppercase tracking-[0.18em] text-[#0a2225]/40">
+                      Your direct line to your specialist
+                    </p>
+                  </header>
+                  <BookingConversation
+                    bookingId={booking.id}
+                    travelerId={booking.traveler_id}
+                    partnerId={booking.partner_id}
+                  />
+                </div>
+              </div>
+
+              {/* RIGHT column */}
+              <div className="space-y-5 md:sticky md:top-6 md:self-start">
+                <div className="border-t border-[#0a2225]/15 pt-6">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                    Payment
+                  </p>
+                  <p className="mt-3 font-secondary text-[26px] text-[#0a2225]">
+                    {formatMoney(amountPaid, currency)}{" "}
+                    <span className="text-[14px] text-[#0a2225]/45">
+                      of {formatMoney(total, currency)} paid
+                    </span>
+                  </p>
+                  <div className="mt-3.5 h-[5px] overflow-hidden rounded-full bg-[#EFE8D6]">
+                    <span
+                      className="block h-full rounded-full bg-[#C7A962] transition-all"
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-[11px] text-[#0a2225]/45">
+                    {progressPct}% paid · held in escrow
+                  </p>
+                  {contractGate && (
+                    <div className="mt-4 rounded-xl border border-[#C7A962]/50 bg-[#C7A962]/10 p-3.5">
+                      <p className="text-[13px] leading-relaxed text-[#8D6B2F]">
+                        Your trip contract needs a signature before payment can proceed.
+                      </p>
+                      {contractGate.contractId && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/contract/${contractGate.contractId}/sign?type=traveler`)}
+                          className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                        >
+                          Review &amp; sign contract
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="mt-4 border-t border-[#E5DFC6] pt-4">
+                    <p className="flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
+                      <span>Balance remaining</span>
+                      <span className="font-secondary text-[15px] text-[#0a2225]">
+                        {formatMoney(balance, currency)}
+                      </span>
+                    </p>
+                    <p className="mt-2 flex items-center justify-between text-[12.5px] text-[#0a2225]/60">
+                      <span>Due</span>
+                      <span className="text-[#0a2225]">Before departure</span>
+                    </p>
+                    {!fullyPaid &&
+                      !depositPaid &&
+                      booking.status !== "cancelled" &&
+                      (booking.deposit_amount ?? 0) > 0 && (
+                        <button
+                          type="button"
+                          onClick={handlePayBalance}
+                          disabled={payingBalance}
+                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                        >
+                          {payingBalance
+                            ? "Preparing checkout…"
+                            : `Pay deposit · ${formatMoney(deposit, currency)} + 3.5% fee`}
+                        </button>
+                      )}
+                    {!fullyPaid && depositPaid && balance > 0 && booking.status !== "cancelled" && (
+                      <button
+                        type="button"
+                        onClick={handlePayBalance}
+                        disabled={payingBalance}
+                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                      >
+                        {payingBalance
+                          ? "Preparing checkout…"
+                          : `Pay balance · ${formatMoney(balance, currency)} + 3.5% fee`}
+                      </button>
+                    )}
+                    {payError && (
+                      <p className="mt-3 rounded-2xl border border-[#b3452f]/30 bg-[#b3452f]/5 px-4 py-2.5 text-center text-[12px] leading-relaxed text-[#b3452f]">
+                        {payError}
+                      </p>
+                    )}
+                    {booking.status === "paid_in_full" && (
+                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[12px] uppercase tracking-[0.14em] text-[#0a2225]/60">
+                        Paid in full — nothing further due
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+
+
                 {!isHireBooking && (
                   <ContractStatusCard variant="traveler" bookingId={booking.id} />
                 )}
@@ -913,7 +906,7 @@ export default function BookingDetailPage() {
                   canConfirmComplete ||
                   booking.status === "completed" ||
                   (depositReleased && booking.status !== "cancelled")) && (
-                  <div className="rounded-2xl border border-[#E5DFC6] bg-white px-6 py-6">
+                  <div className="border-t border-[#0a2225]/15 pt-6">
                     <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                       Your escrow
                     </p>
