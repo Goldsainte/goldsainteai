@@ -32,7 +32,7 @@ export default function LegalCreatorAgreementPage() {
       <BackButton className="mb-6" />
 
       <header className="mb-10">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151] mb-2">Legal</p>
+        <p className="text-[12.5px] uppercase tracking-[0.2em] text-[#7A7151] mb-2">Legal</p>
         <h1 className="font-secondary text-4xl text-[#0a2225] mb-3">Creator Partnership Agreement</h1>
         <p className="text-sm text-[#4a4a4a]">Last updated: May 19, 2026</p>
       </header>
@@ -53,7 +53,7 @@ export default function LegalCreatorAgreementPage() {
             <li>the brand, advertiser, traveler, or partner engaging through the Goldsainte platform ("<strong>Brand</strong>"); and</li>
             <li>the creator, influencer, videographer, travel storyteller, or service provider participating in campaigns through Goldsainte ("<strong>Creator</strong>").</li>
           </ul>
-          <p>Goldsainte Holdings LLC and its affiliates ("<strong>Goldsainte</strong>," "<strong>we</strong>," or "<strong>our</strong>") operate the Goldsainte marketplace, AI tooling, messaging, escrow/payments, and safety systems (collectively, the "<strong>Goldsainte Platform</strong>").</p>
+          <p>Goldsainte Holdings LLC and its affiliates ("<strong>Goldsainte</strong>," "<strong>we</strong>," or "<strong>our</strong>") operate the Goldsainte marketplace, AI tooling, messaging, payment integrations, and safety systems (collectively, the "<strong>Goldsainte Platform</strong>").</p>
           <p>By accepting a campaign invitation, submitting proposals or deliverables, or otherwise participating in a Brand–Creator engagement via the Goldsainte Platform, Brand and Creator (each, a "<strong>Party</strong>" and together, the "<strong>Parties</strong>") agree to be bound by this Agreement, in addition to the Goldsainte Terms of Service, Privacy Policy, and Creator Safety &amp; Conduct Policy.</p>
         </CardContent></Card>
 
