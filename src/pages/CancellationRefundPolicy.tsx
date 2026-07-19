@@ -47,7 +47,7 @@ const SECTIONS = [
       {
         num: "03",
         title: "Goldsainte marketplace policies",
-        desc: "Governs how disputes are reviewed, how platform fees are treated, and how escrow funds are released or returned.",
+        desc: "Governs how disputes are reviewed, how platform fees are treated, and how refunds are issued by your specialist.",
       },
     ],
   },
