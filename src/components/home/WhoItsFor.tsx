@@ -48,7 +48,7 @@ export function WhoItsFor() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
-                    <span>Book inside a protected marketplace with escrow and support.</span>
+                    <span>Book inside a vetted marketplace with secure Stripe payments and support.</span>
                   </li>
                 </ul>
               </div>
@@ -90,7 +90,7 @@ export function WhoItsFor() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#BFAD72]"></span>
-                    <span>Manage payments through Goldsainte's escrow and identity checks.</span>
+                    <span>Take payments in your own Stripe account, with identity checks on every member.</span>
                   </li>
                 </ul>
               </div>
