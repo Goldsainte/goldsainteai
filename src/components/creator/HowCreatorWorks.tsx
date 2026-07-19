@@ -19,7 +19,7 @@ export function HowCreatorWorks({ creatorName = "Your creator" }: HowCreatorWork
     {
       icon: CreditCard,
       title: "Review & book",
-      description: "Refine your plan and book securely through Goldsainte.",
+      description: "Refine your plan and book securely on Goldsainte.",
     },
   ];
 
