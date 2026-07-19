@@ -78,9 +78,9 @@ export default function HomePage() {
       <Suspense fallback={null}>
         <PlatformDemoSection />
       </Suspense>
+      <DreamTripBand />
       <CreatorShowcaseSection />
       <FeaturedTripsSection />
-      <DreamTripBand />
       <EarnSection />
       <TrustPlaque />
       <FinalCTABand />
