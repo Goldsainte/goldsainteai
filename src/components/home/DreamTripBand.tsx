@@ -29,8 +29,8 @@ const STEPS = [
   {
     n: "3",
     img: overwater,
-    title: "Book in escrow",
-    body: "Choose the one you love. Your payment is protected until you travel.",
+    title: "Book with confidence",
+    body: "Choose the one you love. Pay your specialist directly, secured by Stripe.",
     kind: "escrow" as const,
   },
 ];
@@ -157,7 +157,7 @@ export function DreamTripBand() {
 
                 {step.kind === "escrow" && (
                   <div className="mt-3">
-                    {["Deposit held securely until your trip", "Released only after your trip"].map((line) => (
+                    {["Secure Stripe checkout, direct to your specialist", "Support from booking to boarding"].map((line) => (
                       <div key={line} className="flex items-center gap-2.5 py-[5px] text-[13px] text-[#FDF9F0]/85" style={inter}>
                         <span className="flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-[#C7A962] text-[12.5px] text-[#0a2225]">
                           ✓
