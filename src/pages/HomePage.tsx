@@ -1,4 +1,5 @@
 import { HomeHero } from "@/components/home/HomeHero";
+import { AsFeaturedIn } from "@/components/home/AsFeaturedIn";
 import { StatsStrip } from "@/components/home/StatsStrip";
 import { DreamTripBand } from "@/components/home/DreamTripBand";
 import { EarnSection } from "@/components/home/EarnSection";
@@ -13,6 +14,7 @@ export default function HomePage() {
   return (
     <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
       <HomeHero />
+      <AsFeaturedIn />
       <StatsStrip />
       <OneConversationSection />
       <DreamTripBand />
