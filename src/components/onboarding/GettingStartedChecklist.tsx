@@ -69,7 +69,7 @@ const TRAVELER_ITEMS: ChecklistItem[] = [
   {
     id: "read-trust-safety",
     label: "Read how we protect your trip",
-    description: "Learn how escrow, verification, and dispute resolution keep your money safe.",
+    description: "Learn how verification, secure Stripe payments, and dispute support keep your money safe.",
     cta: { label: "Trust & Safety", to: "/trust-safety" },
     isComplete: () => false,
   },
