@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { ResidenceSelect } from "@/components/compliance/ResidenceSelect";
+import { isSotBlockedState } from "@/lib/residency";
 
 interface ProposalMessageCardProps {
   message: {
@@ -29,6 +31,7 @@ export function ProposalMessageCard({
   tripTitle,
 }: ProposalMessageCardProps) {
   const [accepting, setAccepting] = useState(false);
+  const [residenceState, setResidenceState] = useState("");
   const meta = message.metadata || {};
   const price: number = Number(meta.price) || 0;
   const depositPct: number = Number(meta.depositPercentage) || 25;
@@ -41,6 +44,24 @@ export function ProposalMessageCard({
   const note: string = meta.note || "";
 
   const handleAccept = async () => {
+    // SOT residency gate: enforced server-side in trip-checkout-create.
+    if (!residenceState) {
+      toast({
+        title: "Select your state of residence",
+        description: "We need it to process your trip booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (isSotBlockedState(residenceState)) {
+      toast({
+        title: "Not yet available in your state",
+        description:
+          "Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington.",
+        variant: "destructive",
+      });
+      return;
+    }
     setAccepting(true);
     try {
       const { data: booking, error: bookingError } = await supabase
@@ -49,8 +70,8 @@ export function ProposalMessageCard({
           traveler_id: currentUserId,
           partner_id: message.sender_id, // the agent who proposed
           partner_role: "agent",
-          total_price: price,
-          deposit_amount: depositAmount,
+          total_price: Math.round(price * 100), // cents — column standard
+          deposit_amount: Math.round(depositAmount * 100), // cents
           deposit_percentage: depositPct,
           currency: "USD",
           status: "deposit_pending",
@@ -66,6 +87,8 @@ export function ProposalMessageCard({
             ...(tripTitle ? { trip_title: tripTitle } : {}),
             guest_service_fee: guestServiceFee,
             guest_service_fee_rate: GUEST_FEE_RATE,
+            residence_state: residenceState,
+            residence_attested_at: new Date().toISOString(),
           },
         } as any)
         .select("id")
@@ -80,6 +103,7 @@ export function ProposalMessageCard({
           tripBookingId: booking.id,
           amountTotalCents: Math.round(depositTotal * 100),
           currency: "usd",
+          residenceState,
           successUrl: `${window.location.origin}/booking-confirmation?booking=${booking.id}`,
           cancelUrl: `${window.location.origin}/messages`,
           affiliateCode:
@@ -114,7 +138,7 @@ export function ProposalMessageCard({
       } else {
         toast({
           title: "Couldn't start checkout",
-          description: body?.message || err.message,
+          description: body?.error || body?.message || err.message,
           variant: "destructive",
         });
       }
@@ -129,7 +153,7 @@ export function ProposalMessageCard({
         isSelf ? "ml-auto" : ""
       }`}
     >
-      <p className="text-[11px] uppercase tracking-[0.18em] text-[#C7A962] font-medium">
+      <p className="text-[12.5px] uppercase tracking-[0.18em] text-[#C7A962] font-medium">
         Trip proposal
       </p>
       <div className="mt-2 flex items-baseline justify-between gap-3">
@@ -148,20 +172,28 @@ export function ProposalMessageCard({
         </p>
       )}
       {!isSelf && (
-        <Button
-          onClick={handleAccept}
-          disabled={accepting}
-          className="mt-4 w-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white"
-        >
-          {accepting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            "Accept and Pay Deposit"
-          )}
-        </Button>
+        <div className="mt-4 space-y-3">
+          <ResidenceSelect
+            value={residenceState}
+            onChange={setResidenceState}
+            compact
+            id="proposal-residence-state"
+          />
+          <Button
+            onClick={handleAccept}
+            disabled={accepting || isSotBlockedState(residenceState)}
+            className="w-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white"
+          >
+            {accepting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Accept and Pay Deposit"
+            )}
+          </Button>
+        </div>
       )}
       {isSelf && (
-        <p className="mt-3 text-[11px] text-[#9CA3AF] italic">
+        <p className="mt-3 text-[12.5px] text-[#9CA3AF] italic">
           Awaiting traveler response
         </p>
       )}
