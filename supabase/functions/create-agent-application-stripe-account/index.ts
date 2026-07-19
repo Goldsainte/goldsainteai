@@ -64,12 +64,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create new Stripe Connect Express account
+    // Create new Stripe Connect STANDARD account (2026-07-19): the agent
+    // is the merchant of record — they own their Stripe relationship,
+    // disputes, refunds, and losses. Goldsainte earns an application fee.
     const account = await stripe.accounts.create({
-      type: 'express',
+      type: 'standard',
       country: application.business_country || 'US',
       email: application.email,
       capabilities: {
+        card_payments: { requested: true }, // direct charges — agent is merchant of record
         transfers: { requested: true },
       },
       business_type: application.business_type === 'sole_proprietor' ? 'individual' : 'company',
