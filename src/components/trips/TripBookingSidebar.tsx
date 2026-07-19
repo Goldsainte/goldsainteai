@@ -298,7 +298,7 @@ export function TripBookingSidebar({
           {[
             { step: 1, text: "Select your dates and group size" },
             { step: 2, text: `Request to book with ${displayHostName}` },
-            { step: 3, text: "Pay securely through Goldsainte" },
+            { step: 3, text: "Pay your specialist securely via Stripe" },
           ].map((item) => (
             <div key={item.step} className="flex items-center gap-3">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0C4D47] text-xs font-semibold text-white">
