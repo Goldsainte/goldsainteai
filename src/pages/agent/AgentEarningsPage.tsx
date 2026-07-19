@@ -5,7 +5,7 @@ export default function AgentEarningsPage() {
     <PartnerEarningsView
       role="agent"
       title="Agent earnings overview"
-      intro="Track how your itinerary work converts into payouts. Goldsainte holds funds in escrow until each release milestone clears."
+      intro="Track how your itinerary work converts into revenue. Payments are charged directly on your own Stripe account at booking."
       backLink="/agent-dashboard"
       backLabel="Back to agent tools"
     />
