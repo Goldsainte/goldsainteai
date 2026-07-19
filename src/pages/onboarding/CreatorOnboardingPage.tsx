@@ -1035,7 +1035,7 @@ export default function CreatorOnboardingPage() {
                 <div>
                   <h2 className="font-secondary text-2xl text-[#0a2225]">Get hired onto trips</h2>
                   <p className="mt-1.5 text-sm leading-relaxed text-[#0a2225]/70">
-                    Travelers can hire you to join their own trip — you host the days, they cover it at your rate, and payment is escrow-protected. Set your rate now and you're hireable the moment you finish.
+                    Travelers can hire you to join their own trip — you host the days, they cover it at your rate, paid straight to your Stripe account. Set your rate now and you're hireable the moment you finish.
                   </p>
                 </div>
 
