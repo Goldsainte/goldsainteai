@@ -10,7 +10,7 @@ const MONO = "ui-monospace, 'SF Mono', Menlo, monospace";
 const STATUS_COPY: Record<string, { label: string; note: string }> = {
   pending_verification: {
     label: "Awaiting Identity Verification",
-    note: "Complete your Stripe Identity verification to activate your account. Until then, your application remains in escrow.",
+    note: "Complete your Stripe Identity verification to activate your account. Until then, your application remains on hold.",
   },
   verified: {
     label: "Account Active",
