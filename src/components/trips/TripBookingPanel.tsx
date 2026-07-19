@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { ResidenceSelect } from "@/components/compliance/ResidenceSelect";
+import { isSotBlockedState } from "@/lib/residency";
 
 type BookingStatus =
   | "draft"
@@ -43,10 +45,14 @@ export function TripBookingPanel({
   );
   const [currency, setCurrency] = useState(booking?.currency ?? "usd");
   const [creating, setCreating] = useState(false);
+  const [residenceState, setResidenceState] = useState("");
 
   const handleCreateLink = async () => {
     const valueNum = Number(amount.replace(/[^\d.]/g, ""));
     if (!valueNum || valueNum <= 0) return;
+    // SOT residency gate — the agent attests the CLIENT's state of
+    // residence (standard advisor practice); enforced server-side too.
+    if (!residenceState || isSotBlockedState(residenceState)) return;
 
     setCreating(true);
     try {
@@ -61,6 +67,10 @@ export function TripBookingPanel({
             status: "draft",
             currency: currency.toLowerCase(),
             total_price: 0,
+            metadata: {
+              residence_state: residenceState,
+              residence_attested_at: new Date().toISOString(),
+            },
           }] as any)
           .select("id, status, total_price, currency, payment_url, platform_commission, partner_payout")
           .single();
@@ -80,6 +90,7 @@ export function TripBookingPanel({
             tripBookingId: bookingId,
             amountTotalCents,
             currency: currency.toLowerCase(),
+            residenceState,
             affiliateCode:
               (await import("@/hooks/useAffiliateRef")).getActiveAffiliateRef() || undefined,
             gclid:
@@ -147,11 +158,11 @@ export function TripBookingPanel({
   return (
     <div className="flex flex-col rounded-2xl border border-[#E5DFC6] bg-white">
       <div className="flex items-center justify-between border-b border-[#E5DFC6] px-3 py-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#7A7151]">
+        <p className="text-[12.5px] font-semibold uppercase tracking-wide text-[#7A7151]">
           Booking & Payment
         </p>
         <Badge
-          className={`border px-2 py-0.5 text-[11px] ${statusColor[currentStatus]}`}
+          className={`border px-2 py-0.5 text-[12.5px] ${statusColor[currentStatus]}`}
         >
           {statusLabel[currentStatus]}
         </Badge>
@@ -159,7 +170,7 @@ export function TripBookingPanel({
 
       <div className="space-y-3 px-3 py-3">
         {acceptedAt ? (
-          <p className="text-[11px] text-[#4a4a4a]">
+          <p className="text-[12.5px] text-[#4a4a4a]">
             Proposal accepted on{" "}
             {new Date(acceptedAt).toLocaleDateString(undefined, {
               month: "short",
@@ -168,14 +179,14 @@ export function TripBookingPanel({
             })}
           </p>
         ) : (
-          <p className="text-[11px] text-[#8C8470]">
+          <p className="text-[12.5px] text-[#8C8470]">
             Once a traveler accepts a proposal, you can prepare a quote and send
             a payment link here.
           </p>
         )}
 
         {booking && booking.total_price > 0 && (
-          <div className="space-y-1 rounded-lg bg-[#F7F3EA] px-2 py-2 text-[11px]">
+          <div className="space-y-1 rounded-lg bg-[#F7F3EA] px-2 py-2 text-[12.5px]">
             <div className="flex items-center justify-between">
               <span className="text-[#7A7151]">Total trip value:</span>
               <span className="font-semibold text-[#0a2225]">
@@ -199,7 +210,7 @@ export function TripBookingPanel({
 
         <div className="grid gap-2 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-wide text-[#7A7151]">
+            <label className="mb-1 block text-[12px] uppercase tracking-wide text-[#7A7151]">
               Total trip amount
             </label>
             <Input
@@ -210,7 +221,7 @@ export function TripBookingPanel({
             />
           </div>
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-wide text-[#7A7151]">
+            <label className="mb-1 block text-[12px] uppercase tracking-wide text-[#7A7151]">
               Currency
             </label>
             <Input
@@ -222,27 +233,35 @@ export function TripBookingPanel({
           </div>
         </div>
 
+        <ResidenceSelect
+          value={residenceState}
+          onChange={setResidenceState}
+          label="Client's state of residence"
+          compact
+          id="panel-residence-state"
+        />
+
         <div className="flex items-center justify-between gap-2">
           {booking?.payment_url ? (
             <a
               href={booking.payment_url}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1 text-[11px] text-[#7A7151] underline-offset-4 hover:underline"
+              className="flex items-center gap-1 text-[12.5px] text-[#7A7151] underline-offset-4 hover:underline"
             >
               <ExternalLink className="h-3 w-3" />
               View payment link
             </a>
           ) : (
-            <span className="text-[11px] text-[#8C8470]">
+            <span className="text-[12.5px] text-[#8C8470]">
               No payment link yet.
             </span>
           )}
 
           <Button
             size="sm"
-            className="h-7 text-[11px] bg-[#0a2225] text-[#E5DFC6] hover:bg-[#0a2225]/90"
-            disabled={creating || !amount.trim()}
+            className="h-7 text-[12.5px] bg-[#0a2225] text-[#E5DFC6] hover:bg-[#0a2225]/90"
+            disabled={creating || !amount.trim() || !residenceState || isSotBlockedState(residenceState)}
             onClick={handleCreateLink}
           >
             {creating ? "Creating…" : "Create payment link"}
