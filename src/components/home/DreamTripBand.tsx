@@ -157,7 +157,7 @@ export function DreamTripBand() {
 
                 {step.kind === "escrow" && (
                   <div className="mt-3">
-                    {["Deposit held in escrow", "Released only after your trip"].map((line) => (
+                    {["Deposit held securely until your trip", "Released only after your trip"].map((line) => (
                       <div key={line} className="flex items-center gap-2.5 py-[5px] text-[13px] text-[#FDF9F0]/85" style={inter}>
                         <span className="flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-[#C7A962] text-[12.5px] text-[#0a2225]">
                           ✓
