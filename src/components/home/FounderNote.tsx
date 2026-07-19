@@ -2,7 +2,7 @@
 // reviews yet). Layout mirrors Fora's advisor-quote block: left-aligned large
 // serif quote, then a horizontal row of round photo + name/title beneath.
 import { useState } from "react";
-import founderPhoto from "@/assets/founder.jpg";
+import founderPhoto from "@/assets/founder.webp";
 
 const inter = { fontFamily: "Inter, sans-serif" } as const;
 
