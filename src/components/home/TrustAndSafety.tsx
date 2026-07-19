@@ -11,9 +11,9 @@ const features = [
   },
   {
     label: "Payments",
-    pill: "Escrow",
+    pill: "Payments",
     title: "Protected funds",
-    body: "Your money is held securely and released in milestones, with a post-trip protection window.",
+    body: "You pay your specialist directly through Stripe, with support from booking to return.",
     icon: Lock,
   },
   {
