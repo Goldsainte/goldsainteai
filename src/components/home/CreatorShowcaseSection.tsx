@@ -26,14 +26,14 @@ const TABS = [
       "Travelers hire you to plan, guide, or shoot their trip. Requests land in your pipeline — you send the proposal, they accept, it's booked.",
   },
   {
-    title: "Escrow on every dollar",
+    title: "Paid at booking",
     body:
-      "Deposits and balances sit in escrow — released to you at milestones, never chased over Venmo.",
+      "Deposits and balances land in your own Stripe account the moment your client pays — never chased over Venmo.",
   },
   {
-    title: "Keep 96.5%",
+    title: "A flat 3.5% fee",
     body:
-      "A flat 7% platform fee, split with the traveler. No tiers of take-rate. No surprises at payout.",
+      "7% platform fee total, split evenly with your traveler. Standard card processing applies. No tiers. No surprises.",
   },
   {
     title: "Sell guides & services",
@@ -138,7 +138,7 @@ export function CreatorShowcaseSection() {
         </h2>
         <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/75">
           Everything a travel creator needs to run a real business — hire
-          requests, escrow-protected payments, a storefront for your guides and
+          requests, direct Stripe payments, a storefront for your guides and
           services, and a client pipeline — in one place, on your terms.
         </p>
 
@@ -146,9 +146,9 @@ export function CreatorShowcaseSection() {
         <div className="mt-11 grid grid-cols-2 border-t border-[#0a2225]/15 md:grid-cols-4">
           {[
             ["7%", "Flat fee. Ever."],
-            ["96.5%", "Of every trip is yours"],
+            ["3.5%", "Your flat platform fee"],
             ["$0", "To start"],
-            ["100%", "Escrow-protected"],
+            ["100%", "Paid direct to your Stripe"],
           ].map(([n, l], i) => (
             <div
               key={l}
@@ -259,21 +259,21 @@ export function CreatorShowcaseSection() {
                     className="mt-3.5 max-w-[390px] rounded-xl border border-[#E5DFC6]/25 bg-[#E5DFC6]/10 px-4 py-2.5 text-[13.5px] text-[#E5DFC6] opacity-0"
                     style={{ animation: "gsCsSlideIn .7s 1.7s forwards" }}
                   >
-                    Proposal accepted — deposit is in escrow.
+                    Proposal accepted — deposit paid to your account.
                   </div>
                 </>
               )}
 
               {active === 1 && (
                 <>
-                  <SceneChip>Escrow, start to finish</SceneChip>
+                  <SceneChip>Paid direct, start to finish</SceneChip>
                   <div className="max-w-[400px]">
                     {[
                       "Traveler pays the deposit",
-                      "Funds held securely until milestones are met",
+                      "Paid straight to your Stripe account",
                       "Balance paid before departure",
                       "Trip happens",
-                      "Released to you",
+                      "Your business, your revenue",
                     ].map((step, i) => (
                       <div
                         key={step}
