@@ -27,8 +27,8 @@ function Flow() {
   const steps: [string, string][] = [
     ["Your content", "Guides, reels, your map — travelers discover you"],
     ["Trip request", "They tap Design my trip or Request to join"],
-    ["Escrow", "They pay Goldsainte — money held safely"],
-    ["You're paid", "Released to your bank as the trip happens"],
+    ["Direct pay", "They pay you — straight to your Stripe account"],
+    ["You're paid", "Settles to your bank on your Stripe schedule"],
   ];
   return (
     <div className="mt-8 grid gap-4 rounded-3xl bg-[#0c4d47]/[0.06] p-6 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] sm:items-start">
@@ -132,7 +132,7 @@ export default function CreatorHandbookPage() {
         <Section n={6} title="Messages">
           <p className={P}>
             Travelers message you from the button on your card; everything lives in your Goldsainte
-            inbox. On-platform chat is what makes escrow protection and dispute support possible.
+            inbox. On-platform chat is what makes payment records and dispute support possible.
           </p>
         </Section>
 
