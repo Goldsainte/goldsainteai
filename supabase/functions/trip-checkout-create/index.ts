@@ -1,4 +1,9 @@
-// trip-checkout-create v1.1 - never regress a confirmed/paid booking to payment_pending (2026-07-18)
+// trip-checkout-create v2.0 - DIRECT CHARGES: agent is merchant of record on their Standard account;
+//        Goldsainte commission via application_fee (7% of slice base when the traveler fee rides on
+//        top, 3.5% on bare-base charges). Legacy platform-charged and partnerless bookings stay on
+//        the platform path — charge models never mix within one booking. (2026-07-19)
+// v1.2 - SOT residency gate: CA/FL/HI/IA/WA declined; attested state stamped on booking + PI (2026-07-19)
+// v1.1 - never regress a confirmed/paid booking to payment_pending (2026-07-18)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
 
@@ -19,6 +24,7 @@ interface RequestBody {
   cancelUrl?: string;
   affiliateCode?: string;
   gclid?: string;
+  residenceState?: string;
 }
 
 Deno.serve(async (req) => {
@@ -61,6 +67,11 @@ Deno.serve(async (req) => {
       body.gclid.length > 0 &&
       body.gclid.length <= 256
         ? body.gclid
+        : undefined;
+    const residenceState =
+      typeof body.residenceState === "string" &&
+      /^[A-Za-z]{2,4}$/.test(body.residenceState.trim())
+        ? body.residenceState.trim().toUpperCase()
         : undefined;
 
     if (!tripBookingId || !amountTotalCents || amountTotalCents <= 0) {
@@ -118,6 +129,7 @@ Deno.serve(async (req) => {
       throw bookingError ?? new Error("Booking not found");
     }
 
+    let matchedBaseCents = 0; // slice base (deposit/balance/total) for application-fee math (v2.0)
     // ------------------------------------------------------------------
     // MONEY GUARD (Jul 18): never trust a client-supplied amount. The
     // column standard is integer CENTS. The requested charge must match
@@ -131,13 +143,20 @@ Deno.serve(async (req) => {
       const depositCents = Math.max(0, Math.round(Number(booking.deposit_amount ?? 0)));
       const balanceCents = Math.max(0, totalCents - depositCents);
       const withFee = (c: number) => Math.round(c * 1.035);
-      const allowed = [
-        depositCents, withFee(depositCents),
-        balanceCents, withFee(balanceCents),
-        totalCents, withFee(totalCents),
-      ].filter((c) => c > 0);
+      const allowedPairs = [
+        { amount: depositCents, base: depositCents },
+        { amount: withFee(depositCents), base: depositCents },
+        { amount: balanceCents, base: balanceCents },
+        { amount: withFee(balanceCents), base: balanceCents },
+        { amount: totalCents, base: totalCents },
+        { amount: withFee(totalCents), base: totalCents },
+      ].filter((p) => p.amount > 0);
+      const allowed = allowedPairs.map((p) => p.amount);
       const TOLERANCE_CENTS = 100;
-      const ok = allowed.some((c) => Math.abs(c - Number(amountTotalCents)) <= TOLERANCE_CENTS);
+      const matchedPair = allowedPairs.find(
+        (p) => Math.abs(p.amount - Number(amountTotalCents)) <= TOLERANCE_CENTS
+      );
+      const ok = !!matchedPair;
       if (!ok) {
         console.error(
           `[trip-checkout-create] REFUSED amount ${amountTotalCents}c for booking ${tripBookingId}; ` +
@@ -150,6 +169,7 @@ Deno.serve(async (req) => {
           { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
+      matchedBaseCents = matchedPair!.base;
     }
 
 
@@ -166,6 +186,131 @@ Deno.serve(async (req) => {
         { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
+
+    // -------------------------------------------------------------------
+    // SOT RESIDENCY GATE (Jul 19): CA, FL, HI, IA, and WA require Seller
+    // of Travel registration with extraterritorial reach (they apply when
+    // selling travel to their residents, wherever the seller sits). Until
+    // the host-agency / registration structure is live, trip purchases by
+    // residents of those states are declined. The attested state arrives
+    // from the purchase UI or was stamped on the booking at creation;
+    // enforcement lives HERE so every checkout path is covered. Balance
+    // payments on bookings that predate attestation are allowed (legacy
+    // bookings carry no state and are already confirmed/paid).
+    // -------------------------------------------------------------------
+    const SOT_BLOCKED_STATES = ["CA", "FL", "HI", "IA", "WA"];
+    const bookingMetaForGate = ((booking as any).metadata ?? {}) as any;
+    const attestedState: string | undefined =
+      residenceState ||
+      (typeof bookingMetaForGate.residence_state === "string"
+        ? bookingMetaForGate.residence_state.trim().toUpperCase()
+        : undefined);
+    const isPrePaymentBooking = !["confirmed", "paid_in_full", "completed"].includes(
+      String(booking.status)
+    );
+    if (attestedState && SOT_BLOCKED_STATES.includes(attestedState)) {
+      console.warn(
+        `[trip-checkout-create] SOT gate declined booking ${tripBookingId}: attested state ${attestedState}`
+      );
+      return new Response(
+        JSON.stringify({
+          error:
+            "Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington.",
+          code: "SOT_STATE_BLOCKED",
+        }),
+        { status: 451, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+      );
+    }
+    if (!attestedState && isPrePaymentBooking) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Please select your state of residence to continue. If this page has been open a while, refresh it and try again.",
+          code: "RESIDENCE_REQUIRED",
+        }),
+        { status: 400, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+      );
+    }
+
+    // -------------------------------------------------------------------
+    // DIRECT-CHARGE RESOLUTION (v2.0): the AGENT is the merchant of
+    // record. New bookings with a partner charge ON the partner's Standard
+    // connected account, with Goldsainte's commission split out as an
+    // application fee. Rules:
+    //   1. New booking + partner → partner MUST be charges_enabled
+    //      (verified LIVE against Stripe, never a cached flag) or checkout
+    //      is declined with AGENT_NOT_READY.
+    //   2. Legacy bookings whose deposit was platform-charged stay on the
+    //      platform path end-to-end — charge models never mix per booking.
+    //   3. Partnerless (platform/concierge) bookings stay platform-charged
+    //      and are flagged in logs: they make Goldsainte the seller and
+    //      should be retired or assigned to an agent.
+    // -------------------------------------------------------------------
+    let connectAccountId: string | null = null;
+    {
+      const partnerId = (booking as any).partner_id as string | null;
+      const priorDirect = bookingMetaForGate.charge_model === "direct";
+      const legacyPlatformPaid = !isPrePaymentBooking && !priorDirect;
+
+      if (partnerId && !legacyPlatformPaid) {
+        const { data: partnerProfile } = await supabase
+          .from("profiles")
+          .select("stripe_account_id, stripe_connect_account_id")
+          .eq("id", partnerId)
+          .maybeSingle();
+        const acctId =
+          (partnerProfile as any)?.stripe_account_id ||
+          (partnerProfile as any)?.stripe_connect_account_id ||
+          null;
+
+        let ready = false;
+        if (acctId) {
+          try {
+            const acct = await stripe.accounts.retrieve(acctId);
+            ready = !!(acct as any).charges_enabled;
+          } catch (e) {
+            console.error(`[trip-checkout-create] account retrieve failed for ${acctId}:`, e);
+          }
+        }
+
+        if (ready) {
+          connectAccountId = acctId;
+        } else if (isPrePaymentBooking) {
+          return new Response(
+            JSON.stringify({
+              error:
+                "This specialist isn't set up to accept payments yet. Send them a message — once they activate payments you'll be able to book right away.",
+              code: "AGENT_NOT_READY",
+            }),
+            { status: 409, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+          );
+        } else if (priorDirect) {
+          // Balance payment on a direct-charge booking whose account has
+          // gone un-ready: charging the platform instead would strand the
+          // traveler's money on the wrong balance. Refuse and retry later.
+          return new Response(
+            JSON.stringify({
+              error:
+                "Your specialist's payment account is temporarily unavailable. Please try again shortly or contact support.",
+              code: "AGENT_ACCOUNT_UNAVAILABLE",
+            }),
+            { status: 409, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+          );
+        }
+      } else if (!partnerId) {
+        console.warn(
+          `[trip-checkout-create] PLATFORM-SELLER booking ${tripBookingId} (no partner_id) — platform is merchant of record; retire this inventory or assign an agent.`
+        );
+      }
+    }
+
+    // Application fee = charged amount minus the agent's 96.5% of the
+    // slice base. Fee-inclusive charge (1.035×base): fee = 7% of base
+    // (traveler 3.5% + host 3.5%). Bare-base charge: fee = 3.5% of base.
+    // The agent absorbs Stripe processing, as the merchant of record.
+    const applicationFeeCents = connectAccountId
+      ? Math.max(0, Math.round(Number(amountTotalCents)) - Math.round(matchedBaseCents * 0.965))
+      : 0;
     
     // -------------------------------------------------------------------
     // Lazy auto-link: if a contract exists for this (traveler, agent)
@@ -322,7 +467,7 @@ Deno.serve(async (req) => {
     //   2. `customer_email` is set on the session. Stripe uses this to send
     //      the receipt and to create / link a Customer record so the payment
     //      is searchable by email in the Stripe dashboard.
-    const session = await stripe.checkout.sessions.create({
+    const sessionCreateParams: any = {
       mode: "payment",
       currency: currency.toLowerCase(),
       customer_email: user.email,
@@ -347,6 +492,7 @@ Deno.serve(async (req) => {
       success_url: `${successUrl}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
       payment_intent_data: {
+        ...(connectAccountId ? { application_fee_amount: applicationFeeCents } : {}),
         description: piDescription,
         metadata: {
           trip_booking_id: booking.id,
@@ -357,6 +503,9 @@ Deno.serve(async (req) => {
           type: "trip_booking",
           ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
           ...(gclid ? { gclid } : {}),
+          ...(attestedState ? { residence_state: attestedState } : {}),
+          charge_model: connectAccountId ? "direct" : "platform",
+          ...(connectAccountId ? { stripe_account: connectAccountId } : {}),
         },
       },
       metadata: {
@@ -372,8 +521,17 @@ Deno.serve(async (req) => {
         destination: destination ?? "",
         ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
         ...(gclid ? { gclid } : {}),
+        ...(attestedState ? { residence_state: attestedState } : {}),
+        charge_model: connectAccountId ? "direct" : "platform",
+        ...(connectAccountId ? { stripe_account: connectAccountId } : {}),
       },
-    });
+    };
+
+    // Direct charge on the agent's Standard account (Goldsainte's cut as
+    // an application fee) — or platform charge for legacy/platform paths.
+    const session = connectAccountId
+      ? await stripe.checkout.sessions.create(sessionCreateParams, { stripeAccount: connectAccountId })
+      : await stripe.checkout.sessions.create(sessionCreateParams);
 
     // Update booking with payment details.
     //
@@ -404,6 +562,20 @@ Deno.serve(async (req) => {
           booking_reference: bookingRef,
           ...(tripTitle ? { trip_title: tripTitle } : {}),
           ...(destination ? { destination } : {}),
+          ...(attestedState
+            ? {
+                residence_state: attestedState,
+                residence_attested_at:
+                  bookingMetaForGate.residence_attested_at ?? new Date().toISOString(),
+              }
+            : {}),
+          charge_model: connectAccountId ? "direct" : "platform",
+          ...(connectAccountId
+            ? {
+                stripe_account: connectAccountId,
+                application_fee_cents: applicationFeeCents,
+              }
+            : {}),
         },
       })
       .eq("id", booking.id)
