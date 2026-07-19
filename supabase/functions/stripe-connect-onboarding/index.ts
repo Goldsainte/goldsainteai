@@ -68,7 +68,7 @@ serve(async (req) => {
     // Create Stripe Connect account if doesn't exist
     if (!accountId) {
       const account = await stripe.accounts.create({
-        type: 'express',
+        type: 'standard', // Standard (2026-07-19): agent is a fully independent merchant of record
         country: 'US',
         email: user.email,
         capabilities: {
@@ -76,14 +76,8 @@ serve(async (req) => {
           transfers: { requested: true },
         },
         business_type: 'individual',
-        settings: {
-          payouts: {
-            schedule: {
-              interval: 'daily',
-              delay_days: 'minimum',
-            },
-          },
-        },
+        // No settings.payouts — payout schedules are not settable by the
+        // platform on Standard accounts; the account holder controls their own.
       });
       
       accountId = account.id;
