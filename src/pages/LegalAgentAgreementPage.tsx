@@ -32,7 +32,7 @@ export default function LegalAgentAgreementPage() {
       <BackButton className="mb-6" />
 
       <header className="mb-10">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151] mb-2">Legal</p>
+        <p className="text-[12.5px] uppercase tracking-[0.2em] text-[#7A7151] mb-2">Legal</p>
         <h1 className="font-secondary text-4xl text-[#0a2225] mb-3">Agent Partnership Agreement</h1>
         <p className="text-sm text-[#4a4a4a]">Last updated: May 19, 2026</p>
       </header>
@@ -48,7 +48,7 @@ export default function LegalAgentAgreementPage() {
 
       <div className="space-y-6">
         <Card><CardHeader><SectionHeader icon={Handshake} number="1" title="Introduction &amp; Parties" /></CardHeader><CardContent className="space-y-4 leading-relaxed">
-          <p>This Goldsainte Agent Partnership Agreement ("<strong>Agreement</strong>") is a legally binding contract between you, the licensed travel agent or travel agency ("<strong>Agent</strong>"), and Goldsainte AI, Inc. and its affiliates ("<strong>Goldsainte</strong>," "<strong>we</strong>," or "<strong>our</strong>"), which operate the Goldsainte marketplace, AI tooling, escrow/payments, messaging, and safety systems (collectively, the "<strong>Goldsainte Platform</strong>").</p>
+          <p>This Goldsainte Agent Partnership Agreement ("<strong>Agreement</strong>") is a legally binding contract between you, the licensed travel agent or travel agency ("<strong>Agent</strong>"), and Goldsainte AI, Inc. and its affiliates ("<strong>Goldsainte</strong>," "<strong>we</strong>," or "<strong>our</strong>"), which operate the Goldsainte marketplace, AI tooling, payment integrations, messaging, and safety systems (collectively, the "<strong>Goldsainte Platform</strong>").</p>
           <p>By submitting an Agent application, accepting trip requests, sending proposals, or otherwise participating on the Goldsainte Platform as an Agent, you agree to be bound by this Agreement, together with the Goldsainte Terms of Service, Privacy Policy, Marketplace Guidelines, and Cancellation &amp; Refund Policy.</p>
         </CardContent></Card>
 
@@ -60,7 +60,7 @@ export default function LegalAgentAgreementPage() {
             <li><strong>Booking</strong> means a confirmed engagement between Agent and Traveler facilitated via the Platform.</li>
             <li><strong>Supplier</strong> means a hotel, airline, ground operator, DMC, or other third-party provider sourced by Agent.</li>
             <li><strong>Platform Fee</strong> means Goldsainte's 7% marketplace fee (3.5% deducted from Agent, 3.5% added to Traveler) on each Booking.</li>
-            <li><strong>Escrow</strong> means funds held by Goldsainte (via Stripe Connect) until milestone release conditions are met.</li>
+            <li><strong>Direct Payment</strong> means a payment processed by Stripe on Agent's own connected Stripe account, with Agent as the merchant of record and Goldsainte's platform fee collected automatically as an application fee.</li>
           </ul>
         </CardContent></Card>
 
@@ -84,7 +84,7 @@ export default function LegalAgentAgreementPage() {
           <h4 className="font-semibold">5.1 Proposals</h4>
           <p>Agent must submit proposals that are accurate, complete, and reflect a genuine ability to fulfill the Trip Request. Quoted pricing, inclusions, cancellation terms, and payment schedules become binding offers when sent.</p>
           <h4 className="font-semibold">5.2 Acceptance &amp; Contract Formation</h4>
-          <p>A Booking is formed when Traveler accepts a Proposal and completes the required deposit through Platform escrow. Agent must honor accepted Proposals as quoted.</p>
+          <p>A Booking is formed when Traveler accepts a Proposal and completes the required deposit through the Platform's Stripe checkout, charged to Agent as merchant of record. Agent must honor accepted Proposals as quoted.</p>
           <h4 className="font-semibold">5.3 Modifications</h4>
           <p>Any change in price, dates, inclusions, or terms after acceptance must be issued as a written change order through the Platform and accepted by Traveler before becoming effective.</p>
         </CardContent></Card>
@@ -95,9 +95,9 @@ export default function LegalAgentAgreementPage() {
           <p>Goldsainte may adjust the Platform Fee on prospective Bookings with at least thirty (30) days' notice.</p>
         </CardContent></Card>
 
-        <Card><CardHeader><SectionHeader icon={CreditCard} number="7" title="Payments, Escrow &amp; Payouts" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
-          <p>All Traveler payments must be processed through Goldsainte's escrow via Stripe Connect. Agent agrees not to invoice Traveler off-platform for any portion of a Booking sourced through Goldsainte.</p>
-          <p>Funds are released to Agent in accordance with the milestone schedule specified in the accepted Proposal (e.g., deposit on Supplier confirmation, balance after departure). Goldsainte may withhold or claw back funds in cases of dispute, fraud, chargeback, Supplier non-performance, or policy violation.</p>
+        <Card><CardHeader><SectionHeader icon={CreditCard} number="7" title="Payments, Fees &amp; Processing" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
+          <p>All Traveler payments must be processed through the Platform's Stripe checkout, charged directly on Agent's connected Stripe account with Agent as the merchant of record. Agent agrees not to invoice Traveler off-platform for any portion of a Booking sourced through Goldsainte.</p>
+          <p>Traveler payments settle directly to Agent's Stripe account at the time of each charge, less Goldsainte's application fee (3.5% of the booking base; Travelers pay a separate 3.5% service fee on top). As merchant of record, Agent is responsible for card processing fees, refunds, and chargebacks on Agent's bookings, and for maintaining all registrations, licenses, bonding, or insolvency protections required to sell travel in Agent's jurisdiction and to Travelers in theirs. Goldsainte may suspend checkout for Agent's listings in cases of dispute, fraud, chargeback abuse, Supplier non-performance, or policy violation.</p>
           <p>Agent is responsible for all taxes, withholdings, and reporting obligations on amounts received.</p>
         </CardContent></Card>
 
@@ -121,7 +121,7 @@ export default function LegalAgentAgreementPage() {
 
         <Card><CardHeader><SectionHeader icon={AlertCircle} number="11" title="Cancellations, Refunds &amp; Disputes" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
           <p>Cancellation and refund terms for each Booking are governed by the Supplier terms disclosed in the accepted Proposal and Goldsainte's <a href="/cancellation-refund-policy" className="text-[#0c4d47] underline">Cancellation &amp; Refund Policy</a>. Agent must clearly disclose Supplier penalties before acceptance.</p>
-          <p>Disputes are handled through Goldsainte's resolution center. Goldsainte may, at its discretion, mediate, hold funds, or issue refunds where Agent has materially breached this Agreement or failed to deliver agreed services.</p>
+          <p>Disputes are handled through Goldsainte's resolution center. Goldsainte may, at its discretion, mediate and require Agent to issue refunds from Agent's Stripe account where Agent has materially breached this Agreement or failed to deliver agreed services.</p>
         </CardContent></Card>
 
         <Card><CardHeader><SectionHeader icon={Share2} number="12" title="Intellectual Property" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
