@@ -112,7 +112,7 @@ export function HomeHero() {
             <p className="mt-4 text-center md:text-left max-w-xl mx-auto md:mx-0 text-[15px] md:text-[17px] leading-relaxed text-[#3f4a4b]">
               {t(
                 "home.heroV2.sub",
-                "Wherever you're dreaming of, someone who knows it is here. Travel creators and certified specialists design your trip by hand. Post your dream trip, compare their proposals, and book yours directly — payments secured by Stripe."
+                "Wherever you're dreaming of, someone who knows it is here. Creators bring you the inspiration; certified specialists design your trip by hand. Post your dream trip, compare their proposals, and book yours directly — payments secured by Stripe."
               )}
             </p>
 
