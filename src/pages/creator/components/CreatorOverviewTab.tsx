@@ -58,7 +58,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
       steps: [
         "Declare what you can do — content, guiding, hosting — and set your day rate.",
         "Travelers hire you onto their own trip: their dates, your named scope.",
-        "You confirm the total; escrow releases your payout after the trip.",
+        "You confirm the total; payment is charged straight to your Stripe account.",
       ],
     },
   ];
@@ -152,8 +152,8 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
               build in. Travelers pay a 3.5% service fee on top; a matching
               3.5% platform fee comes out of your payout. That is
               Goldsainte&apos;s entire take: 7% total, flat, on every booking.
-              Every payment is held in escrow and releases as milestones
-              complete.
+              Every payment is charged directly on your own Stripe account
+              at booking.
             </p>
           </div>
           <div className="shrink-0 text-center">
