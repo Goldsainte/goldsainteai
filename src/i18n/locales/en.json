@@ -322,6 +322,12 @@
       "subtitle": "Join our network and earn commissions on luxury travel bookings",
       "apply": "Apply Now",
       "browse": "Browse Agents"
+    },
+    "heroV2": {
+      "eyebrow": "The Global Travel Marketplace",
+      "h1a": "Trips built by people",
+      "h1b": "who've been there.",
+      "sub": "The global marketplace where travel creators and certified specialists design your trip — not an algorithm. Post your dream trip, let experts around the world come to you, and book your specialist directly — payments secured by Stripe."
     }
   },
   "navigation": {
