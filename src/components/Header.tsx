@@ -669,6 +669,8 @@ export const Header = () => {
                   </Button>
                 )}
 
+                <LanguageSelector size="default" className="gap-2 text-[#BFAD72] hover:text-white transition-colors" />
+
                 {/* Unified Profile Menu - Desktop */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
