@@ -1,3 +1,4 @@
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Instagram, Linkedin } from "lucide-react";
 import { Link } from "react-router-dom";
 import verticalLogo from "@/assets/primary-vertical-logo-gold.webp";
@@ -163,6 +164,8 @@ export const Footer = () => {
           </button>
           <span className="text-[#9A9079]">·</span>
           <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
+          <span className="text-[#9A9079]">·</span>
+          <LanguageSelector className="gap-2 text-[#9A9079] hover:text-[#E5DFC6] transition-colors" />
         </div>
       </div>
     </footer>
