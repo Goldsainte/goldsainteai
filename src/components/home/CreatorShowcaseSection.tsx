@@ -23,7 +23,7 @@ const TABS = [
   {
     title: "Get hired for trips",
     body:
-      "Travelers hire you to plan, guide, or shoot their trip. Requests land in your pipeline — you send the proposal, they accept, it's booked.",
+      "Travelers hire you to guide, host, or shoot their trip. Requests land in your pipeline — you send the proposal, they accept, it's booked.",
   },
   {
     title: "Paid at booking",
