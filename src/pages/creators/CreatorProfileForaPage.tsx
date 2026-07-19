@@ -322,7 +322,7 @@ export default function CreatorProfileForaPage() {
                 <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-[#0a2225]/75">
                   {firstName} already has these trips on the calendar. Hire them
                   on location — since they're traveling there anyway, your dates
-                  can line up with theirs, and every booking stays escrow-protected
+                  can line up with theirs, and every booking runs through secure Stripe checkout
                   on Goldsainte.
                 </p>
                 <div className="mt-6 space-y-3">
