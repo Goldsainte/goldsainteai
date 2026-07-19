@@ -36,10 +36,10 @@ const PILLARS = [
     icon: CreditCard,
     eyebrow: "02 — Payments",
     title: "Your money is protected from the moment you pay.",
-    body: "Every payment on Goldsainte is processed by Stripe, a PCI Level 1 certified processor. We never see or store your card details. For booked trips, funds are held in escrow through Stripe Connect and released to the travel professional only after the trip begins — so you are never paying for something that hasn't been delivered.",
+    body: "Every payment on Goldsainte is processed by Stripe, a PCI Level 1 certified processor. We never see or store your card details. For booked trips, your payment goes directly to your travel professional's own Stripe account — they are your seller of record, with their name on your statement and full accountability for your booking.",
     details: [
       "PCI Level 1 certified payment processing",
-      "Escrow holds funds until trip commencement",
+      "Payments go direct to your vetted professional",
       "No card details stored by Goldsainte",
       "Refund eligibility per our cancellation policy",
     ],
@@ -135,7 +135,7 @@ function PillarCard({ pillar, index }: { pillar: (typeof PILLARS)[number]; index
         <div className="flex-shrink-0 w-10 h-10 rounded-sm bg-[#0c4d47]/10 flex items-center justify-center">
           <Icon className="h-5 w-5 text-[#0c4d47]" />
         </div>
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mt-0 md:mt-2">
+        <p className="text-[12px] uppercase tracking-[0.28em] text-[#C7A962] mt-0 md:mt-2">
           {pillar.eyebrow}
         </p>
       </div>
@@ -163,7 +163,7 @@ function PillarCard({ pillar, index }: { pillar: (typeof PILLARS)[number]; index
         {pillar.cta && (
           <Link
             to={pillar.cta.to}
-            className="inline-flex items-center gap-1.5 mt-8 text-[11px] uppercase tracking-[0.22em] text-[#0c4d47] hover:underline underline-offset-4"
+            className="inline-flex items-center gap-1.5 mt-8 text-[12.5px] uppercase tracking-[0.22em] text-[#0c4d47] hover:underline underline-offset-4"
           >
             {pillar.cta.label}
             <ArrowUpRight className="h-3.5 w-3.5" />
@@ -185,7 +185,7 @@ export default function TrustSafety() {
         <title>Trust &amp; Safety · Goldsainte</title>
         <meta
           name="description"
-          content="How Goldsainte protects travelers and travel professionals — verification, escrow payments, dispute resolution, and real-time moderation."
+          content="How Goldsainte protects travelers and travel professionals — verification, secure direct payments, dispute resolution, and real-time moderation."
         />
       </Helmet>
 
@@ -193,14 +193,14 @@ export default function TrustSafety() {
 
         {/* ── HERO ── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-16 md:pb-20">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
+          <p className="text-[12px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
             Safety &amp; Trust
           </p>
           <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] max-w-3xl mb-6">
             Travel with confidence. We built the protection in.
           </h1>
           <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl mb-10">
-            Goldsainte is built on verified professionals, escrow-protected payments,
+            Goldsainte is built on verified professionals, secure direct payments,
             documented communication, and a moderation team that actually responds.
             Here is exactly how every layer works.
           </p>
@@ -209,7 +209,7 @@ export default function TrustSafety() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
               { stat: "ID verified", label: "Every travel agent" },
-              { stat: "Escrow", label: "All trip payments" },
+              { stat: "Stripe", label: "Every payment, secured" },
               { stat: "24 hrs", label: "Report review SLA" },
               { stat: "7 days", label: "Dispute resolution" },
               { stat: "PCI L1", label: "Payment security" },
@@ -222,7 +222,7 @@ export default function TrustSafety() {
                 <p className="font-secondary text-xl md:text-2xl text-[#0c4d47]">
                   {s.stat}
                 </p>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#0a2225]/50 mt-1">
+                <p className="text-[12.5px] uppercase tracking-[0.18em] text-[#0a2225]/50 mt-1">
                   {s.label}
                 </p>
               </div>
@@ -240,7 +240,7 @@ export default function TrustSafety() {
         {/* ── WHAT WE WILL NEVER DO ── */}
         <section className="border-t border-[#E5DFC6] bg-white/60">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+            <p className="text-[12px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
               Our commitments
             </p>
             <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-10 max-w-xl">
@@ -253,7 +253,7 @@ export default function TrustSafety() {
                 "Share your personal information without consent",
                 "Pressure you to book before reviewing a proposal",
                 "Ignore a report or close it without review",
-                "Release escrow funds before a trip begins",
+                "Let unvetted sellers take your payment",
                 "Allow unverified professionals to accept bookings",
                 "Penalize you for filing a legitimate dispute",
               ].map((item) => (
@@ -274,7 +274,7 @@ export default function TrustSafety() {
         {/* ── EMERGENCY / CONTACT ── */}
         <section className="border-t border-[#E5DFC6]">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+            <p className="text-[12px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
               Need help now?
             </p>
             <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-10">
@@ -291,21 +291,21 @@ export default function TrustSafety() {
                     <div className="w-9 h-9 rounded-sm bg-[#0c4d47]/10 flex items-center justify-center">
                       <Icon className="h-4 w-4 text-[#0c4d47]" />
                     </div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-[#0a2225]/50">
+                    <p className="text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50">
                       {item.label}
                     </p>
                     <p className="text-sm text-[#0a2225]/70 leading-relaxed">{item.desc}</p>
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="text-[11px] uppercase tracking-[0.2em] text-[#0c4d47] hover:underline underline-offset-4"
+                        className="text-[12.5px] uppercase tracking-[0.2em] text-[#0c4d47] hover:underline underline-offset-4"
                       >
                         {item.contact}
                       </a>
                     ) : (
                       <Link
                         to={item.to!}
-                        className="text-[11px] uppercase tracking-[0.2em] text-[#0c4d47] hover:underline underline-offset-4"
+                        className="text-[12.5px] uppercase tracking-[0.2em] text-[#0c4d47] hover:underline underline-offset-4"
                       >
                         {item.contact}
                       </Link>
@@ -328,13 +328,13 @@ export default function TrustSafety() {
               <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
                 <a
                   href="mailto:support@goldsainte.com"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#0c4d47] text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#FDF9F0] transition"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#0c4d47] text-[12.5px] uppercase tracking-[0.2em] font-medium hover:bg-[#FDF9F0] transition"
                 >
                   Contact support
                 </a>
                 <Link
                   to="/community-guidelines"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white text-[11px] uppercase tracking-[0.2em] hover:border-white transition"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white text-[12.5px] uppercase tracking-[0.2em] hover:border-white transition"
                 >
                   Community guidelines
                 </Link>
