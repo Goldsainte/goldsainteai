@@ -7,7 +7,7 @@ const STEPS: HowItWorksStep[] = [
   { number: "02", icon: Send, title: "Post a trip request", description: "Describe your dream trip — dates, budget, style — and our AI matches you with the right specialists in minutes.", cta: { label: "Post a trip", to: "/post-trip" } },
   { number: "03", icon: MessageCircle, title: "Get matched proposals", description: "Verified specialists send custom plans tailored to your brief. Most proposals arrive within 24-48 hours — specialists are based around the world, so response times vary by time zone. Compare itineraries, pricing and reviews side by side." },
   { number: "04", icon: CreditCard, title: "Review and book", description: "Pay a deposit to confirm and the balance closer to departure. All payments stay on-platform for your protection.", cta: { label: "How payments work", to: "/help" } },
-  { number: "05", icon: ShieldCheck, title: "Travel protected", description: "Your funds are held in escrow and only released to your specialist after each milestone is delivered." },
+  { number: "05", icon: ShieldCheck, title: "Travel protected", description: "You pay your vetted specialist directly through secure Stripe checkout — with Goldsainte support behind every booking." },
   { number: "06", icon: Star, title: "Leave a review", description: "Help future travelers discover great specialists by sharing your experience after your trip." },
 ];
 
