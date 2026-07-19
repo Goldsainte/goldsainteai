@@ -24,8 +24,9 @@ export function FounderNote() {
             &ldquo;Travel discovery already happens on social — what&rsquo;s been
             missing is everything after the inspiration. We built Goldsainte so
             the person who inspired your trip can actually design it, lead it, and
-            earn from it — and so every dollar you spend is protected until
-            you&rsquo;re standing in the place you dreamed about.&rdquo;
+            earn from it — and so the person you trust with your journey is
+            exactly who you pay, on a marketplace that stands behind every
+            specialist.&rdquo;
           </p>
         </blockquote>
 
