@@ -322,6 +322,12 @@
         "body": "Hôtels, resorts et marques de style de vie — présentez votre établissement à des voyageurs exigeants.",
         "button": "Candidature marque"
       }
+    },
+    "heroV2": {
+      "eyebrow": "La marketplace de voyage intelligente",
+      "h1a": "Des voyages conçus par ceux",
+      "h1b": "qui y sont déjà allés.",
+      "sub": "Où que vous rêviez d'aller, quelqu'un ici connaît l'endroit. Créateurs de voyage et spécialistes certifiés conçoivent votre voyage à la main. Publiez le voyage de vos rêves, comparez leurs propositions et réservez directement — paiements sécurisés par Stripe."
     }
   },
   "navigation": {
