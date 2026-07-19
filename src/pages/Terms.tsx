@@ -110,6 +110,7 @@ export default function Terms() {
               <div id="a3">
                 <h3 className="font-secondary text-xl font-semibold mb-3">A3. About Goldsainte</h3>
                 <p className="mb-3">Goldsainte operates as a platform connecting travelers with Service Providers offering various Travel Experiences including accommodations, flights, car rentals, attractions, and transportation services.</p>
+                <p className="mb-3"><strong>Seller of record:</strong> For trips and services booked from independent specialists and creators on the marketplace, that specialist or creator is the seller and merchant of record. Payments are processed by Stripe directly to the seller's own Stripe account; Goldsainte provides the marketplace technology, collects a platform fee, and does not itself sell your travel or hold your travel funds.</p>
                 <p className="mb-3">Depending on the service:</p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Goldsainte B.V. facilitates bookings for accommodations, flights, and attractions</li>
@@ -185,7 +186,7 @@ export default function Terms() {
                   <li>Payment is required at the time of booking unless otherwise specified</li>
                   <li>We accept major credit cards and other payment methods as displayed</li>
                   <li>Your payment card may be charged immediately or at a later date depending on the Service Provider's policies</li>
-                  <li>You authorize us to charge the payment method provided for the total amount</li>
+                  <li>You authorize the applicable seller to charge, via Stripe, the payment method provided for the total amount</li>
                 </ul>
               </div>
 
