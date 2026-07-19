@@ -207,14 +207,6 @@ export function HomeHero() {
                     <img src={heroTertiaryImg} alt="Friends hiking a coastal trail" className="h-full w-full object-cover" loading="eager" fetchPriority="high" decoding="async" />
                   </div>
                 </div>
-                <div className="mt-2 rounded-2xl bg-[#0c4d47] px-3 md:px-4 py-2 text-xs md:text-sm text-[#E5DFC6]">
-                  <p className="font-semibold mb-1 text-[12px] md:text-sm" style={inter}>
-                    {t('home.hero.storyboardCaption')}
-                  </p>
-                  <p className="text-[12.5px] md:text-xs text-[#E5DFC6]/90" style={inter}>
-                    {t('home.hero.storyboardDescription')}
-                  </p>
-                </div>
               </div>
             </div>
           </div>
