@@ -816,35 +816,35 @@ export default function ProposalDetailPage() {
                       ? isHireProposal
                         ? [
                             "The proposal becomes an active booking \u2014 no contract step for hires; the scope you sent is the agreement.",
-                            `The traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 held in escrow from day one.`,
-                            "Coordinate the days in Messages; the balance lands in escrow before departure.",
+                            `The traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 charged securely through Stripe.`,
+                            "Coordinate the days in Messages; the balance is paid before departure.",
                             "Travel with them and deliver everything in your scope.",
-                            "When the traveler confirms the trip went as agreed, your payout is released \u2014 your total minus the 7% platform fee.",
+                            "Payments settle straight to your own Stripe account \u2014 your total minus the 7% platform fee.",
                           ]
                         : [
                           "The proposal becomes an active booking — and the first move is YOURS: open the booking and hit Create contract (Goldsainte AI can draft it for you), then send it. Both of you sign; nothing moves until it's fully executed.",
-                          `Once both signatures are in, the traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow — not released to you yet.`,
+                          `Once both signatures are in, the traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 charged directly on your Stripe account.`,
                           "You secure the reservations and share the confirmations with the traveler in Messages.",
-                          "The traveler reviews the confirmations and releases the deposit to you as working capital (minus the platform fee).",
-                          "The traveler pays the balance before departure; it stays in escrow through the trip.",
-                          "After the trip, the traveler confirms completion and your final payout is released.",
+                          "Keep the traveler posted in Messages as you confirm each piece of the trip.",
+                          "The traveler pays the balance before departure \u2014 settled to your account like the deposit.",
+                          "After the trip, the traveler confirms completion and you close out the booking.",
                         ]
                       : isHireProposal
                         ? [
                             "Accepting creates your booking. The scope above is what you've both agreed to \u2014 no separate contract step for hires.",
-                            `You pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow and stays protected until after the trip.`,
+                            `You pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 paid securely through Stripe to your specialist, your seller of record.`,
                             `${hirePartnerFirst} plans around your dates and stays in touch in Messages.`,
-                            "The balance is due before departure and stays in escrow through your trip.",
+                            "The balance is due before departure \u2014 paid the same secure way.",
                             `${hirePartnerFirst} joins your trip and delivers everything in the scope.`,
-                            `When you confirm the trip went as agreed, the payout is released to ${hirePartnerFirst}.`,
+                            "When the trip wraps, confirm it went as agreed \u2014 Goldsainte support has your back if anything fell short.",
                           ]
                         : [
                           "Accepting creates your booking. Your specialist prepares and sends the contract for both of you to sign — nothing is owed until it's fully executed.",
-                          `Once both signatures are in, you pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit. It's held in escrow and stays under your control.`,
+                          `Once both signatures are in, you pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 paid securely through Stripe to your specialist, your seller of record.`,
                           "Your specialist secures the reservations and shares the confirmations with you in Messages.",
-                          "Only after you've reviewed them do you release the deposit so your specialist can lock everything in.",
-                          "The balance is due before departure and stays in escrow through your trip.",
-                          "When you confirm the trip went as agreed, the final payment is released to your specialist.",
+                          "Review the confirmations as they arrive \u2014 everything stays documented in your booking.",
+                          "The balance is due before departure \u2014 paid the same secure way.",
+                          "When the trip wraps, confirm it went as agreed \u2014 Goldsainte support has your back if anything fell short.",
                         ]
                     ).map((step, i) => (
                       <li key={i} className="flex items-start gap-3 text-[15px] text-foreground">
