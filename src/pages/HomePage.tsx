@@ -1,4 +1,5 @@
 import { HomeHero } from "@/components/home/HomeHero";
+import { FounderNote } from "@/components/home/FounderNote";
 import { AsFeaturedIn } from "@/components/home/AsFeaturedIn";
 import { StatsStrip } from "@/components/home/StatsStrip";
 import { DreamTripBand } from "@/components/home/DreamTripBand";
@@ -24,6 +25,7 @@ export default function HomePage() {
       <Suspense fallback={null}>
         <PlatformDemoSection />
       </Suspense>
+      <FounderNote />
       <EarnSection />
       <TrustPlaque />
       <FinalCTABand />
