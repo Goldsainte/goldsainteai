@@ -3,6 +3,7 @@
 // day one. Layout and rhythm intentionally identical to the old strip.
 export function StatsStrip() {
   const facts = [
+    { value: "45+ countries", label: "Specialists can join & get paid" },
     { value: "Book direct", label: "Your payment goes to your specialist" },
     { value: "Secured by Stripe", label: "Payments & payouts" },
     { value: "Team-reviewed", label: "Every listing, before it goes live" },
@@ -11,7 +12,7 @@ export function StatsStrip() {
   return (
     <section className="bg-[#f7f3ea] border-y border-[#E5DFC6]">
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 text-center">
           {facts.map((f, i) => (
             <div
               key={f.value}
