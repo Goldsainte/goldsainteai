@@ -70,8 +70,8 @@ export function DreamTripBand() {
         </h2>
         <p className="mt-4 max-w-[560px] text-[16px] leading-relaxed text-[#FDF9F0]/85 md:text-[17.5px]">
           Stop scrolling through the same packages everyone else books. Describe
-          the trip you actually want, and real travel creators and certified
-          specialists design it for you — start to finish.
+          the trip you actually want, and certified specialists design it
+          for you — start to finish.
         </p>
 
         <div className="mt-7 flex flex-wrap items-center gap-4">
