@@ -161,10 +161,10 @@ export default function PartnerBookingsPage() {
               Bookings with you
             </h1>
             <p className="mt-4 text-[15px] leading-relaxed text-[#0a2225]/60">
-              Every trip a traveler has confirmed with you — payments held in
-              escrow and released on milestones: your deposit as working
-              capital once reservations are confirmed, the balance when your
-              traveler confirms the trip. Goldsainte's flat 3.5% on each side.
+              Every trip a traveler has confirmed with you — payments charged
+              directly on your own Stripe account the moment they pay, deposit
+              and balance alike. Goldsainte's flat 3.5% on each side, collected
+              automatically.
             </p>
           </header>
 
@@ -231,7 +231,7 @@ function PartnerBookingRowCard({ isHireBooking, booking,
     const ok = await confirmDialog({
       title: "Request payment release?",
       description:
-        "Goldsainte holds trip funds in escrow. This notifies your traveler and Goldsainte that you're ready — share your confirmed reservations with them in Messages and they release your deposit as working capital; when the trip is complete they confirm it to release the final payment.",
+        "For bookings paid on the legacy platform-held flow, this notifies your traveler and Goldsainte that you're ready — share your confirmed reservations with them in Messages and they release your deposit; when the trip is complete they confirm it to release the final payment. New bookings are paid to your Stripe account directly and don't need a release.",
       confirmText: "Send request",
     });
     if (!ok) return;
