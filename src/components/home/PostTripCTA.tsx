@@ -19,7 +19,7 @@ export function PostTripCTA() {
             <h2 className="text-balance text-lg font-semibold tracking-tight md:text-xl">
               Have a dream trip in mind?
               <span className="block text-[#BFAD72]">
-                Post it once. Let creators and agents compete to design it.
+                Post it once. Let certified specialists compete to design it.
               </span>
             </h2>
 
