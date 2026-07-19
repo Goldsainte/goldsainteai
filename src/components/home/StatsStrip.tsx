@@ -3,7 +3,7 @@
 // day one. Layout and rhythm intentionally identical to the old strip.
 export function StatsStrip() {
   const facts = [
-    { value: "Escrow-protected", label: "Every dollar held until you travel" },
+    { value: "Book direct", label: "Your payment goes to your specialist" },
     { value: "Secured by Stripe", label: "Payments & payouts" },
     { value: "Team-reviewed", label: "Every listing, before it goes live" },
   ];
