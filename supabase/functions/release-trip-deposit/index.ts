@@ -1,5 +1,7 @@
 // ============================================================================
-// release-trip-deposit v5.2 — MILESTONE ESCROW (cents-true seam 2026-07-18)
+// release-trip-deposit v5.3 — direct-charge bookings (agent is merchant of record) are refused:
+//        the traveler paid the agent's account directly; no platform-held funds exist. (2026-07-19)
+// v5.2 — MILESTONE ESCROW (cents-true seam 2026-07-18)
 // ============================================================================
 // v5.1 (Jul 15, later that night) — restores the literal `amount:
 //   toCents(payout)` in transfers.create; v5 had refactored it to a const,
@@ -147,6 +149,17 @@ Deno.serve(async (req) => {
     // $54,281.25 transfer.)
     const total = Number(booking.total_price) / 100;
     const deposit = Number(booking.deposit_amount ?? 0) / 100;
+
+    // v5.3: DIRECT-CHARGE bookings have nothing to release — the traveler
+    // paid the agent's Standard account directly; no funds sit on the
+    // platform balance. (Legacy platform-charged bookings pass through.)
+    if ((((booking as any).metadata as any) ?? {}).charge_model === "direct") {
+      return json(req, {
+        error:
+          "This booking was paid directly to your specialist — there's no platform-held payment to release.",
+        code: "DIRECT_CHARGE_BOOKING",
+      }, 400);
+    }
     const currency = (booking.currency || "usd").toLowerCase();
     const meta = (booking.metadata as Record<string, unknown>) ?? {};
     const tripTitle = (meta as any)?.trip_title || "the trip";
