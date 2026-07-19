@@ -322,6 +322,12 @@
         "body": "Hotels, Resorts und Lifestyle-Marken — präsentiere deine Property anspruchsvollen Reisenden.",
         "button": "Markenbewerbung"
       }
+    },
+    "heroV2": {
+      "eyebrow": "Der smarte Reisemarktplatz",
+      "h1a": "Reisen von Menschen,",
+      "h1b": "die schon dort waren.",
+      "sub": "Wovon Sie auch träumen — hier ist jemand, der es kennt. Travel-Creator und zertifizierte Spezialisten gestalten Ihre Reise von Hand. Posten Sie Ihre Traumreise, vergleichen Sie die Vorschläge und buchen Sie direkt — Zahlungen gesichert durch Stripe."
     }
   },
   "navigation": {
