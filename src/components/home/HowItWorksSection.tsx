@@ -113,16 +113,6 @@ export function HowItWorksSection() {
                   loading="lazy"/>
                 ))}
               </div>
-              <div className="mt-4 rounded-2xl bg-[#0c4d47] px-4 py-3 text-sm text-[#E5DFC6]">
-                <p className="font-semibold mb-1">
-                  Every journey begins with a vision.
-                </p>
-                <p className="text-xs text-[#E5DFC6]/90 whitespace-pre-line">
-                  {"From inspiration to itinerary in minutes."}
-                  {"\n"}
-                  {"Upload photos, generate a trip, and share or sell it instantly."}
-                </p>
-              </div>
             </div>
           </div>
         </div>
