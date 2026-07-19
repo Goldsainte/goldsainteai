@@ -95,13 +95,13 @@ export const PaymentModal = ({
               <p className="font-semibold mb-2">About this payment</p>
               <p className="mb-2">
                 Goldsainte operates as a marketplace platform. Your trip is fulfilled by the 
-                travel professional named in this booking. Payment is processed securely and 
-                held in escrow until job completion.
+                travel professional named in this booking — your seller of record. Payment is 
+                processed securely by Stripe directly to their account.
               </p>
               <ul className="space-y-1">
                 <li>• Platform service fee: Included in total</li>
-                <li>• <strong>Escrow protection:</strong> Funds held securely until delivery</li>
-                <li>• Agent receives payment after you approve their work</li>
+                <li>• <strong>Direct payment:</strong> Processed securely by Stripe to your professional</li>
+                <li>• Goldsainte support mediates if anything falls short</li>
               </ul>
             </AlertDescription>
           </Alert>
@@ -131,8 +131,9 @@ export const PaymentModal = ({
 
           <Alert>
             <AlertDescription className="text-xs">
-              <strong>Escrow Protection:</strong> Your payment is held securely in escrow until the job is completed. 
-              The agent receives funds only after you review and approve their work. This ensures quality and protects both parties.
+              <strong>Secure payment:</strong> Your payment is processed by Stripe directly to the professional 
+              fulfilling this booking — your seller of record. Goldsainte vets every professional and our support 
+              team mediates disputes to protect both parties.
             </AlertDescription>
           </Alert>
 
