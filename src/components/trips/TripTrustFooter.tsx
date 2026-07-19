@@ -6,7 +6,7 @@ export function TripTrustFooter() {
     },
     {
       title: "Secure Payments",
-      description: "Your payment is protected until after your trip",
+      description: "Paid securely to your specialist via Stripe",
     },
     {
       title: "24/7 Support",
