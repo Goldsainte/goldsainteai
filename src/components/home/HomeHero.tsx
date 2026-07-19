@@ -84,7 +84,7 @@ export function HomeHero() {
           <div className="flex flex-col justify-center">
             {/* Pill badge (unchanged) */}
             <div className="flex justify-center md:justify-start">
-              <div className="inline-flex items-center gap-1.5 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 md:py-1.5 text-[10px] md:text-sm font-medium uppercase tracking-[0.06em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
+              <div className="inline-flex items-center gap-1.5 md:gap-2 rounded-full border border-[#E5DFC6] bg-[#BFAD72] px-3 py-1 md:py-1.5 text-[12px] md:text-sm font-medium uppercase tracking-[0.06em] md:tracking-[0.12em] text-[#073331] whitespace-nowrap">
                 <span>{t('common.travelers')}</span>
                 <span className="h-[1px] w-1.5 md:w-4 bg-[#073331]/30" />
                 <span>{t('common.creators')}</span>
@@ -95,7 +95,7 @@ export function HomeHero() {
 
             {/* Category eyebrow */}
             <p
-              className="mt-7 text-center md:text-left text-[11px] md:text-[11.5px] font-semibold uppercase tracking-[0.26em] text-[#8a7136]"
+              className="mt-7 text-center md:text-left text-[12.5px] md:text-[13px] font-semibold uppercase tracking-[0.26em] text-[#8a7136]"
               style={inter}
             >
               The Smarter Travel Marketplace
@@ -147,10 +147,15 @@ export function HomeHero() {
             {popularTrips && popularTrips.length >= 3 && (
               <div className="mt-8">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#0a2225]/60" style={inter}>
+                  <span className="text-[12px] font-medium uppercase tracking-[0.18em] text-[#0a2225]/60" style={inter}>
                     Popular Trips
                   </span>
                   <span className="h-px flex-1 bg-[#E5DFC6]" />
+                  {/* Featured Trips section (and its view-all) was cut — the
+                      marketplace door now lives here so inventory stays one tap away. */}
+                  <Link to="/marketplace" className="whitespace-nowrap text-[13px] font-medium text-[#0c4d47] hover:underline" style={inter}>
+                    View all →
+                  </Link>
                 </div>
                 <div className="grid grid-cols-3 gap-2 md:gap-3">
                   {popularTrips.map((trip: any) => (
@@ -175,7 +180,7 @@ export function HomeHero() {
                         {trip.title}
                       </p>
                       {typeof trip.price_per_person === "number" && (
-                        <p className="text-[11px] md:text-[12px] text-[#0a2225]/70" style={inter}>
+                        <p className="text-[12.5px] md:text-[12px] text-[#0a2225]/70" style={inter}>
                           From {formatPrice(trip.price_per_person, trip.currency)}
                         </p>
                       )}
@@ -206,7 +211,7 @@ export function HomeHero() {
                   <p className="font-semibold mb-1 text-[12px] md:text-sm" style={inter}>
                     {t('home.hero.storyboardCaption')}
                   </p>
-                  <p className="text-[11px] md:text-xs text-[#E5DFC6]/90" style={inter}>
+                  <p className="text-[12.5px] md:text-xs text-[#E5DFC6]/90" style={inter}>
                     {t('home.hero.storyboardDescription')}
                   </p>
                 </div>
