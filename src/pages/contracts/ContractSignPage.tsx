@@ -638,7 +638,7 @@ export default function ContractSignPage() {
                   </p>
                   <p className="text-sm text-green-800">
                     {userRole === "traveler"
-                      ? "Both parties have signed. Next: pay your deposit from your booking — it stays in escrow, and only you can release it after your specialist shows you confirmed reservations."
+                      ? "Both parties have signed. Next: pay your deposit from your booking — it's charged securely through Stripe directly to your specialist, your seller of record."
                       : "Both parties have signed. Next: the traveler pays the deposit — you'll be notified. Then share the confirmed reservations in Messages so they can release it to you."}
                   </p>
                 </div>
