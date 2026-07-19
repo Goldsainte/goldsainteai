@@ -31,6 +31,16 @@ serve(async (req) => {
       throw new Error('User not authenticated');
     }
 
+    // Country for the Stripe account (2026-07-19): global marketplace —
+    // the account's country is FIXED at creation, so it must arrive from
+    // the client. Two-letter ISO code; defaults to US.
+    let reqBody: any = {};
+    try { reqBody = await req.json(); } catch { /* no body is fine */ }
+    const accountCountry =
+      typeof reqBody?.country === "string" && /^[A-Za-z]{2}$/.test(reqBody.country.trim())
+        ? reqBody.country.trim().toUpperCase()
+        : "US";
+
     // Get user profile
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
@@ -50,7 +60,7 @@ serve(async (req) => {
     if (!accountId) {
       const account = await stripe.accounts.create({
         type: 'standard', // Standard (2026-07-19): account holder owns their Stripe relationship
-        country: 'US',
+        country: accountCountry,
         email: user.email,
         capabilities: {
           card_payments: { requested: true },
