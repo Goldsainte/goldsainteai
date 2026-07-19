@@ -112,7 +112,7 @@ export function HomeHero() {
             <p className="mt-4 text-center md:text-left max-w-xl mx-auto md:mx-0 text-[15px] md:text-[17px] leading-relaxed text-[#3f4a4b]">
               The marketplace where travel creators and certified specialists design
               your trip — not an algorithm. Post your dream trip, let the experts come
-              to you, and book with every dollar protected until you travel.
+              to you, and book your specialist directly — payments secured by Stripe.
             </p>
 
             {/* Search bar — the SAME MarketplaceSearch component the
