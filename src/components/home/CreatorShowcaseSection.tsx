@@ -270,7 +270,7 @@ export function CreatorShowcaseSection() {
                   <div className="max-w-[400px]">
                     {[
                       "Traveler pays the deposit",
-                      "Funds held in escrow — not with anyone",
+                      "Funds held securely until milestones are met",
                       "Balance paid before departure",
                       "Trip happens",
                       "Released to you",
