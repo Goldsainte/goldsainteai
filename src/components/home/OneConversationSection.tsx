@@ -4,27 +4,27 @@
 const POINTS = [
   {
     n: "01",
-    title: "Tap to book. Right in the chat.",
+    title: "Discover with confidence.",
     body:
-      "Your specialist sends a proposal in your thread. One tap, deposit paid. No forms. No redirects.",
+      "Browse journeys designed from real destination experience — by specialists and travelers who've actually been there.",
   },
   {
     n: "02",
-    title: "Signed before a dollar moves.",
+    title: "Choose what fits.",
     body:
-      "Real contracts, signed digitally in minutes. Payment stays locked until both parties sign.",
+      "Book instantly with transparent pricing, or compare tailored proposals built around your vision and pick the one you love.",
   },
   {
     n: "03",
-    title: "Your money moves when work happens.",
+    title: "Plan in one place.",
     body:
-      "Every payment is held in escrow and released to your specialist milestone by milestone. Never before.",
+      "Keep your messages, itinerary, documents, and updates together — from first idea to the day you land.",
   },
   {
     n: "04",
-    title: "Everything on the record.",
+    title: "Travel with support.",
     body:
-      "Messages, contracts, payments — one protected record. If anything goes off-plan, we step in with the full picture.",
+      "Stay connected to your specialist before, during, and after your journey — a message away the whole way.",
   },
 ];
 
