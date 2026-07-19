@@ -7,7 +7,7 @@ export default function PaymentsAndFeesPage() {
         Goldsainte charges a 7% platform fee on every booking: 3.5% is deducted from the specialist's earnings and 3.5% is added to the traveler's price. Stripe processing fees are billed separately at standard rates.
       </p>
       <p>
-        All payments are held on-platform in escrow and released to specialists as each milestone of the trip is delivered. Travelers and specialists never exchange payment information directly.
+        All payments run through Goldsainte's secure Stripe checkout and are charged directly to your specialist — your seller of record. Travelers and specialists never exchange payment information directly.
       </p>
       <p>
         Travelers see prices in USD by default. Specialists can list in any major currency — Stripe handles automatic FX conversion at competitive rates, with a 1% fee on cross-currency settlements (Stripe's fee, not Goldsainte's).
