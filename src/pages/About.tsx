@@ -55,8 +55,8 @@ const About = () => {
         },
         {
           icon: CreditCard,
-          title: "Escrow & Milestone Payments",
-          description: "All payments stay on-platform. Funds are held in escrow and released to your specialist as each milestone of your trip is delivered."
+          title: "Secure Direct Payments",
+          description: "All payments stay on-platform through Stripe's secure checkout — charged directly to your specialist, your seller of record, with Goldsainte support behind every booking."
         },
         {
           icon: ShieldCheck,
@@ -893,7 +893,7 @@ const About = () => {
           <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
             <p><strong>Proprietary Technology:</strong> AI trip planning, specialist matching, and personalised recommendation systems.</p>
             <p><strong>Triple-Sided Network:</strong> Integrated ecosystem connecting travelers, agents, and creators.</p>
-            <p><strong>Trust & Safety Infrastructure:</strong> Verified agents, content moderation, escrow payouts, and transparent reviews.</p>
+            <p><strong>Trust & Safety Infrastructure:</strong> Verified agents, content moderation, secure direct payments, and transparent reviews.</p>
             <p><strong>Brand Loyalty:</strong> Curated trips and high-quality creator content increase repeat bookings and engagement.</p>
           </div>
         </div>
