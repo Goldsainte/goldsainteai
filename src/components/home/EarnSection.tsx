@@ -13,7 +13,7 @@ const cards = [
     tag: "For travel creators",
     title: "Turn your influence into booked trips",
     mechanics: "AI-written guides · Your travel map · Brand collabs · Paid group trips",
-    body: "Your profile becomes a storefront: publish destination guides with an AI writer trained on your voice, light up your travel map, open brand collaborations, and let followers request spots on your trips — every booking paid directly into your own Stripe account.",
+    body: "Your profile becomes a storefront: publish destination guides with an AI writer trained on your voice, light up your travel map, open brand collaborations, and share marketplace trips with your own affiliate link — earning a commission on every booking you inspire.",
     cta: "Start creating",
     link: "/auth?mode=signup&role=creator",
     image: creatorImage,
