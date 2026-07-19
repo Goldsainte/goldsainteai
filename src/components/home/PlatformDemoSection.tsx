@@ -18,7 +18,7 @@ const FEATURES = [
   ["AI guide writer", "Destination guides in your voice, drafted in seconds"],
   ["Your travel map", "Every country you've been lights up gold"],
   ["Guide analytics", "Live view counts and milestone alerts"],
-  ["Escrow payouts", "Every booking protected; paid out through Stripe"],
+  ["Direct payouts", "Every booking paid straight to your Stripe account"],
   ["Brand collab hub", "Media kit, formats, and inbound partnerships"],
 ];
 
