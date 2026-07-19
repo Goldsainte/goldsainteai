@@ -60,11 +60,11 @@ export default function Terms() {
       <BackButton className="mb-6" />
 
       <header className="mb-10">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7151] mb-2">Legal</p>
+        <p className="text-[12.5px] uppercase tracking-[0.2em] text-[#7A7151] mb-2">Legal</p>
         <h1 className="font-secondary text-4xl text-[#0a2225] mb-3">
           Goldsainte Terms of Service
         </h1>
-        <p className="text-sm text-[#4a4a4a]">Last updated: May 19, 2026</p>
+        <p className="text-sm text-[#4a4a4a]">Last updated: July 19, 2026</p>
       </header>
 
       <Alert className="mb-8">
@@ -73,6 +73,17 @@ export default function Terms() {
           These Terms of Service constitute a legal agreement between you and Goldsainte AI, Inc.
           By using our platform, you agree to be bound by these terms. Please read them carefully.
           If you do not agree, please do not use the service.
+        </AlertDescription>
+      </Alert>
+
+      <Alert className="mb-8 border-[#C7A962]/40 bg-[#FDF9F0]">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription className="text-sm">
+          <span className="font-semibold">Availability notice:</span> Trip bookings are not
+          currently offered to residents of California, Florida, Hawaii, Iowa, or Washington,
+          which require Seller of Travel registration. Residents of these states may not
+          purchase trips on the Platform at this time. Creator services and travel guides are
+          not affected. Your state of residence is collected at checkout to apply this policy.
         </AlertDescription>
       </Alert>
 
