@@ -1,4 +1,6 @@
-// stripe-webhook-handler v3.1 - cents-true seams for total_price at the payoutMath boundary (2026-07-18)
+// stripe-webhook-handler v3.2 - Connect-aware: verifies against the platform OR connected-accounts
+//        endpoint secret (STRIPE_CONNECT_WEBHOOK_SECRET); direct-charge events carry event.account. (2026-07-19)
+// v3.1 - cents-true seams for total_price at the payoutMath boundary (2026-07-18)
 import "../_shared/resend-guard.ts";
 import { accumulateCollected, isFullyPaid, stripTravelerFee } from '../_shared/payoutMath.ts';
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
@@ -11,6 +13,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
 });
 
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+const connectWebhookSecret = Deno.env.get("STRIPE_CONNECT_WEBHOOK_SECRET");
 
 const supabaseClient = createClient(
   Deno.env.get("SUPABASE_URL") ?? "",
@@ -21,7 +24,7 @@ const supabaseClient = createClient(
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
 
-  if (!signature || !webhookSecret) {
+  if (!signature || (!webhookSecret && !connectWebhookSecret)) {
     console.error("Missing stripe-signature header or webhook secret");
     return new Response("Webhook signature or secret missing", { status: 400 });
   }
@@ -29,7 +32,27 @@ serve(async (req) => {
   try {
     const body = await req.text();
     // Deno SubtleCrypto is async-only — must use constructEventAsync.
-    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    // Two Stripe endpoints feed this URL: the platform endpoint and the
+    // connected-accounts endpoint (direct charges fire on the agent's
+    // account). Each has its own signing secret — try both.
+    let event: any = null;
+    let verifyError: unknown = null;
+    for (const secret of [webhookSecret, connectWebhookSecret]) {
+      if (!secret) continue;
+      try {
+        event = await stripe.webhooks.constructEventAsync(body, signature, secret);
+        break;
+      } catch (e) {
+        verifyError = e;
+      }
+    }
+    if (!event) {
+      throw verifyError ?? new Error("Webhook signature verification failed");
+    }
+    const connectedAccount = (event as any).account as string | undefined;
+    if (connectedAccount) {
+      console.log(`Connect event from account ${connectedAccount}`);
+    }
     
     console.log(`Processing webhook event: ${event.type}`);
 
