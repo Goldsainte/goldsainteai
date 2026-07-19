@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AskQuestionDrawer } from "@/components/trips/AskQuestionDrawer";
 import { trackEvent } from "@/lib/analytics/events";
+import { ResidenceSelect } from "@/components/compliance/ResidenceSelect";
+import { isSotBlockedState } from "@/lib/residency";
 
 interface TripBookingSidebarProps {
   tripId: string;
@@ -44,6 +46,7 @@ export function TripBookingSidebar({
   const [isLoading, setIsLoading] = useState(false);
   const [isAskLoading, setIsAskLoading] = useState(false);
   const [isAskDrawerOpen, setIsAskDrawerOpen] = useState(false);
+  const [residenceState, setResidenceState] = useState("");
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -81,6 +84,17 @@ export function TripBookingSidebar({
       return;
     }
 
+    // SOT residency gate: enforced server-side in trip-checkout-create;
+    // this is the honest front door.
+    if (!residenceState) {
+      toast.error("Please select your state of residence to continue.");
+      return;
+    }
+    if (isSotBlockedState(residenceState)) {
+      toast.error("Trip bookings aren't yet available in your state.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const depositAmount = depositBase;
@@ -105,6 +119,8 @@ export function TripBookingSidebar({
             source: "marketplace_booking",
             guest_service_fee: guestServiceFee,
             guest_service_fee_rate: GUEST_FEE_RATE,
+            residence_state: residenceState,
+            residence_attested_at: new Date().toISOString(),
           },
         } as any)
         .select("id")
@@ -119,6 +135,7 @@ export function TripBookingSidebar({
           tripBookingId: booking.id,
           amountTotalCents: amountCents,
           currency: (currency || "USD").toLowerCase(),
+          residenceState,
           successUrl: `${window.location.origin}/booking-confirmation?booking=${booking.id}`,
           cancelUrl: `${window.location.origin}/marketplace/trip/${tripId}`,
           affiliateCode:
@@ -133,7 +150,15 @@ export function TripBookingSidebar({
 
       window.location.href = data.paymentUrl;
     } catch (err: any) {
-      toast.error(err.message || "Failed to start checkout. Please try again.");
+      // Edge-function errors carry the real JSON body on err.context —
+      // surface AGENT_NOT_READY / SOT messages instead of a generic code.
+      let body: any = null;
+      try {
+        body = await err?.context?.json?.();
+      } catch {
+        /* no parseable body */
+      }
+      toast.error(body?.error || err.message || "Failed to start checkout. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -217,9 +242,10 @@ export function TripBookingSidebar({
 
       {/* CTAs */}
       <div className="mt-6 space-y-3">
+        <ResidenceSelect value={residenceState} onChange={setResidenceState} />
         <Button
           onClick={handleRequestToBook}
-          disabled={isLoading}
+          disabled={isLoading || isSotBlockedState(residenceState)}
           className="w-full rounded-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
         >
           {isLoading ? "Sending..." : (instantBooking ? "Book Instantly" : "Reserve with Deposit")}
@@ -256,7 +282,7 @@ export function TripBookingSidebar({
             <span>Due today</span>
             <span>{formatPrice(depositTotal)}</span>
           </div>
-          <p className="pt-1 text-[11px] text-[#7A7151]">
+          <p className="pt-1 text-[12.5px] text-[#7A7151]">
             Remaining balance of {formatPrice(pricePerPerson - depositBase)} is due before
             departure. Flexible payment plans available at checkout.
           </p>
