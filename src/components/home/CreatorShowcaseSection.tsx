@@ -14,8 +14,8 @@ import bali from "@/assets/home/storyboard-bali.webp";
 import seoul from "@/assets/home/storyboard-seoul.webp";
 import maldives from "@/assets/home/storyboard-maldives.webp";
 import jungle from "@/assets/home/hero-jungle-villa.webp";
-import desert from "@/assets/creator-desert-camel.jpg";
-import beach from "@/assets/beach-flowers.jpg";
+import desert from "@/assets/creator-desert-camel.webp";
+import beach from "@/assets/beach-flowers.webp";
 
 const ROTATE_MS = 5000;
 
