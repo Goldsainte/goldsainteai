@@ -206,7 +206,7 @@ export const StripeConnectOnboarding = () => {
 
         <Alert>
           <AlertDescription className="text-xs">
-            <strong>How it works:</strong> You keep 96.5% of your quoted price — Goldsainte's fee is a flat 3.5% on your side (travelers pay their own 3.5% on top). Funds are held in escrow and released in milestones: your deposit as working capital once you share confirmed reservations with your traveler, and the balance when they confirm the trip is complete. Released payouts land in your bank account via Stripe, typically within 1–2 business days.
+            <strong>How it works:</strong> Goldsainte's fee is a flat 3.5% on your side (travelers pay their own 3.5% on top), collected automatically as an application fee. You're the merchant of record: traveler payments — deposits and balances alike — are charged directly on your own Stripe account the moment they book, and settle to your bank on your Stripe payout schedule. Standard card processing applies.
           </AlertDescription>
         </Alert>
       </CardContent>
