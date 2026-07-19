@@ -93,21 +93,15 @@ serve(async (req) => {
       
       try {
         const acct = await stripe.accounts.create({
-          type: "express",
+          type: "standard", // Standard (2026-07-19): agent owns their Stripe relationship end-to-end
           email: user.email ?? undefined,
           business_type: "individual",
           capabilities: { 
             transfers: { requested: true }, 
             card_payments: { requested: true } 
           },
-          settings: {
-            payouts: {
-              schedule: {
-                interval: 'daily',
-                delay_days: 'minimum',
-              },
-            },
-          },
+        // No settings.payouts — payout schedules are not settable by the
+        // platform on Standard accounts; the account holder controls their own.
         });
         
         accountId = acct.id;
