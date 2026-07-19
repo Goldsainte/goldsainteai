@@ -315,7 +315,7 @@ export default function GuidePage() {
               {[
                 ["Verified specialists", "Every specialist is vetted by Goldsainte"],
                 ["Personalized plans", "Travel designed around your style"],
-                ["Secure booking", "Funds held in escrow until you confirm"],
+                ["Secure booking", "Paid safely through Stripe checkout"],
               ].map(([t, d]) => (
                 <div key={t}>
                   <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#0a2225]">{t}</p>
