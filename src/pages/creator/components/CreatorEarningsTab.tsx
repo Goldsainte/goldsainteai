@@ -53,14 +53,14 @@ export function CreatorEarningsTab() {
       {/* Summary cards */}
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-3">
         <SummaryCard
-          label="Released"
+          label="Paid"
           value={snapshot ? formatMoney(snapshot.released, currency) : "—"}
-          description="Already paid out"
+          description="Settled to your account"
         />
         <SummaryCard
-          label="Held in escrow"
+          label="Pending"
           value={snapshot ? formatMoney(snapshot.pending, currency) : "—"}
-          description="Awaiting milestone"
+          description="Processing or awaiting release"
         />
         <SummaryCard
           label="Lifetime"
