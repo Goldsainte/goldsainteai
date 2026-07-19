@@ -11,7 +11,7 @@ const columns = [
   {
     eyebrow: "Payments",
     title: "Processed through Stripe",
-    body: "Checkout and payouts run on Stripe, and funds are released as your booking milestones are met. Your card details never touch our servers.",
+    body: "Checkout runs on Stripe and pays your specialist directly — they're your seller of record. Your card details never touch our servers.",
   },
   {
     eyebrow: "Support",
