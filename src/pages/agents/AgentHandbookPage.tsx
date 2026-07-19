@@ -13,7 +13,7 @@ const P = "mt-3 leading-relaxed text-[#0a2225]/85";
 function Path({ steps }: { steps: string[] }) {
   return (
     <div className="mt-4 flex flex-wrap items-center gap-1.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6B2F]">Find it:</span>
+      <span className="text-[12.5px] font-semibold uppercase tracking-[0.14em] text-[#8D6B2F]">Find it:</span>
       {steps.map((s, i) => (
         <span key={i} className="flex items-center gap-1.5">
           <span className="rounded-full border border-[#C7B892]/60 bg-white px-3 py-1 text-[12px] text-[#0a2225]">{s}</span>
@@ -28,7 +28,7 @@ function Flow() {
   const steps: [string, string][] = [
     ["Trip request", "Travelers find you, or post trips you can bid on"],
     ["Your proposal", "You design the itinerary and quote your price"],
-    ["Escrow", "They pay Goldsainte — funds held safely in milestones"],
+    ["Direct pay", "They pay you — straight to your Stripe account at booking"],
     ["You're paid", "Deposit as working capital, balance on completion"],
   ];
   return (
@@ -76,9 +76,10 @@ export default function AgentHandbookPage() {
 
         <Flow />
         <p className="mt-3 text-center text-[13px] text-[#0a2225]/60">
-          You keep 96.5% of your quoted price — Goldsainte's fee is a flat 3.5% (travelers pay their own
-          3.5%). Your deposit releases as working capital once you share confirmed reservations; the
-          balance releases when the traveler confirms trip completion. Payouts land in 1–2 business days.
+          Goldsainte's fee is a flat 3.5% of your quoted price (travelers pay their own 3.5% on top),
+          collected automatically. You're the merchant of record: deposits and balances are charged
+          directly on your own Stripe account the moment your traveler pays, and settle to your bank
+          on your Stripe payout schedule. Standard card processing applies.
         </p>
 
         <Section n={1} title="Your profile — the magazine">
@@ -103,7 +104,7 @@ export default function AgentHandbookPage() {
         <Section n={3} title="Trips & tours">
           <p className={P}>
             Your published marketplace packages appear on your profile under <strong>My trips &
-            tours</strong> — bookable, escrow-protected. Build them from your dashboard; they double as
+            tours</strong> — bookable, paid direct to you. Build them from your dashboard; they double as
             proof of work for every traveler who lands on your page.
           </p>
         </Section>
@@ -111,7 +112,7 @@ export default function AgentHandbookPage() {
         <Section n={4} title="Proposals & messages">
           <p className={P}>
             Trip requests land in your pipeline; you respond with proposals. Conversations stay in
-            your Goldsainte inbox — on-platform is what makes the escrow protection real, for you and
+            your Goldsainte inbox — on-platform is what keeps payment records, disputes, and support protections real, for you and
             the traveler.
           </p>
         </Section>
