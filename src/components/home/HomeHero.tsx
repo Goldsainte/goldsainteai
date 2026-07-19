@@ -98,21 +98,22 @@ export function HomeHero() {
               className="mt-7 text-center md:text-left text-[12.5px] md:text-[13px] font-semibold uppercase tracking-[0.26em] text-[#8a7136]"
               style={inter}
             >
-              The Smarter Travel Marketplace
+              {t("home.heroV2.eyebrow", "The Smarter Travel Marketplace")}
             </p>
             <span aria-hidden="true" className="mx-auto md:mx-0 mt-2.5 block h-px w-11 bg-[#C7A962]" />
 
             {/* Promise headline */}
             <h1 className="mt-4 text-center md:text-left font-secondary text-[30px] sm:text-[36px] leading-[1.1] md:text-[44px] lg:text-[50px] font-medium">
-              Trips built by people
+              {t("home.heroV2.h1a", "Trips built by people")}
               <br />
-              <em className="text-[#0c4d47]">who've been there.</em>
+              <em className="text-[#0c4d47]">{t("home.heroV2.h1b", "who've been there.")}</em>
             </h1>
 
             <p className="mt-4 text-center md:text-left max-w-xl mx-auto md:mx-0 text-[15px] md:text-[17px] leading-relaxed text-[#3f4a4b]">
-              The marketplace where travel creators and certified specialists design
-              your trip — not an algorithm. Post your dream trip, let the experts come
-              to you, and book your specialist directly — payments secured by Stripe.
+              {t(
+                "home.heroV2.sub",
+                "Wherever you're dreaming of, someone who knows it is here. Travel creators and certified specialists design your trip by hand. Post your dream trip, compare their proposals, and book yours directly — payments secured by Stripe."
+              )}
             </p>
 
             {/* Search bar — the SAME MarketplaceSearch component the
