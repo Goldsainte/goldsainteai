@@ -26,6 +26,11 @@ serve(async (req) => {
     let body: any = {};
     try { body = await req.json(); } catch { /* no body is fine */ }
     const origin = body?.origin || req.headers.get("origin") || DEFAULT_SITE_URL;
+    // Global marketplace (2026-07-19): account country is fixed at creation.
+    const accountCountry =
+      typeof body?.country === "string" && /^[A-Za-z]{2}$/.test(body.country.trim())
+        ? body.country.trim().toUpperCase()
+        : "US";
     const RETURN_URL = `${origin}/creator-dashboard?stripe=success`;
     const REFRESH_URL = `${origin}/creator-dashboard?stripe=refresh`;
 
@@ -94,6 +99,7 @@ serve(async (req) => {
       try {
         const acct = await stripe.accounts.create({
           type: "standard", // Standard (2026-07-19): agent owns their Stripe relationship end-to-end
+          country: accountCountry,
           email: user.email ?? undefined,
           business_type: "individual",
           capabilities: { 
