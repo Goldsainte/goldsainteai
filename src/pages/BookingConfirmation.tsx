@@ -215,7 +215,7 @@ export default function BookingConfirmation() {
     "Your specialist will contact you within 24 hours to confirm trip details.",
     `Your balance of ${balanceDueText} is due before departure.`,
     "Your itinerary and contract are saved in your dashboard.",
-    "Funds are held in escrow and released to your specialist on agreed milestones.",
+    "Your payment goes directly to your specialist — your seller of record for this trip.",
     "You can message your specialist anytime from your bookings dashboard.",
   ];
 
