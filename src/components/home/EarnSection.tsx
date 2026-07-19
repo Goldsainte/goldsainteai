@@ -23,7 +23,7 @@ const cards = [
     tag: "For travel specialists",
     title: "Design journeys for clients worldwide",
     mechanics: "Trip requests · Bespoke proposals · Paid at booking",
-    body: "Real travelers post dream trips; you answer with bespoke proposals. Get paid at booking — deposits and balances land in your own Stripe account the moment your client pays. No invoicing, no chasing.",
+    body: "Real travelers post dream trips from around the world; you answer with bespoke proposals — wherever you're based. Get paid at booking — deposits and balances land in your own Stripe account the moment your client pays. No invoicing, no chasing.",
     cta: "Join as a specialist",
     link: "/apply/agent",
     image: expertImage,
