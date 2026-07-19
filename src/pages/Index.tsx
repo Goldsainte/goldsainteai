@@ -71,10 +71,10 @@ export default function Index() {
   return (
     <>
       <Helmet>
-        <title>Goldsainte · Luxury Travel Marketplace</title>
+        <title>Goldsainte — Explore Trips or Post Your Dream Trip</title>
         <meta
           name="description"
-          content="Goldsainte connects travelers, TikTok creators, and certified travel agents through storyboards. Turn inspiration into bookable trips with AI matching, escrow protection, and on-platform collaboration."
+          content="Browse bookable trips, tours, and guides from travel creators and certified specialists. Nothing fits? Post your Dream Trip, compare tailored proposals, and book the one you love."
         />
       </Helmet>
 
