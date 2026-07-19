@@ -193,7 +193,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         <>
         {undeclaredOnTrip && (
           <div className="mb-8 border-t border-[#E5DFC6] pt-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Finish your setup</p>
+            <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Finish your setup</p>
             <h3 className="mt-2 font-secondary text-xl leading-snug text-[#0a2225] md:text-2xl">Declare what travelers can hire you for</h3>
             <p className="mt-1.5 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/70">
               Your On-Trip offer doesn't list capabilities yet, so travelers see a generic hire form. Pick from the list once {"\u2014"} your profile, the hire form, and proposals all update together.
@@ -209,7 +209,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         )}
         {hostedService && (
           <div className="mb-8 rounded-3xl border border-[#E5DFC6] bg-white p-5 md:p-7">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
+            <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
             {hostedServices.length > 1 && (
               <div className="mt-3 inline-flex max-w-full flex-wrap gap-0.5 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] p-0.5">
                 {hostedServices.map((s, i) => (
@@ -267,7 +267,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                   ["Lodging", hostedService.expense_lodging],
                   ["Meals", hostedService.expense_meals],
                 ] as [string, string | null][]).filter(([, v]) => v).map(([label, v]) => (
-                  <span key={label} className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 text-[11px] text-[#0a2225]">
+                  <span key={label} className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] px-2.5 text-[12.5px] text-[#0a2225]">
                     <span className="text-[#0a2225]/60">{label}:</span>
                     <span className="font-medium">
                       {v === "traveler" ? "traveler covers" : v === "creator" ? "in the rate" : "each their own"}
@@ -284,7 +284,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
               {[
                 "Request your dates",
                 `${who} replies with a proposal`,
-                "Book \u2014 held in escrow until the trip",
+                "Book \u2014 paid direct to your Stripe account",
               ].map((s, i) => (
                 <p key={s} className="flex items-baseline gap-2 text-[13px] text-[#0a2225]/80">
                   <span className="font-secondary text-lg leading-none text-[#8D6B2F]">{i + 1}</span>
@@ -305,7 +305,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
             return (
               <div key={tierKey}>
                 {/* Tier header */}
-                <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">
+                <p className="mb-4 text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">
                   {config.label}
                 </p>
 
@@ -507,7 +507,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                   }`}
                 >
                   {t.tag && (
-                    <span className="absolute -top-3 left-6 bg-[#C7A962] text-[#0a2225] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                    <span className="absolute -top-3 left-6 bg-[#C7A962] text-[#0a2225] text-[12px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                       {t.tag}
                     </span>
                   )}
@@ -572,7 +572,7 @@ const TIERS = [
     features: [
       "Join travelers on their own trip as guide and creator",
       "You set a day rate; final total agreed by proposal",
-      "Escrow-protected \u2014 paid deposit up front, rest after the trip",
+      "Paid direct \u2014 deposit at booking, balance before departure",
     ],
   },
   {
