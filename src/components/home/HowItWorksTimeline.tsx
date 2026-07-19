@@ -21,7 +21,7 @@ export function HowItWorksTimeline() {
     {
       label: "Step 4",
       title: "You review, chat and book on Goldsainte",
-      body: "You compare proposals, chat with your team, and confirm the trip. Payments go through Goldsainte's escrow for added protection.",
+      body: "You compare proposals, chat with your team, and confirm the trip. You pay your specialist directly, secured by Stripe.",
     },
   ];
 
