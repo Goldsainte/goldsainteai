@@ -41,7 +41,7 @@ const SECTIONS = [
     eyebrow: "02 — Payments",
     title: "All payments stay on Goldsainte. No exceptions.",
     intro:
-      "Every booking made through Goldsainte is protected by our escrow payment system. Taking payments — or requesting payments — outside the platform eliminates all protections for both parties. This is one of our most enforced policies.",
+      "Every booking made through Goldsainte runs through our secure Stripe checkout — your specialist is the seller of record, with full payment records, dispute support, and Goldsainte behind every transaction. Taking payments — or requesting payments — outside the platform eliminates those protections for both parties. This is one of our most enforced policies.",
     allowed: [
       "Quoting, negotiating, and invoicing through the Goldsainte booking flow",
       "Referencing payment timelines and milestones within the platform chat",
@@ -188,7 +188,7 @@ function GuidelineSection({
           <div className="flex-shrink-0 w-10 h-10 rounded-sm bg-[#0c4d47]/10 flex items-center justify-center">
             <Icon className="h-5 w-5 text-[#0c4d47]" />
           </div>
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mt-0 md:mt-2">
+          <p className="text-[12px] uppercase tracking-[0.28em] text-[#C7A962] mt-0 md:mt-2">
             {section.eyebrow}
           </p>
         </div>
@@ -205,7 +205,7 @@ function GuidelineSection({
           <div className="grid sm:grid-cols-2 gap-5">
             {/* Allowed */}
             <div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[#0c4d47] mb-3 flex items-center gap-1.5">
+              <p className="text-[12px] uppercase tracking-[0.22em] text-[#0c4d47] mb-3 flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Allowed
               </p>
@@ -224,7 +224,7 @@ function GuidelineSection({
 
             {/* Prohibited */}
             <div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[#993c1d] mb-3 flex items-center gap-1.5">
+              <p className="text-[12px] uppercase tracking-[0.22em] text-[#993c1d] mb-3 flex items-center gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 Prohibited
               </p>
@@ -266,7 +266,7 @@ export default function CommunityGuidelines() {
 
         {/* ── HERO ── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-14 md:pb-20">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
+          <p className="text-[12px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
             Community Guidelines
           </p>
           <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] max-w-3xl mb-6">
@@ -293,7 +293,7 @@ export default function CommunityGuidelines() {
         {/* ── QUICK SUMMARY STRIP ── */}
         <div className="border-y border-[#E5DFC6] bg-white/60">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#0a2225]/40 mb-4">
+            <p className="text-[12px] uppercase tracking-[0.28em] text-[#0a2225]/40 mb-4">
               The short version
             </p>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -329,7 +329,7 @@ export default function CommunityGuidelines() {
         {/* ── ENFORCEMENT ── */}
         <section className="border-t border-[#E5DFC6] bg-white/60">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
+            <p className="text-[12px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
               Enforcement
             </p>
             <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-4 max-w-xl">
@@ -351,7 +351,7 @@ export default function CommunityGuidelines() {
                       style={{ background: tier.color }}
                     />
                     <p
-                      className="text-[11px] uppercase tracking-[0.2em] font-medium"
+                      className="text-[12.5px] uppercase tracking-[0.2em] font-medium"
                       style={{ color: tier.color }}
                     >
                       {tier.level}
@@ -374,7 +374,7 @@ export default function CommunityGuidelines() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
             <div className="grid md:grid-cols-12 gap-10">
               <div className="md:col-span-7 space-y-5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962]">
+                <p className="text-[12px] uppercase tracking-[0.28em] text-[#C7A962]">
                   Appeals &amp; reporting
                 </p>
                 <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">
@@ -393,14 +393,14 @@ export default function CommunityGuidelines() {
                 <div className="flex flex-wrap gap-3 pt-2">
                   <a
                     href="mailto:support@goldsainte.com"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-white text-[11px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] transition"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0c4d47] text-white text-[12.5px] uppercase tracking-[0.2em] hover:bg-[#0a3d39] transition"
                   >
                     <Flag className="h-3.5 w-3.5" />
                     Submit an appeal
                   </a>
                   <Link
                     to="/trust-safety"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[11px] uppercase tracking-[0.2em] hover:border-[#0c4d47] hover:text-[#0c4d47] transition"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#E5DFC6] text-[#0a2225] text-[12.5px] uppercase tracking-[0.2em] hover:border-[#0c4d47] hover:text-[#0c4d47] transition"
                   >
                     Trust &amp; Safety
                     <ArrowUpRight className="h-3.5 w-3.5" />
@@ -409,7 +409,7 @@ export default function CommunityGuidelines() {
               </div>
               <div className="md:col-span-5 md:pl-10 md:border-l border-[#E5DFC6] space-y-6 text-sm text-[#0a2225]/65 leading-relaxed">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
+                  <p className="text-[12px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
                     Appeals
                   </p>
                   <a
@@ -420,7 +420,7 @@ export default function CommunityGuidelines() {
                   </a>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
+                  <p className="text-[12px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
                     Urgent safety reports
                   </p>
                   <a
@@ -431,7 +431,7 @@ export default function CommunityGuidelines() {
                   </a>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
+                  <p className="text-[12px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
                     General support
                   </p>
                   <a
@@ -442,7 +442,7 @@ export default function CommunityGuidelines() {
                   </a>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
+                  <p className="text-[12px] uppercase tracking-[0.25em] text-[#C7A962] mb-2">
                     Last updated
                   </p>
                   <p>May 2026</p>
