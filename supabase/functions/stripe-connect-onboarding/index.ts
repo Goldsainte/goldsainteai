@@ -57,6 +57,15 @@ serve(async (req) => {
       apiVersion: "2024-06-20",
     });
 
+    // Country for the Stripe account (2026-07-19): global marketplace —
+    // fixed at creation, so it must arrive from the client. ISO-2; US default.
+    let reqBody: any = {};
+    try { reqBody = await req.json(); } catch { /* no body is fine */ }
+    const accountCountry =
+      typeof reqBody?.country === "string" && /^[A-Za-z]{2}$/.test(reqBody.country.trim())
+        ? reqBody.country.trim().toUpperCase()
+        : "US";
+
     // v3 (Jul 13): the Connect account id's ONE home is profiles.
     const { data: profileRow } = await supabaseClient
       .from('profiles')
@@ -69,7 +78,7 @@ serve(async (req) => {
     if (!accountId) {
       const account = await stripe.accounts.create({
         type: 'standard', // Standard (2026-07-19): agent is a fully independent merchant of record
-        country: 'US',
+        country: accountCountry,
         email: user.email,
         capabilities: {
           card_payments: { requested: true },
