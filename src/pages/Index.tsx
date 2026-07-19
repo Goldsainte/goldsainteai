@@ -71,10 +71,10 @@ export default function Index() {
   return (
     <>
       <Helmet>
-        <title>Goldsainte — Book Trips from Creators & Local Specialists</title>
+        <title>Goldsainte — Trips by Local Specialists, Inspired by Creators</title>
         <meta
           name="description"
-          content="Wherever you're dreaming of, someone who knows it is on Goldsainte. Browse trips, tours, and guides from creators and certified specialists — or post your Dream Trip and compare tailored proposals."
+          content="Wherever you're dreaming of, someone who knows it is on Goldsainte. Browse trips and tours from certified specialists, guides from the creators who inspired them — or post your Dream Trip and compare tailored proposals."
         />
       </Helmet>
 
