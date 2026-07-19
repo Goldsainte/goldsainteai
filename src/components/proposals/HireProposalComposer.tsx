@@ -21,7 +21,7 @@ import {
 
 const F =
   "w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] placeholder:text-[#0a2225]/35 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50";
-const EYEBROW = "text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]";
+const EYEBROW = "text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]";
 
 const HOSTING_OPTIONS = [
   "Traveling with you full-time",
@@ -427,7 +427,7 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
             {payout && (
               <p className="mt-3 text-[13px] text-[#0a2225]/70">
                 Your payout {"\u2248"} <span className="font-secondary text-[16px] text-[#8D6B2F]">${payout.toLocaleString()}</span>{" "}
-                after the 7% platform fee {"\u00b7"} held in escrow, released after the trip.
+                after the 7% platform fee {"\u00b7"} charged straight to your Stripe account.
               </p>
             )}
           </div>
@@ -437,7 +437,7 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
             {submitting ? "Sending\u2026" : "Send proposal"}
           </button>
           <p className="-mt-4 text-center text-[12px] text-[#0a2225]/55">
-            They accept and pay the deposit {"\u2014"} escrow-protected until the trip.
+            They accept and pay the deposit {"\u2014"} paid direct to your Stripe account.
           </p>
         </div>
       </div>
