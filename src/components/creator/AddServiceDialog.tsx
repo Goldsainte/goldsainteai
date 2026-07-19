@@ -229,7 +229,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const aiPanel = (target: string) =>
     aiTarget === target && aiVersions.length > 0 ? (
       <div className="mt-2 space-y-1.5">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-[#8D6B2F]">Tap one to use it</p>
+        <p className="text-[12.5px] uppercase tracking-[0.14em] text-[#8D6B2F]">Tap one to use it</p>
         {aiVersions.map((v, i) => (
           <button key={i} type="button" onClick={() => applySuggestion(v)}
             className="block w-full rounded-lg border border-[#E5DFC6] bg-white px-3 py-2 text-left text-sm leading-snug text-[#0a2225] transition-colors hover:border-[#C7A962] !min-h-0">
@@ -318,7 +318,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                       {i + 1}
                     </span>
                     <span
-                      className={`hidden truncate text-[10px] font-semibold uppercase tracking-[0.15em] sm:block ${
+                      className={`hidden truncate text-[12px] font-semibold uppercase tracking-[0.15em] sm:block ${
                         i === step ? "text-[#0a2225]" : "text-[#9CA3AF]"
                       }`}
                     >
@@ -327,7 +327,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   </div>
                 ))}
               </div>
-              <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-[#8D6B2F] sm:hidden">{STEPS[step]}</p>
+              <p className="mt-1 text-[12.5px] uppercase tracking-[0.15em] text-[#8D6B2F] sm:hidden">{STEPS[step]}</p>
             </div>
 
             <div className="space-y-4 pt-1">
@@ -441,7 +441,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   {tier === "on_trip" && (
                     <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4 space-y-2">
                       <p className="text-sm text-[#0a2225] font-medium">How On-Trip pricing works</p>
-                      <p className="text-xs text-[#6B7280]">Travelers hire you at your listed day rate. When a hire request arrives, you reply in Messages and send a proposal with the final total — day rate × trip days, and whether the traveler covers your travel and lodging (say so in your description). Payment goes through Goldsainte escrow: deposit at booking, the rest released after the trip.</p>
+                      <p className="text-xs text-[#6B7280]">Travelers hire you at your listed day rate. When a hire request arrives, you reply in Messages and send a proposal with the final total — day rate × trip days, and whether the traveler covers your travel and lodging (say so in your description). Payment runs through Goldsainte's Stripe checkout, charged straight to your own Stripe account: deposit at booking, balance before departure.</p>
                     </div>
                   )}
                   {!isItineraryTier && tier !== "add_on" && tier !== "on_trip" && (
