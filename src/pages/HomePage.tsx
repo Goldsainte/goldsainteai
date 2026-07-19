@@ -5,7 +5,7 @@ import { EarnSection } from "@/components/home/EarnSection";
 import { lazy, Suspense } from "react";
 const PlatformDemoSection = lazy(() => import("@/components/home/PlatformDemoSection"));
 import { OneConversationSection } from "@/components/home/OneConversationSection";
-import { CreatorShowcaseSection } from "@/components/home/CreatorShowcaseSection";
+const CreatorShowcaseSection = lazy(() => import("@/components/home/CreatorShowcaseSection").then(m => ({ default: m.CreatorShowcaseSection })));
 import { TrustPlaque } from "@/components/home/TrustPlaque";
 import { FinalCTABand } from "@/components/home/FinalCTABand";
 
@@ -16,7 +16,9 @@ export default function HomePage() {
       <StatsStrip />
       <OneConversationSection />
       <DreamTripBand />
-      <CreatorShowcaseSection />
+      <Suspense fallback={null}>
+        <CreatorShowcaseSection />
+      </Suspense>
       <Suspense fallback={null}>
         <PlatformDemoSection />
       </Suspense>
