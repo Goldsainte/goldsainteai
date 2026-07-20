@@ -65,9 +65,12 @@ const CAL = [
 const SCENE_IMG = [positano, overwater, amalfi, bali, desert];
 
 function SceneChip({ children }: { children: React.ReactNode }) {
-  // Solid dark pill — headings never get lost behind photography.
+  // Inline pill that flows at the TOP of the scene-content column (not
+  // absolutely positioned over the middle of the photo). Sits inside the
+  // existing top gradient scrim, so on mobile it never overlaps the image
+  // focal point or the scene title/stat below it.
   return (
-    <span className="absolute left-6 top-5 z-20 inline-flex items-center rounded-full bg-[#061a18]/85 px-3.5 py-1.5 text-[12px] uppercase tracking-[0.2em] text-[#C7A962] backdrop-blur-sm">
+    <span className="mb-3 inline-flex w-fit items-center rounded-full bg-[#061a18]/85 px-3.5 py-1.5 text-[12px] uppercase tracking-[0.2em] text-[#C7A962] backdrop-blur-sm">
       {children}
     </span>
   );
