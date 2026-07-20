@@ -127,7 +127,7 @@ export default function PartnerBookingDetailPage() {
     const ok = await confirmDialog({
       title: "Request payment release?",
       description:
-        "Goldsainte holds trip funds in escrow. This notifies your traveler and Goldsainte that you're ready — share your confirmed reservations with them in Messages and they release your deposit as working capital; when the trip is complete they confirm it to release the final payment.",
+        "For bookings paid on the legacy platform-held flow, this notifies your traveler and Goldsainte that you're ready — share your confirmed reservations in Messages and they release your deposit; on completion they confirm to release the final payment. New bookings are charged directly on your Stripe account and don't need a release.",
       confirmText: "Send request",
     });
     if (!ok) return;
@@ -191,9 +191,9 @@ export default function PartnerBookingDetailPage() {
   const journeyLabel = released
     ? "Deposit released — booking complete"
     : balancePaid
-      ? "Paid in full — funds in escrow"
+      ? "Paid in full"
       : depositPaid
-        ? "Deposit in escrow — balance pending"
+        ? "Deposit paid — balance pending"
         : "Awaiting deposit";
 
   const fmt = (d?: string | null) =>
@@ -304,7 +304,7 @@ export default function PartnerBookingDetailPage() {
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Payment</p>
           <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
-            Escrow & payout
+            Payments
           </h2>
           <div className="mt-5 divide-y divide-[#0a2225]/8">
             <div className="flex items-baseline justify-between py-3">
@@ -331,9 +331,10 @@ export default function PartnerBookingDetailPage() {
             </div>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-[#0a2225]/45">
-            Traveler funds are held in escrow and released on milestones — your traveler
-            releases your deposit as working capital once you share confirmed reservations,
-            and the balance when they confirm the trip. Flat 3.5% on each side.
+            On the current model, traveler payments are charged directly on your own
+            Stripe account the moment they pay — deposit and balance alike. Older
+            platform-held bookings release on milestones once your traveler confirms.
+            Flat 3.5% on each side.
           </p>
         </div>
 
