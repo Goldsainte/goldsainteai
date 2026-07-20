@@ -14,10 +14,10 @@ export const DisputeOpenedEmail = ({ disputeId, disputeOpenedBy, tripName }: Pro
     title={"A dispute has been opened"}
     headline={`A dispute has been opened.`}
     tagline={`Goldsainte has formally opened a dispute case.`}
-    lede={`A dispute regarding ${tripName ?? ""} has been opened by ${disputeOpenedBy ?? ""}. Funds in escrow are paused while our concierge team reviews the case. Both parties will be contacted shortly.`}
+    lede={`A dispute regarding ${tripName ?? ""} has been opened by ${disputeOpenedBy ?? ""}. Payments related to this booking are paused while our concierge team reviews the case. Both parties will be contacted shortly.`}
     steps={[
     `Our concierge team has been notified and will review the case.`,
-    `Funds in escrow are paused pending resolution.`,
+    `Payments are paused pending resolution.`,
     `Both parties may submit supporting documentation.`,
     `Resolution typically occurs within 5–10 business days.`,
     `All comms regarding the dispute must remain on-platform.`
