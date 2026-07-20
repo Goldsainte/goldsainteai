@@ -76,9 +76,21 @@ Deno.serve(async (req) => {
     // Resolve the recipient's Stripe account and verify it can accept charges.
     const { data: recipient } = await supabase
       .from("profiles")
-      .select("stripe_account_id, stripe_connect_account_id, display_name, full_name")
+      .select("stripe_account_id, stripe_connect_account_id, display_name, full_name, accepts_tips")
       .eq("id", recipientId)
       .maybeSingle();
+
+    // Opt-out: the recipient turned tips off.
+    if ((recipient as any)?.accepts_tips === false) {
+      return json(
+        cors,
+        {
+          error: "This person isn't accepting tips right now.",
+          code: "TIPS_DISABLED",
+        },
+        409
+      );
+    }
 
     const acctId =
       (recipient as any)?.stripe_account_id ||
@@ -90,7 +102,7 @@ Deno.serve(async (req) => {
         cors,
         {
           error:
-            "This person isn't set up to receive tips yet. Once they activate payments, you'll be able to send one.",
+            "This creator or agent will need to activate their tip functionality before they can accept tips. Check back soon!",
           code: "RECIPIENT_NOT_READY",
         },
         409
@@ -109,7 +121,7 @@ Deno.serve(async (req) => {
         cors,
         {
           error:
-            "This person's payment account isn't active yet, so tips can't be sent right now.",
+            "This creator or agent will need to activate their tip functionality before they can accept tips. Check back soon!",
           code: "RECIPIENT_NOT_READY",
         },
         409
