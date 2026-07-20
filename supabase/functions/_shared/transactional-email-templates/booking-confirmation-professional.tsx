@@ -13,12 +13,12 @@ export const BookingConfirmationProfessionalEmail = ({ bookingId, travelerName, 
   <AuthEmailLayout
     title={"New booking confirmed"}
     headline={`A new booking is confirmed.`}
-    tagline={`Funds are held in escrow. Begin coordination at your convenience.`}
-    lede={`${travelerName ?? ""} has confirmed their booking for ${tripName ?? ""}. The contract is in effect and the first milestone payment has been escrowed.`}
+    tagline={`Payment received. Begin coordination at your convenience.`}
+    lede={`${travelerName ?? ""} has confirmed their booking for ${tripName ?? ""}. The contract is in effect and the deposit has been paid to your Stripe account.`}
     steps={[
     `Review the contract and traveler details in your dashboard.`,
     `Begin on-platform coordination with the traveler.`,
-    `Hit each milestone — funds release on completion.`,
+    `The balance is paid before departure, straight to your account.`,
     `Payouts settle to your connected Stripe account.`,
     `Communication and payment must remain on-platform.`
   ]}
