@@ -43,6 +43,7 @@ export default function AgentSettingsPage() {
     instagram_handle: "",
     agency_name: "",
     country: "",
+    accepts_tips: true,
     story: "",
     travel_style: "",
     destinations: "",
@@ -68,7 +69,7 @@ export default function AgentSettingsPage() {
       const [{ data: p }, { data: a }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("display_name, full_name, location, avatar_url, instagram_handle, bio")
+          .select("display_name, full_name, location, avatar_url, instagram_handle, bio, accepts_tips")
           .eq("id", user.id)
           .maybeSingle(),
         supabase
@@ -86,6 +87,7 @@ export default function AgentSettingsPage() {
         instagram_handle: p?.instagram_handle || "",
         agency_name: a?.agency_name || "",
         country: (a as any)?.country || "",
+        accepts_tips: (p as any)?.accepts_tips ?? true,
         story: a?.bio || p?.bio || "",
         travel_style: a?.travel_style || "",
         destinations: (a?.destinations || []).join(", "),
@@ -143,6 +145,7 @@ export default function AgentSettingsPage() {
           location: form.location.trim() || null,
           avatar_url: form.avatar_url || null,
           instagram_handle: form.instagram_handle.replace(/^@/, "").trim() || null,
+          accepts_tips: form.accepts_tips,
         })
         .eq("id", user.id)
         .select("id");
@@ -293,6 +296,19 @@ export default function AgentSettingsPage() {
                   ))}
                 </select>
                 <p className={hint}>Where you're authorized to sell travel — shown on your profile and trip listings.</p>
+              </div>
+              <div>
+                <label className={label}>Tips</label>
+                <label className="mt-2 flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.accepts_tips}
+                    onChange={(e) => setForm((f) => ({ ...f, accepts_tips: e.target.checked }))}
+                    className="h-4 w-4 accent-[#0C4D47]"
+                  />
+                  <span className="text-sm text-[#0a2225]">Allow travelers to tip me</span>
+                </label>
+                <p className={hint}>A tip button shows on your public profile. Turn this off to hide it.</p>
               </div>
               <div>
                 <label className={label}>Trips starting at ($/night)</label>
