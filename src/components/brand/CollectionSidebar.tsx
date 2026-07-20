@@ -21,7 +21,7 @@ export function CollectionSidebar({
         <div className="space-y-3">
           {startingPriceLabel && (
             <div>
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#A4987C]">
+              <p className="text-[12.5px] uppercase tracking-[0.16em] text-[#A4987C]">
                 Starting from
               </p>
               <p className="mt-1 text-base font-medium text-[#0a2225]">
@@ -31,7 +31,7 @@ export function CollectionSidebar({
           )}
 
           <div>
-            <p className="text-[11px] text-[#8C8470]">
+            <p className="text-[12.5px] text-[#8C8470]">
               Hosted by <span className="font-medium text-[#0a2225]">{brandName}</span>
             </p>
           </div>
@@ -44,7 +44,7 @@ export function CollectionSidebar({
           </Button>
         </div>
 
-        <p className="mt-3 text-[11px] text-[#8A806B]">
+        <p className="mt-3 text-[12.5px] text-[#8A806B]">
           You'll be matched with creators & travel designers aligned with this
           brand's aesthetic.
         </p>
@@ -63,19 +63,19 @@ export function CollectionSidebar({
           </li>
           <li>
             You review tailored proposals, refine details in chat and book
-            securely via escrow.
+            securely through Stripe.
           </li>
         </ol>
       </div>
 
       {/* Trust & safety */}
       <div className="rounded-[20px] border border-[#E5DFC6] bg-[#FDFBF5] px-4 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A4987C]">
+        <p className="text-[12.5px] font-semibold uppercase tracking-[0.16em] text-[#A4987C]">
           Trust & safety
         </p>
         <ul className="mt-2 space-y-1 text-[12px] text-[#6E6650]">
           <li>✓ Verified brand partners & identity-checked professionals</li>
-          <li>✓ Escrowed payments with post-trip protection window</li>
+          <li>✓ Secure payments with campaign protection</li>
           <li>✓ Messaging and approvals stay inside Goldsainte</li>
         </ul>
       </div>
