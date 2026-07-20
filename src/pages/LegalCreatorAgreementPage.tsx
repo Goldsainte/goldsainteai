@@ -41,7 +41,7 @@ export default function LegalCreatorAgreementPage() {
         <Handshake className="h-4 w-4" />
         <AlertDescription className="text-sm">
           This Creator Partnership Agreement governs the relationship between you and Goldsainte AI, Inc.
-          when you publish content, packaged trips, itinerary guides, or custom services on the Goldsainte
+          when you publish content, itinerary guides, or custom services on the Goldsainte
           marketplace. By creating a Creator account, you accept these terms.
         </AlertDescription>
       </Alert>
