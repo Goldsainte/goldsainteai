@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+  const [tips, setTips] = useState<TipsSnapshot | null>(null);
 import { Link } from "react-router-dom";
 import { ArrowRight, AlertCircle } from "lucide-react";
 import {
   getPartnerBookingEarnings,
   type PartnerEarningSnapshot,
+  getMyTips,
+  type TipsSnapshot,
 } from "@/services/earningsService";
 import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 
@@ -37,6 +40,15 @@ export function CreatorEarningsTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    getMyTips()
+      .then((t) => { if (!cancelled) setTips(t); })
+      .catch(() => { /* tips are best-effort; ignore */ });
+    return () => { cancelled = true; };
+  }, []);
+
+
   const currency = snapshot?.currency || "USD";
   const total = (snapshot?.pending || 0) + (snapshot?.released || 0);
 
@@ -69,6 +81,31 @@ export function CreatorEarningsTab() {
           highlight
         />
       </div>
+
+      {/* Tips */}
+      {tips && tips.count > 0 && (
+        <div className="border-t border-[#0a2225]/15 pt-6 space-y-4">
+          <div className="flex items-baseline justify-between">
+            <h3 className="font-secondary text-[22px] text-[#0a2225]">Tips</h3>
+            <p className="text-[15px] text-[#0a2225]/55">
+              {formatMoney(tips.totalNetCents / 100, tips.currency)} from {tips.count} tip{tips.count === 1 ? "" : "s"}
+            </p>
+          </div>
+          <div className="space-y-2">
+            {tips.recent.map((t) => (
+              <div key={t.id} className="flex items-center justify-between rounded-xl bg-[#FDF9F0] px-4 py-3">
+                <div className="min-w-0">
+                  <p className="font-medium text-[#0a2225]">{formatMoney(t.net_cents / 100, t.currency)}</p>
+                  {t.note && <p className="truncate text-[13px] text-[#0a2225]/55">"{t.note}"</p>}
+                </div>
+                <p className="shrink-0 text-[13px] text-[#0a2225]/45">
+                  {new Date(t.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Booking payouts */}
       <div className="border-t border-[#0a2225]/15 pt-6 space-y-4">
