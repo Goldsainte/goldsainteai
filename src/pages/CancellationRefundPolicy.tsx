@@ -42,7 +42,7 @@ const SECTIONS = [
       {
         num: "02",
         title: "Travel professional's policies",
-        desc: "The agent or creator you book with sets their own cancellation, deposit, and refund terms in the proposal. These are agreed to when you confirm the booking.",
+        desc: "The independent travel agent or agency you book with sets their own cancellation, deposit, and refund terms in the proposal. These are agreed to when you confirm the booking.",
       },
       {
         num: "03",
@@ -117,11 +117,11 @@ const SECTIONS = [
     icon: Scale,
     eyebrow: "06 — Disputes",
     title: "If something goes wrong, file a claim from your booking page.",
-    body: "Goldsainte is not responsible for the acts, errors, or omissions of independent travel professionals or suppliers. However, if you have a dispute, our team reviews evidence from both parties and aims to issue a binding decision within 7 business days.",
+    body: "Goldsainte is not responsible for the acts, errors, or omissions of independent travel professionals or suppliers. If you have a dispute, our team administers the platform dispute process: we review evidence from both parties and aim to resolve platform-level issues within 7 business days. Goldsainte does not modify supplier terms or assume the seller's obligations under your travel-services agreement, and formal legal rights remain available to both parties.",
     points: [
       "File a claim directly from your booking page",
       "Our team reviews on-platform messages, documents, and payment records",
-      "We aim to issue a binding decision within 7 business days",
+      "We aim to resolve platform-level disputes within 7 business days",
       "Escalation path to senior review available if needed",
     ],
     cta: { label: "View full dispute process", to: "/trust-safety" },
