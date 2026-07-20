@@ -38,17 +38,21 @@ export function AsFeaturedIn() {
         </span>
         <span aria-hidden="true" className="mx-auto mt-3.5 block h-px w-12 bg-[#C7A962]" />
 
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-x-10 gap-y-7 md:gap-x-14 md:gap-y-8">
+        {/* Fixed grid, not flex-wrap: 2 cols on mobile, 4 on md, 8 on lg —
+            every logo gets an equal centered cell, so 8 logos stack in clean
+            symmetric rows instead of ragged wrapping. */}
+        <div className="mx-auto mt-9 grid max-w-4xl grid-cols-2 items-center gap-x-6 gap-y-9 sm:grid-cols-4 md:gap-x-10 md:gap-y-10 lg:grid-cols-8 lg:gap-x-8">
           {OUTLETS.map((o) => (
-            <img
-              key={o.alt}
-              src={o.src}
-              alt={o.alt}
-              loading="lazy"
-              decoding="async"
-              style={{ height: o.h }}
-              className="w-auto opacity-70 grayscale transition-all duration-300 hover:opacity-100 md:opacity-60"
-            />
+            <div key={o.alt} className="flex items-center justify-center">
+              <img
+                src={o.src}
+                alt={o.alt}
+                loading="lazy"
+                decoding="async"
+                style={{ height: o.h }}
+                className="w-auto max-w-full opacity-70 grayscale transition-all duration-300 hover:opacity-100 md:opacity-60"
+              />
+            </div>
           ))}
         </div>
       </div>
