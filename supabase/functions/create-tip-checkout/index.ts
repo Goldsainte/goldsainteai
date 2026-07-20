@@ -144,16 +144,21 @@ Deno.serve(async (req) => {
           application_fee_amount: applicationFeeCents,
           description: `Goldsainte tip for ${recipientName}`,
           metadata: {
-            kind: "tip",
+            type: "tip",
             recipient_id: recipientId,
             ...(tipperId ? { tipper_id: tipperId } : {}),
             stripe_account: acctId,
           },
         },
         metadata: {
-          kind: "tip",
+          type: "tip",
           recipient_id: recipientId,
           ...(tipperId ? { tipper_id: tipperId } : {}),
+          amount_cents: String(amountCents),
+          platform_fee_cents: String(applicationFeeCents),
+          net_cents: String(amountCents - applicationFeeCents),
+          stripe_account: acctId,
+          ...(note ? { note } : {}),
         },
         success_url:
           successUrl || `${origin}/creators/${recipientId}?tip=success`,
