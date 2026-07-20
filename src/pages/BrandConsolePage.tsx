@@ -217,7 +217,7 @@ export default function BrandConsolePage() {
             </div>
           ) : !profile ? (
             <div className="mx-auto max-w-md rounded-2xl bg-white px-8 py-12 text-center shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
-              <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Maison</p>
+              <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Maison</p>
               <h1 className="mt-3 font-secondary text-[28px] text-[#0a2225]">Set up your house</h1>
               <p className="mt-3 text-[14.5px] leading-relaxed text-[#0a2225]/55">
                 Tell us about your operation and we'll open your storefront on Goldsainte.
@@ -233,7 +233,7 @@ export default function BrandConsolePage() {
           ) : (
             <>
               {/* ── The Maison ── */}
-              <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Maison</p>
+              <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Maison</p>
               <div className="mt-2 flex flex-wrap items-start justify-between gap-6">
                 <div className="max-w-xl">
                   <div className="flex items-center gap-4">
@@ -256,12 +256,12 @@ export default function BrandConsolePage() {
                   </p>
                   <div className="mt-5 flex flex-wrap gap-2.5">
                     {(profile.categories ?? []).slice(0, 3).map((c) => (
-                      <span key={c} className="inline-flex items-center rounded-full border border-[#C7A962] px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#8D6B2F]">
+                      <span key={c} className="inline-flex items-center rounded-full border border-[#C7A962] px-4 py-2 text-[12.5px] uppercase tracking-[0.16em] text-[#8D6B2F]">
                         {c}
                       </span>
                     ))}
                     {(profile.regions ?? []).slice(0, 2).map((r) => (
-                      <span key={r} className="inline-flex items-center rounded-full border border-[#0a2225]/18 px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#0a2225]/60">
+                      <span key={r} className="inline-flex items-center rounded-full border border-[#0a2225]/18 px-4 py-2 text-[12.5px] uppercase tracking-[0.16em] text-[#0a2225]/60">
                         {r}
                       </span>
                     ))}
@@ -285,7 +285,7 @@ export default function BrandConsolePage() {
                   { k: "Trip inquiries", v: totals.tripInquiries, l: "Last 30 days" },
                 ].map((x) => (
                   <div key={x.k} className="rounded-2xl bg-white px-5 py-5 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/50">{x.k}</p>
+                    <p className="text-[12px] uppercase tracking-[0.2em] text-[#0a2225]/50">{x.k}</p>
                     <p className="mt-1.5 font-secondary text-[30px] leading-none text-[#0a2225]">{x.v}</p>
                     <p className="mt-2 text-[11.5px] text-[#0a2225]/45">{x.l}</p>
                   </div>
@@ -303,7 +303,7 @@ export default function BrandConsolePage() {
               {activeTab === "house" && (
                 <div>
                   <div className="border-b border-[#0a2225]/10 pb-16 pt-10">
-                    <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
+                    <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
                     <h2 className="mt-4 max-w-3xl font-secondary text-[42px] leading-[1.08] text-[#0a2225] md:text-[56px]">
                       Be found by the people building&nbsp;trips.
                     </h2>
@@ -338,7 +338,7 @@ export default function BrandConsolePage() {
                   </div>
 
                   <div className="border-b border-[#0a2225]/10 py-16">
-                    <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">
+                    <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">
                       How Goldsainte works for operators
                     </p>
                     <h2 className="mt-3 font-secondary text-[38px] text-[#0a2225]">Two ways to grow</h2>
@@ -357,7 +357,7 @@ export default function BrandConsolePage() {
                         <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">Partner on bookings</h3>
                         <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
                           <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>When an agent builds your experience into a client's journey, the booking runs through Goldsainte.</p>
-                          <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>Funds are held in escrow, protected by a signed contract, until milestones complete.</p>
+                          <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>Payments are held securely and protected by a signed contract until campaign milestones complete.</p>
                           <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>You're paid your price — Goldsainte's take is flat and transparent.</p>
                         </div>
                       </div>
@@ -366,18 +366,18 @@ export default function BrandConsolePage() {
 
                   <div className="grid items-center gap-10 py-14 md:grid-cols-[1fr_auto]">
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
+                      <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
                       <p className="mt-4 max-w-2xl text-[16px] leading-[1.7] text-[#0a2225]/80">
                         You set your price — your costs and your margin are yours to build in.
                         Travelers pay a 3.5% service fee on top; a matching 3.5% platform fee comes
                         out of the payout. That is Goldsainte's entire take: 7% total, flat, on
-                        every booking. Every payment is held in escrow — protected by a signed
-                        contract — and releases as milestones complete.
+                        every booking. Every payment is held securely — protected by a signed
+                        contract — and releases as campaign milestones complete.
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-secondary text-[58px] leading-none text-[#0a2225]">7%</p>
-                      <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-[#0a2225]/50">Total · 3.5 + 3.5</p>
+                      <p className="mt-2 text-[12px] uppercase tracking-[0.24em] text-[#0a2225]/50">Total · 3.5 + 3.5</p>
                     </div>
                   </div>
                 </div>
@@ -426,7 +426,7 @@ export default function BrandConsolePage() {
                         <p className="mt-4 text-[14.5px] leading-relaxed text-[#0a2225]/80">{inq.message}</p>
                         {drafts[inq.id] && (
                           <div className="mt-4 rounded-xl border border-[#E5DFC6] bg-[#fdfaf2] p-4">
-                            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Suggested reply</p>
+                            <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Suggested reply</p>
                             <p className="mt-2 whitespace-pre-wrap text-[14px] leading-relaxed text-[#0a2225]/80">{drafts[inq.id]}</p>
                             <button
                               type="button"
@@ -445,14 +445,14 @@ export default function BrandConsolePage() {
                             type="button"
                             disabled={draftingId === inq.id}
                             onClick={() => draftReply(inq)}
-                            className="rounded-full border border-[#C7A962]/50 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/10 disabled:opacity-50"
+                            className="rounded-full border border-[#C7A962]/50 px-4 py-2 text-[12.5px] font-medium uppercase tracking-[0.12em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/10 disabled:opacity-50"
                           >
                             {draftingId === inq.id ? "Drafting…" : "Draft reply with AI"}
                           </button>
                           <button
                             type="button"
                             onClick={() => navigate("/messages")}
-                            className="rounded-full border border-[#0a2225]/20 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/70 transition-colors hover:bg-[#f7f3ea]"
+                            className="rounded-full border border-[#0a2225]/20 px-4 py-2 text-[12.5px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/70 transition-colors hover:bg-[#f7f3ea]"
                           >
                             Reply in Messages
                           </button>
@@ -460,7 +460,7 @@ export default function BrandConsolePage() {
                             <button
                               type="button"
                               onClick={() => markReplied(inq.id)}
-                              className="rounded-full bg-[#0c4d47] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                              className="rounded-full bg-[#0c4d47] px-4 py-2 text-[12.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
                             >
                               Mark replied
                             </button>
@@ -491,10 +491,10 @@ export default function BrandConsolePage() {
                     </CardContent>
                   </Card>
                   <section className="space-y-3 rounded-2xl bg-white px-6 py-6 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
-                    <h2 className="text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                    <h2 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                       How Goldsainte AI sees your house
                     </h2>
-                    <div className="flex flex-wrap gap-2 text-[11px]">
+                    <div className="flex flex-wrap gap-2 text-[12.5px]">
                       {(profile.categories ?? []).map((c) => (
                         <span key={c} className="rounded-full border border-[#C7A962]/60 px-3 py-1 uppercase tracking-wide text-[#8D6B2F]">{c}</span>
                       ))}
@@ -529,14 +529,14 @@ interface MetricCardProps {
 function MetricCard({ label, value, helper }: MetricCardProps) {
   return (
     <div className="rounded-2xl border border-[#E5DFC6] bg-white px-4 py-3">
-      <p className="text-[11px] uppercase tracking-wide text-[#7A7151]">
+      <p className="text-[12.5px] uppercase tracking-wide text-[#7A7151]">
         {label}
       </p>
       <p className="mt-1 text-xl font-semibold text-[#0a2225]">
         {value}
       </p>
       {helper && (
-        <p className="mt-1 text-[11px] text-[#8C8470]">
+        <p className="mt-1 text-[12.5px] text-[#8C8470]">
           {helper}
         </p>
       )}
@@ -797,7 +797,7 @@ function CollectionsSection({ brandProfileId }: { brandProfileId: string }) {
                           className="h-full w-full object-cover"
                         loading="lazy"/>
                       ) : (
-                        <div className="flex h-full w-full flex-col items-center justify-center text-[10px] text-[#0a2225]">
+                        <div className="flex h-full w-full flex-col items-center justify-center text-[12px] text-[#0a2225]">
                           <ImageIcon className="mb-1 h-4 w-4" />
                           No cover
                         </div>
@@ -826,7 +826,7 @@ function CollectionsSection({ brandProfileId }: { brandProfileId: string }) {
                         }
                       />
                       <Textarea
-                        className="h-16 text-[11px]"
+                        className="h-16 text-[12.5px]"
                         value={c.description ?? ""}
                         placeholder="Short description (optional)"
                         onChange={(e) =>
@@ -840,7 +840,7 @@ function CollectionsSection({ brandProfileId }: { brandProfileId: string }) {
                     <div className="flex flex-col items-end gap-2">
                       {/* Publish toggle */}
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] uppercase tracking-wide text-[#7A7151]">
+                        <span className="text-[12px] uppercase tracking-wide text-[#7A7151]">
                           {c.is_published ? "Published" : "Draft"}
                         </span>
                         <Checkbox
