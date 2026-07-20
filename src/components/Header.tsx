@@ -640,7 +640,7 @@ export const Header = () => {
                     <DropdownMenuItem onClick={() => navigate('/apply/agent')} className="cursor-pointer px-4 py-3">
                       <div>
                         <p className="text-sm font-medium text-[#0a2225]">Become an Agent</p>
-                        <p className="text-xs text-[#6B7280]">Sell trips and guides on Goldsainte</p>
+                        <p className="text-xs text-[#6B7280]">Design and sell trips as the seller of record</p>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/apply/tour-operator')} className="cursor-pointer px-4 py-3">
