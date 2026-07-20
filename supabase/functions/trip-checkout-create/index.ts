@@ -298,8 +298,21 @@ Deno.serve(async (req) => {
           );
         }
       } else if (!partnerId) {
+        // Goldsainte Concierge (partnerless) inventory is INQUIRY-ONLY.
+        // Goldsainte is not the seller of travel, so it must never be the
+        // merchant of record on a trip. These trips are lead-gen: an inquiry
+        // routes to an independent agent who becomes the seller. Refuse any
+        // attempt to charge a partnerless trip, regardless of surface.
         console.warn(
-          `[trip-checkout-create] PLATFORM-SELLER booking ${tripBookingId} (no partner_id) — platform is merchant of record; retire this inventory or assign an agent.`
+          `[trip-checkout-create] Refused partnerless (Concierge) checkout ${tripBookingId} — inquiry-only, Goldsainte is not a seller of travel.`
+        );
+        return new Response(
+          JSON.stringify({
+            error:
+              "This is a Goldsainte Concierge trip and isn't purchased directly. Use \u201cRequest this trip\u201d and we\u2019ll connect you with a travel agent in your area who can book it for you.",
+            code: "CONCIERGE_INQUIRY_ONLY",
+          }),
+          { status: 409, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
         );
       }
     }
