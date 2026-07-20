@@ -277,7 +277,7 @@ export function TripRequestModal({
               <Info className="h-4 w-4 text-[#7A7151]" />
               <AlertDescription className="text-[11px] text-[#4a4a4a]">
                 Goldsainte is a curated marketplace connecting travelers with certified travel 
-                professionals. Your trip will be fulfilled by the travel agent or creator who 
+                professionals. Your trip will be fulfilled by the independent travel agent or agency who 
                 accepts your request, not by Goldsainte directly.
               </AlertDescription>
             </Alert>
