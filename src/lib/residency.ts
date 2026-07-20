@@ -82,3 +82,46 @@ export const US_RESIDENCE_OPTIONS: { code: string; name: string }[] = [
   { code: "WY", name: "Wyoming" },
   { code: "INTL", name: "Outside the United States" },
 ];
+
+// ---------------------------------------------------------------------------
+// WORLD COUNTRIES (2026-07-19): agents are a global marketplace — their
+// country of operation is captured at application and shown on their public
+// profile and on every trip listing (seller-of-record identification).
+// This is the seller's home country, distinct from `destinations` (where
+// they sell) and from residency (traveler-side SOT gating above).
+// ---------------------------------------------------------------------------
+export const WORLD_COUNTRIES: { code: string; name: string }[] = [
+  { code: "US", name: "United States" }, { code: "GB", name: "United Kingdom" },
+  { code: "CA", name: "Canada" }, { code: "AU", name: "Australia" },
+  { code: "NZ", name: "New Zealand" }, { code: "IE", name: "Ireland" },
+  { code: "FR", name: "France" }, { code: "DE", name: "Germany" },
+  { code: "ES", name: "Spain" }, { code: "PT", name: "Portugal" },
+  { code: "IT", name: "Italy" }, { code: "NL", name: "Netherlands" },
+  { code: "BE", name: "Belgium" }, { code: "CH", name: "Switzerland" },
+  { code: "AT", name: "Austria" }, { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" }, { code: "DK", name: "Denmark" },
+  { code: "FI", name: "Finland" }, { code: "PL", name: "Poland" },
+  { code: "CZ", name: "Czechia" }, { code: "GR", name: "Greece" },
+  { code: "HR", name: "Croatia" }, { code: "RO", name: "Romania" },
+  { code: "HU", name: "Hungary" }, { code: "MX", name: "Mexico" },
+  { code: "BR", name: "Brazil" }, { code: "AR", name: "Argentina" },
+  { code: "CL", name: "Chile" }, { code: "CO", name: "Colombia" },
+  { code: "PE", name: "Peru" }, { code: "CR", name: "Costa Rica" },
+  { code: "JP", name: "Japan" }, { code: "SG", name: "Singapore" },
+  { code: "HK", name: "Hong Kong" }, { code: "TH", name: "Thailand" },
+  { code: "MY", name: "Malaysia" }, { code: "ID", name: "Indonesia" },
+  { code: "PH", name: "Philippines" }, { code: "VN", name: "Vietnam" },
+  { code: "IN", name: "India" }, { code: "AE", name: "United Arab Emirates" },
+  { code: "SA", name: "Saudi Arabia" }, { code: "IL", name: "Israel" },
+  { code: "TR", name: "Türkiye" }, { code: "ZA", name: "South Africa" },
+  { code: "KE", name: "Kenya" }, { code: "MA", name: "Morocco" },
+  { code: "EG", name: "Egypt" }, { code: "TZ", name: "Tanzania" },
+  { code: "KR", name: "South Korea" }, { code: "TW", name: "Taiwan" },
+  { code: "OTHER", name: "Other" },
+];
+
+export function countryName(code?: string | null): string | null {
+  if (!code) return null;
+  const hit = WORLD_COUNTRIES.find((c) => c.code === code.trim().toUpperCase());
+  return hit ? hit.name : code;
+}
