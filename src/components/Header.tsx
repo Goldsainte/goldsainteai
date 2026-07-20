@@ -205,14 +205,9 @@ export const Header = () => {
                        <NotificationBell />
                     </>
                   )}
-                  {!user && (
-                    <Button
-                      onClick={() => navigate('/auth?mode=signup')}
-                      className="rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] h-10 px-4 text-xs font-semibold"
-                    >
-                      Get Started
-                    </Button>
-                  )}
+                  {/* Get Started removed on mobile — the hero CTA + bottom
+                      nav carry signup; header stays clean. Sign-in lives in
+                      the mobile menu below. */}
 
                   {/* Unified Profile Menu - Mobile */}
                   <DropdownMenu>
@@ -264,7 +259,7 @@ export const Header = () => {
                           <div className="pb-1 pt-1">
                             <p className="px-6 pb-1 pt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#BFAD72]">My Travel</p>
                             {/* — Traveling — */}
-                            <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Traveling</div>
+                            <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Traveling</div>
                             <DropdownMenuItem
                               onClick={() => navigate(primaryBookingsPath)}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -311,7 +306,7 @@ export const Header = () => {
                               <div className="relative flex-shrink-0">
                                 <MessageCircle className="h-5 w-5 text-[#0a2225]" />
                                 {unreadMessageCount > 0 && (
-                                  <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-[#0c4d47] text-[9px] font-bold text-[#fdfaf2] flex items-center justify-center px-1">
+                                  <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-[#0c4d47] text-[12px] font-bold text-[#fdfaf2] flex items-center justify-center px-1">
                                     {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
                                   </span>
                                 )}
@@ -321,7 +316,7 @@ export const Header = () => {
                           </div>
 
                           {(isAgentAccount || isCreator || isAdmin || isBrand) && (
-                            <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
+                            <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
                           )}
                             {isCreator && (
                               <DropdownMenuItem
@@ -400,7 +395,7 @@ export const Header = () => {
 
                           {/* Account */}
                           <div className="py-2">
-                            <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Account</div>
+                            <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Account</div>
                             <DropdownMenuItem
                               onClick={() => navigate(getProfilePath())}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
@@ -712,7 +707,7 @@ export const Header = () => {
                             <Users className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
                             <span className="text-[15px] font-medium text-[#0a2225]">Saved &amp; Following</span>
                           </DropdownMenuItem>
-                          <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Traveling</div>
+                          <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Traveling</div>
                           <DropdownMenuItem
                             onClick={() => navigate(primaryBookingsPath)}
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
@@ -728,7 +723,7 @@ export const Header = () => {
                               <span className="text-[15px] font-medium text-[#0a2225]">My Requests</span>
                             </DropdownMenuItem>
                         {(isAgentAccount || isCreator || isAdmin || isBrand) && (
-                          <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
+                          <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
                         )}
                           {isCreator && (
                             <DropdownMenuItem
@@ -809,7 +804,7 @@ export const Header = () => {
                             <div className="relative flex-shrink-0">
                               <MessageCircle className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300" />
                               {unreadMessageCount > 0 && (
-                                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-[#0c4d47] text-[9px] font-bold text-[#fdfaf2] flex items-center justify-center px-1">
+                                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] rounded-full bg-[#0c4d47] text-[12px] font-bold text-[#fdfaf2] flex items-center justify-center px-1">
                                   {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
                                 </span>
                               )}
@@ -822,7 +817,7 @@ export const Header = () => {
 
                         {/* Account */}
                         <div className="py-2">
-                          <div className="mx-2 px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Account</div>
+                          <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Account</div>
                           <DropdownMenuItem
                             onClick={() => navigate(getProfilePath())}
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
