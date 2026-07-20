@@ -327,7 +327,7 @@ export function StoryboardBuilder({
       <div className="mt-4 border-t border-[#E5DFC6] pt-3">
         <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[#8D8D8D]">Storyboard preview</p>
         {items.length === 0 ? (
-          <p className="text-xs text-[#8D8D8D]">Start dropping in photos and links — this becomes the visual brief your agent or creator works from.</p>
+          <p className="text-xs text-[#8D8D8D]">Start dropping in photos and links — this becomes the visual brief your travel specialist works from.</p>
         ) : (
           <div className="columns-2 md:columns-3 gap-3 space-y-3">
             {items.map((item, idx) => {
