@@ -19,7 +19,7 @@ export const NewTripMatchEmail = ({ destination, requestId }: Props) => (
     `Craft a tailored proposal — itinerary, inclusions, total investment.`,
     `Submit before competitors do.`,
     `Communicate with the traveler on-platform once invited.`,
-    `All accepted bookings settle through Goldsainte's escrow.`
+    `All accepted bookings are paid securely through Stripe, straight to your account.`
   ]}
     cta={{ label: 'View request', url: `https://goldsainte.ai/marketplace/request/${requestId ?? ""}` }}
   />
