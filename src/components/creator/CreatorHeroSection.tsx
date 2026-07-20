@@ -75,6 +75,7 @@ export function CreatorHeroSection({
   onEditCover,
 }: CreatorHeroSectionProps) {
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [tipOpen, setTipOpen] = useState(false);
   const canEdit = isOwnProfile && !!profileUserId;
   const memberYear = memberSince ? new Date(memberSince).getFullYear() : null;
   const showCompleteNudge = isOwnProfile && (!title || title === "Travel Designer") && !location;
@@ -232,6 +233,16 @@ export function CreatorHeroSection({
               </Button>
             )}
             {!isOwnProfile && targetUserId && (
+              <Button
+                onClick={() => setTipOpen(true)}
+                variant="outline"
+                className="h-12 flex-1 rounded-full border-[#C7A962] bg-white px-6 text-sm font-medium text-[#8a7136] hover:bg-[#FDF9F0] md:flex-none"
+              >
+                <Heart className="mr-1.5 h-4 w-4" />
+                Tip
+              </Button>
+            )}
+            {!isOwnProfile && targetUserId && (
               <FollowButton
                 targetUserId={targetUserId}
                 className="h-12 flex-1 rounded-full border-[#E5DFC6] bg-white px-6 text-sm font-medium text-[#0a2225] hover:bg-[#f7f3ea] md:flex-none"
@@ -248,6 +259,14 @@ export function CreatorHeroSection({
           userId={profileUserId}
           currentAvatarUrl={avatarUrl}
           onSuccess={() => onProfileUpdated?.()}
+        />
+      )}
+          {!isOwnProfile && targetUserId && (
+        <TipModal
+          open={tipOpen}
+          onOpenChange={setTipOpen}
+          recipientId={targetUserId}
+          recipientName={(name || "this creator").split(" ")[0]}
         />
       )}
     </section>
