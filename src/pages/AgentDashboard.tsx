@@ -413,7 +413,7 @@ export default function AgentDashboard() {
       onClick={onClick}
       className="rounded-2xl bg-white px-5 py-5 text-left shadow-[0_2px_16px_rgba(0,0,0,0.06)] transition hover:shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
     >
-      <p className="text-[10px] uppercase tracking-[0.2em] text-[#0a2225]/50">{label}</p>
+      <p className="text-[12px] uppercase tracking-[0.2em] text-[#0a2225]/50">{label}</p>
       <p className="mt-1.5 font-secondary text-[30px] leading-none text-[#0a2225]">
         {value ?? "—"}
       </p>
@@ -425,7 +425,7 @@ export default function AgentDashboard() {
     <div className="min-h-screen bg-[#f7f3ea] flex flex-col pb-20 lg:pb-0">
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
         {/* ── The Bureau ── */}
-        <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Bureau</p>
+        <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Bureau</p>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
             <h1 className="font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[54px]">
@@ -437,16 +437,16 @@ export default function AgentDashboard() {
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-2.5">
               {agent.is_verified ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962] px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#8D6B2F]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962] px-4 py-2 text-[12.5px] uppercase tracking-[0.18em] text-[#8D6B2F]">
                   ◈ Verified agent
                 </span>
               ) : (
-                <span className="inline-flex items-center rounded-full border border-[#0a2225]/20 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#0a2225]/50">
+                <span className="inline-flex items-center rounded-full border border-[#0a2225]/20 px-4 py-2 text-[12.5px] uppercase tracking-[0.18em] text-[#0a2225]/50">
                   Pending verification
                 </span>
               )}
               {Number(agent.rating) > 0 && (
-                <span className="inline-flex items-center rounded-full border border-[#0a2225]/15 px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-[#0a2225]/60">
+                <span className="inline-flex items-center rounded-full border border-[#0a2225]/15 px-4 py-2 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/60">
                   ★ {agent.rating}/5 · {agent.total_reviews} reviews
                 </span>
               )}
@@ -571,7 +571,7 @@ export default function AgentDashboard() {
           {/* ── Desk: the Bureau overview ── */}
           <TabsContent value="desk" className="space-y-0">
             <div className="border-b border-[#0a2225]/10 pb-16 pt-6">
-              <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
+              <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
               <h2 className="mt-4 max-w-3xl font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[58px]">
                 Find a brief, design the trip, get&nbsp;paid.
               </h2>
@@ -598,7 +598,7 @@ export default function AgentDashboard() {
             </div>
 
             <div className="border-b border-[#0a2225]/10 py-16">
-              <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">
+              <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">
                 How Goldsainte works for agents
               </p>
               <h2 className="mt-3 font-secondary text-[38px] text-[#0a2225]">Two ways to earn</h2>
@@ -626,18 +626,18 @@ export default function AgentDashboard() {
 
             <div className="grid items-center gap-10 border-b border-[#0a2225]/10 py-14 md:grid-cols-[1fr_auto]">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
+                <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
                 <p className="mt-4 max-w-2xl text-[16px] leading-[1.7] text-[#0a2225]/80">
                   You set your price — your costs and your margin are yours to build in. Travelers
                   pay a 3.5% service fee on top; a matching 3.5% platform fee comes out of your
                   payout. That is Goldsainte's entire take: 7% total, flat, on every booking. Every
-                  payment is held in escrow — protected by a signed contract — and releases as
-                  milestones complete.
+                  payment is charged directly to your own Stripe account at booking — you're
+                  the merchant of record, with a signed contract behind every trip.
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-secondary text-[58px] leading-none text-[#0a2225]">7%</p>
-                <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-[#0a2225]/50">
+                <p className="mt-2 text-[12px] uppercase tracking-[0.24em] text-[#0a2225]/50">
                   Total · 3.5 + 3.5
                 </p>
               </div>
@@ -645,7 +645,7 @@ export default function AgentDashboard() {
 
             <div className="flex flex-wrap items-center justify-between gap-3 py-9 text-[15px]">
               <span>
-                <span className="text-[11px] uppercase tracking-[0.24em] text-[#8D6B2F]">New here?</span>
+                <span className="text-[12.5px] uppercase tracking-[0.24em] text-[#8D6B2F]">New here?</span>
                 &nbsp;&nbsp;The full guide to proposals, contracts, payouts, and fees.
               </span>
               <Link to="/how-it-works/agent" className="text-[#0a2225] hover:text-[#8D6B2F]">
