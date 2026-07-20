@@ -161,7 +161,7 @@ export default function MyBookingsPage() {
               </h1>
             </div>
             <p className="max-w-xs text-[14.5px] leading-relaxed text-[#0a2225]/55 md:text-right">
-              Payments, contracts, and your specialist — every detail, held in
+              Payments, contracts, and your specialist — every detail, all in
               one place.
             </p>
           </header>
