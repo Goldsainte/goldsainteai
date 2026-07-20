@@ -320,3 +320,41 @@ export async function getPartnerBookingEarnings(role: "creator" | "agent"): Prom
     bookings,
   };
 }
+
+// ── Tips (2026-07-20) ──────────────────────────────────────────────
+export interface TipEntry {
+  id: string;
+  amount_cents: number;
+  net_cents: number;
+  currency: string;
+  note: string | null;
+  created_at: string;
+}
+
+export interface TipsSnapshot {
+  currency: string;
+  count: number;
+  totalNetCents: number;
+  recent: TipEntry[];
+}
+
+export async function getMyTips(): Promise<TipsSnapshot> {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) throw new Error("Not authenticated");
+
+  const { data, error } = await supabase
+    .from("tips")
+    .select("id, amount_cents, net_cents, currency, note, created_at")
+    .eq("recipient_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  const rows = (data ?? []) as TipEntry[];
+  const totalNetCents = rows.reduce((sum, t) => sum + (t.net_cents || 0), 0);
+  return {
+    currency: rows[0]?.currency?.toUpperCase() || "USD",
+    count: rows.length,
+    totalNetCents,
+    recent: rows.slice(0, 8),
+  };
+}
