@@ -150,7 +150,7 @@ serve(async (req) => {
                 ? [
                     "Open the request and review the dates and scope.",
                     "Reply with your proposal \u2014 total price and terms.",
-                    "They accept and pay the deposit \u2014 escrow-protected.",
+                    "They accept and pay the deposit \u2014 paid securely to you via Stripe.",
                   ]
                 : [];
             const stepsHtml = steps.length
