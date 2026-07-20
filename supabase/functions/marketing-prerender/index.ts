@@ -66,7 +66,7 @@ const PAGES: Record<string, PageMeta> = {
       },
       {
         heading: "Why Goldsainte",
-        body: "Mandatory identity verification on every account. Escrowed payments with milestone releases. AI-powered matching between your brief and the right specialist. A platform engineered for trust at the high end of travel.",
+        body: "Mandatory identity verification on every account. Secure payments through Stripe, direct to your specialist. AI-powered matching between your brief and the right specialist. A platform engineered for trust at the high end of travel.",
         links: [
           { label: "Trust & Safety", href: "/trust-safety" },
           { label: "About", href: "/about" },
@@ -108,7 +108,7 @@ const PAGES: Record<string, PageMeta> = {
       },
       {
         heading: "How It Works",
-        body: "Travelers post requests. Specialists and creators bid with tailored proposals. Bookings happen on-platform with milestone-based escrow, identity verification, and dispute support.",
+        body: "Travelers post requests. Certified specialists bid with tailored proposals; creators inspire. Bookings happen on-platform with secure Stripe payments, identity verification, and dispute support.",
         links: [
           { label: "What we do", href: "/what-we-do" },
           { label: "Trust & Safety", href: "/trust-safety" },
@@ -150,7 +150,7 @@ const PAGES: Record<string, PageMeta> = {
       },
       {
         heading: "On-Platform Payments",
-        body: "Every booking is processed on Goldsainte with milestone-based escrow. Funds release as the trip progresses, with built-in dispute resolution and refund protection.",
+        body: "Every booking is processed on Goldsainte through secure Stripe checkout, paid directly to your specialist — your seller of record. Built-in dispute support keeps both sides protected.",
       },
       {
         heading: "Verified Experts",
@@ -187,7 +187,7 @@ const PAGES: Record<string, PageMeta> = {
     sections: [
       {
         heading: "For Travelers",
-        body: "How to request a trip, compare proposals, book securely on-platform, and manage payments through milestone-based escrow.",
+        body: "How to request a trip, compare proposals, book securely on-platform, and pay your specialist directly through Stripe.",
         links: [
           { label: "Browse the Marketplace", href: "/marketplace" },
           { label: "Trust & Safety", href: "/trust-safety" },
@@ -203,25 +203,25 @@ const PAGES: Record<string, PageMeta> = {
       },
       {
         heading: "Payments & Fees",
-        body: "Goldsainte charges a transparent 7% platform fee — 3.5% deducted from the host and 3.5% added to the guest. All payments are processed on-platform with milestone-based escrow.",
+        body: "Goldsainte charges a transparent 7% platform fee — 3.5% from the host and 3.5% from the guest. All payments are processed on-platform through secure Stripe checkout, direct to the seller.",
       },
     ],
   },
   "/trust-safety": {
     title: "Trust & Safety — Goldsainte",
     description:
-      "How Goldsainte keeps travelers, agents, and creators safe: mandatory identity verification, on-platform payments, escrow, and dispute resolution.",
+      "How Goldsainte keeps travelers, agents, and creators safe: mandatory identity verification, secure on-platform payments, and dispute resolution.",
     h1: "Trust & Safety",
     intro:
-      "Trust is the foundation of every booking on Goldsainte. We verify every account, escrow every payment, and keep every conversation on-platform — so travelers, agents, and creators can transact with confidence at the high end of travel.",
+      "Trust is the foundation of every booking on Goldsainte. We verify every account, process every payment securely through Stripe, and keep every conversation on-platform — so travelers, agents, and creators can transact with confidence at the high end of travel.",
     sections: [
       {
         heading: "Mandatory Identity Verification",
         body: "Every traveler, agent, and creator on Goldsainte completes Stripe Identity verification before they can transact. No exceptions.",
       },
       {
-        heading: "On-Platform Payments & Escrow",
-        body: "All payments are processed on Goldsainte with milestone-based escrow. Funds release as the trip progresses, with built-in refund protection and dispute resolution.",
+        heading: "Secure On-Platform Payments",
+        body: "All payments are processed on Goldsainte through secure Stripe checkout, paid directly to your specialist — your seller of record. Built-in dispute support keeps both sides protected.",
       },
       {
         heading: "On-Platform Communication",
@@ -243,7 +243,7 @@ const PAGES: Record<string, PageMeta> = {
     sections: [
       {
         heading: "What You Get",
-        body: "Qualified, high-intent leads. A polished proposal workspace. On-platform payments with milestone escrow. A verified profile that builds long-term trust with travelers.",
+        body: "Qualified, high-intent leads. A polished proposal workspace. Secure on-platform payments, direct to your Stripe account. A verified profile that builds long-term trust with travelers.",
       },
       {
         heading: "Requirements",
