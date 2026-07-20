@@ -669,7 +669,7 @@ export default function PostTripPage() {
     return (
       <div className="min-h-screen bg-[#FDF9F0] px-4 py-10 md:py-16">
         <form onSubmit={handleHireSubmit} className="mx-auto max-w-xl rounded-3xl border border-[#E5DFC6] bg-white p-6 md:p-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
+          <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
           <h1 className="mt-2 font-secondary text-2xl leading-tight text-[#0a2225] md:text-3xl">
             Hire {preferredName || "your host"}
           </h1>
@@ -747,7 +747,7 @@ export default function PostTripPage() {
             {submitting ? "Sending\u2026" : `Send hire request to ${hireFirstName}`}
           </button>
           <p className="mt-3 text-center text-[12px] leading-relaxed text-[#0a2225]/60">
-            You won't be charged now. {hireFirstName} replies with a proposal; payment is escrow-protected.
+            You won't be charged now. {hireFirstName} replies with a proposal; payment is processed securely through Stripe.
           </p>
           <button type="button" onClick={() => navigate(-1)}
             className="mt-4 block w-full text-center text-[13px] text-[#0a2225]/60 hover:text-[#0a2225] !min-h-0">
@@ -778,7 +778,7 @@ export default function PostTripPage() {
             />
           ))}
         </div>
-        <p className="text-center text-[11px] text-[#9A9079]">Step {currentStep + 1} of {TOTAL_STEPS}</p>
+        <p className="text-center text-[12.5px] text-[#9A9079]">Step {currentStep + 1} of {TOTAL_STEPS}</p>
       </div>
 
       {/* Prefill banners (only on step 0) */}
@@ -1006,12 +1006,12 @@ export default function PostTripPage() {
                     <div className="mt-3 space-y-2 rounded-2xl border border-[#E5DFC6] bg-[#FDFBF5] p-4">
                       {itineraryPrefill.itinerary.map(day => (
                         <div key={day.dayNumber} className="flex gap-3 py-2 border-b border-[#E5DFC6] last:border-b-0">
-                          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#0a2225] text-white text-[10px] font-medium flex-shrink-0">
+                          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#0a2225] text-white text-[12px] font-medium flex-shrink-0">
                             {day.dayNumber}
                           </span>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium text-[#0a2225]">{day.title}</p>
-                            <p className="text-[10px] text-[#4a4a4a] line-clamp-2">{day.description}</p>
+                            <p className="text-[12px] text-[#4a4a4a] line-clamp-2">{day.description}</p>
                           </div>
                         </div>
                       ))}
@@ -1021,7 +1021,7 @@ export default function PostTripPage() {
               )}
 
               {/* Condensed trust & safety */}
-              <p className="text-[11px] text-[#9A9079]">
+              <p className="text-[12.5px] text-[#9A9079]">
                 Your brief is shared only with vetted professionals. Keep payments on-platform.{" "}
                 <button type="button" onClick={() => setShowSafetyModal(true)}
                   className="text-[#0c4d47] font-medium hover:underline underline-offset-2">
@@ -1067,7 +1067,7 @@ export default function PostTripPage() {
 
         {/* Disclaimer on review step */}
         {currentStep === 4 && (
-          <p className="text-center text-[10px] text-[#9A9079] mt-4">
+          <p className="text-center text-[12px] text-[#9A9079] mt-4">
             By posting, you agree to keep all booking communication inside Goldsainte.
           </p>
         )}
