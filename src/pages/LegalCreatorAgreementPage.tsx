@@ -65,7 +65,7 @@ export default function LegalCreatorAgreementPage() {
             <li><strong>Creator Content</strong> means all content, materials, and services produced or provided by Creator in connection with a Campaign.</li>
             <li><strong>Deliverables</strong> means the specific Creator Content required under a Campaign Brief.</li>
             <li><strong>Brand Assets</strong> means logos, trademarks, brand guidelines, music, images, footage, copy, or any other material supplied by Brand for use in a Campaign.</li>
-            <li><strong>Escrow</strong> means the payment arrangement where Brand's funds are held securely by Goldsainte until certain conditions are met.</li>
+            <li><strong>Payment Hold</strong> means the arrangement, applicable to brand–creator Campaigns only, in which a Brand's Campaign funds are held on Goldsainte's platform balance (processed via Stripe) and released to Creator when the conditions in the Campaign Brief are met. This is a contractual payment-hold arrangement, not a bank, trust, or fiduciary escrow account.</li>
             <li><strong>Goldsainte AI</strong> means Goldsainte's internal AI tools, including recommendation systems, moderation systems, and any content-drafting features.</li>
             <li><strong>Campaign Period</strong> means the duration of a Campaign specified in the Campaign Brief. If no period is specified, the default Campaign Period is one (1) year from first public publication.</li>
           </ul>
@@ -108,11 +108,11 @@ export default function LegalCreatorAgreementPage() {
           <p>Creator agrees to keep all Brand–Creator communication on the Goldsainte Platform, not solicit or accept off-platform payments, promptly respond to messages, and use respectful and professional language.</p>
         </CardContent></Card>
 
-        <Card><CardHeader><SectionHeader icon={Percent} number="6" title="Fees, Escrow, Refunds &amp; Cancellations" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
-          <h4 className="font-semibold">6.1 Creator Fee &amp; Escrow</h4>
-          <p>The Creator fee for a Campaign ("<strong>Creator Fee</strong>") will be specified in the Campaign Brief. Creator Fee payments will be processed through Goldsainte's escrow system. Brand's funds are held in Escrow and released to Creator when relevant conditions are met.</p>
+        <Card><CardHeader><SectionHeader icon={Percent} number="6" title="Fees, Payment Hold, Refunds &amp; Cancellations" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
+          <h4 className="font-semibold">6.1 Creator Fee &amp; Payment Hold</h4>
+          <p>The Creator fee for a Campaign ("<strong>Creator Fee</strong>") will be specified in the Campaign Brief. Creator Fee payments are processed through Stripe and held on Goldsainte's platform balance under the Payment Hold arrangement described above, then released to Creator when the conditions in the Campaign Brief are met. This Payment Hold applies to brand–creator Campaigns only; travel bookings on the Platform are sold by, and paid directly to, the independent travel agent or agency serving as merchant of record.</p>
           <h4 className="font-semibold">6.2 Refunds &amp; Cancellations</h4>
-          <p>Refunds and cancellations are governed by the Goldsainte Refund &amp; Cancellation Policy. Brand may be entitled to a full or partial refund depending on the stage of work completed; once Creator Content has been publicly posted or used, refunds are typically not available. Goldsainte's determinations regarding refunds and Escrow distribution are final.</p>
+          <p>Refunds and cancellations are governed by the Goldsainte Refund &amp; Cancellation Policy. Brand may be entitled to a full or partial refund depending on the stage of work completed; once Creator Content has been publicly posted or used, refunds are typically not available. Goldsainte administers the platform payment-hold and refund process for Campaigns; its determinations regarding release and refund of held Campaign funds are final as to platform administration, without modifying either Party's underlying contractual rights.</p>
           <h4 className="font-semibold">6.3 Taxes</h4>
           <p>Creator is solely responsible for all taxes, social contributions, or similar obligations arising from Creator Fees. Creator may be required to provide tax forms or identification information as reasonably requested.</p>
         </CardContent></Card>
