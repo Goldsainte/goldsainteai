@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
               subject: `Bid accepted — next: your payment for ${job.title}`,
               html: emailShell(
                 "Your specialist is confirmed.",
-                `You've accepted a bid for <strong>${job.title}</strong>. Next: complete your payment — it's held in Goldsainte's escrow and released to your specialist on agreed milestones, so your booking stays protected.`,
+                `You've accepted a bid for <strong>${job.title}</strong>. Next: complete your payment — it's processed securely through Stripe directly to your specialist, your seller of record for this trip.`,
                 "Complete payment",
                 "https://goldsainte.ai/my-jobs"
               ),
@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
               subject: `Your bid was accepted — ${job.title}`,
               html: emailShell(
                 "Your bid was accepted.",
-                `Congratulations — the traveler chose your bid for <strong>${job.title}</strong>. Next: the traveler completes payment into escrow; you'll be notified the moment it lands. Keep all trip details and communication on-platform.`,
+                `Congratulations — the traveler chose your bid for <strong>${job.title}</strong>. Next: the traveler completes payment, charged directly to your Stripe account; you'll be notified the moment it lands. Keep all trip details and communication on-platform.`,
                 "Open your dashboard",
                 "https://goldsainte.ai/agent-dashboard"
               ),
