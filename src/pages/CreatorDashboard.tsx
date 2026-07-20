@@ -89,6 +89,32 @@ export default function CreatorDashboard() {
   
   const [profile, setProfile] = useState<Profile | null>(null);
 
+  // Tab state — declared here (before any conditional return) so hook order is
+  // stable every render (React requires this; a hook after an early return
+  // throws error #321 and white-screens the whole dashboard). Lazy initializers
+  // read the URL directly so they don't depend on consts defined further down.
+  const [activeGroup, setActiveGroupState] = useState<GroupKey>(() => {
+    const tab = (searchParams.get("tab") || "") as LeafKey;
+    const stripeR = searchParams.get("stripe");
+    const wanted = tab || (stripeR ? "earnings" : "overview");
+    if (wanted === "settings") return "overview";
+    const map: Record<string, GroupKey> = {
+      overview: "overview", requests: "pipeline", proposals: "pipeline", trips: "pipeline",
+      guides: "catalog", services: "catalog",
+      performance: "growth", affiliate: "growth", content: "growth",
+      earnings: "earnings", portfolio: "pipeline",
+    };
+    return map[wanted] ?? "overview";
+  });
+  const [activeLeaf, setActiveLeaf] = useState<LeafKey>(() => {
+    const tab = (searchParams.get("tab") || "") as LeafKey;
+    const stripeR = searchParams.get("stripe");
+    const wanted = tab || (stripeR ? "earnings" : "overview");
+    const valid = ["overview","requests","proposals","trips","portfolio","guides","services","performance","affiliate","content","earnings","settings"];
+    return (valid.includes(wanted) ? wanted : "overview") as LeafKey;
+  });
+
+
   const onboardingIncomplete = profile && !profile.has_completed_creator_onboarding;
 
   useEffect(() => {
@@ -251,10 +277,6 @@ export default function CreatorDashboard() {
     ? requestedLeaf
     : "overview";
 
-  const [activeGroup, setActiveGroupState] = useState<GroupKey>(
-    initialIsSettings ? "overview" : LEAF_TO_GROUP[initialLeaf as Exclude<LeafKey, "settings">] ?? "overview"
-  );
-  const [activeLeaf, setActiveLeaf] = useState<LeafKey>(initialLeaf);
 
   const handleGroupChange = (groupKey: string) => {
     const group = GROUPS.find((g) => g.key === groupKey);
