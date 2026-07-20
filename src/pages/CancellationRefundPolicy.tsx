@@ -20,7 +20,7 @@ const SECTIONS = [
     icon: Info,
     eyebrow: "01 — Our role",
     title: "Goldsainte is a marketplace, not a travel provider.",
-    body: "Goldsainte connects travelers with independent travel professionals — agents and creators. We are not the airline, hotel, tour operator, or ground supplier. Your legal contract for travel services is with the travel professional and/or their suppliers, not with Goldsainte.",
+    body: "Goldsainte connects travelers with independent travel professionals. We are not the airline, hotel, tour operator, or ground supplier. All bookable trips and travel packages on Goldsainte are offered, sold, and fulfilled exclusively by independent travel agents or travel agencies authorized to sell travel. Your legal contract for travel services is with that seller and, where applicable, their suppliers — not with Goldsainte, and not with any featured creator.",
     points: [
       "Goldsainte does not operate flights, hotels, tours, or transfers",
       "Goldsainte is not a party to the travel contract between you and the professional",
