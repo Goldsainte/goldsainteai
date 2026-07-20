@@ -37,7 +37,7 @@ export const BookingConfirmationTravelerEmail = ({
       title={"Your trip is confirmed"}
       headline={`Your trip is confirmed.`}
       tagline={`Every detail has been arranged. We wish you an extraordinary journey.`}
-      lede={`Your booking with ${specialistName ?? ""} for ${tripName ?? ""} has been confirmed and the contract is now in effect. Your deposit has been processed and is held securely in escrow.`}
+      lede={`Your booking with ${specialistName ?? ""} for ${tripName ?? ""} has been confirmed and the contract is now in effect. Your deposit has been processed securely through Stripe.`}
       details={details}
       steps={[
         `Your specialist will contact you within 24 hours to confirm trip details.`,
@@ -45,7 +45,7 @@ export const BookingConfirmationTravelerEmail = ({
           ? `Your balance of ${sym}${balanceDue} is due before departure.`
           : `Any remaining balance is due before departure.`,
         `Your itinerary, contract, and receipts are saved in your dashboard.`,
-        `Funds are held in escrow and released to your specialist on agreed milestones.`,
+        `Your payment goes directly to your specialist — your seller of record for this trip.`,
         `Message your specialist anytime from your bookings dashboard — all comms stay on-platform.`,
       ]}
       cta={{ label: 'View my booking', url: `https://goldsainte.ai/bookings/${bookingId ?? ""}` }}
