@@ -16,7 +16,7 @@ export const PaymentReceiptEmail = ({ amount, bookingId, tripName }: Props) => (
     tagline={`A formal receipt for your records.`}
     lede={`We have successfully processed your payment of ${amount ?? ""} for ${tripName ?? ""}. This serves as your official receipt for the transaction.`}
     steps={[
-    `Funds are held in escrow until milestones are met.`,
+    `Your payment goes securely to your specialist, your seller of record.`,
     `A full receipt PDF is available in your dashboard.`,
     `All transactions are protected by the Goldsainte Promise.`,
     `Refunds, if applicable, follow the cancellation terms in your contract.`,
