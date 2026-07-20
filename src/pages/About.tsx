@@ -104,6 +104,9 @@ const About = () => {
           <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] mb-6">
             The Smarter Travel Marketplace
           </h1>
+          <p className="text-base md:text-lg text-[#0a2225]/80 leading-relaxed max-w-2xl mb-4">
+            Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents &mdash; combining bookable travel inspiration with a custom-trip proposal marketplace.
+          </p>
           <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl">
             {t('home.hero.subtitle')}
           </p>
@@ -176,7 +179,7 @@ const About = () => {
               loading="lazy"/>
             </div>
             <p className="text-foreground">
-              Goldsainte is a luxury travel marketplace that connects travelers with certified travel agents and travel creators through AI-powered trip planning. Browse curated trips, post a custom trip request, or work directly with a verified specialist to design your perfect journey.
+              Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents — combining bookable travel inspiration with a custom-trip proposal marketplace. Browse curated trips, post a custom trip request, or work directly with a verified travel agent to design your perfect journey.
             </p>
           </AccordionContent>
         </AccordionItem>
