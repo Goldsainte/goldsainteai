@@ -233,6 +233,7 @@ export async function createAgentAccountFromApplication(
         user_id: userId,
         agency_name: application.agency_name,
         business_type: application.business_type,
+        country: application.business_country || null,
         bio: bioParts.join(" — ") || null,
         website: application.website || null,
         status: "active",
