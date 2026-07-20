@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { AskQuestionDrawer } from "@/components/trips/AskQuestionDrawer";
 import { trackEvent } from "@/lib/analytics/events";
 import { ResidenceSelect } from "@/components/compliance/ResidenceSelect";
-import { isSotBlockedState } from "@/lib/residency";
+import { isSotBlockedState, countryName } from "@/lib/residency";
 
 interface TripBookingSidebarProps {
   tripId: string;
@@ -51,6 +51,7 @@ export function TripBookingSidebar({
   // fetched from travel_agents.agency_name for agent trips. Falls back to
   // the display host name while loading or for non-agent inventory.
   const [sellerLegalName, setSellerLegalName] = useState<string | null>(null);
+  const [sellerCountry, setSellerCountry] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -72,11 +73,13 @@ export function TripBookingSidebar({
     if (!agentId) return;
     supabase
       .from("travel_agents")
-      .select("agency_name")
+      .select("agency_name, country")
       .eq("user_id", agentId)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled && data?.agency_name) setSellerLegalName(data.agency_name);
+        if (cancelled || !data) return;
+        if (data.agency_name) setSellerLegalName(data.agency_name);
+        if ((data as any).country) setSellerCountry(countryName((data as any).country));
       });
     return () => {
       cancelled = true;
@@ -355,6 +358,7 @@ export function TripBookingSidebar({
           <p>
             <span className="font-semibold text-[#4a4a4a]">Sold and fulfilled by:</span>{" "}
             {sellerLegalName || hostName || "the independent travel agent named on this trip"}
+            {sellerCountry ? ` · ${sellerCountry}` : ""}
           </p>
           <p className="mt-1.5">
             Goldsainte provides the marketplace technology and is not the seller of
