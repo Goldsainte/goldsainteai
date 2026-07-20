@@ -87,8 +87,45 @@ export function CreatorSettingsTab() {
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [loadingStripe, setLoadingStripe] = useState(false);
   const [stripeStatus, setStripeStatus] = useState<StripeStatus | null>(null);
+  const [acceptsTips, setAcceptsTips] = useState(true);
+  const [savingTips, setSavingTips] = useState(false);
   const [aiUsage, setAiUsage] = useState<AIUsage | null>(null);
   const [tier, setTier] = useState<TierInfo>(deriveTier(0));
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("accepts_tips")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!cancelled && data) setAcceptsTips((data as any).accepts_tips ?? true);
+    })();
+    const handleToggleTips = async (next: boolean) => {
+    setAcceptsTips(next); // optimistic
+    setSavingTips(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase
+        .from("profiles")
+        .update({ accepts_tips: next })
+        .eq("id", user.id);
+      if (error) throw error;
+      toast.success(next ? "Tips enabled" : "Tips turned off");
+    } catch (e: any) {
+      setAcceptsTips(!next); // revert
+      toast.error(e.message || "Couldn't update tips setting");
+    } finally {
+      setSavingTips(false);
+    }
+  };
+
+  return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -184,6 +221,27 @@ export function CreatorSettingsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Tips */}
+      <SettingsSectionCard
+        icon={Heart}
+        title="Tips"
+        description="Let travelers send you a tip"
+      >
+        <p className="text-[15px] text-[#6B7280]">
+          A tip button shows on your public profile so travelers can say thanks.
+          Tips go directly to your Stripe account. Turn this off to hide the button.
+        </p>
+        <label className="mt-3 flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={acceptsTips}
+            disabled={savingTips}
+            onChange={(e) => handleToggleTips(e.target.checked)}
+            className="h-4 w-4 accent-[#0C4D47]"
+          />
+          <span className="text-sm text-[#0a2225]">Allow travelers to tip me</span>
+        </label>
+      </SettingsSectionCard>
       {/* Account & Profile */}
       <SettingsSectionCard
         icon={User}
