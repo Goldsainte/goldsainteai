@@ -18,7 +18,7 @@ export const NewProposalReceivedEmail = ({ proposalId, specialistName }: Props) 
     `Review the full itinerary, day-by-day inclusions, and total investment.`,
     `Compare with other proposals received for the same request.`,
     `Message ${specialistName ?? ""} directly with questions or refinements.`,
-    `Accept to proceed — payment is held in escrow and released on milestones.`,
+    `Accept to proceed — your deposit is paid securely through Stripe to your specialist.`,
     `All communication and payment must remain on-platform per our Trust & Safety policy.`
   ]}
     cta={{ label: 'Review proposal', url: `https://goldsainte.ai/proposals/${proposalId ?? ""}` }}
