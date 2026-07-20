@@ -190,6 +190,48 @@ async function handleCheckoutCompleted(session: any) {
       currency: session.currency,
       status: 'confirmed',
     });
+  } else if (metadata.type === 'tip') {
+    // On-platform TIP (charged on the recipient's connected account). Record it
+    // so it shows in their earnings and fire a thank-you notification. The
+    // unique stripe_payment_intent_id makes webhook redelivery idempotent.
+    const recipientId = metadata.recipient_id;
+    const tipperId = metadata.tipper_id || null;
+    const amountCents = parseInt(metadata.amount_cents || '0', 10) || (session.amount_total ?? 0);
+    const feeCents = parseInt(metadata.platform_fee_cents || '0', 10);
+    const netCents = parseInt(metadata.net_cents || '0', 10) || (amountCents - feeCents);
+    const tipNote = metadata.note || null;
+
+    if (recipientId) {
+      const { error: tipErr } = await supabaseClient.from('tips').insert({
+        recipient_id: recipientId,
+        tipper_id: tipperId,
+        amount_cents: amountCents,
+        platform_fee_cents: feeCents,
+        net_cents: netCents,
+        currency: (session.currency || 'usd'),
+        note: tipNote,
+        stripe_payment_intent_id: session.payment_intent,
+        stripe_account_id: metadata.stripe_account || connectedAccount || null,
+      });
+      const dup = !!tipErr && (tipErr.code === '23505' || tipErr.message?.includes('duplicate'));
+      if (tipErr && !dup) {
+        console.error('Failed to record tip', tipErr);
+      }
+      // Thank-you notification (skip on redelivery duplicates).
+      if (!dup) {
+        await supabaseClient.from('notifications').insert({
+          user_id: recipientId,
+          type: 'tip_received',
+          title: 'You received a tip!',
+          message: tipNote
+            ? `Someone sent you a $${(amountCents / 100).toFixed(2)} tip: “${tipNote}”`
+            : `Someone sent you a $${(amountCents / 100).toFixed(2)} tip. Thank you!`,
+          entity_type: 'tip',
+          action_url: '/creator/dashboard',
+          action_label: 'View earnings',
+        });
+      }
+    }
   } else if (metadata.type === 'group_payment') {
     await supabaseClient
       .from('group_participants')
