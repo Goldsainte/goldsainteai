@@ -7,7 +7,7 @@ const STEPS: HowItWorksStep[] = [
   { number: "01", icon: UserCircle, title: "Complete your profile", description: "Add your photo, bio and niches so travelers can find you and trust your expertise.", cta: { label: "Complete profile", to: "/onboarding/creator" } },
   { number: "02", icon: ShieldCheck, title: "Verify your identity", description: "Quick Stripe Identity verification builds trust and unlocks payouts." },
   { number: "03", icon: CreditCard, title: "Connect Stripe Connect", description: "Link your bank to receive commissions on bookings and guide sales automatically.", cta: { label: "Set up payouts", to: "/creator-dashboard?tab=earnings" } },
-  { number: "04", icon: Camera, title: "Publish a trip or sell a guide", description: "Choose your monetisation: build a packaged trip travelers can book, or sell a polished itinerary guide." },
+  { number: "04", icon: Camera, title: "Sell guides & services", description: "Choose your monetisation: sell polished itinerary guides, offer your on-trip services for hire, and share marketplace trips with your affiliate link. Bookable trips themselves are sold by verified travel agents." },
   { number: "05", icon: Share2, title: "Share your profile", description: "Your public creator profile is your storefront. Drive traffic from wherever you have an audience — TikTok, Instagram, YouTube, X, your blog, your newsletter, or any social platform." },
   { number: "06", icon: DollarSign, title: "Get paid on every booking", description: "You set your price; Goldsainte's only fee is a flat 3.5% from you plus 3.5% from the traveler. Payments settle directly to your own Stripe account at booking (standard card processing applies)." },
   { number: "07", icon: Star, title: "Build your reputation", description: "Great reviews unlock featured placement across the marketplace, accelerating future bookings." },
@@ -18,8 +18,8 @@ export default function HowItWorksCreator() {
   return (
     <HowItWorksTemplate
       eyebrow={t('howItWorks.creator.eyebrow', 'For Creators')}
-      title={t('howItWorks.creator.title', 'Turn your audience into bookings')}
-      subtitle={t('howItWorks.creator.subtitle', 'A complete commerce layer for travel creators — sell trips, sell guides, get paid.')}
+      title={t('howItWorks.creator.title', 'Turn your travel influence into income')}
+      subtitle={t('howItWorks.creator.subtitle', 'A complete commerce layer for travel creators — sell guides, get hired, and earn on the trips you inspire.')}
       steps={STEPS}
       factCard={{
         text: "Goldsainte's platform fee is a flat 3.5% from you plus 3.5% from the traveler (7% total, always). Payments are charged directly on your own Stripe account at booking and settle to your bank on your Stripe schedule.",
