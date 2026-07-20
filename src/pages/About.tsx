@@ -71,7 +71,7 @@ const About = () => {
         {
           icon: Share2,
           title: "Creator Profiles & Storefronts",
-          description: "Creators turn their audience into bookings with a public profile, storyboards, packaged trips and digital guides — all monetised in one place."
+          description: "Creators turn their influence into income with a public profile, storyboards, digital guides, on-trip services, and affiliate links to the trips they inspire — all monetised in one place."
         },
         {
           icon: DollarSign,
