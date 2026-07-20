@@ -188,8 +188,13 @@ export function CreatorShowcaseSection() {
                   >
                     {t.title}
                   </span>
+                  {/* Description expansion animates HEIGHT, which on mobile
+                      (tabs stacked above the stage) shifted the whole page on
+                      every rotation. Hidden below md; the stage carries the
+                      message there. Desktop keeps the expansion — the fixed
+                      380px stage beside it absorbs the rail's height change. */}
                   <span
-                    className={`block overflow-hidden text-[14px] leading-relaxed text-[#0a2225]/70 transition-all duration-500 ${on ? "mt-1.5 max-h-24 opacity-100" : "max-h-0 opacity-0"}`}
+                    className={`hidden md:block overflow-hidden text-[14px] leading-relaxed text-[#0a2225]/70 transition-all duration-500 ${on ? "md:mt-1.5 md:max-h-24 md:opacity-100" : "md:max-h-0 md:opacity-0"}`}
                   >
                     {t.body}
                   </span>
