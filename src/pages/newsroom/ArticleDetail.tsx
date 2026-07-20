@@ -122,7 +122,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
       <article className={`${newsroomPageShellClass} max-w-[680px] pb-6 md:pb-8 animate-fade-in`}>
         <Link
           to="/newsroom"
-          className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a3d39] transition"
+          className="inline-flex items-center gap-2 text-[12.5px] tracking-[0.25em] uppercase text-[#0c4d47] hover:text-[#0a3d39] transition"
         >
           <ArrowLeft size={14} strokeWidth={1.75} /> Back to Newsroom
         </Link>
@@ -140,7 +140,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
           <span>{formatDate(article.published_at)}</span>
           <span className="text-[#0a2225]/30">·</span>
           <span>{readMinutes} min read</span>
-          <span className="inline-flex items-center bg-[#0c4d47]/10 text-[#0c4d47] px-3 py-0.5 rounded-full text-[11px] tracking-wide uppercase">
+          <span className="inline-flex items-center bg-[#0c4d47]/10 text-[#0c4d47] px-3 py-0.5 rounded-full text-[12.5px] tracking-wide uppercase">
             {article.category || typeLabel}
           </span>
         </div>
@@ -164,7 +164,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
             className="w-full aspect-[16/9] object-cover rounded-sm"
           />
           {article.hero_image_credit && (
-            <figcaption className="text-[11px] text-[#0a2225]/50 mt-3 italic">
+            <figcaption className="text-[12.5px] text-[#0a2225]/50 mt-3 italic">
               {article.hero_image_credit}
             </figcaption>
           )}
@@ -183,7 +183,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
 
       <div className="max-w-[680px] mx-auto px-5 sm:px-6 pt-7 md:pt-12 pb-12 md:pb-16">
         {article.type === "press_release" && (
-          <p className="mb-5 md:mb-6 text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#0a2225]/70 font-medium">
+          <p className="mb-5 md:mb-6 text-[12px] sm:text-[12.5px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#0a2225]/70 font-medium">
             Charlotte, NC&nbsp;&mdash;&nbsp;{formatDate(article.published_at)}&nbsp;&mdash;
           </p>
         )}
@@ -207,7 +207,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                 Goldsainte is an AI-powered travel marketplace headquartered in Charlotte,
                 North Carolina. Founded in 2026, Goldsainte connects travelers with vetted
                 travel creators and certified travel agents through a platform that combines
-                AI trip planning, escrow-protected payments via Stripe Connect, and verified
+                AI trip planning, secure direct payments via Stripe, and verified
                 professional expertise across 47 countries. For more information, visit{" "}
                 <a href="https://goldsainte.ai" className="text-[#0c4d47] underline underline-offset-2">
                   goldsainte.ai
@@ -216,7 +216,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
               </p>
               <Link
                 to="/newsroom/media-kit"
-                className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
+                className="inline-flex items-center gap-2 text-[12.5px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
               >
                 Download brand assets <span aria-hidden>â†’</span>
               </Link>
@@ -259,7 +259,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                     </div>
                   ) : (
                     <div className="aspect-[4/3] rounded-sm mb-5 bg-gradient-to-br from-[#0c4d47] to-[#0a2225] flex items-center justify-center">
-                      <span className="text-[10px] tracking-[0.3em] uppercase text-[#C7A962]">
+                      <span className="text-[12px] tracking-[0.3em] uppercase text-[#C7A962]">
                         {r.type === "press_release" ? "Press Release" : "News"}
                       </span>
                     </div>
@@ -312,7 +312,7 @@ function ShareRow({ title, url }: { title: string; url: string }) {
     "inline-flex items-center justify-center px-4 py-2 rounded-full border border-[#E5DFC6] text-xs uppercase tracking-wider text-[#0a2225]/70 hover:text-[#0c4d47] hover:border-[#0c4d47] transition";
   return (
     <div className="mt-12 flex items-center gap-3 flex-wrap">
-      <span className="text-[10px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
+      <span className="text-[12px] tracking-[0.25em] uppercase text-[#0a2225]/50 mr-1">Share</span>
       <a href={sms} className={cls}>Text</a>
       <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={cls}>WhatsApp</a>
       <a href={linkedin} target="_blank" rel="noopener noreferrer" className={cls}>LinkedIn</a>
@@ -327,4 +327,3 @@ function ShareRow({ title, url }: { title: string; url: string }) {
     </div>
   );
 }
-
