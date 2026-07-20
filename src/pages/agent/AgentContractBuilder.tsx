@@ -619,7 +619,7 @@ export default function AgentContractBuilder() {
         <div className="border-t border-white/10 bg-[#083530]">
           <div className="mx-auto flex h-[46px] max-w-3xl items-center gap-5 px-4 md:px-6">
             <span className="flex items-center gap-2.5 text-[13px] text-[#E5DFC6]/78">
-              <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
+              <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[12.5px] font-semibold text-[#0a2225]">
                 {(travelerData?.full_name || "T").trim().charAt(0).toUpperCase()}
               </span>
               {travelerData?.full_name || "Traveler"}
@@ -714,7 +714,7 @@ export default function AgentContractBuilder() {
             <div className="grid gap-2 sm:grid-cols-3">
               {[
                 { icon: ShieldCheck, text: "Timestamped e-signatures from both parties" },
-                { icon: Lock, text: "Traveler funds held in escrow until milestones" },
+                { icon: Lock, text: "Payments charged directly to your Stripe account" },
                 { icon: FileText, text: "Executed PDF delivered to both parties" },
               ].map(({ icon: Icon, text }) => (
                 <div
@@ -734,16 +734,16 @@ export default function AgentContractBuilder() {
                 className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                  <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                     Section {ROMAN[i] ?? i + 1}
                   </p>
                   {(section.fields?.some((f) => f.required) ?? false) &&
                     ((requiredStatus.find((r) => r.id === section.id)?.missing ?? 0) === 0 ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0c4d47]">
+                      <span className="inline-flex items-center gap-1 text-[12.5px] font-medium text-[#0c4d47]">
                         <CheckCircle2 className="h-3.5 w-3.5" /> Complete
                       </span>
                     ) : (
-                      <span className="text-[10px] uppercase tracking-[0.14em] text-[#8D6B2F]">
+                      <span className="text-[12px] uppercase tracking-[0.14em] text-[#8D6B2F]">
                         {requiredStatus.find((r) => r.id === section.id)?.missing} required
                       </span>
                     ))}
@@ -805,7 +805,7 @@ export default function AgentContractBuilder() {
         ) : (
           /* Upload your own */
           <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your document</p>
+            <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your document</p>
             <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
               Upload your contract
             </h2>
@@ -823,7 +823,7 @@ export default function AgentContractBuilder() {
                   </span>
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-[#0c4d47]" />
                 </span>
-                <label className="cursor-pointer rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20">
+                <label className="cursor-pointer rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-4 py-1.5 text-[12.5px] font-medium uppercase tracking-[0.1em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20">
                   Replace
                   <input type="file" accept="application/pdf" className="hidden" onChange={handleUpload} />
                 </label>
@@ -853,7 +853,7 @@ export default function AgentContractBuilder() {
 
         {/* Agent signature */}
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Execution</p>
+          <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Execution</p>
           <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
             Agent signature
           </h2>
@@ -871,7 +871,7 @@ export default function AgentContractBuilder() {
                   <button
                     type="button"
                     onClick={() => setAgentSignature("")}
-                    className="rounded-full border border-[#0a2225]/20 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea]"
+                    className="rounded-full border border-[#0a2225]/20 px-4 py-1.5 text-[12.5px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea]"
                   >
                     Clear
                   </button>
@@ -890,7 +890,7 @@ export default function AgentContractBuilder() {
           </div>
         </div>
 
-        <p className="pb-6 text-center text-[11px] leading-relaxed text-[#0a2225]/40">
+        <p className="pb-6 text-center text-[12.5px] leading-relaxed text-[#0a2225]/40">
           Templates and AI-drafted language are provided for convenience and do not constitute
           legal advice.
         </p>
