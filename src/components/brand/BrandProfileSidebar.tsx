@@ -120,7 +120,7 @@ export function BrandProfileSidebar({
         <ul className="space-y-3">
           {[
             { icon: ShieldCheck, text: "Verified partner" },
-            { icon: CreditCard, text: "Secure, escrowed payments" },
+            { icon: CreditCard, text: "Secure payments through Stripe" },
             { icon: MessageCircle, text: "On-platform messaging" },
             { icon: CheckCircle, text: "Dispute resolution support" },
           ].map(({ icon: Icon, text }) => (
