@@ -88,7 +88,7 @@ export function PartnerEarningsView({
           </div>
           <div className="hidden md:flex items-center gap-2 text-xs text-[#6B7280]">
             <Wallet className="h-4 w-4 text-[#0c4d47]" />
-            <span>Funds move from traveler to escrow to you.</span>
+            <span>Payments are charged directly to your Stripe account at booking.</span>
           </div>
         </div>
       </section>
@@ -101,9 +101,9 @@ export function PartnerEarningsView({
             description="Already paid out" 
           />
           <SummaryCard 
-            label="Held in escrow" 
+            label="Pending" 
             value={snapshot ? formatMoney(snapshot.pending, currency) : "—"} 
-            description="Awaiting milestone" 
+            description="Processing or awaiting release" 
           />
           <SummaryCard 
             label="Lifetime" 
