@@ -80,19 +80,32 @@ export function CreatorMediaGallery({
     }
     try {
       // Cover image: creator-provided wins; TikTok links can auto-fetch one
-      // (Instagram blocks thumbnail access without a registered FB app).
+      // via an edge function (browsers can't call TikTok/IG oembed directly —
+      // CORS blocks it, which is what surfaced as "Failed to fetch").
       let thumbnail_url: string | null = null;
       if (coverFile) {
         const ext = (coverFile.name.split(".").pop() || "jpg").toLowerCase();
         const path = `${creatorId}/highlights/cover-${Date.now()}.${ext}`;
-        const { error: cErr } = await supabase.storage.from("avatars").upload(path, coverFile, { cacheControl: "3600" });
-        if (cErr) throw cErr;
-        thumbnail_url = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+        const { error: cErr } = await supabase.storage
+          .from("avatars")
+          .upload(path, coverFile, { cacheControl: "3600", upsert: true });
+        if (cErr) {
+          // Don't hard-fail the whole add on a cover-upload hiccup — keep the
+          // reel, just without a custom cover.
+          console.warn("Cover upload failed, continuing without it:", cErr);
+        } else {
+          thumbnail_url = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+        }
       } else if (source === "tiktok") {
+        // Server-side thumbnail fetch (best-effort; failure just falls back
+        // to the branded tile).
         try {
-          const r = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(u)}`);
-          if (r.ok) thumbnail_url = (await r.json())?.thumbnail_url ?? null;
-        } catch { /* fall back to the branded tile */ }
+          const { data: thumb } = await supabase.functions.invoke(
+            "fetch-reel-thumbnail",
+            { body: { url: u } }
+          );
+          thumbnail_url = thumb?.thumbnail_url ?? null;
+        } catch { /* branded tile fallback */ }
       }
       const { data: row, error } = await supabase
         .from("creator_media")
@@ -153,7 +166,7 @@ export function CreatorMediaGallery({
             className="text-xs font-medium text-[#0c4d47] underline underline-offset-4">
             {coverFile ? `Cover: ${coverFile.name}` : "Add a cover photo (recommended for Instagram)"}
           </button>
-          <span className="text-[11px] text-[#6B7280]">TikTok covers are fetched automatically.</span>
+          <span className="text-[12.5px] text-[#6B7280]">TikTok covers are fetched automatically.</span>
         </div>
       )}
     </div>
@@ -274,7 +287,7 @@ export function CreatorMediaGallery({
                   loading="lazy"
                 />
                 {item.is_cover && (
-                  <span className="absolute top-2 left-2 flex items-center gap-1 bg-[#C7A962] text-white text-[9px] font-semibold px-2 py-0.5 rounded-full uppercase">
+                  <span className="absolute top-2 left-2 flex items-center gap-1 bg-[#C7A962] text-white text-[12px] font-semibold px-2 py-0.5 rounded-full uppercase">
                     <Star className="w-3 h-3" /> Cover
                   </span>
                 )}
@@ -318,7 +331,7 @@ export function CreatorMediaGallery({
 
             {/* Source badge for social content */}
             {item.source !== "upload" && (
-              <span className="absolute top-2 left-2 text-[9px] bg-black/50 text-white px-2 py-0.5 rounded-full uppercase font-medium">
+              <span className="absolute top-2 left-2 text-[12px] bg-black/50 text-white px-2 py-0.5 rounded-full uppercase font-medium">
                 {item.source}
               </span>
             )}
