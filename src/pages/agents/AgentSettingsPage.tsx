@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { WORLD_COUNTRIES } from "@/lib/residency";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Loader2, Camera, ExternalLink } from "lucide-react";
@@ -41,6 +42,7 @@ export default function AgentSettingsPage() {
     avatar_url: "",
     instagram_handle: "",
     agency_name: "",
+    country: "",
     story: "",
     travel_style: "",
     destinations: "",
@@ -72,7 +74,7 @@ export default function AgentSettingsPage() {
         supabase
           .from("travel_agents")
           .select(
-            "agency_name, bio, travel_style, destinations, specializations, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, languages"
+            "agency_name, country, bio, travel_style, destinations, specializations, starting_price_per_night, logo_url, website, linkedin_url, facebook_url, pinterest_url, languages"
           )
           .eq("user_id", user.id)
           .maybeSingle(),
@@ -83,6 +85,7 @@ export default function AgentSettingsPage() {
         avatar_url: p?.avatar_url || "",
         instagram_handle: p?.instagram_handle || "",
         agency_name: a?.agency_name || "",
+        country: (a as any)?.country || "",
         story: a?.bio || p?.bio || "",
         travel_style: a?.travel_style || "",
         destinations: (a?.destinations || []).join(", "),
@@ -162,6 +165,7 @@ export default function AgentSettingsPage() {
           facebook_url: form.facebook_url.trim() || null,
           pinterest_url: form.pinterest_url.trim() || null,
           languages: toArray(form.languages),
+          country: form.country || null,
         })
         .eq("user_id", user.id)
         .select("user_id");
@@ -275,6 +279,20 @@ export default function AgentSettingsPage() {
                     placeholder="Charlotte, NC, USA"
                   />
                 </div>
+              </div>
+              <div>
+                <label className={label}>Country of operation</label>
+                <select
+                  className={input}
+                  value={form.country}
+                  onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
+                >
+                  <option value="">Select your country</option>
+                  {WORLD_COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.name}</option>
+                  ))}
+                </select>
+                <p className={hint}>Where you're authorized to sell travel — shown on your profile and trip listings.</p>
               </div>
               <div>
                 <label className={label}>Trips starting at ($/night)</label>
