@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { WORLD_COUNTRIES } from "@/lib/residency";
 import { Label } from "@/components/ui/label";
 import { AIRewriteButton } from "@/components/AIRewriteButton";
 import { Textarea } from "@/components/ui/textarea";
@@ -698,6 +699,20 @@ function AgentApplicationFormInner() {
                 <Input value={formData.agencyName} onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })} className={luxuryInputClasses} />
               </div>
               <div>
+                <Label className="text-sm font-medium text-[#0a2225]">Country of operation *</Label>
+                <Select value={formData.businessCountry} onValueChange={(value: string) => setFormData({ ...formData, businessCountry: value })}>
+                  <SelectTrigger className={luxuryInputClasses}>
+                    <SelectValue placeholder="Select your country" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {WORLD_COUNTRIES.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="mt-1 text-xs text-[#6B7280]">Where your agency is based and authorized to sell travel. Shown on your public profile and trip listings.</p>
+              </div>
+              <div>
                 <Label className="text-sm font-medium text-[#0a2225]">Business Type *</Label>
                 <Select value={formData.businessType} onValueChange={(value: BusinessType) => setFormData({ ...formData, businessType: value })}>
                   <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
@@ -874,7 +889,7 @@ function AgentApplicationFormInner() {
         return (
           <div className="space-y-8">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Final step</p>
+              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Final step</p>
               <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">Verify your identity</h3>
               <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
                 Completing Stripe Identity verification activates your advisor account
@@ -884,7 +899,7 @@ function AgentApplicationFormInner() {
             </div>
 
             <div className="border-y border-[#0a2225]/10 py-7">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Have ready</p>
+              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Have ready</p>
               <div className="mt-4 space-y-3.5 text-[15.5px] leading-relaxed text-[#0a2225]/80">
                 <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>A government-issued photo ID — passport or driver's license.</p>
                 <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>A device with a camera, for a quick selfie match.</p>
