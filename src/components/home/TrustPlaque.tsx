@@ -15,7 +15,7 @@ const columns = [
   {
     eyebrow: "Identity",
     title: "Verified, every account",
-    body: "Travelers, creators, and travel agents complete Stripe Identity verification before they can transact. No exceptions.",
+    body: "Every creator and travel agent completes Stripe Identity verification before they can list or take a booking. You always know who you’re working with.",
   },
   {
     eyebrow: "Payments",
