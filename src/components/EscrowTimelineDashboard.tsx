@@ -77,7 +77,7 @@ export default function EscrowTimelineDashboard() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Payment Escrow Timeline</h1>
+        <h1 className="text-3xl font-bold">Payment Timeline</h1>
         <p className="text-muted-foreground">Track your payment releases</p>
       </div>
 
