@@ -478,7 +478,7 @@ export default function TripRequestDetailPage() {
             {/* LEFT: Trip brief (same for traveler & responders) */}
             <section className="rounded-3xl border border-[#E5DFC6] bg-white/95 p-5 shadow-sm md:p-6">
               <div className="flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-[11px] font-medium text-[#0c4d47]">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47]/10 px-3 py-1 text-[12.5px] font-medium text-[#0c4d47]">
                   <Sparkles className="h-3 w-3 text-[#BFAD72]" />
                   <span>Trip request from Goldsainte traveler</span>
                 </div>
@@ -492,7 +492,7 @@ export default function TripRequestDetailPage() {
                   `Trip to ${trip.destination || "somewhere special"}`}
               </h1>
 
-              <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-[#4a4a4a]">
+              <div className="mt-2 flex flex-wrap gap-3 text-[12.5px] text-[#4a4a4a]">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 ring-1 ring-[#E5DFC6]">
                   <MapPin className="h-3 w-3 text-[#8D8D8D]" />
                   {trip.destination || "Destination TBD"}
@@ -514,7 +514,7 @@ export default function TripRequestDetailPage() {
               </div>
 
               {trip.trip_style && trip.trip_style.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-[#4a4a4a]">
+                <div className="mt-3 flex flex-wrap gap-1.5 text-[12px] text-[#4a4a4a]">
                   {trip.trip_style.map((style) => (
                     <span
                       key={style}
@@ -527,7 +527,7 @@ export default function TripRequestDetailPage() {
               )}
 
               {trip.tiktok_link && (
-                <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[11px] text-[#0c4d47] ring-1 ring-[#BFAD72]/60">
+                <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[12.5px] text-[#0c4d47] ring-1 ring-[#BFAD72]/60">
                   <Link2 className="h-3 w-3 text-[#BFAD72]" />
                   <a
                     href={trip.tiktok_link}
@@ -541,7 +541,7 @@ export default function TripRequestDetailPage() {
               )}
 
               <div className="mt-4 rounded-2xl bg-white/80 p-3 text-xs text-[#4a4a4a]">
-                <p className="text-[11px] font-medium text-[#0a2225]">
+                <p className="text-[12.5px] font-medium text-[#0a2225]">
                   Traveler's brief
                 </p>
                 <p className="mt-1 whitespace-pre-line">
@@ -606,13 +606,13 @@ function OwnerProposalsPanel({
       <h2 className="text-sm font-semibold tracking-tight text-[#E5DFC6]">
         Proposals received
       </h2>
-      <p className="mt-1 text-[11px] text-[#E5DFC6]/80">
+      <p className="mt-1 text-[12.5px] text-[#E5DFC6]/80">
         Review proposals from creators and agents. When you accept one, you'll
         be able to open a private chat and later mark the trip as booked.
       </p>
 
       {proposals.length === 0 ? (
-        <div className="mt-4 rounded-2xl bg-black/30 px-3 py-4 text-[11px] text-[#E5DFC6]/80">
+        <div className="mt-4 rounded-2xl bg-black/30 px-3 py-4 text-[12.5px] text-[#E5DFC6]/80">
           No proposals yet. We'll notify you as soon as someone responds to
           this trip.
         </div>
@@ -626,10 +626,10 @@ function OwnerProposalsPanel({
             return (
               <article
                 key={p.id}
-                className="rounded-2xl bg-black/30 px-3 py-3 text-[11px] text-[#E5DFC6] ring-1 ring-[#BFAD72]/30"
+                className="rounded-2xl bg-black/30 px-3 py-3 text-[12.5px] text-[#E5DFC6] ring-1 ring-[#BFAD72]/30"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="inline-flex items-center gap-2 text-[10px]">
+                  <div className="inline-flex items-center gap-2 text-[12px]">
                     <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#BFAD72]/90 text-[#0a2225]">
                       <User className="h-3.5 w-3.5" />
                     </div>
@@ -648,17 +648,17 @@ function OwnerProposalsPanel({
                 </div>
 
                 {p.headline && (
-                  <p className="mt-2 text-[11px] font-medium">{p.headline}</p>
+                  <p className="mt-2 text-[12.5px] font-medium">{p.headline}</p>
                 )}
 
                 {p.message && (
-                  <p className="mt-1 whitespace-pre-line text-[11px] text-[#E5DFC6]/85">
+                  <p className="mt-1 whitespace-pre-line text-[12.5px] text-[#E5DFC6]/85">
                     {p.message}
                   </p>
                 )}
 
                 {p.price_from !== null && (
-                  <p className="mt-2 text-[10px] text-[#E5DFC6]/80">
+                  <p className="mt-2 text-[12px] text-[#E5DFC6]/80">
                     Estimated starting price:{" "}
                     <span className="font-semibold">
                       ${p.price_from} per person
@@ -666,7 +666,7 @@ function OwnerProposalsPanel({
                   </p>
                 )}
 
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12.5px]">
                   <div className="flex flex-wrap gap-2">
                     {!isBooked && !isAccepted && !isDeclined && (
                       <>
@@ -674,7 +674,7 @@ function OwnerProposalsPanel({
                           type="button"
                           onClick={() => onAccept(p.id)}
                           disabled={!!updatingProposalId}
-                          className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
+                          className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 text-[12.5px] font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
                         >
                           {isUpdating && (
                             <Loader2 className="h-3 w-3 animate-spin" />
@@ -686,7 +686,7 @@ function OwnerProposalsPanel({
                           type="button"
                           onClick={() => onDecline(p.id)}
                           disabled={!!updatingProposalId}
-                          className="inline-flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-[11px] font-semibold text-[#E5DFC6] hover:bg-black/60 disabled:opacity-60"
+                          className="inline-flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-[12.5px] font-semibold text-[#E5DFC6] hover:bg-black/60 disabled:opacity-60"
                         >
                           {!isUpdating && <X className="h-3 w-3" />}
                           Decline
@@ -697,7 +697,7 @@ function OwnerProposalsPanel({
                     {isAccepted && !isBooked && (
                       <Link
                         to={`/trip-request/${trip.id}/chat`}
-                        className="inline-flex items-center gap-1 rounded-full bg-[#BFAD72] px-3 py-1 text-[11px] font-semibold text-[#0a2225] hover:bg-[#d4c58d]"
+                        className="inline-flex items-center gap-1 rounded-full bg-[#BFAD72] px-3 py-1 text-[12.5px] font-semibold text-[#0a2225] hover:bg-[#d4c58d]"
                       >
                         <MessageCircle className="h-3 w-3" />
                         Open chat
@@ -705,7 +705,7 @@ function OwnerProposalsPanel({
                     )}
 
                     {isBooked && p.status === "booked" && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-semibold text-emerald-800">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-[12px] font-semibold text-emerald-800">
                         <Check className="h-3 w-3" />
                         Trip booked with this partner
                       </span>
@@ -720,7 +720,7 @@ function OwnerProposalsPanel({
 
       {hasAccepted && !isBooked && (
         <div className="mt-4 space-y-2 border-t border-white/10 pt-3">
-          <p className="text-[11px] text-[#E5DFC6]/80">
+          <p className="text-[12.5px] text-[#E5DFC6]/80">
             Once dates and details are confirmed with your chosen partner, you
             can mark this trip as booked.
           </p>
@@ -739,7 +739,7 @@ function OwnerProposalsPanel({
       )}
 
       {isBooked && (
-        <p className="mt-3 text-[10px] text-[#E5DFC6]/70">
+        <p className="mt-3 text-[12px] text-[#E5DFC6]/70">
           This trip is marked as booked. You can still continue chatting with
           your partner and, later, move it to completed when the trip happens.
         </p>
@@ -750,7 +750,7 @@ function OwnerProposalsPanel({
 
 function StatusBadge({ status }: { status: string }) {
   const base =
-    "inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-medium";
+    "inline-flex rounded-full px-2.5 py-0.5 text-[12px] font-medium";
 
   if (status === "accepted") {
     return (
@@ -809,7 +809,7 @@ function ResponderProposalForm({
       <h2 className="text-sm font-semibold tracking-tight text-[#E5DFC6]">
         Send your proposal
       </h2>
-      <p className="mt-1 text-[11px] text-[#E5DFC6]/80">
+      <p className="mt-1 text-[12.5px] text-[#E5DFC6]/80">
         Introduce yourself, outline your concept, and give a baseline price.
         The traveler will see this alongside proposals from other creators
         and agents.
@@ -818,10 +818,10 @@ function ResponderProposalForm({
       <form onSubmit={onSubmit} className="mt-4 space-y-3">
         {/* Role */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#E5DFC6]">
+          <label className="text-[12.5px] font-medium text-[#E5DFC6]">
             I'm responding as a…
           </label>
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="grid grid-cols-2 gap-2 text-[12.5px]">
             <button
               type="button"
               onClick={() => onChange("proposerRole", "creator")}
@@ -849,7 +849,7 @@ function ResponderProposalForm({
 
         {/* Headline */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#E5DFC6]">
+          <label className="text-[12.5px] font-medium text-[#E5DFC6]">
             Proposal headline
           </label>
           <Input
@@ -862,7 +862,7 @@ function ResponderProposalForm({
 
         {/* Message */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#E5DFC6]">
+          <label className="text-[12.5px] font-medium text-[#E5DFC6]">
             Message to traveler
           </label>
           <Textarea
@@ -877,7 +877,7 @@ function ResponderProposalForm({
 
         {/* Baseline price */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-[#E5DFC6]">
+          <label className="text-[12.5px] font-medium text-[#E5DFC6]">
             Estimated starting price (per person)
           </label>
           <Input
@@ -888,33 +888,33 @@ function ResponderProposalForm({
             placeholder="e.g., 3800"
             className="rounded-xl border border-[#BFAD72]/40 bg-[#0a2225] text-xs text-[#E5DFC6] placeholder:text-[#E5DFC6]/60"
           />
-          <p className="text-[10px] text-[#E5DFC6]/70">
+          <p className="text-[12px] text-[#E5DFC6]/70">
             This doesn't lock you in—it just helps the traveler compare options.
             You can refine pricing together later.
           </p>
         </div>
 
-        {/* Payout terms — milestone escrow, the real numbers.
+        {/* Payout terms — the real numbers.
             (Creator collaborations are hidden for launch; their economics are
             undecided — see handoff. proposal.collaborating stays false.) */}
         <div className="space-y-1 rounded-2xl border border-[#BFAD72]/30 bg-black/20 p-3">
-          <p className="text-[11px] font-semibold text-[#E5DFC6]">Your payout</p>
-          <p className="text-[10px] text-[#E5DFC6]/70">
+          <p className="text-[12.5px] font-semibold text-[#E5DFC6]">Your payout</p>
+          <p className="text-[12px] text-[#E5DFC6]/70">
             You keep 96.5% of your quoted price — Goldsainte's flat fee is 3.5%
-            on your side. Funds sit in escrow and release in milestones: your
-            deposit as working capital once you share confirmed reservations,
-            the balance when your traveler confirms the trip.
+            on your side. Payments are charged directly to your own Stripe account
+            at booking — the deposit at acceptance, the balance before
+            departure.
           </p>
         </div>
 
         {/* Errors & success */}
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[12.5px] text-red-700">
             {error}
           </div>
         )}
         {success && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[12.5px] text-emerald-800">
             Proposal sent. The traveler will see your pitch in their Goldsainte
             account. We'll notify them as responses arrive.
           </div>
