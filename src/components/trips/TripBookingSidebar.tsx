@@ -265,26 +265,44 @@ export function TripBookingSidebar({
 
       {/* CTAs */}
       <div className="mt-6 space-y-3">
-        <ResidenceSelect value={residenceState} onChange={setResidenceState} />
-        <Button
-          onClick={handleRequestToBook}
-          disabled={isLoading || isSotBlockedState(residenceState)}
-          className="w-full rounded-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
-        >
-          {isLoading ? "Sending..." : (instantBooking ? "Book Instantly" : "Reserve with Deposit")}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={handleAskQuestion}
-          disabled={isAskLoading}
-          className="w-full rounded-full border-[#E5DFC6] py-6 text-base hover:bg-[#FDF9F0]"
-        >
-          <MessageCircle className="mr-2 h-4 w-4" />
-          {isAskLoading ? "Opening..." : "Ask a Question"}
-        </Button>
+        {isPlatformTrip ? (
+          // Goldsainte Concierge inventory is inquiry-only: Goldsainte is not
+          // the seller of travel. An inquiry routes to Goldsainte, who
+          // connects the traveler with an independent travel agent in their
+          // area who becomes the seller of record. No deposit is taken here.
+          <Button
+            onClick={handleAskQuestion}
+            disabled={isAskLoading}
+            className="w-full rounded-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            {isAskLoading ? "Opening..." : "Request this trip"}
+          </Button>
+        ) : (
+          <>
+            <ResidenceSelect value={residenceState} onChange={setResidenceState} />
+            <Button
+              onClick={handleRequestToBook}
+              disabled={isLoading || isSotBlockedState(residenceState)}
+              className="w-full rounded-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
+            >
+              {isLoading ? "Sending..." : (instantBooking ? "Book Instantly" : "Reserve with Deposit")}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleAskQuestion}
+              disabled={isAskLoading}
+              className="w-full rounded-full border-[#E5DFC6] py-6 text-base hover:bg-[#FDF9F0]"
+            >
+              <MessageCircle className="mr-2 h-4 w-4" />
+              {isAskLoading ? "Opening..." : "Ask a Question"}
+            </Button>
+          </>
+        )}
       </div>
 
-      {/* Deposit Info */}
+      {/* Deposit Info — hidden for inquiry-only Concierge trips */}
+      {!isPlatformTrip && (
       <div className="mt-6 rounded-xl bg-[#FDF9F0] p-4">
         <div className="flex items-center gap-2">
           <CreditCard className="h-4 w-4 text-[#C7B892]" />
@@ -311,6 +329,17 @@ export function TripBookingSidebar({
           </p>
         </div>
       </div>
+      )}
+
+      {/* Concierge inquiry note */}
+      {isPlatformTrip && (
+        <div className="mt-6 rounded-xl bg-[#FDF9F0] p-4 text-xs leading-relaxed text-[#7A7151]">
+          This is a Goldsainte Concierge trip. Request it and we\u2019ll connect
+          you with an independent travel agent in your area who can design and
+          book it for you \u2014 they\u2019ll be your seller of record. Goldsainte
+          provides the marketplace; we don\u2019t sell the trip ourselves.
+        </div>
+      )}
 
       {/* How It Works */}
       <div className="mt-6 border-t border-[#E5DFC6] pt-6">
