@@ -13,10 +13,10 @@ export const PayoutSentEmail = ({ amount, payoutId, tripName }: Props) => (
   <AuthEmailLayout
     title={"A payout has been sent to your account"}
     headline={`A payout is on its way.`}
-    tagline={`Your earnings have been released from escrow.`}
+    tagline={`Your payout is on its way.`}
     lede={`Goldsainte has released a payout of ${amount ?? ""} to your connected Stripe account for ${tripName ?? ""}. Funds typically arrive within 1–2 business days.`}
     steps={[
-    `View payout details and milestone breakdown in your dashboard.`,
+    `View payout details in your dashboard.`,
     `The Goldsainte platform fee has already been deducted.`,
     `Your Stripe Connect dashboard shows expected arrival.`,
     `Tax documents are generated annually for your records.`,
