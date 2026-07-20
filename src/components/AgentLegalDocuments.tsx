@@ -222,7 +222,7 @@ export const VendorDialog = ({ children }: { children: React.ReactNode }) => (
             <ul className="list-disc pl-5 space-y-1 mt-2">
               <li>Flat rate: 3.5% of the booking value on the advisor side (travelers pay a separate 3.5% service fee)</li>
               <li>Commission is calculated on the total booking value excluding taxes</li>
-              <li>Payouts are released from escrow in milestones per the platform's release process</li>
+              <li>Payments are charged directly to your connected Stripe account as the merchant of record</li>
               <li>Rates may be adjusted with 30 days advance notice</li>
             </ul>
           </section>
