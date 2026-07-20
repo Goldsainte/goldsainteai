@@ -106,7 +106,7 @@ export const PackagePaymentPlanSelector = ({
         <Alert>
           <Shield className="h-4 w-4" />
           <AlertDescription>
-            Your payment is held in escrow and released to the creator in stages. Deposits are non-refundable.
+            Your payment is charged securely through Stripe to the creator in stages. Deposits are non-refundable.
           </AlertDescription>
         </Alert>
 
