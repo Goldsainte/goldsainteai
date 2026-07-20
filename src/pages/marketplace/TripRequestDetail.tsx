@@ -792,8 +792,8 @@ export default function TripRequestDetail() {
                     b: "If they accept, the request becomes a booking and they pay a 25% deposit through secure checkout. You never handle payment yourself.",
                   },
                   {
-                    t: "Goldsainte holds the money",
-                    b: "Every payment sits in escrow with Goldsainte \u2014 not with the traveler, not with you \u2014 until the work is done. The balance is due before departure.",
+                    t: "Paid at booking, secured by Stripe",
+                    b: "Every payment runs through Goldsainte\u2019s secure Stripe checkout and settles directly to your own Stripe account \u2014 the deposit at acceptance, the balance before departure.",
                   },
                   {
                     t: "Deliver the trip",
@@ -801,7 +801,7 @@ export default function TripRequestDetail() {
                   },
                   {
                     t: "Get paid",
-                    b: "After the traveler confirms the trip went as agreed, escrow releases your payout: 96.5% of your price. Goldsainte's entire fee is a flat 7%, split between both sides.",
+                    b: "Payments land in your own Stripe account as they\u2019re made. Goldsainte\u2019s entire fee is a flat 7%, split between both sides \u2014 3.5% from you, 3.5% from the traveler.",
                   },
                 ]
               : [
@@ -815,11 +815,11 @@ export default function TripRequestDetail() {
                   },
                   {
                     t: "They compare and accept",
-                    b: "The traveler reviews every proposal and accepts their favorite \u2014 acceptance creates a booking with a 25% deposit into escrow.",
+                    b: "The traveler reviews every proposal and accepts their favorite \u2014 acceptance creates a booking with a 25% deposit through secure Stripe checkout.",
                   },
                   {
                     t: "Deliver, then get paid",
-                    b: "Funds stay in escrow until the traveler confirms the trip. Your payout is 96.5% of your price \u2014 Goldsainte's flat fee is 7% total across both sides.",
+                    b: "Payments are charged directly on your own Stripe account at booking. Goldsainte\u2019s flat fee is 7% total across both sides \u2014 the rest is yours, minus standard card processing.",
                   },
                 ]
             ).map((step, i) => (
@@ -839,15 +839,15 @@ export default function TripRequestDetail() {
             <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
               <div className="border-t border-[#0a2225]/15 pt-3">
                 <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Deposit</p>
-                <p className="font-secondary text-[17px] text-[#0a2225]">25% at acceptance, held in escrow</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">25% at acceptance, paid at booking</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
                 <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Balance</p>
-                <p className="font-secondary text-[17px] text-[#0a2225]">Due before departure, also into escrow</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">Due before departure, same secure checkout</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
                 <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Your payout</p>
-                <p className="font-secondary text-[17px] text-[#0a2225]">96.5% of your price, released after the trip is confirmed</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">96.5% of your price, paid straight to your Stripe account</p>
               </div>
             </div>
             <p className="mt-7 text-[16px] leading-relaxed text-[#0a2225]/75">
