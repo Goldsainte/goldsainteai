@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-  const [tips, setTips] = useState<TipsSnapshot | null>(null);
 import { Link } from "react-router-dom";
 import { ArrowRight, AlertCircle } from "lucide-react";
 import {
@@ -22,6 +21,7 @@ export function CreatorEarningsTab() {
   const [snapshot, setSnapshot] = useState<PartnerEarningSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tips, setTips] = useState<TipsSnapshot | null>(null);
   useEffect(() => {
     let cancelled = false;
     async function load() {
