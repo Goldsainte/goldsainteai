@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
 import { MessageButton } from "@/components/messaging/MessageButton";
+import { TipModal } from "@/components/creator/TipModal";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 
 // ============================================================================
@@ -162,6 +165,7 @@ export default function AgentPublicProfilePage() {
     );
   }
 
+  const [tipOpen, setTipOpen] = useState(false);
   const displayName = profile.display_name || profile.full_name || "Goldsainte Specialist";
   const firstName = displayName.split(" ")[0];
   const askUsAbout = [
@@ -219,13 +223,25 @@ export default function AgentPublicProfilePage() {
         belowCta={
           // Visible to everyone except the owner; MessageButton self-hides for
           // self and routes signed-out visitors to /auth on tap.
-          <MessageButton
-            recipientId={profile.id}
-            recipientName={displayName}
-            variant="outline"
-            className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
-            label={"Message " + firstName}
-          />
+          <div className="space-y-2">
+            <MessageButton
+              recipientId={profile.id}
+              recipientName={displayName}
+              variant="outline"
+              className="w-full rounded-full border-[#0a2225]/25 py-6 text-[15px]"
+              label={"Message " + firstName}
+            />
+            {user?.id !== profile.id && (
+              <Button
+                onClick={() => setTipOpen(true)}
+                variant="outline"
+                className="w-full rounded-full border-[#C7A962] py-6 text-[15px] font-medium text-[#8a7136] hover:bg-[#FDF9F0]"
+              >
+                <Heart className="mr-1.5 h-4 w-4" />
+                Tip {firstName}
+              </Button>
+            )}
+          </div>
         }
         ownerActions={
           user?.id === profile.id
@@ -252,6 +268,14 @@ export default function AgentPublicProfilePage() {
           </section>
         }
       />
-    </div>
+          {user?.id !== profile.id && (
+        <TipModal
+          open={tipOpen}
+          onOpenChange={setTipOpen}
+          recipientId={profile.id}
+          recipientName={firstName}
+        />
+      )}
+</div>
   );
 }
