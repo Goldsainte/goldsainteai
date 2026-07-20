@@ -34,7 +34,7 @@ const PAGES: Record<string, PageMeta> = {
   "/": {
     title: "Goldsainte — The Smarter Travel Marketplace",
     description:
-      "Plan, discover, and book extraordinary trips with certified travel specialists and explorers across 50+ countries. Powered by AI, built around you.",
+      "Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents — combining bookable travel inspiration with a custom-trip proposal marketplace. Powered by AI, built around you.",
     h1: "The Smarter Travel Marketplace",
     intro:
       "Goldsainte connects discerning travelers with certified specialists and travel creators across more than 50 countries. Plan, discover, and book extraordinary journeys on one intelligent platform — with on-platform payments, vetted experts, and transparent pricing.",
@@ -97,7 +97,7 @@ const PAGES: Record<string, PageMeta> = {
   "/about": {
     title: "About Goldsainte — Our Mission",
     description:
-      "Goldsainte is the global marketplace for extraordinary travel — connecting travelers, specialists, and travel creators in one intelligent platform.",
+      "Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents — combining bookable travel inspiration with a custom-trip proposal marketplace.",
     h1: "About Goldsainte",
     intro:
       "Goldsainte was built to bring trust, transparency, and craftsmanship back to the way extraordinary trips are planned. We connect travelers directly with the world's best specialists and creators — and we make sure every transaction is secure, every expert is verified, and every itinerary is bookable.",
