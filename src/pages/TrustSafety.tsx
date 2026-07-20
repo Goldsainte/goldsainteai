@@ -48,11 +48,11 @@ const PILLARS = [
     icon: Gavel,
     eyebrow: "03 — Disputes",
     title: "If something goes wrong, we step in.",
-    body: "File a claim directly from your booking page. Our dispute resolution team reviews evidence from both parties — including on-platform messages, documents, and payment records — and issues a binding decision within 7 business days. This is why we require all booking communication to stay on-platform: it gives us the record we need to protect you.",
+    body: "File a claim directly from your booking page. Our dispute team administers the platform dispute process: we review evidence from both parties — on-platform messages, documents, and payment records — and aim to resolve platform-level issues within 7 business days, without modifying supplier terms or the seller's obligations under your travel-services agreement. This is why we require all booking communication to stay on-platform: it gives us the record we need to protect you.",
     details: [
       "Claim filed from your booking page",
       "Evidence review within 2 business days",
-      "Binding decision issued in 7 business days",
+      "Platform-level resolution within 7 business days",
       "Escalation path to senior review if needed",
     ],
     cta: { label: "Refund policy & dispute process", to: "/cancellation-refund-policy" },
