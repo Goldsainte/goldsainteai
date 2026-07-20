@@ -10,10 +10,10 @@ export const CreatorEscrowDashboard = () => {
         </div>
         <div>
           <p className="text-sm font-medium text-[#0a2225]">
-            Escrow system is active
+            Payments are active
           </p>
           <p className="text-sm text-[#6B7280]">
-            Payments are held securely and released when milestones are met.
+            Payments are charged securely through Stripe, directly to your account.
           </p>
         </div>
       </div>
@@ -22,9 +22,9 @@ export const CreatorEscrowDashboard = () => {
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard
           icon={<Clock className="h-5 w-5 text-[#C7A962]" />}
-          label="Pending in Escrow"
+          label="Pending"
           value="$0.00"
-          helper="Awaiting milestone completion"
+          helper="Processing or awaiting release"
         />
         <StatCard
           icon={<CheckCircle className="h-5 w-5 text-[#0c4d47]" />}
@@ -41,13 +41,13 @@ export const CreatorEscrowDashboard = () => {
         />
       </div>
 
-      {/* How Escrow Works */}
+      {/* How Payments Work */}
       <div className="bg-white border border-[#E5DFC6] rounded-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-[#E5DFC6]">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-[#C7A962]" />
             <h3 className="text-lg font-secondary text-[#0a2225]">
-              How Escrow Works
+              How Payments Work
             </h3>
           </div>
         </div>
@@ -78,7 +78,7 @@ export const CreatorEscrowDashboard = () => {
                 Milestone-Based Releases
               </h4>
               <p className="text-sm text-[#6B7280]">
-                Earnings are released as you complete milestones. Submit evidence and get paid after customer approval.
+                Payments are charged directly to your Stripe account at booking. No invoicing, no chasing.
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export const CreatorEscrowDashboard = () => {
                 Upfront Payout <span className="text-xs px-2 py-0.5 rounded-full bg-[#C7A962]/10 text-[#C7A962] ml-1">Verified Creators</span>
               </h4>
               <p className="text-sm text-[#6B7280]">
-                Verified creators receive 20-30% upfront. The remaining 70-80% is held in escrow until milestones are met.
+                Payments are processed securely through Stripe and land directly in your connected account.
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const CreatorEscrowDashboard = () => {
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#6B7280] flex items-center gap-1">
-                  <ArrowRight className="w-3 h-3" /> Held in escrow
+                  <ArrowRight className="w-3 h-3" /> Paid to your account
                 </span>
                 <span className="text-[#6B7280]">$3,400</span>
               </div>
