@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, Shield, MessageCircle, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,10 @@ export function TripBookingSidebar({
   const [isAskLoading, setIsAskLoading] = useState(false);
   const [isAskDrawerOpen, setIsAskDrawerOpen] = useState(false);
   const [residenceState, setResidenceState] = useState("");
+  // Seller-of-record identification (regulatory): the LEGAL selling entity,
+  // fetched from travel_agents.agency_name for agent trips. Falls back to
+  // the display host name while loading or for non-agent inventory.
+  const [sellerLegalName, setSellerLegalName] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -62,6 +66,22 @@ export function TripBookingSidebar({
   const depositBase = Math.round(pricePerPerson * (depositPercentage / 100));
   const guestServiceFee = Math.round(depositBase * GUEST_FEE_RATE * 100) / 100;
   const depositTotal = depositBase + guestServiceFee;
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!agentId) return;
+    supabase
+      .from("travel_agents")
+      .select("agency_name")
+      .eq("user_id", agentId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.agency_name) setSellerLegalName(data.agency_name);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [agentId]);
 
   const isPlatformTrip = creatorType === "platform" && !agentId && !creatorId;
   const partnerId = agentId || creatorId;
@@ -328,6 +348,21 @@ export function TripBookingSidebar({
           ))}
         </div>
       </div>
+
+      {/* Seller-of-record identification (regulatory disclosure) */}
+      {agentId && (
+        <div className="mt-6 border-t border-[#E5DFC6] pt-4 text-xs leading-relaxed text-[#6B7280]">
+          <p>
+            <span className="font-semibold text-[#4a4a4a]">Sold and fulfilled by:</span>{" "}
+            {sellerLegalName || hostName || "the independent travel agent named on this trip"}
+          </p>
+          <p className="mt-1.5">
+            Goldsainte provides the marketplace technology and is not the seller of
+            the travel services. Featured creators provide inspiration only. Your
+            travel-services agreement is with the seller named above.
+          </p>
+        </div>
+      )}
     </div>
 
     <AskQuestionDrawer
