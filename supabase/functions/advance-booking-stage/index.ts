@@ -65,50 +65,55 @@ function personaFromCapabilities(caps: string[]): Persona {
 }
 
 // Traveler-facing headline per persona per stage (1..3).
+// These MIRROR THE TIMELINE STEP TITLES in src/lib/bookingDeliverables.ts
+// (TRAVELER_JOURNEYS, steps 4/5/6) VERBATIM, so the bell/email always say
+// exactly what the booking timeline shows. {name} = the specialist's first
+// name. If you edit a step title in bookingDeliverables.ts, update it here too.
 const STAGE_HEADLINE: Record<Persona, [string, string, string]> = {
   creative: [
-    "Your shoot has begun",
+    "{name} is capturing your trip",
     "Your gallery is being edited",
-    "Your gallery has been delivered",
+    "Your gallery is delivered",
   ],
   family: [
-    "Your support has begun",
-    "Your trip is underway",
+    "{name} is supporting your trip",
+    "Your trip begins",
     "Your trip is complete",
   ],
   trip: [
-    "Your specialist is designing your days",
-    "Your journey is underway",
+    "{name} is designing your days",
+    "Your journey begins",
     "Your journey is complete",
   ],
   generic: [
-    "Your specialist is putting your trip together",
-    "Your journey is underway",
+    "{name} is putting your trip together",
+    "Your journey begins",
     "Your journey is complete",
   ],
 };
 
-// A short "what this means" line for the email body per persona per stage.
+// The email body line per persona per stage — MIRRORS the timeline step `sub`
+// text in bookingDeliverables.ts verbatim, for the same reason.
 const STAGE_DETAIL: Record<Persona, [string, string, string]> = {
   creative: [
-    "Your photographer has started capturing your moments. Previews may appear in your booking Messages as sessions happen.",
-    "Your sessions are wrapped and your images are being selected and finished.",
-    "Your gallery is ready. Open your booking to view everything, and close it out once you're happy.",
+    "Your moments are being shot as each session happens.",
+    "{name} is selecting and finishing your images.",
+    "Once you've received everything and all is well, you close it out.",
   ],
   family: [
-    "Your support is now underway for your trip.",
-    "Your trip is in progress — your specialist is a message away throughout.",
-    "Everything's wrapped up. Open your booking to confirm and close it out.",
+    "An extra capable pair of hands, there when you need it.",
+    "{name} is with you throughout, a message away.",
+    "Once you've returned and all is well, you close it out.",
   ],
   trip: [
-    "Your specialist has started building your itinerary. Reservations and details will appear in your booking as they're confirmed.",
-    "Your trip is underway — your specialist is a message away throughout.",
-    "Your journey is complete. Open your booking to confirm and close it out.",
+    "Your reservations and itinerary appear here as each detail is confirmed.",
+    "{name} is with you throughout, a message away.",
+    "Once you've returned and all is well, you close the journey.",
   ],
   generic: [
-    "Your specialist has started putting your trip together. Details will appear in your booking as they're confirmed.",
-    "Your trip is underway — your specialist is a message away throughout.",
-    "Your journey is complete. Open your booking to confirm and close it out.",
+    "The details appear here as each one is confirmed.",
+    "{name} is with you throughout, a message away.",
+    "Once you've returned and all is well, you close the journey.",
   ],
 };
 
@@ -216,6 +221,25 @@ Deno.serve(async (req: Request) => {
     }
     const persona = personaFromCapabilities(capabilities);
 
+    // Resolve the specialist's first name so {name} in the copy reads naturally
+    // ("Jordan is capturing your trip"). Best-effort; falls back gracefully.
+    let specialistFirst = "Your specialist";
+    try {
+      if (booking.partner_id) {
+        const { data: prof } = await admin
+          .from("profiles")
+          .select("display_name, full_name")
+          .eq("id", booking.partner_id)
+          .maybeSingle();
+        const full =
+          (prof as any)?.display_name || (prof as any)?.full_name || "";
+        const first = String(full).trim().split(/\s+/)[0];
+        if (first) specialistFirst = first;
+      }
+    } catch (_e) {
+      // Name is presentational — never fatal.
+    }
+
     // --- Perform the update (single field; trigger enforces forward-only) -
     const { error: updErr } = await admin
       .from("trip_bookings")
@@ -227,8 +251,9 @@ Deno.serve(async (req: Request) => {
     // Non-fatal: the stage advance already succeeded; a notification failure
     // must not fail the request. We surface any channel errors for logging.
     const idx = (toStage - 1) as 0 | 1 | 2;
-    const title = STAGE_HEADLINE[persona][idx];
-    const detail = STAGE_DETAIL[persona][idx];
+    const fill = (s: string) => s.split("{name}").join(specialistFirst);
+    const title = fill(STAGE_HEADLINE[persona][idx]);
+    const detail = fill(STAGE_DETAIL[persona][idx]);
     let notify: { ok: boolean; errors?: unknown } = { ok: true };
     try {
       const { data: nr, error: ne } = await admin.functions.invoke(
