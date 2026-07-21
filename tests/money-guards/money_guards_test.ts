@@ -233,18 +233,33 @@ Deno.test("clients cannot write the money tables", () => {
 // Pages — the keys stay where they belong
 // ─────────────────────────────────────────────────────────────────────────────
 
-Deno.test("the traveler holds both keys (escrow card with both releases)", () => {
-  assertContains(TRAVELER_PAGE, "Your escrow", "The consent card is the product's trust story.");
-  assertContains(TRAVELER_PAGE, '"release_deposit"', "Working-capital release is the traveler's.");
-  assertContains(TRAVELER_PAGE, '"release_final"', "Trip-complete confirmation is the traveler's.");
-  assertContains(TRAVELER_PAGE, "Change of plans?", "Live-river cancellation requests.");
+Deno.test("traveler page is direct-charge: specialist is seller of record, no escrow UI (model change Jul 20 2026)", () => {
+  // The booking pages moved off platform-held escrow to Stripe direct charges:
+  // the specialist is merchant/seller of record, paid at checkout, and there is
+  // no traveler-operated deposit/final "release" any more. These assertions
+  // guard that the escrow UI never creeps back into the traveler page. (The
+  // release-trip-deposit EDGE FUNCTION still exists for any legacy platform-held
+  // bookings and is guarded by its own tests above — this is about the PAGE.)
+  assertContains(TRAVELER_PAGE, "seller of record", "The direct-charge trust story: the specialist is the seller of record.");
+  assertContains(TRAVELER_PAGE, "trip-checkout-create", "Payments go through the direct-charge checkout function.");
+  assertNotContains(TRAVELER_PAGE, "Your escrow", "The escrow consent card is retired under direct charges.");
+  assertNotContains(TRAVELER_PAGE, '"release_deposit"', "No traveler-operated deposit release under direct charges.");
+  assertNotContains(TRAVELER_PAGE, '"release_final"', "No traveler-operated final release under direct charges.");
+  assertNotContains(TRAVELER_PAGE, "release-trip-deposit", "The page must not invoke the legacy release engine.");
 });
 
-Deno.test("partner pages request — they never self-release (Jul 11: the vendor held the vault key)", () => {
+Deno.test("partner pages are direct-charge: partner is seller of record, no release UI (model change Jul 20 2026)", () => {
+  // Under direct charges the partner IS their own Stripe merchant — traveler
+  // payments land on their account at checkout, so there is no "request release"
+  // flow on the partner surfaces any more. Guard that neither the list nor the
+  // detail page reintroduces a release button or invokes the legacy engine.
   for (const p of [PARTNER_LIST, PARTNER_DETAIL]) {
-    assertContains(p, '"request_release"', "Partners send requests.");
+    assertNotContains(p, '"request_release"', "No release-request flow under direct charges — the partner is paid at checkout.");
+    assertNotContains(p, "release-trip-deposit", "Partner pages must not invoke the legacy release engine.");
     assertNotContains(p, "Release deposit", "No self-release button may return.");
   }
+  // The detail page carries the direct-charge economics explicitly.
+  assertContains(PARTNER_DETAIL, "seller of record", "The partner is the seller of record and keeps 96.5%.");
 });
 
 Deno.test("the admin desk exists as fallback with both milestone actions", () => {
