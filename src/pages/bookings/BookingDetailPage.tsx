@@ -15,6 +15,7 @@ import { createDispute, getBookingDisputes } from "@/services/disputeService";
 import {
   buildDeliverables,
   deliverablesHeading,
+  buildJourneyCopy,
   DELIVERABLES_FALLBACK,
 } from "@/lib/bookingDeliverables";
 
@@ -664,56 +665,42 @@ export default function BookingDetailPage() {
           ? 40
           : 0;
 
+  // Persona-aware step copy (photographer vs trip specialist vs …), keyed off
+  // the same hire_capabilities the deliverables use. The lifecycle STATE
+  // (done/cur/next) is computed here from booking status; only the wording
+  // comes from the shared journey table.
+  const firstName = (specialistName || "your specialist").split(/\s+/)[0];
+  const journeyCopy = buildJourneyCopy(hireCapabilities, "traveler", firstName);
+
   type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
-  const stepReserved: TL = {
-    title: "Your journey is reserved",
-    sub: "Everything from here is looked after, start to finish.",
-    state: depositPaid || isConfirmed ? "done" : "cur",
-  };
-  const stepSecured: TL = {
-    title: "Your place is secured",
-    sub: `${specialistName} is confirmed and your dates are held.`,
-    state: isConfirmed ? "done" : depositPaid ? "cur" : "next",
-  };
-  const stepArranged: TL = {
-    title: "Your trip is fully arranged",
-    sub: "Nothing more is needed from you.",
-    state:
-      booking?.status === "paid_in_full" || tripComplete
-        ? "done"
-        : isConfirmed
-          ? "cur"
-          : "next",
-  };
-  const stepDesigning: TL = {
-    title: `${specialistName} is designing your days`,
-    sub: "Your reservations and itinerary appear here as each detail is confirmed.",
-    state: tripComplete ? "done" : booking?.status === "paid_in_full" ? "cur" : "next",
-    when: booking?.status === "paid_in_full" ? "You're here" : undefined,
-  };
-  const stepBegins: TL = {
-    title: "Your journey begins",
-    sub: `${specialistName} is with you throughout, a message away.`,
-    state: tripComplete ? "done" : "next",
-  };
-  const stepComplete: TL = {
-    title: "Your journey is complete",
-    sub: "Once you've returned and all is well, you close the journey.",
-    state: tripComplete ? "cur" : "next",
-  };
-  const timeline: TL[] = [
-    stepReserved,
-    stepSecured,
-    stepArranged,
-    stepDesigning,
-    stepBegins,
-    stepComplete,
+  const stepStates: Array<{ state: TL["state"]; when?: string }> = [
+    { state: depositPaid || isConfirmed ? "done" : "cur" },
+    { state: isConfirmed ? "done" : depositPaid ? "cur" : "next" },
+    {
+      state:
+        booking?.status === "paid_in_full" || tripComplete
+          ? "done"
+          : isConfirmed
+            ? "cur"
+            : "next",
+    },
+    {
+      state: tripComplete ? "done" : booking?.status === "paid_in_full" ? "cur" : "next",
+      when: booking?.status === "paid_in_full" ? "You're here" : undefined,
+    },
+    { state: tripComplete ? "done" : "next" },
+    { state: tripComplete ? "cur" : "next" },
   ];
-  const currentStep = timeline.find((t) => t.state === "cur") || stepReserved;
+  const timeline: TL[] = journeyCopy.steps.map((s, i) => ({
+    title: s.title,
+    sub: s.sub,
+    state: stepStates[i].state,
+    when: stepStates[i].when,
+  }));
+  const currentStep = timeline.find((t) => t.state === "cur") || timeline[0];
 
   // Deliverables (dynamic, from hire_capabilities). Null → single fallback line.
   const deliverables = buildDeliverables(hireCapabilities);
-  const firstName = (specialistName || "your specialist").split(/\s+/)[0];
   const deliverablesHead = deliverablesHeading(hireCapabilities, firstName, "traveler");
 
   // Has the traveler paid anything at all yet? Gate the payment container copy.
@@ -794,13 +781,13 @@ export default function BookingDetailPage() {
             <section className="mt-14">
               <div className="text-center">
                 <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                  Your journey, step by step
+                  {journeyCopy.trackerEyebrow}
                 </p>
                 <div className="mt-6 font-secondary text-[36px] leading-none text-[#0a2225]">
                   {journeyPct}%
                 </div>
                 <p className="mt-2 text-[13px] uppercase tracking-[0.16em] text-[#0a2225]/50">
-                  of your journey arranged
+                  {journeyCopy.progressLabel}
                 </p>
                 <div className="mx-auto mt-6 h-1 w-[280px] overflow-hidden rounded-full bg-[#EDE6D3]">
                   <div
