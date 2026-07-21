@@ -146,6 +146,19 @@ export const Footer = () => {
           </p>
         </div>
 
+        {/* Seller-of-record disclosure. Kept in English in the markup (not the
+            i18n layer) because legal disclosure text should be reviewed and
+            translated by counsel rather than machine-translated. */}
+        <div className="text-center max-w-3xl mx-auto px-4 pb-6">
+          <p className="text-[11px] leading-relaxed text-[#9A9079]">
+            Travel booked on Goldsainte is sold by independent travel
+            professionals, who are the seller of record and are paid directly
+            for your trip. Goldsainte is a technology platform that connects
+            travelers with these professionals — we are not a travel agency,
+            tour operator, airline, hotel, or the seller of your travel.
+          </p>
+        </div>
+
         {/* Legal Bottom Bar */}
         <div className="pt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center">
           {legalLinks.map((l, i) => (
