@@ -21,6 +21,7 @@ type BookingRow = {
   total_price: number | null;
   deposit_amount: number | null;
   partner_payout: number | null;
+  fulfillment_stage: number | null;
   currency: string | null;
   created_at: string;
   metadata: Record<string, any> | null;
@@ -44,6 +45,7 @@ export default function PartnerBookingDetailPage() {
   const [cover, setCover] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [hireCapabilities, setHireCapabilities] = useState<string[]>([]);
+  const [advancingTo, setAdvancingTo] = useState<number | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -61,7 +63,7 @@ export default function PartnerBookingDetailPage() {
           .select(
             `
             id, status, partner_role, traveler_id, partner_id,
-            total_price, proposal_id, deposit_amount, partner_payout, currency,
+            total_price, proposal_id, deposit_amount, partner_payout, fulfillment_stage, currency,
             created_at, metadata,
             trip_requests:trip_request_id (
               id, title, destination, start_date, end_date,
@@ -146,6 +148,32 @@ export default function PartnerBookingDetailPage() {
       </div>
     );
   }
+
+  // Advance this booking's work phase by one step. Calls the secure edge
+  // function (partner-only + forward-only, server-enforced), which also
+  // notifies the traveler by email + in-app bell. On success we optimistically
+  // bump the local stage so the timeline moves immediately.
+  async function advanceStage(toStage: number) {
+    if (!booking || advancingTo !== null) return;
+    setAdvancingTo(toStage);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "advance-booking-stage",
+        { body: { tripBookingId: booking.id, toStage } }
+      );
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setBooking((prev) =>
+        prev ? { ...prev, fulfillment_stage: toStage } : prev
+      );
+      toast.success("Progress updated — your client has been notified.");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't update progress. Please try again.");
+    } finally {
+      setAdvancingTo(null);
+    }
+  }
+
   const trip = booking.trip_requests;
   const title =
     trip?.title ||
@@ -195,38 +223,68 @@ export default function PartnerBookingDetailPage() {
         : booking.status.replace(/_/g, " ");
 
   // Progress %, partner-framed (their delivery arc, not money release).
-  const engagementPct = tripComplete
-    ? 100
-    : balancePaid
-      ? 80
-      : depositPaid
-        ? 50
-        : 20;
+  // engagementPct is computed after the step states are known (below), so it
+  // always reflects both the payment steps and the partner's marked work steps.
 
   // Persona-aware step copy (photographer vs trip specialist vs …), keyed off
   // the same hire_capabilities the deliverables use. Lifecycle STATE is
-  // computed here from booking status; wording comes from the shared table.
+  // computed here; wording comes from the shared table.
   const partnerJourney = buildJourneyCopy(hireCapabilities, "partner", clientFirst);
 
-  type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
-  const partnerStates: Array<{ state: TL["state"]; when?: string }> = [
+  // The six steps split into two halves:
+  //  • Steps 1-3 (indices 0,1,2) are PAYMENT-driven and advance on their own.
+  //  • Steps 4-6 (indices 3,4,5) are the WORK the partner does, tracked by
+  //    fulfillment_stage (1,2,3). The partner marks these done themselves.
+  // A work step can only be marked once the trip is fully paid — you can't be
+  // "capturing" or "designing" before the booking is paid in full.
+  const stage = Number(booking.fulfillment_stage ?? 0); // 0..3
+  const workUnlocked = balancePaid; // paid_in_full or completed
+
+  type TL = {
+    title: string;
+    sub: string;
+    state: "done" | "cur" | "next";
+    when?: string;
+    /** When set, this step shows a "mark done" button that advances to N. */
+    advanceTo?: 1 | 2 | 3;
+  };
+
+  // Payment half (unchanged behaviour).
+  const paymentStates: Array<{ state: TL["state"] }> = [
     { state: depositPaid ? "done" : "cur" },
     { state: balancePaid ? "done" : depositPaid ? "cur" : "next" },
-    { state: tripComplete ? "done" : balancePaid ? "cur" : "next" },
-    {
-      state: tripComplete ? "done" : balancePaid ? "cur" : "next",
-      when: balancePaid && !tripComplete ? "You're here" : undefined,
-    },
-    { state: tripComplete ? "done" : "next" },
-    { state: tripComplete ? "cur" : "next" },
+    { state: balancePaid ? "done" : depositPaid ? "cur" : "next" },
   ];
+
+  // Work half — driven by fulfillment_stage. Step index 3 => stage 1, 4 => 2,
+  // 5 => 3. "done" if stage has passed it, "cur" if it's the next to mark,
+  // "next" otherwise. The current work step carries the advance button.
+  const workStates: Array<{ state: TL["state"]; advanceTo?: 1 | 2 | 3; when?: string }> =
+    [1, 2, 3].map((n) => {
+      const stageNum = n as 1 | 2 | 3;
+      if (stage >= stageNum) return { state: "done" as const };
+      // Not yet done. It's the current one to mark if it's exactly the next
+      // stage AND the work phase is unlocked (fully paid).
+      const isNextToMark = stageNum === stage + 1;
+      if (isNextToMark && workUnlocked) {
+        return { state: "cur" as const, advanceTo: stageNum, when: "You're here" };
+      }
+      return { state: "next" as const };
+    });
+
+  const stepStates = [...paymentStates, ...workStates];
   const timeline: TL[] = partnerJourney.steps.map((s, i) => ({
     title: s.title,
     sub: s.sub,
-    state: partnerStates[i].state,
-    when: partnerStates[i].when,
+    state: stepStates[i].state,
+    when: (stepStates[i] as any).when,
+    advanceTo: (stepStates[i] as any).advanceTo,
   }));
   const currentStep = timeline.find((t) => t.state === "cur") || timeline[0];
+
+  // Progress = share of the six steps that are done (payment + work alike).
+  const doneCount = timeline.filter((t) => t.state === "done").length;
+  const engagementPct = Math.round((doneCount / timeline.length) * 100);
 
   const deliverables = buildDeliverables(hireCapabilities);
   const deliverablesHead = deliverablesHeading(hireCapabilities, clientFirst, "partner");
@@ -327,6 +385,23 @@ export default function PartnerBookingDetailPage() {
                   <p className="mt-1.5 text-[12px] uppercase tracking-[0.12em] text-[#0a2225]/40">
                     {t.when}
                   </p>
+                )}
+                {t.advanceTo && (
+                  <button
+                    type="button"
+                    onClick={() => advanceStage(t.advanceTo!)}
+                    disabled={advancingTo !== null}
+                    className="mt-3.5 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.1em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                  >
+                    {advancingTo === t.advanceTo ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Updating…
+                      </>
+                    ) : (
+                      <>Mark this done</>
+                    )}
+                  </button>
                 )}
               </div>
             ))}
