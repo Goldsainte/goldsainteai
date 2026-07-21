@@ -3,7 +3,7 @@
 // person onto your trip to do." ONE list, used at every stage: creators
 // declare from it, travelers choose from the creator's declared subset, the
 // choice rides the request, and the proposal prefills from it — so by the
-// time escrow holds a deposit, both sides have agreed to the same named
+// time the traveler pays, both sides have agreed to the same named
 // scope. Edit LABELS/HINTS here freely; IDs are stored in
 // creator_services.includes and trip_requests.source_metadata and must stay
 // stable. (Founder: this file is the taxonomy — change wording here only.)
