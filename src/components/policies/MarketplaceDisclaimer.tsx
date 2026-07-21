@@ -38,9 +38,11 @@ export function MarketplaceDisclaimer({
       <Info className="h-4 w-4 shrink-0" />
       <AlertDescription className={`${textSize} leading-relaxed`}>
         Goldsainte is a curated marketplace. Travel services shown or booked on this
-        platform are designed and fulfilled by independent travel professionals and
-        third-party suppliers. Goldsainte is not the airline, hotel, tour operator,
-        ground operator, or service provider for your trip.
+        platform are designed, sold, and fulfilled by independent travel professionals and
+        third-party suppliers. The travel professional is the seller of record for your
+        trip and is charged directly at checkout — Goldsainte holds a platform service fee
+        only and is not the airline, hotel, tour operator, ground operator, seller, or
+        service provider for your trip.
         <br />
         <br />
         Cancellation and refund eligibility is governed by supplier rules and the travel
