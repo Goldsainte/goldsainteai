@@ -50,10 +50,11 @@ export function TripPoliciesPanel({
   return (
     <div className="space-y-6 text-sm text-[#0a2225]/80 leading-relaxed">
       <p>
-        Your travel professional builds and delivers this trip. Goldsainte holds
-        the booking, the payment, and the record — so we can step in if
-        something doesn&apos;t go to plan. We are not the airline, hotel, or
-        tour operator.
+        Your travel professional builds and delivers this trip, and is your
+        seller of record — payment is charged securely to them at checkout, and
+        they hold the booking and the arrangements directly. Goldsainte is the
+        platform that connects you and helps things run smoothly. We are not the
+        airline, hotel, or tour operator.
       </p>
  
       <p>
@@ -124,4 +125,3 @@ export function TripPoliciesPanel({
     </div>
   );
 }
- 
