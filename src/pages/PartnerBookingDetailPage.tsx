@@ -3,9 +3,13 @@ import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
-import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
-import { ChevronLeft, MessageCircle, Loader2 } from "lucide-react";
+import { ChevronLeft, MessageCircle, Loader2, CheckCircle2 } from "lucide-react";
+import {
+  buildDeliverables,
+  deliverablesHeading,
+  DELIVERABLES_FALLBACK,
+} from "@/lib/bookingDeliverables";
 
 type BookingRow = {
   id: string;
@@ -38,7 +42,7 @@ export default function PartnerBookingDetailPage() {
   const [travelerName, setTravelerName] = useState<string | null>(null);
   const [cover, setCover] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [releasing, setReleasing] = useState(false);
+  const [hireCapabilities, setHireCapabilities] = useState<string[]>([]);
 
   useEffect(() => {
     let alive = true;
@@ -84,10 +88,22 @@ export default function PartnerBookingDetailPage() {
           if (pid) {
             const { data: pr } = await (supabase
               .from("trip_proposals")
-              .select("price_breakdown" as any)
+              .select("price_breakdown, trip_request_id" as any)
               .eq("id", pid)
               .maybeSingle() as any);
             setIsHireBooking(Boolean((pr as any)?.price_breakdown?.hire));
+            const reqId = (pr as any)?.trip_request_id;
+            if (reqId) {
+              const { data: req } = await (supabase
+                .from("trip_requests")
+                .select("source_metadata" as any)
+                .eq("id", reqId)
+                .maybeSingle() as any);
+              const caps = (req as any)?.source_metadata?.hire_capabilities;
+              if (Array.isArray(caps)) {
+                setHireCapabilities(caps.filter((c: any) => typeof c === "string"));
+              }
+            }
           }
         } catch { /* hire detection is cosmetic */ }
 
@@ -122,31 +138,6 @@ export default function PartnerBookingDetailPage() {
     };
   }, [id, navigate]);
 
-  async function handleRelease() {
-    if (!booking) return;
-    const ok = await confirmDialog({
-      title: "Request payment release?",
-      description:
-        "For bookings paid on the legacy platform-held flow, this notifies your traveler and Goldsainte that you're ready — share your confirmed reservations in Messages and they release your deposit; on completion they confirm to release the final payment. New bookings are charged directly on your Stripe account and don't need a release.",
-      confirmText: "Send request",
-    });
-    if (!ok) return;
-    setReleasing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke(
-        "release-trip-deposit",
-        { body: { tripBookingId: booking.id, action: "request_release" } }
-      );
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      toast.success("Request sent — your traveler and Goldsainte have been notified.");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to send the release request");
-    } finally {
-      setReleasing(false);
-    }
-  }
-
   if (loading || !booking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea]">
@@ -154,14 +145,16 @@ export default function PartnerBookingDetailPage() {
       </div>
     );
   }
-
   const trip = booking.trip_requests;
   const title =
     trip?.title ||
     (booking.metadata as any)?.trip_title ||
     trip?.destination ||
     "Goldsainte Trip";
+  const clientName = travelerName || "your client";
+  const clientFirst = clientName.split(/\s+/)[0];
   const initial = (travelerName || "T").trim().charAt(0).toUpperCase();
+  const reference = `GS-${booking.id.slice(0, 8).toUpperCase()}`;
   const money = (v: number | null | undefined) =>
     v != null
       ? `$${(Number(v) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -179,22 +172,11 @@ export default function PartnerBookingDetailPage() {
     Number(booking.total_price || 0) - Number(booking.deposit_amount || 0)
   );
 
-  // Payment journey: deposit → balance → released
   const depositPaid = ["confirmed", "paid_in_full", "completed"].includes(booking.status);
   const balancePaid = ["paid_in_full", "completed"].includes(booking.status);
-  const released = booking.status === "completed";
-  const paymentDots = [
-    { label: "Deposit", on: depositPaid },
-    { label: "Balance", on: balancePaid },
-    { label: "Released", on: released },
-  ];
-  const journeyLabel = released
-    ? "Deposit released — booking complete"
-    : balancePaid
-      ? "Paid in full"
-      : depositPaid
-        ? "Deposit paid — balance pending"
-        : "Awaiting deposit";
+  const tripComplete = booking.status === "completed";
+
+  const heroImage = cover || (trip?.destination ? getTripRequestImageUrl(trip.destination) : null);
 
   const fmt = (d?: string | null) =>
     d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : null;
@@ -203,173 +185,302 @@ export default function PartnerBookingDetailPage() {
       ? `${fmt(trip.start_date)} – ${fmt(trip.end_date)}`
       : fmt(trip?.start_date) || null;
 
+  const humanStatus = tripComplete
+    ? "Complete"
+    : balancePaid
+      ? "Paid in full"
+      : depositPaid
+        ? "Deposit secured"
+        : booking.status.replace(/_/g, " ");
+
+  // Progress %, partner-framed (their delivery arc, not money release).
+  const engagementPct = tripComplete
+    ? 100
+    : balancePaid
+      ? 80
+      : depositPaid
+        ? 50
+        : 20;
+
+  // Partner timeline — from the approved partner mockup, money model corrected:
+  // Booking confirmed → Deposit secured → Paid in full → You're preparing →
+  // The trip → Complete. No "payout released": the partner is their own
+  // seller of record, paid directly on their Stripe at checkout.
+  type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
+  const timeline: TL[] = [
+    {
+      title: "Booking confirmed",
+      sub: `${clientFirst}'s booking is confirmed and yours to deliver.`,
+      state: depositPaid ? "done" : "cur",
+    },
+    {
+      title: "Deposit secured",
+      sub: "The deposit has been charged to your Stripe account.",
+      state: balancePaid ? "done" : depositPaid ? "cur" : "next",
+    },
+    {
+      title: "Paid in full",
+      sub: "The full trip has been charged directly to you.",
+      state: tripComplete ? "done" : balancePaid ? "cur" : "next",
+    },
+    {
+      title: `Prepare & share ${clientFirst}'s reservations`,
+      sub: "Confirm the details and share them in Messages as you go.",
+      state: tripComplete ? "done" : balancePaid ? "cur" : "next",
+      when: balancePaid && !tripComplete ? "You're here" : undefined,
+    },
+    {
+      title: "The trip",
+      sub: dates ? `${dates}. You're a message away throughout.` : "You're a message away throughout.",
+      state: tripComplete ? "done" : "next",
+    },
+    {
+      title: "Complete",
+      sub: `Once ${clientFirst} has returned and all is well, the engagement closes.`,
+      state: tripComplete ? "cur" : "next",
+    },
+  ];
+  const currentStep = timeline.find((t) => t.state === "cur") || timeline[0];
+
+  const deliverables = buildDeliverables(hireCapabilities);
+  const deliverablesHead = deliverablesHeading(hireCapabilities, clientFirst, "partner");
+
   return (
-    <div className="min-h-screen bg-[#f7f3ea]">
-      {/* Command bar — two-tier */}
-      <div className="sticky top-0 z-40 shadow-[0_2px_16px_rgba(10,34,37,0.28)]">
-        <div className="bg-gradient-to-r from-[#0c4d47] to-[#0a2225]">
-          <div className="mx-auto flex h-[72px] max-w-3xl items-center gap-4 px-4 md:px-6">
+    <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
+      <section className="mx-auto max-w-[860px] px-8 pt-8 pb-2">
+        <button
+          type="button"
+          onClick={() => navigate("/partner-bookings")}
+          className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Back to bookings
+        </button>
+      </section>
+
+      <article className="mx-auto max-w-[860px] px-8 pb-28 pt-2">
+        {/* Minimal hero */}
+        <div className="relative h-[96px] overflow-hidden rounded-2xl">
+          {heroImage && (
+            <img
+              src={heroImage}
+              alt={trip?.destination || title}
+              className="absolute inset-0 h-full w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/40 to-[#061418]/[0.03]" />
+        </div>
+
+        <div className="mt-10 text-center">
+          <p className="text-[12px] uppercase tracking-[0.24em] text-[#8D6B2F]">
+            Your engagement · {reference}
+          </p>
+          <h1 className="mt-3.5 font-secondary text-[30px] leading-[1.06] text-[#0a2225] md:text-4xl">
+            {title}
+          </h1>
+          <p className="mt-3.5 text-[16px] text-[#0a2225]/60">
+            For {clientName}
+            {dates ? ` · ${dates}` : ""}
+          </p>
+          <span className="mt-5 inline-block rounded-full bg-[#0c4d47] px-5 py-2.5 text-[11px] uppercase tracking-[0.16em] text-[#E5DFC6]">
+            {humanStatus}
+          </span>
+        </div>
+
+        <hr className="mx-auto mt-20 h-[2px] w-12 border-none bg-[#C7A962]" />
+
+        {/* Engagement tracker */}
+        <section className="mt-14">
+          <div className="text-center">
+            <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+              This engagement, step by step
+            </p>
+            <div className="mt-6 font-secondary text-[36px] leading-none text-[#0a2225]">
+              {engagementPct}%
+            </div>
+            <p className="mt-2 text-[13px] uppercase tracking-[0.16em] text-[#0a2225]/50">
+              of this engagement complete
+            </p>
+            <div className="mx-auto mt-6 h-1 w-[280px] overflow-hidden rounded-full bg-[#EDE6D3]">
+              <div
+                className="h-full rounded-full bg-[#C7A962] transition-[width] duration-1000"
+                style={{ width: `${engagementPct}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="relative mx-auto mt-14 max-w-[520px] pl-1">
+            <div className="absolute bottom-2 left-[17px] top-2 w-[2px] bg-[#0a2225]/10" />
+            {timeline.map((t, i) => (
+              <div key={i} className="relative pb-8 pl-14 last:pb-0">
+                <span
+                  className={
+                    "absolute left-[5px] top-0.5 flex h-[25px] w-[25px] items-center justify-center rounded-full text-[12px] " +
+                    (t.state === "done"
+                      ? "bg-[#0c4d47] text-[#E5DFC6]"
+                      : t.state === "cur"
+                        ? "border-2 border-[#C7A962] bg-white font-medium text-[#8D6B2F] shadow-[0_0_0_7px_rgba(199,169,98,0.14)]"
+                        : "border border-[#0a2225]/20 bg-white text-[#0a2225]/40")
+                  }
+                >
+                  {t.state === "done" ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
+                </span>
+                <h3
+                  className={
+                    "font-secondary text-[19px] " +
+                    (t.state === "next" ? "text-[#0a2225]/40" : "text-[#0a2225]")
+                  }
+                >
+                  {t.title}
+                </h3>
+                <p className="mt-1 max-w-[400px] text-[15px] text-[#0a2225]/60">{t.sub}</p>
+                {t.when && (
+                  <p className="mt-1.5 text-[12px] uppercase tracking-[0.12em] text-[#0a2225]/40">
+                    {t.when}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Happening now */}
+          <div className="mx-auto mt-14 max-w-[520px] rounded-[20px] bg-white p-9 text-center shadow-[0_24px_64px_-40px_rgba(10,34,37,0.35)]">
+            <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+              Your next step
+            </p>
+            <h3 className="mt-4 font-secondary text-[21px] text-[#0a2225]">{currentStep.title}.</h3>
+            <p className="mx-auto mt-2 max-w-[420px] text-[15px] text-[#0a2225]/65">
+              {currentStep.sub}
+            </p>
+          </div>
+
+          {/* Client chip */}
+          <div className="mx-auto mt-6 flex max-w-[520px] items-center justify-center gap-4">
+            <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#C7A962] text-[17px] font-medium text-[#0a2225]">
+              {initial}
+            </div>
+            <div className="text-left">
+              <small className="block text-[12px] uppercase tracking-[0.16em] text-[#0a2225]/50">
+                Your client
+              </small>
+              <span className="font-secondary text-[20px] text-[#0a2225]">{clientName}</span>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="mx-auto mt-6 flex max-w-[520px] flex-wrap justify-center gap-4">
             <button
               type="button"
-              onClick={() => navigate("/partner-bookings")}
-              aria-label="Back"
-              className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#E5DFC6]/28 text-[#E5DFC6] transition-colors hover:bg-white/10"
+              onClick={() => navigate("/messages")}
+              className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3.5 text-[13px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <MessageCircle className="h-4 w-4" />
+              Message {clientFirst}
             </button>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">
-                Client Booking · GS-{booking.id.slice(0, 8).toUpperCase()}
-              </p>
-              <h1 className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">
-                {title}
-              </h1>
-            </div>
-            {["confirmed", "paid_in_full"].includes(booking.status) ? (
-              <button
-                type="button"
-                onClick={handleRelease}
-                disabled={releasing}
-                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#C7A962] px-6 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:opacity-50"
-              >
-                {releasing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {releasing ? "Sending…" : "Request release"}
-              </button>
-            ) : (
-              <span className="shrink-0 rounded-full border border-[#E5DFC6]/35 px-4 py-2 text-[10.5px] uppercase tracking-[0.16em] text-[#E5DFC6]">
-                {booking.status.replace(/_/g, " ")}
-              </span>
-            )}
           </div>
-        </div>
-        <div className="border-t border-white/10 bg-[#083530]">
-          <div className="mx-auto flex h-[46px] max-w-3xl items-center gap-5 px-4 md:px-6">
-            <span className="flex items-center gap-2.5 text-[13px] text-[#f7f3ea]">
-              <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
-                {initial}
-              </span>
-              {travelerName || "Traveler"}
-            </span>
-            {dates && (
-              <span className="hidden text-[13px] text-[#f7f3ea] sm:inline">{dates}</span>
-            )}
-            <div className="flex-1" />
-            <div className="hidden items-center gap-3 md:flex">
-              {paymentDots.map((d) => (
-                <span key={d.label} className="flex items-center gap-1.5">
+        </section>
+
+        <hr className="mx-auto mt-20 h-[2px] w-12 border-none bg-[#C7A962]" />
+
+        {/* Deliverables — what the partner is delivering */}
+        <section className="mt-14">
+          <div className="text-center">
+            <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+              The engagement
+            </p>
+            <h2 className="mt-4 font-secondary text-[22px] text-[#0a2225]">{deliverablesHead}</h2>
+          </div>
+          <div className="mx-auto mt-6 max-w-[520px]">
+            {deliverables ? (
+              deliverables.map((d, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between border-b border-[#0a2225]/10 py-5"
+                >
+                  <span className="font-secondary text-[18px] text-[#0a2225]">{d.label}</span>
                   <span
-                    className={`h-[10px] w-[10px] rounded-full ${
-                      d.on ? "bg-[#C7A962]" : "border border-[#E5DFC6]/45 bg-transparent"
-                    }`}
-                  />
-                  <span className={`text-[11.5px] ${d.on ? "text-[#f7f3ea]" : "text-[#E5DFC6]/65"}`}>
-                    {d.label}
+                    className={
+                      "text-[12px] uppercase tracking-[0.14em] " +
+                      (d.state === "active" ? "text-[#8D6B2F]" : "text-[#0a2225]/35")
+                    }
+                  >
+                    {d.state === "active" ? "In progress" : "Upcoming"}
                   </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-[15px] text-[#0a2225]/60">{DELIVERABLES_FALLBACK}.</p>
+            )}
+          </div>
+        </section>
+
+        {/* Payment — partner economics, direct-charge */}
+        <section className="mt-20">
+          <div className="text-center">
+            <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">Payment</p>
+          </div>
+          <div className="mx-auto mt-6 max-w-[520px]">
+            <div className="divide-y divide-[#0a2225]/[0.08]">
+              <div className="flex items-baseline justify-between py-4">
+                <span className="text-[15px] text-[#0a2225]/65">Trip total</span>
+                <span className="font-secondary text-[19px] text-[#0a2225]">
+                  {money(booking.total_price)}
                 </span>
-              ))}
+              </div>
+              <div className="flex items-baseline justify-between py-4">
+                <span className="text-[15px] text-[#0a2225]/65">Deposit</span>
+                <span className="font-secondary text-[19px] text-[#0a2225]">
+                  {money(booking.deposit_amount)}
+                </span>
+              </div>
+              <div className="flex items-baseline justify-between py-4">
+                <span className="text-[15px] text-[#0a2225]/65">Balance</span>
+                <span className="font-secondary text-[19px] text-[#0a2225]">{money(balance)}</span>
+              </div>
+              <div className="flex items-baseline justify-between py-4">
+                <span className="text-[15px] text-[#0a2225]/65">{payoutLabel}</span>
+                <span className="font-secondary text-[22px] text-[#0c4d47]">
+                  $
+                  {payoutValue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
             </div>
-            <span className="text-[13px] font-medium text-white">{journeyLabel}</span>
+            <p className="mt-4 text-[13px] leading-relaxed text-[#0a2225]/50">
+              You are the seller of record. Traveler payments are charged directly
+              to your own Stripe account at checkout — deposit and balance alike —
+              and you keep 96.5%. Goldsainte's flat 3.5% applies on each side.
+            </p>
           </div>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 md:px-6">
-        {/* Cover */}
-        <div className="relative h-40 overflow-hidden rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
-          {(cover || trip?.destination) && (
-            <img
-              src={cover || getTripRequestImageUrl(trip!.destination!)}
-              alt={trip?.destination || "Trip"}
-              className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/80 via-[#0a2225]/20 to-transparent" />
-          {cover ? (
-            <img src={cover} alt="" className="h-full w-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-[#0c4d47] to-[#0a2225]" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/70 via-transparent to-transparent" />
-          <p className="absolute bottom-3 left-4 text-[12px] text-[#E5DFC6]/85">
-            Booked{" "}
-            {new Date(booking.created_at).toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
-            {trip?.destination ? ` · ${trip.destination}` : ""}
-          </p>
-        </div>
-
-        {/* Money */}
-        <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Payment</p>
-          <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
-            Payments
-          </h2>
-          <div className="mt-5 divide-y divide-[#0a2225]/8">
-            <div className="flex items-baseline justify-between py-3">
-              <span className="text-[15px] text-[#0a2225]/65">Trip total</span>
-              <span className="font-secondary text-[19px] text-[#0a2225]">
-                {money(booking.total_price)}
-              </span>
-            </div>
-            <div className="flex items-baseline justify-between py-3">
-              <span className="text-[15px] text-[#0a2225]/65">Deposit</span>
-              <span className="font-secondary text-[19px] text-[#0a2225]">
-                {money(booking.deposit_amount)}
-              </span>
-            </div>
-            <div className="flex items-baseline justify-between py-3">
-              <span className="text-[15px] text-[#0a2225]/65">Balance</span>
-              <span className="font-secondary text-[19px] text-[#0a2225]">{money(balance)}</span>
-            </div>
-            <div className="flex items-baseline justify-between py-3">
-              <span className="text-[15px] text-[#0a2225]/65">{payoutLabel}</span>
-              <span className="font-secondary text-[21px] text-[#0c4d47]">
-                ${payoutValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-            </div>
-          </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-[#0a2225]/45">
-            On the current model, traveler payments are charged directly on your own
-            Stripe account the moment they pay — deposit and balance alike. Older
-            platform-held bookings release on milestones once your traveler confirms.
-            Flat 3.5% on each side.
-          </p>
-        </div>
+        </section>
 
         {/* Contract */}
         {!isHireBooking && (
-        <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Agreement</p>
-          <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
-            Trip contract
-          </h2>
-          <ContractStatusCard
-            variant="agent"
-            bookingId={booking.id}
-            travelerId={booking.traveler_id}
-            partnerRole={booking.partner_role ?? null}
-            tripTitle={trip?.title || (booking.metadata as any)?.trip_title || null}
-            destination={trip?.destination ?? null}
-            startDate={trip?.start_date ?? null}
-            endDate={trip?.end_date ?? null}
-          />
-        </div>
+          <section className="mt-20">
+            <div className="text-center">
+              <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">Agreement</p>
+              <h2 className="mt-4 font-secondary text-[22px] text-[#0a2225]">Trip contract</h2>
+            </div>
+            <div className="mx-auto mt-6 max-w-[520px]">
+              <ContractStatusCard
+                variant="agent"
+                bookingId={booking.id}
+                travelerId={booking.traveler_id}
+                partnerRole={booking.partner_role ?? null}
+                tripTitle={trip?.title || (booking.metadata as any)?.trip_title || null}
+                destination={trip?.destination ?? null}
+                startDate={trip?.start_date ?? null}
+                endDate={trip?.end_date ?? null}
+              />
+            </div>
+          </section>
         )}
-
-        {/* Actions */}
-        <div className="flex flex-wrap items-center justify-end gap-3 pb-6">
-          <button
-            type="button"
-            onClick={() => navigate("/messages")}
-            className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/20 px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a2225]/70 transition-colors hover:bg-white"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Message traveler
-          </button>
-        </div>
-      </div>
-    </div>
+      </article>
+    </main>
   );
 }
