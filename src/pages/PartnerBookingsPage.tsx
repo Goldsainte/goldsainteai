@@ -7,8 +7,6 @@ import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { MapPin, HandCoins, Users, ArrowRight } from "lucide-react";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { Button } from "@/components/ui/button";
-import { confirmDialog } from "@/components/ui/confirm-dialog";
-import { toast } from "sonner";
 
 type BookingRow = {
   id: string;
@@ -223,33 +221,6 @@ function PartnerBookingRowCard({ isHireBooking, booking,
   const trip = booking.trip_requests;
   const travelers =
     (trip?.travelers_adults || 0) + (trip?.travelers_children || 0);
-  const [releasing, setReleasing] = useState(false);
-
-  const handleRelease = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const ok = await confirmDialog({
-      title: "Request payment release?",
-      description:
-        "For bookings paid on the legacy platform-held flow, this notifies your traveler and Goldsainte that you're ready — share your confirmed reservations with them in Messages and they release your deposit; when the trip is complete they confirm it to release the final payment. New bookings are paid to your Stripe account directly and don't need a release.",
-      confirmText: "Send request",
-    });
-    if (!ok) return;
-    setReleasing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke(
-        "release-trip-deposit",
-        { body: { tripBookingId: booking.id, action: "request_release" } }
-      );
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      toast.success("Request sent — your traveler and Goldsainte have been notified.");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to send the release request");
-    } finally {
-      setReleasing(false);
-    }
-  };
 
   const total =
     booking.total_price != null
@@ -288,7 +259,7 @@ function PartnerBookingRowCard({ isHireBooking, booking,
   const reference = `GS-${booking.id.slice(0, 8).toUpperCase()}`;
   const booked = new Date(booking.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const imgUrl = trip?.destination ? getTripRequestImageUrl(trip.destination) : null;
-  void onStatusChange; void handleRelease; void initial; void total;
+  void onStatusChange; void initial; void total;
   return (
     <Link
       to={`/booking/${booking.id}`}
