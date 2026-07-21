@@ -47,6 +47,7 @@ type BookingRow = {
   created_at: string;
   metadata: Record<string, any> | null;
   stripe_payment_intent_id: string | null;
+  fulfillment_stage: number | null;
 };
 
 type TripRow = {
@@ -196,7 +197,7 @@ export default function BookingDetailPage() {
         const { data: bookingRow, error: bookingErr } = await supabase
           .from("trip_bookings")
           .select(
-            "id, status, traveler_id, partner_id, partner_role, total_price, proposal_id, deposit_amount, currency, created_at, metadata, stripe_payment_intent_id"
+            "id, status, traveler_id, partner_id, partner_role, total_price, proposal_id, deposit_amount, currency, created_at, metadata, stripe_payment_intent_id, fulfillment_stage"
           )
           .eq("id", bookingId)
           .single();
@@ -317,6 +318,33 @@ export default function BookingDetailPage() {
       cancelled = true;
     };
   }, [bookingId, navigate, reloadKey]);
+
+  // Realtime: when the assigned partner advances this booking's fulfillment
+  // stage (or the webhook updates payment), the row changes in the database.
+  // Subscribe to those UPDATEs and bump reloadKey so the timeline re-derives
+  // and animates forward live — the same mechanism chat uses for new messages.
+  // (The migration enabled realtime + REPLICA IDENTITY FULL on trip_bookings.)
+  useEffect(() => {
+    if (!bookingId) return;
+    const channel = supabase
+      .channel(`booking-stage-${bookingId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "trip_bookings",
+          filter: `id=eq.${bookingId}`,
+        },
+        () => {
+          setReloadKey((k) => k + 1);
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [bookingId]);
 
   async function handleFileClaim(e: React.FormEvent) {
     e.preventDefault();
@@ -559,15 +587,8 @@ export default function BookingDetailPage() {
     booking?.status === "confirmed" ||
     booking?.status === "paid_in_full" ||
     booking?.status === "completed";
-  const journeyPct = tripComplete
-    ? 100
-    : booking?.status === "paid_in_full"
-      ? 80
-      : isConfirmed
-        ? 66
-        : depositPaid
-          ? 40
-          : 0;
+  // journeyPct is computed after the step states are known (below), so it
+  // reflects both the payment steps and the partner's marked work steps.
 
   // Persona-aware step copy (photographer vs trip specialist vs …), keyed off
   // the same hire_capabilities the deliverables use. The lifecycle STATE
@@ -577,7 +598,19 @@ export default function BookingDetailPage() {
   const journeyCopy = buildJourneyCopy(hireCapabilities, "traveler", firstName);
 
   type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
-  const stepStates: Array<{ state: TL["state"]; when?: string }> = [
+
+  // The six steps split into two halves (identical model to the partner page,
+  // so both sides always show the same progress):
+  //  • Steps 1-3 (indices 0,1,2): PAYMENT-driven (reserved → secured → paid).
+  //  • Steps 4-6 (indices 3,4,5): the partner's WORK, tracked by
+  //    fulfillment_stage (1,2,3). These advance when the partner marks them,
+  //    which arrives here live via the realtime subscription below.
+  const stage = Number(booking?.fulfillment_stage ?? 0); // 0..3
+  const fullyPaidForWork =
+    booking?.status === "paid_in_full" || booking?.status === "completed";
+
+  // Payment half — unchanged behaviour.
+  const paymentStates: Array<{ state: TL["state"] }> = [
     { state: depositPaid || isConfirmed ? "done" : "cur" },
     { state: isConfirmed ? "done" : depositPaid ? "cur" : "next" },
     {
@@ -588,20 +621,31 @@ export default function BookingDetailPage() {
             ? "cur"
             : "next",
     },
-    {
-      state: tripComplete ? "done" : booking?.status === "paid_in_full" ? "cur" : "next",
-      when: booking?.status === "paid_in_full" ? "You're here" : undefined,
-    },
-    { state: tripComplete ? "done" : "next" },
-    { state: tripComplete ? "cur" : "next" },
   ];
+
+  // Work half — driven by fulfillment_stage. Step index 3 => stage 1, etc.
+  const workStates: Array<{ state: TL["state"]; when?: string }> = [1, 2, 3].map(
+    (n) => {
+      const stageNum = n as 1 | 2 | 3;
+      if (stage >= stageNum) return { state: "done" as const };
+      const isCurrent = stageNum === stage + 1 && fullyPaidForWork;
+      if (isCurrent) return { state: "cur" as const, when: "You're here" };
+      return { state: "next" as const };
+    }
+  );
+
+  const stepStates = [...paymentStates, ...workStates];
   const timeline: TL[] = journeyCopy.steps.map((s, i) => ({
     title: s.title,
     sub: s.sub,
     state: stepStates[i].state,
-    when: stepStates[i].when,
+    when: (stepStates[i] as any).when,
   }));
   const currentStep = timeline.find((t) => t.state === "cur") || timeline[0];
+
+  // Progress = share of the six steps done (payment + partner's work alike).
+  const journeyDone = timeline.filter((t) => t.state === "done").length;
+  const journeyPct = Math.round((journeyDone / timeline.length) * 100);
 
   // Deliverables (dynamic, from hire_capabilities). Null → single fallback line.
   const deliverables = buildDeliverables(hireCapabilities);
