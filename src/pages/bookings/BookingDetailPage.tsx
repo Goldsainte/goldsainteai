@@ -853,21 +853,19 @@ export default function BookingDetailPage() {
                   <button
                     type="button"
                     onClick={() => setMessagesOpen((o) => !o)}
-                    className="flex w-full items-center justify-between border-y border-[#0a2225]/[0.14] py-6 text-left"
+                    className="flex w-full items-center gap-4 border-y border-[#0a2225]/[0.14] py-6 text-left"
                   >
-                    <span className="flex items-center gap-3">
-                      <span className="font-secondary text-[20px] text-[#0a2225]">
-                        {firstName}
-                      </span>
-                      {hasUnread && (
-                        <span className="rounded-full bg-[#0c4d47] px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] text-[#E5DFC6]">
-                          New
-                        </span>
-                      )}
+                    <span className="font-secondary text-[20px] text-[#0a2225]">
+                      {firstName}
                     </span>
-                    <span className="text-[13px] font-medium text-[#8D6B2F]">
+                    <span className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#8D6B2F]">
                       {messagesOpen ? "Collapse" : "Open"}
                     </span>
+                    {hasUnread && (
+                      <span className="rounded-full bg-[#0c4d47] px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] text-[#E5DFC6]">
+                        New
+                      </span>
+                    )}
                   </button>
                   {messagesOpen && (
                     <div className="pt-6">
@@ -938,13 +936,13 @@ export default function BookingDetailPage() {
               <div className="mx-auto mt-6 max-w-[520px]">
                 <div className="flex items-center justify-between gap-4 border-b border-[#0a2225]/10 py-5 text-[15px]">
                   <span className="text-[#0a2225]">Itinerary</span>
-                  <span className="text-[13px] text-[#0a2225]/40">
+                  <span className="text-[14.5px] text-[#0a2225]/45">
                     Arrives when your specialist delivers
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-4 border-b border-[#0a2225]/10 py-5 text-[15px]">
                   <span className="text-[#0a2225]">Confirmations</span>
-                  <span className="text-[13px] text-[#0a2225]/40">
+                  <span className="text-[14.5px] text-[#0a2225]/45">
                     Shared here as they're booked
                   </span>
                 </div>
@@ -963,7 +961,13 @@ export default function BookingDetailPage() {
                 <details open={!fullyPaid}>
                   <summary className="flex cursor-pointer list-none items-center justify-between border-y border-[#0a2225]/[0.14] py-6">
                     <span className="flex items-center">
-                      <span className="font-secondary text-[26px] text-[#0a2225]">
+                      <span
+                        className="text-[34px] font-semibold tracking-[-0.01em] text-[#0a2225]"
+                        style={{
+                          fontFamily:
+                            "'SF Pro Display', 'SF Pro Text', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+                        }}
+                      >
                         {formatMoney(total, currency)}
                       </span>
                       <span className="ml-3.5 rounded-full bg-[#EAF3EC] px-3.5 py-1.5 text-[11px] uppercase tracking-[0.12em] text-[#0c4d47]">
