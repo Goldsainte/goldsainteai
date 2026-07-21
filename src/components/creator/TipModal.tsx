@@ -107,7 +107,7 @@ export function TipModal({ open, onOpenChange, recipientId, recipientName }: Tip
             Or enter an amount
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280]">$</span>
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-[#6B7280]">$</span>
             <Input
               type="number"
               min={1}
@@ -118,7 +118,7 @@ export function TipModal({ open, onOpenChange, recipientId, recipientName }: Tip
                 setSelected(null);
               }}
               placeholder="Custom"
-              className="pl-7"
+              className="pl-8"
             />
           </div>
         </div>
