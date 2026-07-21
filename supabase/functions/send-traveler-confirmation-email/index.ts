@@ -113,7 +113,14 @@ Deno.serve(async (req) => {
               <p>Reference Number: ${referenceNumber}<br/>
               Keep this for tracking your request.</p>
               <p>Questions? Reply to this email or contact our support team.</p>
-              <p style="margin-top: 20px;">© ${new Date().getFullYear()} Goldsainte Travel. All rights reserved.</p>
+              <p style="margin-top: 20px; font-size: 11px; color: #999; line-height: 1.6;">
+                Trips booked on Goldsainte are sold by independent travel professionals,
+                who are the seller of record and are paid directly for your trip.
+                Goldsainte is a technology platform that connects you with these
+                professionals &mdash; we are not a travel agency, tour operator, or the
+                seller of your travel.
+              </p>
+              <p style="margin-top: 16px;">&copy; ${new Date().getFullYear()} Goldsainte AI Inc. All rights reserved.</p>
             </div>
           </div>
         </div>
