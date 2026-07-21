@@ -12,6 +12,11 @@ import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
 import { TripCoverImage } from "@/components/marketplace/TripCoverImage";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { createDispute, getBookingDisputes } from "@/services/disputeService";
+import {
+  buildDeliverables,
+  deliverablesHeading,
+  DELIVERABLES_FALLBACK,
+} from "@/lib/bookingDeliverables";
 
 type DisputeRow = {
   id: string;
@@ -141,6 +146,11 @@ export default function BookingDetailPage() {
     full_name?: string | null;
     avatar_url?: string | null;
   } | null>(null);
+
+  // Hire capabilities drive the dynamic "what your specialist is arranging"
+  // deliverables list. Neither booking page fetched this before the redesign;
+  // it lives on trip_requests.source_metadata.hire_capabilities.
+  const [hireCapabilities, setHireCapabilities] = useState<string[]>([]);
 
   // Returning from Stripe checkout (?paid=1). Stripe redirects the traveler
   // back BEFORE the webhook has necessarily updated the booking, so: greet
@@ -291,12 +301,26 @@ export default function BookingDetailPage() {
           if (pid) {
             const { data: pr } = await (supabase
               .from("trip_proposals")
-              .select("price_breakdown, headline" as any)
+              .select("price_breakdown, headline, trip_request_id" as any)
               .eq("id", pid)
               .maybeSingle() as any);
             const hire = Boolean((pr as any)?.price_breakdown?.hire);
             setIsHireBooking(hire);
             if (hire && (pr as any)?.headline) setHireHeadline((pr as any).headline);
+            // Reach the agreed hire_capabilities through the trip request the
+            // proposal was written against. Presentational + best-effort.
+            const reqId = (pr as any)?.trip_request_id;
+            if (reqId) {
+              const { data: req } = await (supabase
+                .from("trip_requests")
+                .select("source_metadata" as any)
+                .eq("id", reqId)
+                .maybeSingle() as any);
+              const caps = (req as any)?.source_metadata?.hire_capabilities;
+              if (Array.isArray(caps)) {
+                setHireCapabilities(caps.filter((c: any) => typeof c === "string"));
+              }
+            }
           }
         } catch { /* hire detection is presentational */ }
           setTrip(tripRow);
@@ -620,23 +644,99 @@ export default function BookingDetailPage() {
 
 
 
+  // ── Journey timeline: hospitality-first, ZERO money nouns. Derived from
+  //    real booking status + what the traveler has actually paid. Under the
+  //    direct-charge model there is no "release" — the specialist is paid at
+  //    checkout — so the arc is reserve → secure → arrange → design → begin →
+  //    complete, matching the approved design. ──
+  const tripComplete = booking?.status === "completed";
+  const isConfirmed =
+    booking?.status === "confirmed" ||
+    booking?.status === "paid_in_full" ||
+    booking?.status === "completed";
+  const journeyPct = tripComplete
+    ? 100
+    : booking?.status === "paid_in_full"
+      ? 80
+      : isConfirmed
+        ? 66
+        : depositPaid
+          ? 40
+          : 0;
+
+  type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
+  const stepReserved: TL = {
+    title: "Your journey is reserved",
+    sub: "Everything from here is looked after, start to finish.",
+    state: depositPaid || isConfirmed ? "done" : "cur",
+  };
+  const stepSecured: TL = {
+    title: "Your place is secured",
+    sub: `${specialistName} is confirmed and your dates are held.`,
+    state: isConfirmed ? "done" : depositPaid ? "cur" : "next",
+  };
+  const stepArranged: TL = {
+    title: "Your trip is fully arranged",
+    sub: "Nothing more is needed from you.",
+    state:
+      booking?.status === "paid_in_full" || tripComplete
+        ? "done"
+        : isConfirmed
+          ? "cur"
+          : "next",
+  };
+  const stepDesigning: TL = {
+    title: `${specialistName} is designing your days`,
+    sub: "Your reservations and itinerary appear here as each detail is confirmed.",
+    state: tripComplete ? "done" : booking?.status === "paid_in_full" ? "cur" : "next",
+    when: booking?.status === "paid_in_full" ? "You're here" : undefined,
+  };
+  const stepBegins: TL = {
+    title: "Your journey begins",
+    sub: `${specialistName} is with you throughout, a message away.`,
+    state: tripComplete ? "done" : "next",
+  };
+  const stepComplete: TL = {
+    title: "Your journey is complete",
+    sub: "Once you've returned and all is well, you close the journey.",
+    state: tripComplete ? "cur" : "next",
+  };
+  const timeline: TL[] = [
+    stepReserved,
+    stepSecured,
+    stepArranged,
+    stepDesigning,
+    stepBegins,
+    stepComplete,
+  ];
+  const currentStep = timeline.find((t) => t.state === "cur") || stepReserved;
+
+  // Deliverables (dynamic, from hire_capabilities). Null → single fallback line.
+  const deliverables = buildDeliverables(hireCapabilities);
+  const firstName = (specialistName || "your specialist").split(/\s+/)[0];
+  const deliverablesHead = deliverablesHeading(hireCapabilities, firstName, "traveler");
+
+  // Has the traveler paid anything at all yet? Gate the payment container copy.
+  const anyPaid = amountPaid > 0.01;
+
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
       {justPaid && (
-        <div className="mx-auto max-w-6xl px-6 pt-6">
+        <div className="mx-auto max-w-[860px] px-6 pt-6">
           <div className="rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-5 py-4">
             <p className="font-secondary text-[17px] text-[#0a2225]">
               Payment received — thank you.
             </p>
             <p className="mt-1 text-[14.5px] leading-relaxed text-[#0a2225]/65">
               {booking?.status === "paid_in_full" || booking?.status === "completed"
-                ? "Your trip is paid in full. Your specialist will confirm the remaining details — keep an eye on your Messages, and a receipt is on its way to your email."
-                : "A receipt is on its way to your email, and the numbers below may take a few seconds to update. Next: your specialist secures your reservations and shares them in Messages — you release the deposit only after you've seen them."}
+                ? "Your trip is paid in full. Your specialist will confirm the remaining details \u2014 keep an eye on your Messages, and a receipt is on its way to your email."
+                : "A receipt is on its way to your email, and the numbers below may take a few seconds to update. Next: your specialist secures your reservations and shares them with you in Messages."}
             </p>
           </div>
         </div>
       )}
-      <section className="mx-auto max-w-6xl px-6 pt-8 pb-2">
+
+      <section className="mx-auto max-w-[860px] px-8 pt-8 pb-2">
         <Link
           to="/my-bookings"
           className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
@@ -647,737 +747,408 @@ export default function BookingDetailPage() {
       </section>
 
       {loading ? (
-        <section className="mx-auto max-w-6xl px-6 pb-16 pt-6">
-          <div className="h-[300px] w-full animate-pulse rounded-2xl bg-white/40" />
-          <div className="mt-8 grid gap-6 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <div className="h-64 animate-pulse rounded-2xl bg-white/50" />
-            <div className="h-64 animate-pulse rounded-2xl bg-white/50" />
+        <section className="mx-auto max-w-[860px] px-8 pb-16 pt-6">
+          <div className="h-[96px] w-full animate-pulse rounded-2xl bg-white/40" />
+          <div className="mx-auto mt-14 max-w-[520px] space-y-6">
+            <div className="h-40 animate-pulse rounded-2xl bg-white/50" />
+            <div className="h-40 animate-pulse rounded-2xl bg-white/50" />
           </div>
         </section>
       ) : error ? (
-        <section className="mx-auto max-w-6xl px-6 pb-16 pt-6">
+        <section className="mx-auto max-w-[860px] px-8 pb-16 pt-6">
           <p className="text-[15px] text-red-700">{error}</p>
         </section>
       ) : (
         booking && (
-          <article className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-6">
-            {/* ── Hero: destination image with serif title overlaid. Image
-                 always resolves (packaged cover OR destination library). ── */}
-            <div className="relative h-[210px] overflow-hidden rounded-2xl md:h-[240px]">
+          <article className="mx-auto max-w-[860px] px-8 pb-40 pt-2">
+            {/* ── Minimal hero: image band, then eyebrow + serif title + dates
+                 + one status badge, centered. Nothing else. ── */}
+            <div className="relative h-[96px] overflow-hidden rounded-2xl">
               <TripCoverImage
                 src={heroImage}
                 alt={title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/90 via-[#061418]/25 to-[#061418]/20" />
-              <div className="absolute inset-x-0 bottom-0 px-6 pb-6 md:px-10 md:pb-8">
-                <p className="text-[12px] uppercase tracking-[0.3em] text-[#C7A962]/95">
-                  Your journey · {reference}
-                </p>
-                <h1 className="mt-2 max-w-3xl font-secondary text-[26px] leading-[1.1] text-[#fdfaf2] md:text-4xl">
-                  {title}
-                </h1>
-                <p className="mt-2.5 text-[14.5px] text-[#fdfaf2]/80">
-                  {trip?.destination && (
-                    <span className="font-secondary italic">
-                      {trip.destination}
-                    </span>
-                  )}
-                  {trip?.destination && " · "}
-                  {trip?.duration_days
-                    ? `${trip.duration_days} ${
-                        trip.duration_days === 1 ? "day" : "days"
-                      } · `
-                    : ""}
-                  <span className="inline-flex items-center rounded-full bg-[#0c4d47]/95 px-2.5 py-0.5 align-[2px] text-[12px] uppercase tracking-[0.14em] text-[#E5DFC6]">
-                    {humanBookingStatus(booking.status)}
-                  </span>
-                </p>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/40 to-[#061418]/[0.03]" />
             </div>
 
-            {/* ── Content overlapping the hero ── */}
-            <div className="mt-8 px-0 md:px-3">
-                                {/* ── Escrow journey tracker: the arc, with live truth ── */}
-                {booking.status !== "cancelled" && (() => {
-                  const contractExecuted = contractStatus === "fully_executed";
-                  const depositPaid =
-                    (deposit > 0 && amountPaid >= deposit - 0.01) ||
-                    ["confirmed", "paid_in_full", "completed"].includes(booking.status);
-                  const balancePaid =
-                    booking.status === "paid_in_full" ||
-                    booking.status === "completed" ||
-                    (total > 0 && amountPaid >= total - 0.01);
-                  const tripDone = booking.status === "completed" || finalReleased;
-                  const journey = [
-                    {
-                      label: "Booking created",
-                      done: true,
-                      sub: "Secure Stripe checkout for every payment from here.",
-                    },
-                    {
-                      label: "Contract signed by both parties",
-                      done: contractExecuted,
-                      sub: contractExecuted
-                        ? "Fully executed — the terms below are in effect."
-                        : contractStatus
-                          ? "Awaiting signatures — review and sign in the contract card below."
-                          : "Your specialist prepares the contract; you'll be notified to sign.",
-                    },
-                    {
-                      label: "Deposit paid",
-                      done: depositPaid,
-                      sub: depositPaid
-                        ? `${formatMoney(deposit, currency)} secured — it stays under your control.`
-                        : "Once the contract executes, pay the deposit.  processed securely through Stripe.",
-                    },
-                    {
-                      label: "Reservations confirmed — you release the deposit",
-                      done: depositReleased,
-                      sub: depositReleased
-                        ? "Released to your specialist as working capital."
-                        : "Your specialist shares confirmed reservations in Messages. Release only after you've reviewed them.",
-                    },
-                    {
-                      label: "Balance paid",
-                      done: balancePaid,
-                      sub: balancePaid
-                        ? "Paid in full — all set for the trip."
-                        : `Due before departure${balance > 0 ? ` (${formatMoney(balance, currency)})` : ""}.`,
-                    },
-                    {
-                      label: "Trip complete — final payment released",
-                      done: tripDone,
-                      sub: tripDone
-                        ? "All settled. We wish you many more journeys."
-                        : "After your trip, confirm it went as agreed — that releases the final payment to your specialist.",
-                    },
-                  ];
-                  const hireJourney = [
-                    {
-                      label: "Booking created",
-                      done: true,
-                      sub: "Secure Stripe checkout for every payment from here.",
-                    },
-                    {
-                      label: "Deposit paid",
-                      done: depositPaid,
-                      sub: depositPaid
-                        ? `${formatMoney(deposit, currency)} paid \u2014 you\u2019re on your way.`
-                        : "Pay the deposit \u2014 processed securely through Stripe.",
-                    },
-                    {
-                      label: "Balance paid",
-                      done: balancePaid,
-                      sub: balancePaid
-                        ? "Paid in full \u2014 all set for the trip."
-                        : `Due before departure${balance > 0 ? ` (${formatMoney(balance, currency)})` : ""}.`,
-                    },
-                    {
-                      label: `${specialistName || "Your host"} joins your trip`,
-                      done: tripDone,
-                      sub: "The scope you accepted is the agreement \u2014 no contract step for hires.",
-                    },
-                    {
-                      label: "Trip complete \u2014 Trip complete",
-                      done: tripDone,
-                      sub: tripDone
-                        ? "All settled. We wish you many more journeys."
-                        : "After your trip, confirm it went as agreed \u2014 that closes out the booking.",
-                    },
-                  ];
-                  const steps = isHireBooking ? hireJourney : journey;
-                  const currentIdx = steps.findIndex((st) => !st.done);
-                  return (
-                    <div className="border-t border-[#0a2225]/15 pt-6">
-                      <p className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                        Your trip, start to finish
-                      </p>
-
-                      <div className="mt-7 hidden md:flex items-start">
-                        {steps.map((st, i) => {
-                          const state = st.done ? "done" : i === currentIdx ? "current" : "upcoming";
-                          return (
-                            <div key={st.label} className="flex-1 px-2 text-center">
-                              {state === "done" ? (
-                                <CheckCircle2 className="mx-auto h-6 w-6 text-[#0c4d47]" />
-                              ) : (
-                                <span
-                                  className={`mx-auto flex h-6 w-6 items-center justify-center rounded-full text-[13.5px] font-semibold ${
-                                    state === "current"
-                                      ? "border-2 border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
-                                      : "border border-[#0a2225]/20 text-[#0a2225]/40"
-                                  }`}
-                                >
-                                  {i + 1}
-                                </span>
-                              )}
-                              <p
-                                className={`mt-2 text-[14.5px] leading-snug ${
-                                  state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
-                                } ${state === "current" ? "font-medium" : ""}`}
-                              >
-                                {st.label}
-                              </p>
-                              {state === "current" && (
-                                <p className="mt-0.5 text-[12.5px] uppercase tracking-[0.12em] text-[#8D6B2F]">
-                                  You're here
-                                </p>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <ol className="mt-5 space-y-3.5 md:hidden">
-                        {steps.map((st, i) => {
-                          const state = st.done ? "done" : i === currentIdx ? "current" : "upcoming";
-                          return (
-                            <li key={st.label} className="flex items-start gap-3">
-                              {state === "done" ? (
-                                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#0c4d47]" />
-                              ) : (
-                                <span
-                                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[12.5px] font-semibold ${
-                                    state === "current"
-                                      ? "border-[#C7A962] bg-[#C7A962]/10 text-[#8D6B2F]"
-                                      : "border-[#0a2225]/20 text-[#0a2225]/40"
-                                  }`}
-                                >
-                                  {i + 1}
-                                </span>
-                              )}
-                              <p
-                                className={`text-[16px] leading-snug ${
-                                  state === "upcoming" ? "text-[#0a2225]/45" : "text-[#0a2225]"
-                                } ${state === "current" ? "font-medium" : ""}`}
-                              >
-                                {st.label}
-                              </p>
-                            </li>
-                          );
-                        })}
-                      </ol>
-
-                      <div className="mt-7 rounded-2xl bg-[#F6F0E4]/80 px-5 py-4">
-                        <p className="text-[12.5px] uppercase tracking-[0.18em] text-[#8D6B2F]">
-                          Next step
-                        </p>
-                        <p className="mt-1 text-[16px] leading-relaxed text-[#0a2225]">
-                          {currentIdx === -1
-                            ? "All settled \u2014 nothing left to do. We wish you many more journeys."
-                            : steps[currentIdx].sub}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })()}
+            <div className="mt-10 text-center">
+              <p className="text-[12px] uppercase tracking-[0.24em] text-[#8D6B2F]">
+                Your journey · {reference}
+              </p>
+              <h1 className="mt-3.5 font-secondary text-[30px] leading-[1.06] text-[#0a2225] md:text-4xl">
+                {title}
+              </h1>
+              <p className="mt-3.5 text-[16px] text-[#0a2225]/60">
+                {trip?.destination ? trip.destination : "Your custom trip"}
+              </p>
+              <span className="mt-5 inline-block rounded-full bg-[#0c4d47] px-5 py-2.5 text-[11px] uppercase tracking-[0.16em] text-[#E5DFC6]">
+                {humanBookingStatus(booking.status)}
+              </span>
             </div>
 
-            <div className="relative mt-9 grid gap-x-10 gap-y-8 px-0 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] md:px-3">
-              {/* LEFT column */}
-              <div className="space-y-8">
-                {(booking.metadata as any)?.charge_model !== "direct" &&
-                (canReleaseDeposit ||
-                  canConfirmComplete ||
-                  booking.status === "completed" ||
-                  (depositReleased && booking.status !== "cancelled")) && (
-                  <div className="border-t border-[#0a2225]/15 pt-6">
-                    <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                      Your escrow
-                    </p>
-                    {booking.status === "completed" ? (
-                      <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
-                        Payment has been released to your specialist. Thank you
-                        for traveling with Goldsainte — we hope it was
-                        unforgettable.
-                      </p>
-                    ) : canConfirmComplete ? (
-                      <>
-                        <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
-                          Trip complete? Confirming releases the remaining
-                          payment from escrow to your specialist — like
-                          accepting a finished job.
-                        </p>
-                        {releaseError && (
-                          <p className="mt-3 text-[15px] text-red-700">{releaseError}</p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleReleaseMilestone("release_final")}
-                          disabled={releasingFinal}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                        >
-                          {releasingFinal
-                            ? "Releasing payment…"
-                            : "Confirm trip complete"}
-                        </button>
-                        <p className="mt-2.5 text-[12.5px] leading-relaxed text-[#0a2225]/45">
-                          If something went wrong, don't confirm — file a claim
-                          below and Goldsainte holds the funds while we review.
-                        </p>
-                      </>
-                    ) : canReleaseDeposit ? (
-                      <>
-                        <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
-                          Once your specialist shares your confirmed
-                          reservations in Messages, release their working
-                          capital — 96.5% of your deposit — so they can secure
-                          your trip.
-                        </p>
-                        {releaseError && (
-                          <p className="mt-3 text-[15px] text-red-700">{releaseError}</p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleReleaseMilestone("release_deposit")}
-                          disabled={releasingFinal}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                        >
-                          {releasingFinal
-                            ? "Releasing…"
-                            : "Release working capital"}
-                        </button>
-                        <p className="mt-2.5 text-[12.5px] leading-relaxed text-[#0a2225]/45">
-                          Only release after you've seen your confirmations.
-                          The remaining balance stays in escrow until your
-                          trip is complete.
-                        </p>
-                      </>
-                    ) : (
-                      <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/70">
-                        Working capital released — your specialist is securing
-                        your reservations. The rest of your payment stays in
-                        escrow until you confirm the trip is complete.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
+            <hr className="mx-auto mt-20 h-[2px] w-12 border-none bg-[#C7A962]" />
 
-              {/* RIGHT column */}
-              <div className="space-y-5 md:sticky md:top-6 md:self-start">
-                <div className="border-t border-[#0a2225]/15 pt-6">
-                  <p className="text-[13px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                    Payment
-                  </p>
-                  {/* Hero price — the number leads, context sits beneath. */}
-                  <p className="mt-4 font-secondary text-[40px] leading-none text-[#0a2225]">
-                    {formatMoney(amountPaid, currency)}
-                  </p>
-                  <p className="mt-2 text-[15px] text-[#0a2225]/50">
-                    of {formatMoney(total, currency)} · {progressPct}% paid
-                  </p>
-                  <div className="mt-5 h-[8px] overflow-hidden rounded-full bg-[#EFE8D6]">
-                    <span
-                      className="block h-full rounded-full bg-[#C7A962] transition-all"
-                      style={{ width: `${progressPct}%` }}
-                    />
-                  </div>
-                  {/* Ledger: each money line answers "did this happen yet". */}
-                  <div className="mt-6 border-t border-[#0a2225]/10 text-[16px]">
-                    <p className="flex items-center justify-between border-b border-[#0a2225]/10 py-3.5">
-                      <span className="text-[#0a2225]/60">Deposit</span>
-                      <span className="inline-flex items-center gap-2 font-secondary text-[18px] text-[#0a2225]">
-                        {formatMoney(deposit, currency)}
-                        {depositPaid ? (
-                          <CheckCircle2 className="h-[18px] w-[18px] text-[#0c4d47]" />
-                        ) : (
-                          <span className="text-[13px] uppercase tracking-[0.1em] text-[#8D6B2F]">due</span>
-                        )}
-                      </span>
-                    </p>
-                    <p className="flex items-center justify-between py-3.5">
-                      <span className="text-[#0a2225]/60">Balance</span>
-                      <span className="inline-flex items-center gap-2 font-secondary text-[18px] text-[#0a2225]">
-                        {formatMoney(balance, currency)}
-                        {fullyPaid ? (
-                          <CheckCircle2 className="h-[18px] w-[18px] text-[#0c4d47]" />
-                        ) : (
-                          <span className="text-[13px] uppercase tracking-[0.1em] text-[#0a2225]/45">before departure</span>
-                        )}
-                      </span>
-                    </p>
-                  </div>
-                  {contractGate && (
-                    <div className="mt-4 rounded-xl border border-[#C7A962]/50 bg-[#C7A962]/10 p-3.5">
-                      <p className="text-[14.5px] leading-relaxed text-[#8D6B2F]">
-                        Your trip contract needs a signature before payment can proceed.
-                      </p>
-                      {contractGate.contractId && (
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/contract/${contractGate.contractId}/sign?type=traveler`)}
-                          className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] px-4 py-2 text-[12.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
-                        >
-                          Review &amp; sign contract
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="mt-4 border-t border-[#E5DFC6] pt-4">
-                    {/* Restate the outstanding balance ONLY when money is
-                        genuinely still owed. On a paid-in-full booking the
-                        ledger above already shows Balance paid — printing
-                        "Balance remaining / before departure" here too is the
-                        contradiction (paid AND due). */}
-                    {!fullyPaid && balance > 0 && (
-                      <>
-                        <p className="flex items-center justify-between text-[14px] text-[#0a2225]/60">
-                          <span>Balance remaining</span>
-                          <span className="font-secondary text-[16px] text-[#0a2225]">
-                            {formatMoney(balance, currency)}
-                          </span>
-                        </p>
-                        <p className="mt-2 flex items-center justify-between text-[14px] text-[#0a2225]/60">
-                          <span>Due</span>
-                          <span className="text-[#0a2225]">Before departure</span>
-                        </p>
-                      </>
-                    )}
-                    {!fullyPaid &&
-                      booking.status !== "cancelled" &&
-                      !["confirmed","paid_in_full","completed"].includes(String(booking.status)) &&
-                      !(booking.metadata as any)?.residence_state && (
-                        <div className="mt-4">
-                          <ResidenceSelect value={residenceState} onChange={setResidenceState} compact id="booking-residence-state" />
-                        </div>
-                      )}
-                    {!fullyPaid &&
-                      !depositPaid &&
-                      booking.status !== "cancelled" &&
-                      (booking.deposit_amount ?? 0) > 0 && (
-                        <button
-                          type="button"
-                          onClick={handlePayBalance}
-                          disabled={payingBalance}
-                          className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[14.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                        >
-                          {payingBalance
-                            ? "Preparing checkout…"
-                            : `Pay deposit · ${formatMoney(deposit, currency)} + 3.5% fee`}
-                        </button>
-                      )}
-                    {!fullyPaid && depositPaid && balance > 0 && booking.status !== "cancelled" && (
-                      <button
-                        type="button"
-                        onClick={handlePayBalance}
-                        disabled={payingBalance}
-                        className="mt-4 block w-full rounded-full bg-[#0c4d47] py-3 text-center text-[14.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
-                      >
-                        {payingBalance
-                          ? "Preparing checkout…"
-                          : `Pay balance · ${formatMoney(balance, currency)} + 3.5% fee`}
-                      </button>
-                    )}
-                    {payError && (
-                      <p className="mt-3 rounded-2xl border border-[#b3452f]/30 bg-[#b3452f]/5 px-4 py-2.5 text-center text-[13.5px] leading-relaxed text-[#b3452f]">
-                        {payError}
-                      </p>
-                    )}
-                    {fullyPaid && (
-                      <p className="mt-4 rounded-full bg-[#F6F0E4] py-2.5 text-center text-[13.5px] uppercase tracking-[0.14em] text-[#0a2225]/60">
-                        Paid in full — nothing further due
-                      </p>
-                    )}
-                  </div>
+            {/* ── Journey tracker: the emotional centerpiece. % + bar, then the
+                 vertical animated timeline. Zero money nouns anywhere here. ── */}
+            <section className="mt-14">
+              <div className="text-center">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Your journey, step by step
+                </p>
+                <div className="mt-6 font-secondary text-[36px] leading-none text-[#0a2225]">
+                  {journeyPct}%
                 </div>
+                <p className="mt-2 text-[13px] uppercase tracking-[0.16em] text-[#0a2225]/50">
+                  of your journey arranged
+                </p>
+                <div className="mx-auto mt-6 h-1 w-[280px] overflow-hidden rounded-full bg-[#EDE6D3]">
+                  <div
+                    className="h-full rounded-full bg-[#C7A962] transition-[width] duration-1000"
+                    style={{ width: `${journeyPct}%` }}
+                  />
+                </div>
+              </div>
 
+              <div className="relative mx-auto mt-14 max-w-[520px] pl-1">
+                <div className="absolute bottom-2 left-[17px] top-2 w-[2px] bg-[#0a2225]/10" />
+                {timeline.map((t, i) => (
+                  <div key={i} className="relative pb-8 pl-14 last:pb-0">
+                    <span
+                      className={
+                        "absolute left-[5px] top-0.5 flex h-[25px] w-[25px] items-center justify-center rounded-full text-[12px] " +
+                        (t.state === "done"
+                          ? "bg-[#0c4d47] text-[#E5DFC6]"
+                          : t.state === "cur"
+                            ? "border-2 border-[#C7A962] bg-white font-medium text-[#8D6B2F] shadow-[0_0_0_7px_rgba(199,169,98,0.14)]"
+                            : "border border-[#0a2225]/20 bg-white text-[#0a2225]/40")
+                      }
+                    >
+                      {t.state === "done" ? (
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      ) : (
+                        i + 1
+                      )}
+                    </span>
+                    <h3
+                      className={
+                        "font-secondary text-[19px] " +
+                        (t.state === "next" ? "text-[#0a2225]/40" : "text-[#0a2225]")
+                      }
+                    >
+                      {t.title}
+                    </h3>
+                    <p className="mt-1 max-w-[400px] text-[15px] text-[#0a2225]/60">
+                      {t.sub}
+                    </p>
+                    {t.when && (
+                      <p className="mt-1.5 text-[12px] uppercase tracking-[0.12em] text-[#0a2225]/40">
+                        {t.when}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
 
+              {/* Happening now */}
+              <div className="mx-auto mt-14 max-w-[520px] rounded-[20px] bg-white p-9 text-center shadow-[0_24px_64px_-40px_rgba(10,34,37,0.35)]">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Happening now
+                </p>
+                <h3 className="mt-4 font-secondary text-[21px] text-[#0a2225]">
+                  {currentStep.title}.
+                </h3>
+                <p className="mx-auto mt-2 max-w-[420px] text-[15px] text-[#0a2225]/65">
+                  {currentStep.sub}
+                </p>
+              </div>
 
-                {!isHireBooking && (
-                  <ContractStatusCard variant="traveler" bookingId={booking.id} />
+              {/* Who's helping */}
+              <div className="mx-auto mt-6 flex max-w-[520px] items-center justify-center gap-4">
+                <div className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-full bg-[#C7A962] text-[17px] font-medium text-[#0a2225]">
+                  {partnerProfile?.avatar_url ? (
+                    <img
+                      src={partnerProfile.avatar_url}
+                      alt={specialistName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    specialistInitials
+                  )}
+                </div>
+                <div className="text-left">
+                  <small className="block text-[12px] uppercase tracking-[0.16em] text-[#0a2225]/50">
+                    Your specialist
+                  </small>
+                  <span className="font-secondary text-[20px] text-[#0a2225]">
+                    {specialistName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Primary CTAs */}
+              <div className="mx-auto mt-6 flex max-w-[520px] flex-wrap justify-center gap-4">
+                {booking.partner_id && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      document
+                        .getElementById("messages")
+                        ?.scrollIntoView({ behavior: "smooth" })
+                    }
+                    className="rounded-full bg-[#0c4d47] px-7 py-3.5 text-[13px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
+                  >
+                    Message {firstName}
+                  </button>
                 )}
+              </div>
+            </section>
 
+            <hr className="mx-auto mt-20 h-[2px] w-12 border-none bg-[#C7A962]" />
 
-                {/* Messages — collapsed by default, auto-expanded on unread.
-                     Lives near the bottom so money + next-step lead the page. */}
-                <div id="booking-messages" className="border-t border-[#0a2225]/15 pt-6">
+            {/* ── Messages: auto-expands when unread. ── */}
+            <section id="messages" className="mt-14">
+              <div className="text-center">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Messages
+                </p>
+              </div>
+              {booking.partner_id ? (
+                <div className="mx-auto mt-6 max-w-[520px]">
                   <button
                     type="button"
                     onClick={() => setMessagesOpen((o) => !o)}
-                    className="flex w-full items-center justify-between gap-3"
+                    className="flex w-full items-center justify-between border-y border-[#0a2225]/[0.14] py-6 text-left"
                   >
-                    <span className="flex items-center gap-2.5">
-                      <span className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                        Messages
+                    <span className="flex items-center gap-3">
+                      <span className="font-secondary text-[20px] text-[#0a2225]">
+                        {firstName}
                       </span>
                       {hasUnread && (
-                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#0c4d47] px-1.5 text-[12px] font-semibold text-[#E5DFC6]">
+                        <span className="rounded-full bg-[#0c4d47] px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] text-[#E5DFC6]">
                           New
                         </span>
                       )}
                     </span>
-                    <span className="flex items-center gap-2 text-[12px] uppercase tracking-[0.16em] text-[#0a2225]/40">
-                      <span className="hidden sm:inline">
-                        {specialistName || "your specialist"}
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform ${messagesOpen ? "rotate-180" : ""}`}
-                      />
+                    <span className="text-[13px] font-medium text-[#8D6B2F]">
+                      {messagesOpen ? "Collapse" : "Open"}
                     </span>
                   </button>
                   {messagesOpen && (
-                    <div className="mt-5">
+                    <div className="pt-6">
                       <BookingConversation
                         bookingId={booking.id}
                         travelerId={booking.traveler_id}
                         partnerId={booking.partner_id}
+                        partnerName={specialistName}
                       />
                     </div>
                   )}
                 </div>
+              ) : (
+                <p className="mx-auto mt-6 max-w-[520px] text-center text-[15px] text-[#0a2225]/55">
+                  Messaging opens once your specialist is assigned.
+                </p>
+              )}
+            </section>
+
+            {/* ── Deliverables: dynamic from hire_capabilities. ── */}
+            <section className="mt-20">
+              <div className="text-center">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Your trip, assembled
+                </p>
+                <h2 className="mt-4 font-secondary text-[22px] text-[#0a2225]">
+                  {deliverablesHead}
+                </h2>
               </div>
-            </div>
-
-            {/* ── Policies ── */}
-            <section className="mt-14 md:px-3">
-              <p className="mb-5 text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                Policies
-              </p>
-              <TripPoliciesPanel
-                bookingStatus={booking.status}
-                proposalPolicies={null}
-              />
+              <div className="mx-auto mt-6 max-w-[520px]">
+                {deliverables ? (
+                  deliverables.map((d, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between border-b border-[#0a2225]/10 py-5"
+                    >
+                      <span className="font-secondary text-[18px] text-[#0a2225]">
+                        {d.label}
+                      </span>
+                      <span
+                        className={
+                          "text-[12px] uppercase tracking-[0.14em] " +
+                          (d.state === "active"
+                            ? "text-[#8D6B2F]"
+                            : "text-[#0a2225]/35")
+                        }
+                      >
+                        {d.state === "active" ? "In progress" : "Upcoming"}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-[15px] text-[#0a2225]/60">
+                    {DELIVERABLES_FALLBACK}.
+                  </p>
+                )}
+              </div>
             </section>
 
-            {/* ── Claims / disputes ── */}
-            <section className="mt-14 border-t border-[#E5DFC6] pt-8 md:px-3">
-              <header className="mb-6 flex items-baseline justify-between">
-                <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                  Something wrong?
+            {/* ── Travel documents: honest placeholders until a specialist-side
+                 upload control exists. Never fake a checkmark. ── */}
+            <section className="mt-20">
+              <div className="text-center">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Travel documents
                 </p>
-                <p className="text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/40">
-                  File a claim about this booking
-                </p>
-              </header>
+              </div>
+              <div className="mx-auto mt-6 max-w-[520px]">
+                <div className="flex items-center justify-between gap-4 border-b border-[#0a2225]/10 py-5 text-[15px]">
+                  <span className="text-[#0a2225]">Itinerary</span>
+                  <span className="text-[13px] text-[#0a2225]/40">
+                    Arrives when your specialist delivers
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-4 border-b border-[#0a2225]/10 py-5 text-[15px]">
+                  <span className="text-[#0a2225]">Confirmations</span>
+                  <span className="text-[13px] text-[#0a2225]/40">
+                    Shared here as they're booked
+                  </span>
+                </div>
+              </div>
+            </section>
 
-              {disputes.length > 0 && (
-                <ul className="mb-6 space-y-3">
-                  {disputes.map((d) => (
-                    <li
-                      key={d.id}
-                      className="rounded-2xl border border-[#E5DFC6] bg-white p-4"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.16em] text-[#8D6B2F]">
-                          <ShieldAlert className="h-3.5 w-3.5" />
-                          Claim ·{" "}
-                          {new Date(d.created_at).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
-                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[12px] uppercase tracking-[0.14em] text-[#0a2225]">
-                          {d.status.replace(/_/g, " ")}
-                        </span>
-                      </div>
-                      <p className="mt-2 break-words text-[15px] leading-relaxed text-[#0a2225]/80">
-                        {d.reason}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              {hasOpenClaim ? (
-                <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
-                  You have an open claim on this booking. Our team is reviewing
-                  it and will reach out through your booking messages. You can
-                  add details any time in the Messages section above.
+            {/* ── Payment: DIRECT-CHARGE model. Collapsed once paid. Shows what
+                 the traveler paid / owes — never escrow "held/released". ── */}
+            <section className="mt-20">
+              <div className="text-center">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Payment
                 </p>
-              ) : showClaimForm ? (
-                <form onSubmit={handleFileClaim} className="space-y-4">
-                  <label
-                    htmlFor="claim-reason"
-                    className="block text-[15px] text-[#0a2225]/70"
-                  >
-                    Tell us what went wrong. Be as specific as you can — dates,
-                    amounts, and what you expected all help us resolve it
-                    faster.
-                  </label>
-                  <textarea
-                    id="claim-reason"
-                    value={claimReason}
-                    onChange={(e) => setClaimReason(e.target.value)}
-                    rows={5}
-                    maxLength={2000}
-                    placeholder="Describe the issue with this booking…"
-                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-[15px] leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
-                  />
-                  {claimError && (
-                    <p className="text-[15px] text-red-700">{claimError}</p>
-                  )}
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="submit"
-                      disabled={claimSubmitting || !claimReason.trim()}
-                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {claimSubmitting ? "Filing…" : "Submit claim"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowClaimForm(false);
-                        setClaimReason("");
-                        setClaimError(null);
-                      }}
-                      className="text-[15px] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
-                    >
-                      Cancel
-                    </button>
+              </div>
+              <div className="mx-auto mt-6 max-w-[520px]">
+                <details open={!fullyPaid}>
+                  <summary className="flex cursor-pointer list-none items-center justify-between border-y border-[#0a2225]/[0.14] py-6">
+                    <span className="flex items-center">
+                      <span className="font-secondary text-[26px] text-[#0a2225]">
+                        {formatMoney(total, currency)}
+                      </span>
+                      <span className="ml-3.5 rounded-full bg-[#EAF3EC] px-3.5 py-1.5 text-[11px] uppercase tracking-[0.12em] text-[#0c4d47]">
+                        {fullyPaid
+                          ? "Paid in full"
+                          : anyPaid
+                            ? "Balance due"
+                            : "Due"}
+                      </span>
+                    </span>
+                    <span className="text-[13px] font-medium text-[#8D6B2F]">
+                      View breakdown
+                    </span>
+                  </summary>
+                  <div className="py-6">
+                    <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
+                      <span>Deposit</span>
+                      <span>
+                        {formatMoney(deposit, currency)}
+                        {depositPaid ? " \u2713" : ""}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
+                      <span>Balance</span>
+                      <span>
+                        {formatMoney(balance, currency)}
+                        {fullyPaid ? " \u2713" : ""}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
+                      <span>Paid directly to your specialist</span>
+                      <span>{Math.round((anyPaid ? amountPaid : 0) / (total || 1) * 100)}%</span>
+                    </div>
+                    <p className="mt-4 text-[13px] leading-relaxed text-[#0a2225]/50">
+                      Payments are charged securely to your specialist, your
+                      seller of record. A 3.5% service fee applies at checkout.
+                    </p>
+                    {!fullyPaid && booking.status !== "cancelled" && (deposit > 0 || balance > 0) && (
+                      <button
+                        type="button"
+                        onClick={handlePayBalance}
+                        disabled={payingBalance}
+                        className="mt-5 w-full rounded-full bg-[#0c4d47] px-7 py-4 text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
+                      >
+                        {payingBalance
+                          ? "Preparing\u2026"
+                          : depositPaid
+                            ? `Pay balance \u2014 ${formatMoney(balance, currency)} + 3.5% fee`
+                            : `Pay deposit \u2014 ${formatMoney(deposit, currency)} + 3.5% fee`}
+                      </button>
+                    )}
+                    {payError && (
+                      <p className="mt-3 text-[13.5px] text-red-700">{payError}</p>
+                    )}
                   </div>
-                </form>
-              ) : (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="max-w-xl text-[15px] leading-relaxed text-[#0a2225]/60">
-                    If something went wrong with this trip, you can file a claim
-                    and our team will step in. Most issues are resolved fastest
-                    by messaging your travel professional first.
-                  </p>
+                </details>
+              </div>
+            </section>
+
+            {/* ── Support: quiet accordion at the very bottom. ── */}
+            <section className="mt-20">
+              <div className="text-center">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                  Support
+                </p>
+                <h2 className="mt-4 font-secondary text-[22px] text-[#0a2225]">
+                  If you need anything
+                </h2>
+              </div>
+              <div className="mx-auto mt-6 max-w-[520px]">
+                {booking.partner_id && (
                   <button
                     type="button"
-                    onClick={() => setShowClaimForm(true)}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
+                    onClick={() =>
+                      document
+                        .getElementById("messages")
+                        ?.scrollIntoView({ behavior: "smooth" })
+                    }
+                    className="flex w-full items-center justify-between border-b border-[#0a2225]/10 py-5 text-left text-[15px]"
                   >
-                    <ShieldAlert className="h-4 w-4" />
-                    File a claim
+                    <span>Message your specialist</span>
+                    <span className="text-[#0a2225]/35">{"\u2192"}</span>
                   </button>
+                )}
+                <div className="border-b border-[#0a2225]/10 py-5">
+                  <TripPoliciesPanel bookingStatus={booking.status} />
                 </div>
-              )}
+                <Link
+                  to="/community-guidelines"
+                  className="flex items-center justify-between border-b border-[#0a2225]/10 py-5 text-[15px]"
+                >
+                  <span>Community guidelines</span>
+                  <span className="text-[#0a2225]/35">{"\u2192"}</span>
+                </Link>
+              </div>
             </section>
 
-            {/* ── Cancellation ── */}
-            <section className="mt-14 border-t border-[#E5DFC6] pt-8 md:px-3">
-              <header className="mb-6 flex items-baseline justify-between">
-                <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-                  Change of plans?
-                </p>
-                <p className="text-[12px] uppercase tracking-[0.18em] text-[#0a2225]/40">
-                  Request a cancellation
-                </p>
-              </header>
-
-              {cancellations.length > 0 && (
-                <ul className="mb-6 space-y-3">
-                  {cancellations.map((c) => (
-                    <li
-                      key={c.id}
-                      className="rounded-2xl border border-[#E5DFC6] bg-white p-4"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.16em] text-[#8D6B2F]">
-                          <CalendarX className="h-3.5 w-3.5" />
-                          Cancellation ·{" "}
-                          {new Date(c.created_at).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
-                        <span className="inline-flex items-center rounded-full bg-[#F6F0E4] px-2.5 py-0.5 text-[12px] uppercase tracking-[0.14em] text-[#0a2225]">
-                          {humanCancellationStatus(c.status)}
-                        </span>
-                      </div>
-                      <p className="mt-2 break-words text-[15px] leading-relaxed text-[#0a2225]/80">
-                        {c.reason}
-                      </p>
-                      {(c.status === "approved" || c.status === "refunded") &&
-                        (c.refund_amount ?? 0) > 0 && (
-                          <p className="mt-2 text-[15px] text-[#0a2225]/60">
-                            Refund: {formatMoney(c.refund_amount, c.currency || currency)}
-                          </p>
-                        )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              {activeCancellation ? (
-                activeCancellation.status === "pending" ? (
-                  <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
-                    Your cancellation request is with our team. We'll confirm
-                    the outcome here and in your notifications.
+            {/* Contract (kept: real data, useful to the traveler) */}
+            {booking.partner_id && (
+              <section className="mt-20">
+                <div className="text-center">
+                  <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                    Agreement
                   </p>
-                ) : null
-              ) : showCancelForm ? (
-                <form onSubmit={handleRequestCancellation} className="space-y-4">
-                  <label
-                    htmlFor="cancel-reason"
-                    className="block text-[15px] text-[#0a2225]/70"
-                  >
-                    Tell us why you need to cancel. Refunds are reviewed case
-                    by case against your trip's policies.
-                  </label>
-                  <textarea
-                    id="cancel-reason"
-                    value={cancelReason}
-                    onChange={(e) => setCancelReason(e.target.value)}
-                    rows={5}
-                    maxLength={2000}
-                    placeholder="Describe why you're cancelling…"
-                    className="w-full rounded-2xl border border-[#E5DFC6] bg-white p-4 text-[15px] leading-relaxed text-[#0a2225] outline-none focus:border-[#C7A962] focus:ring-1 focus:ring-[#C7A962]"
+                </div>
+                <div className="mx-auto mt-6 max-w-[520px]">
+                  <ContractStatusCard
+                    variant="traveler"
+                    bookingId={booking.id}
+                    travelerId={booking.traveler_id}
+                    destination={trip?.destination ?? null}
                   />
-                  {cancelRequestError && (
-                    <p className="text-[15px] text-red-700">{cancelRequestError}</p>
-                  )}
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="submit"
-                      disabled={cancelSubmitting || !cancelReason.trim()}
-                      className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {cancelSubmitting ? "Submitting…" : "Submit request"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowCancelForm(false);
-                        setCancelReason("");
-                        setCancelRequestError(null);
-                      }}
-                      className="text-[15px] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
-                    >
-                      Never mind
-                    </button>
-                  </div>
-                </form>
-              ) : canRequestCancellation ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="max-w-xl text-[15px] leading-relaxed text-[#0a2225]/60">
-                    Plans change. Request a cancellation and our team will
-                    review it against your trip's policies — refunds are
-                    decided case by case.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowCancelForm(true)}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#0c4d47] transition-colors hover:bg-[#0c4d47] hover:text-[#E5DFC6]"
-                  >
-                    <CalendarX className="h-4 w-4" />
-                    Request cancellation
-                  </button>
                 </div>
-              ) : booking.status === "cancelled" ? (
-                <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
-                  This booking has been cancelled.
-                </p>
-              ) : (
-                <p className="text-[15px] leading-relaxed text-[#0a2225]/60">
-                  This trip is completed, so cancellation no longer applies. If
-                  something went wrong, you can file a claim above.
-                </p>
-              )}
-            </section>
+              </section>
+            )}
           </article>
         )
       )}
 
-      {/* Sticky mobile pay bar: whenever money is due, the primary action is
-          pinned within thumb reach. Absent when nothing is owed. */}
+      {/* ── Sticky bottom action bar (mobile). Direct-charge copy. ── */}
       {booking && !fullyPaid && booking.status !== "cancelled" && (deposit > 0 || balance > 0) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#0a2225]/10 bg-[#fdfaf2]/95 px-4 py-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden">
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
@@ -1401,24 +1172,5 @@ export default function BookingDetailPage() {
         </div>
       )}
     </main>
-  );
-}
-
-function TimelineItem({
-  n,
-  children,
-}: {
-  n: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex gap-4">
-      <span className="w-6 shrink-0 font-secondary text-[16px] italic text-[#8a7a3f]">
-        {n}
-      </span>
-      <p className="text-[15px] leading-relaxed text-[#0a2225]/75">
-        {children}
-      </p>
-    </div>
   );
 }
