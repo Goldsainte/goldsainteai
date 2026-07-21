@@ -9,6 +9,9 @@ import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 import TravelMap from "@/components/partner/TravelMap";
 import { MessageButton } from "@/components/messaging/MessageButton";
+import { TipModal } from "@/components/creator/TipModal";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
 import FollowButton from "@/components/FollowButton";
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
@@ -72,6 +75,7 @@ export default function CreatorProfileForaPage() {
   const [extra, setExtra] = useState<ExtraRow | null>(null);
   const [reviews, setReviews] = useState<PartnerReview[]>([]);
   const [reviewCount, setReviewCount] = useState(0);
+  const [tipOpen, setTipOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -235,18 +239,28 @@ export default function CreatorProfileForaPage() {
           // visitors — gets Follow + Message; both route to /auth when signed out.
           // (The old `user &&` gate hid these from every anonymous visitor.)
           user?.id === dir.id ? undefined : (
-            <div className="grid grid-cols-2 gap-2">
-              <FollowButton
-                targetUserId={dir.id}
-                className="w-full rounded-full py-6 text-[16px]"
-              />
-              <MessageButton
-                recipientId={dir.id}
-                recipientName={displayName}
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <FollowButton
+                  targetUserId={dir.id}
+                  className="w-full rounded-full py-6 text-[16px]"
+                />
+                <MessageButton
+                  recipientId={dir.id}
+                  recipientName={displayName}
+                  variant="outline"
+                  className="w-full rounded-full border-[#0a2225]/25 py-6 text-[16px]"
+                  label="Message"
+                />
+              </div>
+              <Button
+                onClick={() => setTipOpen(true)}
                 variant="outline"
-                className="w-full rounded-full border-[#0a2225]/25 py-6 text-[16px]"
-                label="Message"
-              />
+                className="w-full rounded-full border-[#C7A962] py-6 text-[16px] font-medium text-[#8a7136] hover:bg-[#FDF9F0]"
+              >
+                <Heart className="mr-1.5 h-4 w-4" />
+                Tip {firstName}
+              </Button>
             </div>
           )
         }
@@ -373,6 +387,14 @@ export default function CreatorProfileForaPage() {
         }
         hideBottomGallery
       />
+      {user?.id !== dir.id && (
+        <TipModal
+          open={tipOpen}
+          onOpenChange={setTipOpen}
+          recipientId={dir.id}
+          recipientName={firstName}
+        />
+      )}
     </div>
   );
 }
