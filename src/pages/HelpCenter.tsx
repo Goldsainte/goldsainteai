@@ -1,322 +1,196 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  Search,
-  BookOpen,
-  CreditCard,
-  XCircle,
-  UserCircle,
-  Sparkles,
-  Users,
-  Briefcase,
-  MapPin,
-  ArrowUpRight,
-  MessageSquare,
-  ChevronDown,
-} from "lucide-react";
-import { HelpCenterChat } from "@/components/HelpCenterChat";
-import { helpCenterFAQs, searchFAQs, getFAQsByCategory } from "@/data/helpCenterFAQs";
-import { siteRoutes, searchRoutes } from "@/data/siteRoutes";
-
-// ─────────────────────────────────────────────
-// Data
-// ─────────────────────────────────────────────
-
-const CATEGORIES = [
-  { id: "bookings", label: "Bookings", icon: BookOpen },
-  { id: "payments", label: "Payments", icon: CreditCard },
-  { id: "cancellations", label: "Cancellations", icon: XCircle },
-  { id: "account", label: "Account", icon: UserCircle },
-  { id: "ai-features", label: "AI Features", icon: Sparkles },
-  { id: "creator", label: "Creator Program", icon: Users },
-  { id: "agent", label: "Agent Marketplace", icon: Briefcase },
-  { id: "navigation", label: "Navigation", icon: MapPin },
-];
-
-const GUIDED_TOURS = [
-  { to: "/how-it-works/traveler", label: "For Travelers", desc: "Plan and book trips with verified specialists across 50+ countries." },
-  { to: "/how-it-works/creator", label: "For Creators", desc: "Monetise your audience with trips, guides, and curated experiences." },
-  { to: "/how-it-works/agent", label: "For Agents", desc: "Win clients, manage trips, and grow your practice end-to-end." },
-];
-
-const POPULAR_LINKS = [
-  { path: "/my-trips", label: "My Trips", icon: BookOpen },
-  { path: "/marketplace", label: "Marketplace", icon: Sparkles },
-  { path: "/auth?mode=signup&role=agent", label: "Become an Agent", icon: Users },
-  { path: "/creator-dashboard", label: "Creator Dashboard", icon: Users },
-  { path: "/corporate-contact", label: "Contact Us", icon: MessageSquare },
-];
-
-// ─────────────────────────────────────────────
-// Sub-components
-// ─────────────────────────────────────────────
-
-function FAQItem({ faq }: { faq: { id: string; question: string; answer: string } }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-[#E5DFC6]">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-start justify-between gap-4 py-5 text-left group"
-      >
-        <span className="font-secondary text-base md:text-lg text-[#0a2225] leading-snug group-hover:text-[#0c4d47] transition">
-          {faq.question}
-        </span>
-        <ChevronDown
-          className={`h-4 w-4 text-[#0a2225]/40 flex-shrink-0 mt-1 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      {open && (
-        <div className="pb-6 text-sm md:text-base text-[#0a2225]/70 leading-relaxed pr-8">
-          {faq.answer}
-        </div>
-      )}
-    </div>
-  );
+export interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  category: 'bookings' | 'payments' | 'cancellations' | 'account' | 'ai-features' | 'creator' | 'agent' | 'navigation';
 }
 
-// ─────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────
+// Every route and feature below is verified against the live app. Money answers
+// reflect the direct-charge model: the independent travel professional is the
+// seller of record, charged directly at checkout; travelers pay a 3.5% service
+// fee on top; professionals keep 96.5%. Goldsainte never holds trip funds.
+export const helpCenterFAQs: FAQ[] = [
+  // Navigation
+  {
+    id: 'nav-bookings',
+    question: 'How do I view my bookings?',
+    answer: 'Open /my-bookings to see every trip. Click any booking to open its page — your journey timeline, messages with your travel professional, documents, and payment details all live there.',
+    category: 'navigation'
+  },
+  {
+    id: 'nav-trip-requests',
+    question: 'Where do I see my trip requests?',
+    answer: 'Open /my-trip-requests to review every brief you have posted, or tap Profile → View Trip Requests from anywhere in the app.',
+    category: 'navigation'
+  },
+  {
+    id: 'nav-marketplace',
+    question: 'How do I browse the marketplace?',
+    answer: 'Visit /marketplace to explore trips and specialists, or post your own brief at /marketplace/request-trip and let vetted travel professionals come to you with proposals.',
+    category: 'navigation'
+  },
+  {
+    id: 'nav-agent-apply',
+    question: 'How do I become a travel specialist?',
+    answer: 'Visit /agent-onboarding to start your application. You can also find it in the header under Professional → Become an Agent, or in the footer under Partners.',
+    category: 'navigation'
+  },
+  {
+    id: 'nav-messages',
+    question: 'How do I contact support or my travel professional?',
+    answer: 'Click "Messages" in the header (or visit /messages). For a specific trip, open the booking in /my-bookings — there\'s a message button right on the booking page.',
+    category: 'navigation'
+  },
 
-export default function HelpCenter() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  // Bookings
+  {
+    id: 'booking-how',
+    question: 'How do I book a trip?',
+    answer: 'Post a trip request at /marketplace/request-trip. Vetted travel professionals respond with custom proposals — compare them, message the ones you like, and accept the best fit. You then pay the deposit securely through Stripe checkout and your booking page opens with everything in one place.',
+    category: 'bookings'
+  },
+  {
+    id: 'booking-modify',
+    question: 'Can I change my booking?',
+    answer: 'Message your travel professional directly from the booking page — they design and deliver your trip, so changes go through them. They\'ll confirm what\'s possible and update the details.',
+    category: 'bookings'
+  },
+  {
+    id: 'booking-confirmation',
+    question: 'Where is my booking confirmation?',
+    answer: 'Your Stripe receipt arrives by email right after payment, and your booking page at /my-bookings holds the live record. Itineraries and confirmations appear there as your travel professional delivers them.',
+    category: 'bookings'
+  },
+  {
+    id: 'booking-progress',
+    question: 'How do I track my trip\'s progress?',
+    answer: 'Every booking page has a step-by-step journey timeline. As your travel professional completes each stage of the work, they mark it done — your timeline updates live and you get a notification and an email.',
+    category: 'bookings'
+  },
 
-  const filteredFAQs = searchQuery
-    ? searchFAQs(searchQuery)
-    : selectedCategory
-    ? getFAQsByCategory(selectedCategory)
-    : helpCenterFAQs;
+  // Payments
+  {
+    id: 'payment-who',
+    question: 'Who am I paying when I book?',
+    answer: 'Your travel professional. They are the seller of record for your trip, and your payment is charged directly to their own Stripe account at checkout — Goldsainte never holds your trip funds. A 3.5% platform service fee is added at checkout.',
+    category: 'payments'
+  },
+  {
+    id: 'payment-methods',
+    question: 'What payment methods are accepted?',
+    answer: 'All major credit and debit cards, processed through Stripe\'s secure checkout.',
+    category: 'payments'
+  },
+  {
+    id: 'payment-agent-earnings',
+    question: 'When do travel professionals get paid?',
+    answer: 'Immediately, at checkout. You are the merchant of record — traveler payments land directly in your own Stripe account, and you keep 96.5% (Goldsainte\'s platform fee is 3.5% per side). Track everything at /agent/earnings; bank payout timing follows your own Stripe settings.',
+    category: 'payments'
+  },
 
-  const filteredRoutes = searchQuery ? searchRoutes(searchQuery) : [];
+  // Cancellations
+  {
+    id: 'cancel-how',
+    question: 'How do I cancel my booking?',
+    answer: 'Open the booking in /my-bookings and request a cancellation. Your travel professional\'s published cancellation terms govern the outcome — review them in your proposal or at /cancellation-refund-policy.',
+    category: 'cancellations'
+  },
+  {
+    id: 'cancel-refund',
+    question: 'What is the refund policy?',
+    answer: 'Refund terms are set by your travel professional — they are the seller of record, and any refund is issued by them to your original payment method. Full details, including how deposits and supplier rules work, are at /cancellation-refund-policy.',
+    category: 'cancellations'
+  },
+  {
+    id: 'cancel-dispute',
+    question: 'How do I dispute a charge?',
+    answer: 'Start with Messages or support@goldsainte.com — our team administers the platform dispute process and reviews evidence from both sides. You can read how it works at /dispute-resolution. Because your travel professional is the seller of record, card disputes are ultimately resolved between you and them through your card network.',
+    category: 'cancellations'
+  },
 
-  const activeCategoryLabel = CATEGORIES.find((c) => c.id === selectedCategory)?.label;
+  // Account
+  {
+    id: 'account-create',
+    question: 'How do I create an account?',
+    answer: 'Click "Sign In" in the header, then select "Sign Up". You can sign up with email or Google, and a quick onboarding sets up your travel preferences.',
+    category: 'account'
+  },
+  {
+    id: 'account-verify',
+    question: 'Why should I verify my identity?',
+    answer: 'Verification builds trust with the travel professionals you work with and unlocks the full platform. Complete it at /customer-verification.',
+    category: 'account'
+  },
+  {
+    id: 'account-preferences',
+    question: 'How do I update my preferences?',
+    answer: 'Open /travel-settings to manage your travel preferences and notification settings.',
+    category: 'account'
+  },
 
-  return (
-    <>
-      <div className="bg-[#FDF9F0] text-[#0a2225]">
+  // AI Features
+  {
+    id: 'ai-agent-what',
+    question: 'What is the Personal AI Agent?',
+    answer: 'Your AI agent learns your travel style and preferences so trip matching and recommendations get sharper over time. Set it up at /ai-agent-setup or through /travel-settings.',
+    category: 'ai-features'
+  },
+  {
+    id: 'ai-matching',
+    question: 'How does AI matching work?',
+    answer: 'When you post a trip request, Goldsainte\'s matching surfaces it to the vetted travel professionals best suited to your destination, dates, and style — so the proposals you receive are relevant, not random.',
+    category: 'ai-features'
+  },
 
-        {/* ── HERO ── */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-12 md:pb-16">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#0c4d47] mb-5">
-            Help Center
-          </p>
-          <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] max-w-3xl mb-6">
-            How can we help?
-          </h1>
-          <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-xl mb-10">
-            Browse frequently asked questions, explore our guides, or ask the AI assistant
-            for an instant answer.
-          </p>
+  // Creator Program
+  {
+    id: 'creator-join',
+    question: 'How do I become a creator?',
+    answer: 'Create an account, set up your creator profile, and start posting. Share your travel content, declare the on-trip services you offer (photography, guiding, and more), and travelers can discover and hire you.',
+    category: 'creator'
+  },
+  {
+    id: 'creator-earn',
+    question: 'How do creators earn money?',
+    answer: 'Two ways today: tips from travelers on your profile, and being hired for on-trip services — photography sessions, personal guiding, content creation, and more — through trip requests. Hire payments are charged directly to your own Stripe account and you keep 96.5%.',
+    category: 'creator'
+  },
+  {
+    id: 'creator-dashboard',
+    question: 'Where is the Creator Dashboard?',
+    answer: 'Access it at /creator-dashboard or by clicking your profile picture. Manage your content, services, earnings, and settings from there.',
+    category: 'creator'
+  },
 
-          {/* Search */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0a2225]/35 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search for help articles, pages, or a question…"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSelectedCategory(null);
-              }}
-              className="w-full pl-11 pr-4 py-3.5 rounded-sm border border-[#E5DFC6] bg-white text-sm text-[#0a2225] placeholder:text-[#0a2225]/35 focus:outline-none focus:ring-2 focus:ring-[#0c4d47]/25 focus:border-[#0c4d47] transition"
-            />
-          </div>
-        </section>
+  // Agent Marketplace
+  {
+    id: 'agent-what',
+    question: 'What do travel specialists do?',
+    answer: 'Independent travel professionals design, sell, and deliver the trips on Goldsainte — personalized planning, complex bookings, expert advice, and support throughout your journey. Your travel contract is with them as the seller of record.',
+    category: 'agent'
+  },
+  {
+    id: 'agent-hire',
+    question: 'How do I hire a travel specialist?',
+    answer: 'Post a trip request from the marketplace and vetted specialists respond with proposals. Review their profiles, compare offers, and message them directly from your inbox.',
+    category: 'agent'
+  },
+  {
+    id: 'agent-become',
+    question: 'What are the requirements to become a specialist?',
+    answer: 'Complete the application at /agent-onboarding with your travel expertise and credentials, and agree to our terms. To accept bookings you\'ll also connect your own Stripe account — you are the seller of record and traveler payments go directly to you. Approval typically takes 3-5 business days.',
+    category: 'agent'
+  },
+];
 
-        {/* ── SEARCH RESULTS: ROUTES ── */}
-        {searchQuery && filteredRoutes.length > 0 && (
-          <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
-            <div className="border border-[#E5DFC6] rounded-sm bg-white/60 px-6 py-6">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
-                Pages matching "{searchQuery}"
-              </p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {filteredRoutes.slice(0, 6).map((route) => (
-                  <Link
-                    key={route.path}
-                    to={route.path}
-                    className="flex items-start gap-3 p-4 rounded-sm border border-[#E5DFC6] hover:border-[#0c4d47] bg-[#FDF9F0] group transition"
-                  >
-                    <ArrowUpRight className="h-4 w-4 text-[#0c4d47] flex-shrink-0 mt-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    <div>
-                      <p className="text-sm font-medium text-[#0a2225] group-hover:text-[#0c4d47] transition">
-                        {route.label}
-                      </p>
-                      <p className="text-xs text-[#0a2225]/50 mt-0.5">{route.description}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+export const getFAQsByCategory = (category: string) => {
+  return helpCenterFAQs.filter(faq => faq.category === category);
+};
 
-        {/* ── GUIDED TOURS (no search) ── */}
-        {!searchQuery && (
-          <section className="border-t border-[#E5DFC6]">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
-                Guided tours
-              </p>
-              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-8">
-                Where do you want to start?
-              </h2>
-              <div className="grid sm:grid-cols-3 gap-4">
-                {GUIDED_TOURS.map((tour) => (
-                  <Link
-                    key={tour.to}
-                    to={tour.to}
-                    className="group block border border-[#E5DFC6] rounded-sm bg-white/60 px-6 py-6 hover:border-[#0c4d47] transition"
-                  >
-                    <p className="font-secondary text-xl text-[#0a2225] group-hover:text-[#0c4d47] transition mb-2">
-                      {tour.label}
-                    </p>
-                    <p className="text-sm text-[#0a2225]/60 leading-relaxed mb-4">{tour.desc}</p>
-                    <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-[#0c4d47]">
-                      View guide <ArrowUpRight className="h-3 w-3" />
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── POPULAR PAGES (no search) ── */}
-        {!searchQuery && (
-          <section className="border-t border-[#E5DFC6] bg-white/60">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
-                Popular pages
-              </p>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {POPULAR_LINKS.map((link) => {
-                  const Icon = link.icon;
-                  return (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      className="flex items-center gap-3 border border-[#E5DFC6] rounded-sm px-5 py-4 hover:border-[#0c4d47] hover:text-[#0c4d47] group transition"
-                    >
-                      <Icon className="h-4 w-4 text-[#0c4d47] flex-shrink-0" />
-                      <span className="text-sm text-[#0a2225] group-hover:text-[#0c4d47] transition">
-                        {link.label}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── CATEGORY FILTERS ── */}
-        <section className="border-t border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-18">
-            {!searchQuery && (
-              <>
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-4">
-                  Browse by category
-                </p>
-                {/* Scroll on mobile */}
-                <div className="-mx-4 px-4 sm:mx-0 sm:px-0 mb-10">
-                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x">
-                    <button
-                      onClick={() => setSelectedCategory(null)}
-                      className={`flex-shrink-0 snap-start px-4 py-2 rounded-full text-[11px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap ${
-                        selectedCategory === null
-                          ? "bg-[#0c4d47] text-white"
-                          : "border border-[#E5DFC6] text-[#0a2225]/70 hover:border-[#0c4d47] hover:text-[#0c4d47]"
-                      }`}
-                    >
-                      All
-                    </button>
-                    {CATEGORIES.map((cat) => {
-                      const Icon = cat.icon;
-                      return (
-                        <button
-                          key={cat.id}
-                          onClick={() => setSelectedCategory(cat.id)}
-                          className={`flex-shrink-0 snap-start flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap ${
-                            selectedCategory === cat.id
-                              ? "bg-[#0c4d47] text-white"
-                              : "border border-[#E5DFC6] text-[#0a2225]/70 hover:border-[#0c4d47] hover:text-[#0c4d47]"
-                          }`}
-                        >
-                          <Icon className="h-3 w-3" />
-                          {cat.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* FAQ heading */}
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-3">
-              {searchQuery
-                ? `${filteredFAQs.length} result${filteredFAQs.length !== 1 ? "s" : ""} for "${searchQuery}"`
-                : selectedCategory
-                ? `${activeCategoryLabel}`
-                : "Frequently asked questions"}
-            </p>
-            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] mb-8">
-              {searchQuery ? "Search results" : selectedCategory ? activeCategoryLabel : "Common questions"}
-            </h2>
-
-            {filteredFAQs.length === 0 ? (
-              <div className="py-16 text-center border border-[#E5DFC6] rounded-sm bg-white/60">
-                <p className="text-sm text-[#0a2225]/50 mb-2">No results found.</p>
-                <p className="text-sm text-[#0a2225]/40">Try the AI assistant below for an instant answer.</p>
-              </div>
-            ) : (
-              <div className="border-t border-[#E5DFC6]">
-                {filteredFAQs.map((faq) => (
-                  <FAQItem key={faq.id} faq={faq} />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ── STILL NEED HELP ── */}
-        <section className="border-t border-[#E5DFC6]">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20">
-            <div className="rounded-sm bg-[#0c4d47] px-6 py-8 md:px-10 md:py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div>
-                <h3 className="font-secondary text-xl md:text-2xl text-white mb-2">
-                  Still need help?
-                </h3>
-                <p className="text-sm text-white/70">
-                  Our support team responds within one business day.
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
-                <Link
-                  to="/corporate-contact"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#0c4d47] text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-[#FDF9F0] transition"
-                >
-                  Contact support
-                </Link>
-                <Link
-                  to="/messages"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white text-[11px] uppercase tracking-[0.2em] hover:border-white transition"
-                >
-                  Message us
-                  <ArrowUpRight className="h-3.5 w-3.5 ml-1.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* AI Chat Widget — unchanged */}
-      <HelpCenterChat />
-    </>
+export const searchFAQs = (query: string) => {
+  const lowerQuery = query.toLowerCase();
+  return helpCenterFAQs.filter(faq =>
+    faq.question.toLowerCase().includes(lowerQuery) ||
+    faq.answer.toLowerCase().includes(lowerQuery)
   );
-}
+};
