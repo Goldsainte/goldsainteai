@@ -11,10 +11,14 @@
 //                   and the partner. Does NOT move money.
 //   reject        — record the decision + required note, bell the traveler.
 //                   Booking untouched.
-//   mark_refunded — record that the refund was issued manually in the Stripe
-//                   dashboard (explicit action, mirrors the Release click).
+//   mark_refunded — record that the refund was issued manually from the travel
+//                   professional's connected Stripe account (explicit action).
 //
 // No automatic Stripe refunds by design — money moves only by human hands.
+// SELLER-OF-RECORD: trips are charged directly to the travel professional's own
+// Stripe account, so any refund is issued FROM THAT connected account (the funds
+// live there, not with Goldsainte). The traveler paid the professional directly;
+// the professional refunds them. Goldsainte records and coordinates the decision.
 // ============================================================================
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -184,7 +188,7 @@ serve(async (req) => {
         booking.traveler_id,
         "Cancellation approved",
         amount > 0
-          ? `Your cancellation for ${tripTitle} has been approved. A refund of ${currency} ${amount.toFixed(2)} is being processed.`
+          ? `Your cancellation for ${tripTitle} has been approved. A refund of ${currency} ${amount.toFixed(2)} is being issued by your travel professional to your original payment method.`
           : `Your cancellation for ${tripTitle} has been approved. Per the decision, no refund will be issued.`,
         `/bookings/${booking.id}`
       );
@@ -200,7 +204,8 @@ serve(async (req) => {
       console.log("Cancellation approved:", { cancellationId, amount });
       return jsonResponse(req, 200, {
         success: true,
-        message: "Cancellation approved — booking cancelled. Issue the refund in Stripe, then Mark refunded.",
+        message:
+          "Cancellation approved — booking cancelled. Issue the refund from the travel professional's connected Stripe account (that's where this trip was charged — the traveler paid them directly), then Mark refunded.",
         refundAmount: amount,
       });
     }
