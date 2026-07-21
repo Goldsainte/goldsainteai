@@ -5,7 +5,6 @@ import { ArrowLeft, ShieldAlert, CalendarX, CheckCircle2, ChevronDown } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { ResidenceSelect } from "@/components/compliance/ResidenceSelect";
 import { isSotBlockedState } from "@/lib/residency";
-import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { ContractStatusCard } from "@/components/contracts/ContractStatusCard";
 import { BookingConversation } from "@/components/chat/BookingConversation";
 import { TripPoliciesPanel } from "@/components/trips/TripPoliciesPanel";
@@ -134,11 +133,6 @@ export default function BookingDetailPage() {
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [cancelRequestError, setCancelRequestError] = useState<string | null>(null);
 
-  // Trip-complete confirmation (releases the final payout to the specialist)
-  const [releasingFinal, setReleasingFinal] = useState(false);
-  const [releaseError, setReleaseError] = useState<string | null>(null);
-  const [depositReleased, setDepositReleased] = useState(false);
-  const [finalReleased, setFinalReleased] = useState(false);
   const [contractStatus, setContractStatus] = useState<string | null>(null);
 
   // Specialist (partner) profile for the sidebar card
@@ -250,24 +244,6 @@ export default function BookingDetailPage() {
           cancellationRows = [];
         }
 
-        // Released milestones (drives the escrow card; best-effort).
-        let depositMilestoneReleased = false;
-        let finalMilestoneReleased = false;
-        try {
-          const { data: payouts } = await supabase
-            .from("trip_payouts")
-            .select("milestone")
-            .eq("trip_booking_id", bookingId);
-          depositMilestoneReleased = (payouts ?? []).some(
-            (p: any) => p.milestone === "deposit"
-          );
-          finalMilestoneReleased = (payouts ?? []).some(
-            (p: any) => p.milestone === "final"
-          );
-        } catch {
-          depositMilestoneReleased = false;
-        }
-
         // Contract status for the journey tracker (same query the
         // ContractStatusCard uses; best-effort).
         let contractRow: { status?: string } | null = null;
@@ -327,8 +303,6 @@ export default function BookingDetailPage() {
           setTrip(tripRow);
           setDisputes(disputeRows);
           setCancellations(cancellationRows);
-          setDepositReleased(depositMilestoneReleased);
-          setFinalReleased(finalMilestoneReleased);
           setContractStatus(contractRow?.status ?? null);
           setPartnerProfile(partnerRow);
         }
@@ -396,53 +370,6 @@ export default function BookingDetailPage() {
     (d) => d.status === "open" || d.status === "under_review"
   );
 
-  async function handleReleaseMilestone(action: "release_deposit" | "release_final") {
-    if (!booking || releasingFinal) return;
-    const isDeposit = action === "release_deposit";
-    const ok = await confirmDialog({
-      title: isDeposit
-        ? "Release your specialist's working capital?"
-        : "Confirm your trip is complete?",
-      description: isDeposit
-        ? "Only do this after your specialist has shown you confirmed reservations (check your booking Messages). It releases 96.5% of your deposit to them so they can secure your trip. This can't be undone."
-        : "This releases the remaining payment to your specialist. Only confirm once your trip has happened and you're satisfied. This can't be undone.",
-      confirmText: isDeposit ? "Release working capital" : "Confirm & release payment",
-    });
-    if (!ok) return;
-    setReleasingFinal(true);
-    setReleaseError(null);
-    try {
-      const { data, error: fnError } = await supabase.functions.invoke(
-        "release-trip-deposit",
-        { body: { tripBookingId: booking.id, action } }
-      );
-      if (fnError) {
-        // Non-2xx bodies arrive via error.context — surface the real reason.
-        let message = fnError.message;
-        try {
-          const resp = (fnError as any)?.context;
-          if (resp && typeof resp.json === "function") {
-            const bodyJson = await resp.json();
-            if (bodyJson?.error) message = bodyJson.error;
-          }
-        } catch {
-          /* keep original message */
-        }
-        throw new Error(message);
-      }
-      if ((data as any)?.error) throw new Error((data as any).error);
-      if (isDeposit) {
-        setDepositReleased(true);
-      } else {
-        setBooking((prev) => (prev ? { ...prev, status: "completed" } : prev));
-      }
-    } catch (err: any) {
-      setReleaseError(err.message || "Could not release the payment. Please try again.");
-    } finally {
-      setReleasingFinal(false);
-    }
-  }
-
   const activeCancellation = cancellations.find((c) =>
     ["pending", "approved", "refunded"].includes(c.status)
   );
@@ -450,29 +377,6 @@ export default function BookingDetailPage() {
     !!booking &&
     !["cancelled", "completed"].includes(booking.status) &&
     !activeCancellation;
-
-  // Traveler consent gate for the final release — mirrors the server's
-  // guard so the button never shows when the function would refuse:
-  // balance must be collected (paid_in_full, or confirmed with no balance).
-  const canConfirmComplete =
-    !!booking &&
-    !!booking.partner_id &&
-    !activeCancellation &&
-    (booking.status === "paid_in_full" ||
-      (booking.status === "confirmed" &&
-        (booking.total_price ?? 0) - (booking.deposit_amount ?? 0) <= 0));
-
-  // Traveler consent gate for the DEPOSIT release — the working-capital
-  // moment. Shows once the deposit is paid, while a balance remains, until
-  // it's released. The traveler judges the specialist's reservation proof.
-  const canReleaseDeposit =
-    !!booking &&
-    !!booking.partner_id &&
-    !activeCancellation &&
-    !depositReleased &&
-    booking.status === "confirmed" &&
-    (booking.deposit_amount ?? 0) > 0 &&
-    (booking.total_price ?? 0) - (booking.deposit_amount ?? 0) > 0;
 
   const [payingBalance, setPayingBalance] = useState(false);
   const [contractGate, setContractGate] = useState<{ contractId: string | null } | null>(null);
