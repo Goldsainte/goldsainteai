@@ -71,24 +71,24 @@ function personaFromCapabilities(caps: string[]): Persona {
 // name. If you edit a step title in bookingDeliverables.ts, update it here too.
 const STAGE_HEADLINE: Record<Persona, [string, string, string]> = {
   creative: [
-    "{name} is capturing your trip",
-    "Your gallery is being edited",
-    "Your gallery is delivered",
+    "{name} is shooting",
+    "Your photos are being edited",
+    "Your gallery is ready",
   ],
   family: [
-    "{name} is supporting your trip",
-    "Your trip begins",
-    "Your trip is complete",
+    "{name} is on hand",
+    "Your trip is underway",
+    "Your trip's a wrap",
   ],
   trip: [
-    "{name} is designing your days",
-    "Your journey begins",
-    "Your journey is complete",
+    "{name} is planning your days",
+    "Your trip is underway",
+    "Your trip's a wrap",
   ],
   generic: [
-    "{name} is putting your trip together",
-    "Your journey begins",
-    "Your journey is complete",
+    "{name} is putting it together",
+    "Your trip is underway",
+    "Your trip's a wrap",
   ],
 };
 
@@ -96,24 +96,24 @@ const STAGE_HEADLINE: Record<Persona, [string, string, string]> = {
 // text in bookingDeliverables.ts verbatim, for the same reason.
 const STAGE_DETAIL: Record<Persona, [string, string, string]> = {
   creative: [
-    "Your moments are being shot as each session happens.",
-    "{name} is selecting and finishing your images.",
-    "Once you've received everything and all is well, you close it out.",
+    "Your photos are being taken as each session happens.",
+    "{name} is picking the best shots and finishing them up.",
+    "Have a look, and once you're happy, you're all done.",
   ],
   family: [
-    "An extra capable pair of hands, there when you need it.",
-    "{name} is with you throughout, a message away.",
-    "Once you've returned and all is well, you close it out.",
+    "An extra set of hands, right when you need them.",
+    "{name} is just a message away the whole time.",
+    "Once you're back and all's well, you're all done.",
   ],
   trip: [
-    "Your reservations and itinerary appear here as each detail is confirmed.",
-    "{name} is with you throughout, a message away.",
-    "Once you've returned and all is well, you close the journey.",
+    "Your bookings and plans show up here as they're set.",
+    "{name} is just a message away the whole time.",
+    "Once you're back and all's well, you're all done.",
   ],
   generic: [
-    "The details appear here as each one is confirmed.",
-    "{name} is with you throughout, a message away.",
-    "Once you've returned and all is well, you close the journey.",
+    "The details show up here as they're set.",
+    "{name} is just a message away the whole time.",
+    "Once you're back and all's well, you're all done.",
   ],
 };
 
