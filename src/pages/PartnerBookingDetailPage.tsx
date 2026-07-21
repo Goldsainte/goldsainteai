@@ -8,6 +8,7 @@ import { ChevronLeft, MessageCircle, Loader2, CheckCircle2 } from "lucide-react"
 import {
   buildDeliverables,
   deliverablesHeading,
+  buildJourneyCopy,
   DELIVERABLES_FALLBACK,
 } from "@/lib/bookingDeliverables";
 
@@ -202,44 +203,29 @@ export default function PartnerBookingDetailPage() {
         ? 50
         : 20;
 
-  // Partner timeline — from the approved partner mockup, money model corrected:
-  // Booking confirmed → Deposit secured → Paid in full → You're preparing →
-  // The trip → Complete. No "payout released": the partner is their own
-  // seller of record, paid directly on their Stripe at checkout.
+  // Persona-aware step copy (photographer vs trip specialist vs …), keyed off
+  // the same hire_capabilities the deliverables use. Lifecycle STATE is
+  // computed here from booking status; wording comes from the shared table.
+  const partnerJourney = buildJourneyCopy(hireCapabilities, "partner", clientFirst);
+
   type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
-  const timeline: TL[] = [
+  const partnerStates: Array<{ state: TL["state"]; when?: string }> = [
+    { state: depositPaid ? "done" : "cur" },
+    { state: balancePaid ? "done" : depositPaid ? "cur" : "next" },
+    { state: tripComplete ? "done" : balancePaid ? "cur" : "next" },
     {
-      title: "Booking confirmed",
-      sub: `${clientFirst}'s booking is confirmed and yours to deliver.`,
-      state: depositPaid ? "done" : "cur",
-    },
-    {
-      title: "Deposit secured",
-      sub: "The deposit has been charged to your Stripe account.",
-      state: balancePaid ? "done" : depositPaid ? "cur" : "next",
-    },
-    {
-      title: "Paid in full",
-      sub: "The full trip has been charged directly to you.",
-      state: tripComplete ? "done" : balancePaid ? "cur" : "next",
-    },
-    {
-      title: `Prepare & share ${clientFirst}'s reservations`,
-      sub: "Confirm the details and share them in Messages as you go.",
       state: tripComplete ? "done" : balancePaid ? "cur" : "next",
       when: balancePaid && !tripComplete ? "You're here" : undefined,
     },
-    {
-      title: "The trip",
-      sub: dates ? `${dates}. You're a message away throughout.` : "You're a message away throughout.",
-      state: tripComplete ? "done" : "next",
-    },
-    {
-      title: "Complete",
-      sub: `Once ${clientFirst} has returned and all is well, the engagement closes.`,
-      state: tripComplete ? "cur" : "next",
-    },
+    { state: tripComplete ? "done" : "next" },
+    { state: tripComplete ? "cur" : "next" },
   ];
+  const timeline: TL[] = partnerJourney.steps.map((s, i) => ({
+    title: s.title,
+    sub: s.sub,
+    state: partnerStates[i].state,
+    when: partnerStates[i].when,
+  }));
   const currentStep = timeline.find((t) => t.state === "cur") || timeline[0];
 
   const deliverables = buildDeliverables(hireCapabilities);
@@ -296,13 +282,13 @@ export default function PartnerBookingDetailPage() {
         <section className="mt-14">
           <div className="text-center">
             <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-              This engagement, step by step
+              {partnerJourney.trackerEyebrow}
             </p>
             <div className="mt-6 font-secondary text-[36px] leading-none text-[#0a2225]">
               {engagementPct}%
             </div>
             <p className="mt-2 text-[13px] uppercase tracking-[0.16em] text-[#0a2225]/50">
-              of this engagement complete
+              {partnerJourney.progressLabel}
             </p>
             <div className="mx-auto mt-6 h-1 w-[280px] overflow-hidden rounded-full bg-[#EDE6D3]">
               <div
