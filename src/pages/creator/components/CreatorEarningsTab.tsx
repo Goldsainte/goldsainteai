@@ -162,7 +162,7 @@ export function CreatorEarningsTab() {
       </div>
 
       <p className="text-[14.5px] text-[#6B7280] max-w-2xl leading-relaxed">
-        Goldsainte holds traveler funds for a short protected window before releasing payouts to you and your partners. Need help? Reach out via support@goldsainte.com.
+        Traveler payments are charged directly to your own Stripe account at checkout — you are the seller of record and keep 96.5%, with Goldsainte's flat 3.5% applied per side. Need help? Reach out via support@goldsainte.com.
       </p>
     </div>
   );
