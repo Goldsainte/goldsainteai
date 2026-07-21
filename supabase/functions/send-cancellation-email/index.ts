@@ -57,7 +57,7 @@ serve(async (req) => {
               
               <p>Dear Valued Guest,</p>
               
-              <p>We've received your request to cancel your booking. Your cancellation has been processed successfully.</p>
+              <p>We've received your cancellation request for this booking. Cancellations and any refund are handled under your travel professional's terms &mdash; they are the seller of record for your trip, and any refund is issued by them.</p>
               
               <div class="info-box">
                 <div class="info-row">
@@ -77,7 +77,7 @@ serve(async (req) => {
                 <h3 style="margin: 0 0 8px 0; color: #166534;">Refund Information</h3>
                 <p style="margin: 0; color: #166534;">
                   A refund of <strong>${refundCurrency} $${Number(refundAmount).toFixed(2)}</strong> 
-                  has been processed to your original payment method.
+                  is being issued by your travel professional to your original payment method.
                 </p>
                 <p style="margin: 8px 0 0 0; font-size: 14px; color: #166534;">
                   Please allow 5-10 business days for the refund to appear in your account.
