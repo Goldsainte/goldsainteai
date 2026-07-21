@@ -226,8 +226,8 @@ function PartnerBookingRowCard({ isHireBooking, booking,
     booking.total_price != null
       ? `$${(Number(booking.total_price) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       : "—";
-  // Until release, show the expected 96.5% payout (Goldsainte keeps 3.5%);
-  // after release, show the recorded figure.
+  // Show the expected 96.5% payout (Goldsainte keeps 3.5%) until the recorded
+  // payout figure is available, then show that.
   const payoutValue =
     booking.partner_payout && booking.partner_payout > 0
       ? Number(booking.partner_payout) / 100
