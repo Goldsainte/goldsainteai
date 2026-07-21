@@ -247,6 +247,9 @@ Deno.serve(async (req) => {
     //      should be retired or assigned to an agent.
     // -------------------------------------------------------------------
     let connectAccountId: string | null = null;
+    // The independent travel professional who is the seller of record for this
+    // trip. Used to label the receipt/line item as THEIR sale, not Goldsainte's.
+    let sellerName: string | null = null;
     {
       const partnerId = (booking as any).partner_id as string | null;
       const priorDirect = bookingMetaForGate.charge_model === "direct";
@@ -255,7 +258,7 @@ Deno.serve(async (req) => {
       if (partnerId && !legacyPlatformPaid) {
         const { data: partnerProfile } = await supabase
           .from("profiles")
-          .select("stripe_account_id, stripe_connect_account_id")
+          .select("stripe_account_id, stripe_connect_account_id, agency_name, display_name, full_name")
           .eq("id", partnerId)
           .maybeSingle();
         const acctId =
@@ -275,6 +278,11 @@ Deno.serve(async (req) => {
 
         if (ready) {
           connectAccountId = acctId;
+          sellerName =
+            ((partnerProfile as any)?.agency_name ||
+              (partnerProfile as any)?.display_name ||
+              (partnerProfile as any)?.full_name ||
+              "").trim() || null;
         } else if (isPrePaymentBooking) {
           return new Response(
             JSON.stringify({
@@ -442,21 +450,27 @@ Deno.serve(async (req) => {
     const collectionTitle = sourceMetadata?.collection_title;
     const brandName = sourceMetadata?.brand_name;
 
+    // The line item names the SELLER OF RECORD (the independent travel
+    // professional) — not Goldsainte — because on a direct charge they are the
+    // merchant selling the trip. Goldsainte is named only as the platform it's
+    // booked through. Falls back gracefully if the seller name is unavailable.
+    const sellerLabel = sellerName || "your travel professional";
+    const viaGoldsainte = " (booked via Goldsainte)";
     const lineItemName = tripTitle
-      ? `Goldsainte — ${tripTitle}${destination ? ` (${destination})` : ""}`
-      : `Goldsainte Trip${
+      ? `${sellerLabel} — ${tripTitle}${destination ? ` (${destination})` : ""}`
+      : `${sellerLabel} — Trip${
           collectionTitle ? ` — ${collectionTitle}` :
           brandName ? ` — ${brandName}` :
           destination ? ` to ${destination}` : ""
         }`;
 
-    const lineItemDescription = `Deposit for ${tripTitle || "your Goldsainte trip"}${
+    const lineItemDescription = `Deposit for ${tripTitle || "your trip"}${
       destination ? ` — ${destination}` : ""
-    } • Ref ${bookingRef}`;
+    }${viaGoldsainte} • Sold by ${sellerLabel} • Ref ${bookingRef}`;
 
     const piDescription = tripTitle
-      ? `${bookingRef} • ${tripTitle}${destination ? `, ${destination}` : ""} (deposit)`
-      : `${bookingRef} • Goldsainte deposit${destination ? ` — ${destination}` : ""}`;
+      ? `${bookingRef} • ${tripTitle}${destination ? `, ${destination}` : ""} (deposit) • Sold by ${sellerLabel}`
+      : `${bookingRef} • Deposit${destination ? ` — ${destination}` : ""} • Sold by ${sellerLabel}`;
 
     // Determine redirect URLs. The caller normally supplies these explicitly;
     // the fallback only applies if it doesn't.
