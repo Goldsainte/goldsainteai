@@ -10,8 +10,6 @@ import logomark from "@/assets/logomark-gold.webp";
 // repeated storefront pitches with a single statement.
 // ============================================================================
 
-const inter = { fontFamily: "Inter, sans-serif" } as const;
-
 const GRADS = {
   creators:
     "radial-gradient(circle at 45% 40%, rgba(199,169,98,0.60), rgba(199,169,98,0.42) 55%, rgba(199,169,98,0.34))",
@@ -64,11 +62,11 @@ function SideCard({
       } ${active ? "opacity-100" : "opacity-55 hover:opacity-80"} ${className}`}
       style={style}
     >
-      <h4 className="flex items-center gap-2 text-[15px] font-semibold text-[#0a2225]" style={inter}>
+      <h4 className="flex items-center gap-2.5 font-secondary text-[17px] text-[#0a2225]">
         <span className="h-2.5 w-2.5 flex-shrink-0 rounded-[3px]" style={{ backgroundColor: side.dot }} />
         {side.name}
       </h4>
-      <p className="mt-2 text-[14px] leading-[1.6] text-[#0a2225]/60" style={inter}>
+      <p className="mt-1.5 text-sm leading-relaxed text-[#4a4a4a]">
         {side.body}
       </p>
     </div>
@@ -109,7 +107,7 @@ export function GoldsainteEquation() {
           <h2 className="font-secondary text-[44px] font-medium leading-[1.15] text-[#0a2225]">
             The Goldsainte equation
           </h2>
-          <p className="mt-5 max-w-[400px] text-[16.5px] leading-[1.7] text-[#0a2225]/65" style={inter}>
+          <p className="mt-5 max-w-[400px] text-sm leading-relaxed text-[#4a4a4a] md:text-base">
             Travelers get trips only people could plan. Creators turn expertise
             into income. Agents build businesses that last. Everyone is paid
             directly.
@@ -181,7 +179,7 @@ export function GoldsainteEquation() {
         <h2 className="font-secondary text-[30px] font-medium leading-[1.15] text-[#0a2225]">
           The Goldsainte equation
         </h2>
-        <p className="mt-4 text-[15px] leading-[1.7] text-[#0a2225]/65" style={inter}>
+        <p className="mt-4 text-sm leading-relaxed text-[#4a4a4a] md:text-base">
           Travelers get trips only people could plan. Creators turn expertise
           into income. Agents build businesses that last. Everyone is paid
           directly.
