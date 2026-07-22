@@ -1,3 +1,4 @@
+import { useState } from "react";
 import logomark from "@/assets/logomark-gold.webp";
 
 // ============================================================================
@@ -32,10 +33,25 @@ const SIDES = [
   },
 ] as const;
 
-function SideCard({ side, className = "", style }: { side: (typeof SIDES)[number]; className?: string; style?: React.CSSProperties }) {
+function SideCard({
+  side,
+  active = true,
+  onSelect,
+  className = "",
+  style,
+}: {
+  side: (typeof SIDES)[number];
+  active?: boolean;
+  onSelect?: () => void;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
-      className={`rounded-[14px] border border-[#E5DFC6]/55 bg-[#fffdf8] px-5 py-[18px] shadow-[0_18px_44px_-22px_rgba(10,34,37,0.30)] ${className}`}
+      onClick={onSelect}
+      className={`rounded-[14px] border border-[#E5DFC6]/55 bg-[#fffdf8] px-5 py-[18px] shadow-[0_18px_44px_-22px_rgba(10,34,37,0.30)] transition-all duration-300 ${
+        onSelect ? "cursor-pointer" : ""
+      } ${active ? "opacity-100" : "opacity-55 hover:opacity-80"} ${className}`}
       style={style}
     >
       <h4 className="flex items-center gap-2 text-[15px] font-semibold text-[#0a2225]" style={inter}>
@@ -59,6 +75,16 @@ const CIRCLE = (bg: string): React.CSSProperties => ({
 });
 
 export function GoldsainteEquation() {
+  // Fora-style focus: one side is active — its circle rises to the top at
+  // full strength while the other two circles and cards dim. Click any card
+  // (or circle) to bring that side forward.
+  const [active, setActive] = useState<(typeof SIDES)[number]["key"]>("creators");
+
+  const circleState = (key: string): React.CSSProperties =>
+    active === key
+      ? { opacity: 1, zIndex: 2, filter: "saturate(1.05)" }
+      : { opacity: 0.4, zIndex: 1, filter: "saturate(0.7)" };
+
   return (
     <section
       className="relative overflow-hidden"
@@ -74,15 +100,19 @@ export function GoldsainteEquation() {
             The Goldsainte equation
           </h2>
           <p className="mt-5 max-w-[400px] text-[16.5px] leading-[1.7] text-[#0a2225]/65" style={inter}>
-            Creators and agents build real businesses. Travelers get trips no
-            search bar could plan. Everyone is paid — and treated — directly.
+            Travelers get trips only people could plan. Creators turn expertise
+            into income. Agents build businesses that last. Everyone is paid
+            directly.
           </p>
         </div>
 
         <div className="absolute right-[6%] top-1/2 h-[540px] w-[620px] -translate-y-1/2">
           {/* The three circles — genuinely blending where they overlap */}
           <div
+            onClick={() => setActive("creators")}
+            className="cursor-pointer transition-all duration-300"
             style={{
+              ...circleState("creators"),
               ...CIRCLE(
                 "radial-gradient(circle at 45% 40%, rgba(199,169,98,0.60), rgba(199,169,98,0.42) 55%, rgba(199,169,98,0.34))"
               ),
@@ -91,7 +121,10 @@ export function GoldsainteEquation() {
             }}
           />
           <div
+            onClick={() => setActive("travelers")}
+            className="cursor-pointer transition-all duration-300"
             style={{
+              ...circleState("travelers"),
               ...CIRCLE(
                 "radial-gradient(circle at 42% 42%, rgba(74,124,118,0.52), rgba(74,124,118,0.36) 55%, rgba(74,124,118,0.28))"
               ),
@@ -100,7 +133,10 @@ export function GoldsainteEquation() {
             }}
           />
           <div
+            onClick={() => setActive("agents")}
+            className="cursor-pointer transition-all duration-300"
             style={{
+              ...circleState("agents"),
               ...CIRCLE(
                 "radial-gradient(circle at 55% 42%, rgba(141,107,47,0.50), rgba(141,107,47,0.34) 55%, rgba(141,107,47,0.26))"
               ),
@@ -114,14 +150,14 @@ export function GoldsainteEquation() {
             src={logomark}
             alt="Goldsainte"
             loading="lazy"
-            className="absolute h-[58px] w-[58px] object-contain drop-shadow-[0_5px_14px_rgba(10,34,37,0.22)]"
+            className="absolute z-[3] h-[58px] w-[58px] object-contain drop-shadow-[0_5px_14px_rgba(10,34,37,0.22)]"
             style={{ left: 271, top: 262 }}
           />
 
           {/* Cards at the approved positions */}
-          <SideCard side={SIDES[0]} className="absolute w-[290px]" style={{ left: -64, top: 4 }} />
-          <SideCard side={SIDES[1]} className="absolute w-[290px]" style={{ left: -128, top: 372 }} />
-          <SideCard side={SIDES[2]} className="absolute w-[290px]" style={{ right: -118, top: 396 }} />
+          <SideCard side={SIDES[0]} active={active === "creators"} onSelect={() => setActive("creators")} className="absolute z-[4] w-[290px]" style={{ left: 84, top: 22 }} />
+          <SideCard side={SIDES[1]} active={active === "travelers"} onSelect={() => setActive("travelers")} className="absolute z-[4] w-[290px]" style={{ left: -12, top: 356 }} />
+          <SideCard side={SIDES[2]} active={active === "agents"} onSelect={() => setActive("agents")} className="absolute z-[4] w-[290px]" style={{ right: -8, top: 372 }} />
         </div>
       </div>
 
@@ -131,8 +167,9 @@ export function GoldsainteEquation() {
           The Goldsainte equation
         </h2>
         <p className="mt-4 text-[15.5px] leading-[1.7] text-[#0a2225]/65" style={inter}>
-          Creators and agents build real businesses. Travelers get trips no
-          search bar could plan. Everyone is paid — and treated — directly.
+          Travelers get trips only people could plan. Creators turn expertise
+          into income. Agents build businesses that last. Everyone is paid
+          directly.
         </p>
         <div className="mt-8 space-y-3.5">
           {SIDES.map((s) => (
