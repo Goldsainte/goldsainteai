@@ -105,7 +105,7 @@ export function GoldsainteEquation() {
       >
         <div className="absolute left-[7%] top-1/2 max-w-[430px] -translate-y-[58%]">
           <h2 className="font-secondary text-[44px] font-medium leading-[1.15] text-[#0a2225]">
-            The Goldsainte equation
+            Where travel comes together
           </h2>
           <p className="mt-5 max-w-[400px] text-sm leading-relaxed text-[#4a4a4a] md:text-base">
             Travelers get trips only people could plan. Creators turn expertise
@@ -177,7 +177,7 @@ export function GoldsainteEquation() {
           mobile arrangement). ── */}
       <div className="lg:hidden">
         <h2 className="font-secondary text-[30px] font-medium leading-[1.15] text-[#0a2225]">
-          The Goldsainte equation
+          Where travel comes together
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-[#4a4a4a] md:text-base">
           Travelers get trips only people could plan. Creators turn expertise
