@@ -1,4 +1,5 @@
 import { HomeHero } from "@/components/home/HomeHero";
+import { StorefrontsBand } from "@/components/home/StorefrontsBand";
 import { FounderNote } from "@/components/home/FounderNote";
 import { AsFeaturedIn } from "@/components/home/AsFeaturedIn";
 import { StatsStrip } from "@/components/home/StatsStrip";
@@ -16,6 +17,10 @@ export default function HomePage() {
     <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
       <HomeHero />
       <AsFeaturedIn />
+      {/* Storefront signal for professionals — creators and agents must know
+          within one scroll that they build their own storefront here. The
+          deeper showcase sections below tell the full story. */}
+      <StorefrontsBand />
       <StatsStrip />
       <OneConversationSection />
       <DreamTripBand />
