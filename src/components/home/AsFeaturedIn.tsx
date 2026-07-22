@@ -14,7 +14,9 @@ import charlotteObserver from "@/assets/press/charlotte-observer.png";
 const inter = { fontFamily: "Inter, sans-serif" } as const;
 
 // Ordered strongest-name-first for immediate credibility. h = display height (px),
-// tuned per-logo so wordmarks optically match despite different aspect ratios.
+// tuned per-logo so wordmarks optically match. Rendered as MAX-height with
+// object-contain so narrow grid cells scale logos proportionally — never
+// squishing a wide wordmark to fit (fixed height + max-width distorts).
 const OUTLETS: { src: string; alt: string; h: number }[] = [
   { src: forbes, alt: "Forbes", h: 22 },
   { src: yahooFinance, alt: "Yahoo Finance", h: 20 },
@@ -41,7 +43,7 @@ export function AsFeaturedIn() {
         {/* Fixed grid, not flex-wrap: 2 cols on mobile, 4 on md, 8 on lg —
             every logo gets an equal centered cell, so 8 logos stack in clean
             symmetric rows instead of ragged wrapping. */}
-        <div className="mx-auto mt-9 grid max-w-4xl grid-cols-2 items-center gap-x-6 gap-y-9 sm:grid-cols-4 md:gap-x-10 md:gap-y-10 lg:grid-cols-8 lg:gap-x-8">
+        <div className="mx-auto mt-9 grid max-w-5xl grid-cols-2 items-center gap-x-6 gap-y-9 sm:grid-cols-4 md:gap-x-10 md:gap-y-10 lg:grid-cols-8 lg:gap-x-8">
           {OUTLETS.map((o) => (
             <div key={o.alt} className="flex items-center justify-center">
               <img
@@ -49,8 +51,8 @@ export function AsFeaturedIn() {
                 alt={o.alt}
                 loading="lazy"
                 decoding="async"
-                style={{ height: o.h }}
-                className="w-auto max-w-full opacity-70 grayscale transition-all duration-300 hover:opacity-100 md:opacity-60"
+                style={{ maxHeight: o.h }}
+                className="h-auto w-auto max-w-full object-contain opacity-70 grayscale transition-all duration-300 hover:opacity-100 md:opacity-60"
               />
             </div>
           ))}
