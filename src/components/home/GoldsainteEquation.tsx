@@ -48,6 +48,7 @@ function SideCard({
 }) {
   return (
     <div
+      onMouseEnter={onSelect}
       onClick={onSelect}
       className={`rounded-[14px] border border-[#E5DFC6]/55 bg-[#fffdf8] px-5 py-[18px] shadow-[0_18px_44px_-22px_rgba(10,34,37,0.30)] transition-all duration-300 ${
         onSelect ? "cursor-pointer" : ""
@@ -82,19 +83,22 @@ export function GoldsainteEquation() {
 
   const circleState = (key: string): React.CSSProperties =>
     active === key
-      ? { opacity: 1, zIndex: 2, filter: "saturate(1.05)" }
-      : { opacity: 0.4, zIndex: 1, filter: "saturate(0.7)" };
+      ? { opacity: 1, zIndex: 2, filter: "saturate(1.08)", transform: "scale(1.07)" }
+      : { opacity: 0.4, zIndex: 1, filter: "saturate(0.7)", transform: "scale(1)" };
 
   return (
-    <section
-      className="relative overflow-hidden"
-      style={{
-        background:
-          "radial-gradient(90% 70% at 78% 30%, rgba(199,169,98,0.10), transparent 60%), #f7f3ea",
-      }}
-    >
+    <section className="bg-[#f7f3ea] px-4 py-10 sm:px-6 md:py-14">
+      {/* The containing frame — a rounded, bordered panel that clips the
+          circles at its edges (the Fora device that keeps the venn "held"). */}
+      <div
+        className="relative mx-auto max-w-[1240px] overflow-hidden rounded-[28px] border border-[#0a2225]/[0.08]"
+        style={{
+          background:
+            "radial-gradient(90% 70% at 78% 30%, rgba(199,169,98,0.12), transparent 60%), #fbf8f1",
+        }}
+      >
       {/* ── Desktop: absolute composition, Fora-structure geometry ── */}
-      <div className="relative mx-auto hidden min-h-[700px] max-w-[1240px] lg:block">
+      <div className="relative hidden min-h-[700px] lg:block">
         <div className="absolute left-[7%] top-1/2 max-w-[430px] -translate-y-[58%]">
           <h2 className="font-secondary text-[44px] font-medium leading-[1.15] text-[#0a2225]">
             The Goldsainte equation
@@ -109,8 +113,9 @@ export function GoldsainteEquation() {
         <div className="absolute right-[6%] top-1/2 h-[540px] w-[620px] -translate-y-1/2">
           {/* The three circles — genuinely blending where they overlap */}
           <div
+            onMouseEnter={() => setActive("creators")}
             onClick={() => setActive("creators")}
-            className="cursor-pointer transition-all duration-300"
+            className="cursor-pointer transition-all duration-500 ease-out"
             style={{
               ...circleState("creators"),
               ...CIRCLE(
@@ -121,8 +126,9 @@ export function GoldsainteEquation() {
             }}
           />
           <div
+            onMouseEnter={() => setActive("travelers")}
             onClick={() => setActive("travelers")}
-            className="cursor-pointer transition-all duration-300"
+            className="cursor-pointer transition-all duration-500 ease-out"
             style={{
               ...circleState("travelers"),
               ...CIRCLE(
@@ -133,8 +139,9 @@ export function GoldsainteEquation() {
             }}
           />
           <div
+            onMouseEnter={() => setActive("agents")}
             onClick={() => setActive("agents")}
-            className="cursor-pointer transition-all duration-300"
+            className="cursor-pointer transition-all duration-500 ease-out"
             style={{
               ...circleState("agents"),
               ...CIRCLE(
@@ -150,8 +157,8 @@ export function GoldsainteEquation() {
             src={logomark}
             alt="Goldsainte"
             loading="lazy"
-            className="absolute z-[3] h-[58px] w-[58px] object-contain drop-shadow-[0_5px_14px_rgba(10,34,37,0.22)]"
-            style={{ left: 271, top: 262 }}
+            className="absolute z-[3] h-[58px] w-[58px] object-contain drop-shadow-[0_4px_12px_rgba(10,34,37,0.28)]"
+            style={{ left: 271, top: 262, filter: "brightness(0) invert(1)", opacity: 0.96 }}
           />
 
           {/* Cards at the approved positions */}
@@ -176,6 +183,7 @@ export function GoldsainteEquation() {
             <SideCard key={s.key} side={s} />
           ))}
         </div>
+      </div>
       </div>
     </section>
   );
