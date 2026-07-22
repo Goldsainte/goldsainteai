@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { atHandle, socialUrl } from "@/lib/socialHandles";
-import { Film, ExternalLink, Instagram, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Film, ExternalLink, Instagram, Star, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MediaItem {
@@ -36,6 +36,48 @@ export function CreatorMediaGallery({
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const highlightInput = useRef<HTMLInputElement>(null);
   const [uploadingHighlight, setUploadingHighlight] = useState(false);
+
+  // Capture a real frame from an uploaded video to use as its cover photo.
+  // Runs entirely in the browser (canvas). Without this, video tiles can
+  // render as black frames — especially on mobile Safari.
+  const captureVideoPoster = (file: File): Promise<Blob | null> =>
+    new Promise((resolve) => {
+      try {
+        const url = URL.createObjectURL(file);
+        const v = document.createElement("video");
+        v.muted = true;
+        v.playsInline = true;
+        v.preload = "auto";
+        v.src = url;
+        const done = (blob: Blob | null) => {
+          URL.revokeObjectURL(url);
+          resolve(blob);
+        };
+        v.onloadeddata = () => {
+          // Seek a little way in so we don't grab a black first frame.
+          v.currentTime = Math.min(0.5, (v.duration || 1) * 0.1);
+        };
+        v.onseeked = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = v.videoWidth || 720;
+            canvas.height = v.videoHeight || 1280;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return done(null);
+            ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob((b) => done(b), "image/jpeg", 0.85);
+          } catch {
+            done(null);
+          }
+        };
+        v.onerror = () => done(null);
+        // Safety net: never hang the upload on poster capture.
+        setTimeout(() => done(null), 8000);
+      } catch {
+        resolve(null);
+      }
+    });
+
   const uploadHighlight = async (file: File) => {
     if (!creatorId) return;
     setUploadingHighlight(true);
@@ -46,6 +88,26 @@ export function CreatorMediaGallery({
       const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { cacheControl: "3600" });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+
+      // For videos, generate and upload a cover photo from the footage itself
+      // so the tile always shows a real image. Best-effort — a capture failure
+      // never blocks the upload.
+      let thumbnail_url: string | null = null;
+      if (isVideo) {
+        try {
+          const poster = await captureVideoPoster(file);
+          if (poster) {
+            const posterPath = `${creatorId}/highlights/poster-${Date.now()}.jpg`;
+            const { error: pErr } = await supabase.storage
+              .from("avatars")
+              .upload(posterPath, poster, { cacheControl: "3600", contentType: "image/jpeg" });
+            if (!pErr) {
+              thumbnail_url = supabase.storage.from("avatars").getPublicUrl(posterPath).data.publicUrl;
+            }
+          }
+        } catch { /* tile falls back to first video frame */ }
+      }
+
       const { data: row, error: insErr } = await supabase
         .from("creator_media")
         .insert({
@@ -53,6 +115,7 @@ export function CreatorMediaGallery({
           url: pub.publicUrl,
           media_type: isVideo ? "video" : "image",
           source: "upload",
+          thumbnail_url,
           sort_order: items.length,
         })
         .select("*")
@@ -76,6 +139,16 @@ export function CreatorMediaGallery({
     const source = u.includes("tiktok.com") ? "tiktok" : u.includes("instagram.com") ? "instagram" : null;
     if (!source) {
       alert("Paste a TikTok or Instagram link (it should contain tiktok.com or instagram.com).");
+      return;
+    }
+    // Instagram does not allow platforms to pull reel covers automatically,
+    // so a cover photo is required — otherwise the tile can only show a
+    // generic placeholder. (TikTok covers can usually be fetched for you.)
+    if (source === "instagram" && !coverFile) {
+      alert(
+        "Instagram doesn't let us pull your reel's cover automatically — add a cover photo (a screenshot of the reel works great) so it looks beautiful on your profile."
+      );
+      coverInput.current?.click();
       return;
     }
     try {
@@ -319,12 +392,15 @@ export function CreatorMediaGallery({
                     </span>
                   </div>
                 )}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {item.external_url ? (
-                    <ExternalLink className="w-5 h-5 text-white drop-shadow-lg" />
-                  ) : (
-                    <Film className="w-6 h-6 text-white drop-shadow-lg" />
-                  )}
+                {/* Always-visible play affordance so covers read as videos */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/45 backdrop-blur-[2px] transition-transform group-hover:scale-110">
+                    {item.external_url ? (
+                      <ExternalLink className="w-5 h-5 text-white" />
+                    ) : (
+                      <Play className="ml-0.5 w-5 h-5 text-white" fill="currentColor" />
+                    )}
+                  </span>
                 </div>
               </>
             )}
