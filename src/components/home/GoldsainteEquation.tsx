@@ -12,6 +12,15 @@ import logomark from "@/assets/logomark-gold.webp";
 
 const inter = { fontFamily: "Inter, sans-serif" } as const;
 
+const GRADS = {
+  creators:
+    "radial-gradient(circle at 45% 40%, rgba(199,169,98,0.60), rgba(199,169,98,0.42) 55%, rgba(199,169,98,0.34))",
+  travelers:
+    "radial-gradient(circle at 42% 42%, rgba(74,124,118,0.52), rgba(74,124,118,0.36) 55%, rgba(74,124,118,0.28))",
+  agents:
+    "radial-gradient(circle at 55% 42%, rgba(141,107,47,0.50), rgba(141,107,47,0.34) 55%, rgba(141,107,47,0.26))",
+} as const;
+
 const SIDES = [
   {
     key: "creators",
@@ -66,10 +75,10 @@ function SideCard({
   );
 }
 
-const CIRCLE = (bg: string): React.CSSProperties => ({
+const CIRCLE = (bg: string, size = 340): React.CSSProperties => ({
   position: "absolute",
-  width: 340,
-  height: 340,
+  width: size,
+  height: size,
   borderRadius: "50%",
   mixBlendMode: "multiply",
   background: bg,
@@ -168,20 +177,65 @@ export function GoldsainteEquation() {
         </div>
       </div>
 
-      {/* ── Mobile / tablet: headline then stacked cards ── */}
-      <div className="px-5 py-14 lg:hidden">
+      {/* ── Mobile / tablet: the same venn, scaled — circles, mark, and the
+          three cards cascading over them (matching the reference layout). ── */}
+      <div className="px-5 pb-10 pt-12 lg:hidden">
         <h2 className="font-secondary text-[30px] font-medium leading-[1.15] text-[#0a2225]">
           The Goldsainte equation
         </h2>
-        <p className="mt-4 text-[15.5px] leading-[1.7] text-[#0a2225]/65" style={inter}>
+        <p className="mt-4 text-[15px] leading-[1.7] text-[#0a2225]/65" style={inter}>
           Travelers get trips only people could plan. Creators turn expertise
           into income. Agents build businesses that last. Everyone is paid
           directly.
         </p>
-        <div className="mt-8 space-y-3.5">
-          {SIDES.map((s) => (
-            <SideCard key={s.key} side={s} />
-          ))}
+
+        <div className="relative mx-auto mt-8 h-[610px] w-full max-w-[400px]">
+          {/* circles */}
+          <div
+            onClick={() => setActive("creators")}
+            className="cursor-pointer transition-all duration-500 ease-out"
+            style={{ ...circleState("creators"), ...CIRCLE(GRADS.creators, 230), left: 85, top: 8 }}
+          />
+          <div
+            onClick={() => setActive("travelers")}
+            className="cursor-pointer transition-all duration-500 ease-out"
+            style={{ ...circleState("travelers"), ...CIRCLE(GRADS.travelers, 230), left: 22, top: 165 }}
+          />
+          <div
+            onClick={() => setActive("agents")}
+            className="cursor-pointer transition-all duration-500 ease-out"
+            style={{ ...circleState("agents"), ...CIRCLE(GRADS.agents, 230), left: 148, top: 165 }}
+          />
+          {/* the mark, white, at the three-way intersection */}
+          <img
+            src={logomark}
+            alt="Goldsainte"
+            loading="lazy"
+            className="absolute z-[3] h-[46px] w-[46px] object-contain drop-shadow-[0_4px_12px_rgba(10,34,37,0.28)]"
+            style={{ left: 177, top: 205, filter: "brightness(0) invert(1)", opacity: 0.96 }}
+          />
+          {/* cards cascading over the circles */}
+          <SideCard
+            side={SIDES[0]}
+            active={active === "creators"}
+            onSelect={() => setActive("creators")}
+            className="absolute z-[4]"
+            style={{ left: 12, right: 12, top: 34 }}
+          />
+          <SideCard
+            side={SIDES[1]}
+            active={active === "travelers"}
+            onSelect={() => setActive("travelers")}
+            className="absolute z-[4] w-[268px]"
+            style={{ left: 2, top: 322 }}
+          />
+          <SideCard
+            side={SIDES[2]}
+            active={active === "agents"}
+            onSelect={() => setActive("agents")}
+            className="absolute z-[4] w-[268px]"
+            style={{ right: 2, top: 456 }}
+          />
         </div>
       </div>
       </div>
