@@ -137,10 +137,10 @@ export function HomeHero() {
               </Link>
               <span aria-hidden="true" className="mx-3 hidden text-[#C7A962] md:inline">·</span>
               <span className="mt-1.5 block md:mt-0 md:inline md:whitespace-nowrap">
-                Are you a creator?{" "}
-                <Link to="/auth?mode=signup&role=creator" className="font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
-                  Earn from your travels →
-                </Link>
+                Travel creator or agent?{" "}
+                <a href="#storefronts" className="font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
+                  Open your storefront →
+                </a>
               </span>
             </p>
 
