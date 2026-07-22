@@ -35,14 +35,14 @@ const SIDES = [
 function SideCard({ side, className = "", style }: { side: (typeof SIDES)[number]; className?: string; style?: React.CSSProperties }) {
   return (
     <div
-      className={`rounded-[14px] border border-[#E5DFC6]/55 bg-[#fffdf8] p-6 shadow-[0_22px_55px_-24px_rgba(10,34,37,0.32)] ${className}`}
+      className={`rounded-[14px] border border-[#E5DFC6]/55 bg-[#fffdf8] px-5 py-[18px] shadow-[0_18px_44px_-22px_rgba(10,34,37,0.30)] ${className}`}
       style={style}
     >
-      <h4 className="flex items-center gap-2.5 text-[16px] font-semibold text-[#0a2225]" style={inter}>
+      <h4 className="flex items-center gap-2 text-[15px] font-semibold text-[#0a2225]" style={inter}>
         <span className="h-2.5 w-2.5 flex-shrink-0 rounded-[3px]" style={{ backgroundColor: side.dot }} />
         {side.name}
       </h4>
-      <p className="mt-2 text-[15px] leading-relaxed text-[#0a2225]/60" style={inter}>
+      <p className="mt-2 text-[14px] leading-[1.6] text-[#0a2225]/60" style={inter}>
         {side.body}
       </p>
     </div>
@@ -51,8 +51,8 @@ function SideCard({ side, className = "", style }: { side: (typeof SIDES)[number
 
 const CIRCLE = (bg: string): React.CSSProperties => ({
   position: "absolute",
-  width: 430,
-  height: 430,
+  width: 340,
+  height: 340,
   borderRadius: "50%",
   mixBlendMode: "multiply",
   background: bg,
@@ -68,7 +68,7 @@ export function GoldsainteEquation() {
       }}
     >
       {/* ── Desktop: absolute composition, Fora-structure geometry ── */}
-      <div className="relative mx-auto hidden min-h-[820px] max-w-[1240px] lg:block">
+      <div className="relative mx-auto hidden min-h-[700px] max-w-[1240px] lg:block">
         <div className="absolute left-[7%] top-1/2 max-w-[430px] -translate-y-[58%]">
           <h2 className="font-secondary text-[44px] font-medium leading-[1.15] text-[#0a2225]">
             The Goldsainte equation
@@ -79,15 +79,15 @@ export function GoldsainteEquation() {
           </p>
         </div>
 
-        <div className="absolute right-[4%] top-1/2 h-[740px] w-[760px] -translate-y-1/2">
+        <div className="absolute right-[6%] top-1/2 h-[540px] w-[620px] -translate-y-1/2">
           {/* The three circles — genuinely blending where they overlap */}
           <div
             style={{
               ...CIRCLE(
                 "radial-gradient(circle at 45% 40%, rgba(199,169,98,0.60), rgba(199,169,98,0.42) 55%, rgba(199,169,98,0.34))"
               ),
-              left: 165,
-              top: 10,
+              left: 130,
+              top: 0,
             }}
           />
           <div
@@ -95,8 +95,8 @@ export function GoldsainteEquation() {
               ...CIRCLE(
                 "radial-gradient(circle at 42% 42%, rgba(74,124,118,0.52), rgba(74,124,118,0.36) 55%, rgba(74,124,118,0.28))"
               ),
-              left: 12,
-              top: 288,
+              left: 25,
+              top: 182,
             }}
           />
           <div
@@ -104,8 +104,8 @@ export function GoldsainteEquation() {
               ...CIRCLE(
                 "radial-gradient(circle at 55% 42%, rgba(141,107,47,0.50), rgba(141,107,47,0.34) 55%, rgba(141,107,47,0.26))"
               ),
-              left: 318,
-              top: 288,
+              left: 235,
+              top: 182,
             }}
           />
 
@@ -114,14 +114,14 @@ export function GoldsainteEquation() {
             src={logomark}
             alt="Goldsainte"
             loading="lazy"
-            className="absolute h-[74px] w-[74px] object-contain drop-shadow-[0_6px_18px_rgba(10,34,37,0.25)]"
-            style={{ left: 344, top: 350 }}
+            className="absolute h-[58px] w-[58px] object-contain drop-shadow-[0_5px_14px_rgba(10,34,37,0.22)]"
+            style={{ left: 271, top: 262 }}
           />
 
           {/* Cards at the approved positions */}
-          <SideCard side={SIDES[0]} className="absolute w-[308px]" style={{ left: 62, top: 36 }} />
-          <SideCard side={SIDES[1]} className="absolute w-[308px]" style={{ left: -58, top: 472 }} />
-          <SideCard side={SIDES[2]} className="absolute w-[308px]" style={{ right: -40, top: 492 }} />
+          <SideCard side={SIDES[0]} className="absolute w-[290px]" style={{ left: -64, top: 4 }} />
+          <SideCard side={SIDES[1]} className="absolute w-[290px]" style={{ left: -128, top: 372 }} />
+          <SideCard side={SIDES[2]} className="absolute w-[290px]" style={{ right: -118, top: 396 }} />
         </div>
       </div>
 
