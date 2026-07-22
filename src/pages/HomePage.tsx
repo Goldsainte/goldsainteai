@@ -1,5 +1,5 @@
 import { HomeHero } from "@/components/home/HomeHero";
-import { StorefrontsBand } from "@/components/home/StorefrontsBand";
+import { GoldsainteEquation } from "@/components/home/GoldsainteEquation";
 import { FounderNote } from "@/components/home/FounderNote";
 import { AsFeaturedIn } from "@/components/home/AsFeaturedIn";
 import { StatsStrip } from "@/components/home/StatsStrip";
@@ -17,10 +17,10 @@ export default function HomePage() {
     <main className="bg-[#f7f3ea] text-[#0a2225] min-h-screen">
       <HomeHero />
       <AsFeaturedIn />
-      {/* Storefront signal for professionals — creators and agents must know
-          within one scroll that they build their own storefront here. The
-          deeper showcase sections below tell the full story. */}
-      <StorefrontsBand />
+      {/* The three-sided marketplace, stated once: creators, travelers, and
+          travel agents in one diagram. Replaces the repeated storefront
+          pitches — the deeper showcase sections below are the elaboration. */}
+      <GoldsainteEquation />
       <StatsStrip />
       <OneConversationSection />
       <DreamTripBand />
