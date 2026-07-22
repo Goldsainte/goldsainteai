@@ -97,17 +97,14 @@ export function GoldsainteEquation() {
 
   return (
     <section className="bg-[#f7f3ea] px-4 py-10 sm:px-6 md:py-14">
-      {/* The containing frame — a rounded, bordered panel that clips the
-          circles at its edges (the Fora device that keeps the venn "held"). */}
+      {/* ── Desktop: framed panel containing the absolute composition ── */}
       <div
-        className="relative mx-auto max-w-[1240px] overflow-hidden rounded-[28px] border border-[#0a2225]/[0.08]"
+        className="relative mx-auto hidden min-h-[700px] max-w-[1240px] overflow-hidden rounded-[28px] border border-[#0a2225]/[0.08] lg:block"
         style={{
           background:
             "radial-gradient(90% 70% at 78% 30%, rgba(199,169,98,0.12), transparent 60%), #fbf8f1",
         }}
       >
-      {/* ── Desktop: absolute composition, Fora-structure geometry ── */}
-      <div className="relative hidden min-h-[700px] lg:block">
         <div className="absolute left-[7%] top-1/2 max-w-[430px] -translate-y-[58%]">
           <h2 className="font-secondary text-[44px] font-medium leading-[1.15] text-[#0a2225]">
             The Goldsainte equation
@@ -177,9 +174,10 @@ export function GoldsainteEquation() {
         </div>
       </div>
 
-      {/* ── Mobile / tablet: the same venn, scaled — circles, mark, and the
-          three cards cascading over them (matching the reference layout). ── */}
-      <div className="px-5 pb-10 pt-12 lg:hidden">
+      {/* ── Mobile / tablet: headline above; panel holds the centered venn
+          with the three cards stacked cleanly beneath it (the reference's
+          mobile arrangement). ── */}
+      <div className="lg:hidden">
         <h2 className="font-secondary text-[30px] font-medium leading-[1.15] text-[#0a2225]">
           The Goldsainte equation
         </h2>
@@ -189,55 +187,46 @@ export function GoldsainteEquation() {
           directly.
         </p>
 
-        <div className="relative mx-auto mt-8 h-[610px] w-full max-w-[400px]">
-          {/* circles */}
-          <div
-            onClick={() => setActive("creators")}
-            className="cursor-pointer transition-all duration-500 ease-out"
-            style={{ ...circleState("creators"), ...CIRCLE(GRADS.creators, 230), left: 85, top: 8 }}
-          />
-          <div
-            onClick={() => setActive("travelers")}
-            className="cursor-pointer transition-all duration-500 ease-out"
-            style={{ ...circleState("travelers"), ...CIRCLE(GRADS.travelers, 230), left: 22, top: 165 }}
-          />
-          <div
-            onClick={() => setActive("agents")}
-            className="cursor-pointer transition-all duration-500 ease-out"
-            style={{ ...circleState("agents"), ...CIRCLE(GRADS.agents, 230), left: 148, top: 165 }}
-          />
-          {/* the mark, white, at the three-way intersection */}
-          <img
-            src={logomark}
-            alt="Goldsainte"
-            loading="lazy"
-            className="absolute z-[3] h-[46px] w-[46px] object-contain drop-shadow-[0_4px_12px_rgba(10,34,37,0.28)]"
-            style={{ left: 177, top: 205, filter: "brightness(0) invert(1)", opacity: 0.96 }}
-          />
-          {/* cards cascading over the circles */}
-          <SideCard
-            side={SIDES[0]}
-            active={active === "creators"}
-            onSelect={() => setActive("creators")}
-            className="absolute z-[4]"
-            style={{ left: 12, right: 12, top: 34 }}
-          />
-          <SideCard
-            side={SIDES[1]}
-            active={active === "travelers"}
-            onSelect={() => setActive("travelers")}
-            className="absolute z-[4] w-[268px]"
-            style={{ left: 2, top: 322 }}
-          />
-          <SideCard
-            side={SIDES[2]}
-            active={active === "agents"}
-            onSelect={() => setActive("agents")}
-            className="absolute z-[4] w-[268px]"
-            style={{ right: 2, top: 456 }}
-          />
+        <div
+          className="relative mt-7 overflow-hidden rounded-[24px] border border-[#0a2225]/[0.08] px-4 pb-5 pt-9"
+          style={{
+            background:
+              "radial-gradient(120% 60% at 50% 0%, rgba(199,169,98,0.12), transparent 60%), #fbf8f1",
+          }}
+        >
+          {/* the venn, centered */}
+          <div className="relative mx-auto h-[330px] w-[310px]">
+            <div
+              onClick={() => setActive("creators")}
+              className="cursor-pointer transition-all duration-500 ease-out"
+              style={{ ...circleState("creators"), ...CIRCLE(GRADS.creators, 200), left: 55, top: 0 }}
+            />
+            <div
+              onClick={() => setActive("travelers")}
+              className="cursor-pointer transition-all duration-500 ease-out"
+              style={{ ...circleState("travelers"), ...CIRCLE(GRADS.travelers, 200), left: 0, top: 128 }}
+            />
+            <div
+              onClick={() => setActive("agents")}
+              className="cursor-pointer transition-all duration-500 ease-out"
+              style={{ ...circleState("agents"), ...CIRCLE(GRADS.agents, 200), left: 110, top: 128 }}
+            />
+            <img
+              src={logomark}
+              alt="Goldsainte"
+              loading="lazy"
+              className="absolute z-[3] h-[42px] w-[42px] object-contain drop-shadow-[0_4px_12px_rgba(10,34,37,0.28)]"
+              style={{ left: 134, top: 164, filter: "brightness(0) invert(1)", opacity: 0.96 }}
+            />
+          </div>
+
+          {/* the three cards, stacked full-width beneath the diagram */}
+          <div className="mt-6 space-y-3">
+            {SIDES.map((side) => (
+              <SideCard key={side.key} side={side} active />
+            ))}
+          </div>
         </div>
-      </div>
       </div>
     </section>
   );
