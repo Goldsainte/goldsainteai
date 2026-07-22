@@ -18,14 +18,14 @@ const inter = { fontFamily: "Inter, sans-serif" } as const;
 // object-contain so narrow grid cells scale logos proportionally — never
 // squishing a wide wordmark to fit (fixed height + max-width distorts).
 const OUTLETS: { src: string; alt: string; h: number }[] = [
-  { src: forbes, alt: "Forbes", h: 22 },
-  { src: yahooFinance, alt: "Yahoo Finance", h: 20 },
-  { src: axios, alt: "Axios", h: 20 },
-  { src: marketwatch, alt: "MarketWatch", h: 18 },
-  { src: morningstar, alt: "Morningstar", h: 17 },
-  { src: afrotech, alt: "AfroTech", h: 20 },
-  { src: franchiseTimes, alt: "Franchise Times", h: 20 },
-  { src: charlotteObserver, alt: "The Charlotte Observer", h: 18 },
+  { src: forbes, alt: "Forbes", h: 32 },
+  { src: yahooFinance, alt: "Yahoo Finance", h: 29 },
+  { src: axios, alt: "Axios", h: 29 },
+  { src: marketwatch, alt: "MarketWatch", h: 26 },
+  { src: morningstar, alt: "Morningstar", h: 25 },
+  { src: afrotech, alt: "AfroTech", h: 29 },
+  { src: franchiseTimes, alt: "Franchise Times", h: 29 },
+  { src: charlotteObserver, alt: "The Charlotte Observer", h: 26 },
 ];
 
 export function AsFeaturedIn() {
@@ -40,10 +40,10 @@ export function AsFeaturedIn() {
         </span>
         <span aria-hidden="true" className="mx-auto mt-3.5 block h-px w-12 bg-[#C7A962]" />
 
-        {/* Fixed grid, not flex-wrap: 2 cols on mobile, 4 on md, 8 on lg —
-            every logo gets an equal centered cell, so 8 logos stack in clean
-            symmetric rows instead of ragged wrapping. */}
-        <div className="mx-auto mt-9 grid max-w-5xl grid-cols-2 items-center gap-x-6 gap-y-9 sm:grid-cols-4 md:gap-x-10 md:gap-y-10 lg:grid-cols-8 lg:gap-x-8">
+        {/* Stacked grid: 2 cols on mobile, 4 on desktop — 8 logos sit in two
+            clean rows with room to breathe, at full editorial size. Never a
+            single cramped row. */}
+        <div className="mx-auto mt-9 grid max-w-4xl grid-cols-2 items-center gap-x-8 gap-y-10 md:grid-cols-4 md:gap-x-14 md:gap-y-12">
           {OUTLETS.map((o) => (
             <div key={o.alt} className="flex items-center justify-center">
               <img
