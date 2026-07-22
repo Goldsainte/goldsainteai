@@ -76,23 +76,65 @@ function SceneChip({ children }: { children: React.ReactNode }) {
   );
 }
 
+function SceneFg({
+  i,
+  active,
+  run,
+  pad = "px-6 pb-6 pt-16 md:px-8",
+  children,
+}: {
+  i: number;
+  active: number;
+  run: number;
+  pad?: string;
+  children: React.ReactNode;
+}) {
+  const on = i === active;
+  return (
+    <div
+      className={`absolute inset-0 z-20 flex flex-col justify-center ${pad} transition-opacity duration-700 ${
+        on ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+    >
+      <div key={`run-${run}`} className="contents">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function CreatorShowcaseSection() {
   const [active, setActive] = useState(0);
   const [earned, setEarned] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Per-scene activation counters: bumping one remounts ONLY the incoming
+  // scene's content (replaying its entrance), while the outgoing scene stays
+  // rendered and simply crossfades out — no hard cut.
+  const acts = useRef<number[]>(TABS.map(() => 0));
 
   const restart = (i: number) => {
+    acts.current[i] += 1;
     setActive(i);
     if (timer.current) clearInterval(timer.current);
     timer.current = setInterval(
-      () => setActive((a) => (a + 1) % TABS.length),
+      () =>
+        setActive((a) => {
+          const n = (a + 1) % TABS.length;
+          acts.current[n] += 1;
+          return n;
+        }),
       ROTATE_MS
     );
   };
 
   useEffect(() => {
     timer.current = setInterval(
-      () => setActive((a) => (a + 1) % TABS.length),
+      () =>
+        setActive((a) => {
+          const n = (a + 1) % TABS.length;
+          acts.current[n] += 1;
+          return n;
+        }),
       ROTATE_MS
     );
     return () => {
@@ -166,8 +208,10 @@ export function CreatorShowcaseSection() {
         </div>
 
         <div className="mt-12 grid items-center gap-10 md:grid-cols-[360px_minmax(0,1fr)] md:gap-11">
-          {/* Tabs */}
-          <div className="flex flex-col">
+          {/* Tabs — fixed min-height so the description expansion redistributes
+              space INSIDE this box instead of resizing the section (which
+              shoved the whole page on every rotation). */}
+          <div className="flex flex-col md:min-h-[430px] md:justify-center">
             {TABS.map((t, i) => {
               const on = i === active;
               return (
@@ -227,9 +271,11 @@ export function CreatorShowcaseSection() {
               </div>
             ))}
 
-            {/* Active scene content (remounts on switch to restart animations) */}
-            <div key={active} className="gs-cs-anim absolute inset-0 z-20 flex flex-col justify-center px-6 pb-6 pt-16 md:px-8">
-              {active === 0 && (
+            {/* Scene foregrounds — always mounted; each crossfades in step
+                with its background image, and re-runs its entrance animation
+                only when it activates (never a hard cut). */}
+            <div className="absolute inset-0">
+              <SceneFg i={0} active={active} run={acts.current[0]}>
                 <>
                   <SceneChip>Hire requests</SceneChip>
                   <div
@@ -270,9 +316,9 @@ export function CreatorShowcaseSection() {
                     Proposal accepted — deposit paid to your account.
                   </div>
                 </>
-              )}
+              </SceneFg>
 
-              {active === 1 && (
+              <SceneFg i={1} active={active} run={acts.current[1]}>
                 <>
                   <SceneChip>Paid direct, start to finish</SceneChip>
                   <div className="max-w-[400px]">
@@ -309,9 +355,9 @@ export function CreatorShowcaseSection() {
                     </p>
                   </div>
                 </>
-              )}
+              </SceneFg>
 
-              {active === 2 && (
+              <SceneFg i={2} active={active} run={acts.current[2]}>
                 <>
                   <SceneChip>Your earnings</SceneChip>
                   <p className="font-secondary text-[58px] leading-none text-[#fdfaf2] md:text-[68px]">
@@ -338,34 +384,34 @@ export function CreatorShowcaseSection() {
                     ))}
                   </div>
                 </>
-              )}
+              </SceneFg>
 
-              {active === 3 && (
+              <SceneFg i={3} active={active} run={acts.current[3]} pad="px-6 pb-5 pt-14 md:px-8">
                 <>
                   <SceneChip>Your storefront</SceneChip>
-                  <div className="grid max-w-[520px] grid-cols-3 gap-3">
+                  <div className="grid max-w-[500px] grid-cols-3 gap-2.5">
                     {SHELF.map((it, i) => (
                       <div
                         key={it.t}
-                        className="rounded-xl bg-[#fdfaf2] p-3 opacity-0"
+                        className="rounded-xl bg-[#fdfaf2] p-2.5 opacity-0"
                         style={{ animation: `gsCsSlideIn .55s ${i * 0.22}s cubic-bezier(.2,.9,.3,1) forwards` }}
                       >
                         <img
                           src={it.img}
                           alt=""
                           loading="lazy"
-                          className="mb-2 h-[46px] w-full rounded-lg object-cover md:h-[52px]"
+                          className="mb-1.5 h-[40px] w-full rounded-lg object-cover md:h-[44px]"
                         />
                         <p className="text-[12.5px] font-medium leading-tight text-[#0a2225]">{it.t}</p>
-                        <p className="mt-1 font-secondary text-[16px] text-[#0a2225]">{it.p}</p>
+                        <p className="mt-0.5 font-secondary text-[15px] text-[#0a2225]">{it.p}</p>
                         <p className="text-[12px] uppercase tracking-[0.12em] text-[#8D6B2F]">{it.k}</p>
                       </div>
                     ))}
                   </div>
                 </>
-              )}
+              </SceneFg>
 
-              {active === 4 && (
+              <SceneFg i={4} active={active} run={acts.current[4]}>
                 <>
                   <SceneChip>On location</SceneChip>
                   <div className="max-w-[500px]">
@@ -397,7 +443,7 @@ export function CreatorShowcaseSection() {
                     </div>
                   </div>
                 </>
-              )}
+              </SceneFg>
             </div>
           </div>
         </div>
