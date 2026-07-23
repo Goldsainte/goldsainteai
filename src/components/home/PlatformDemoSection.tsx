@@ -97,7 +97,7 @@ export function PlatformDemoSection() {
               The platform
             </span>
             <h2 className="mt-4 font-secondary text-[30px] leading-tight text-[#f7f3ea] md:text-[38px]">
-              Technology that turns your travels into a business
+              Your travel business, in one storefront
             </h2>
             <ul className="mt-8 space-y-4">
               {FEATURES.map(([t, d]) => (
