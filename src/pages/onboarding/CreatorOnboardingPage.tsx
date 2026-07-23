@@ -5,6 +5,22 @@ import { Input } from "@/components/ui/input";
 import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 import { AIRewriteButton } from "@/components/AIRewriteButton";
 import { normalizeHandle } from "@/lib/socialHandles";
+
+// The profiles.username DB constraint allows only ^[a-z0-9-]{3,30}$ — but
+// social handles legally contain "_" and "." (most do). Derive a
+// constraint-safe username from the handle; the untouched handle itself
+// stays in tiktok_handle / instagram_handle for exact-handle search.
+// Returns "" (→ null) when nothing valid remains — username is optional,
+// and an imperfect username must never block finishing onboarding.
+function toUsername(handle: string): string {
+  const u = normalizeHandle(handle)
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 30);
+  return u.length >= 3 ? u : "";
+}
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -338,7 +354,7 @@ export default function CreatorOnboardingPage() {
           // this is a TikTok-creator marketplace — else Instagram), so
           // creators are searchable by the handle everyone knows them by.
           username:
-            normalizeHandle(tiktokHandle) || normalizeHandle(instagramHandle) || null,
+            toUsername(tiktokHandle) || toUsername(instagramHandle) || null,
           website: website || null,
           about_details: (() => {
             // languages_spoken mirrors the single Languages field ("Your World")
