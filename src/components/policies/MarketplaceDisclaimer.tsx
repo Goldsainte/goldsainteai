@@ -40,7 +40,7 @@ export function MarketplaceDisclaimer({
         Goldsainte is a curated marketplace. Travel services shown or booked on this
         platform are designed, sold, and fulfilled by independent travel professionals and
         third-party suppliers. The travel professional is the seller of record for your
-        trip and is charged directly at checkout — Goldsainte holds a platform service fee
+        trip and is paid directly at checkout — Goldsainte holds a platform service fee
         only and is not the airline, hotel, tour operator, ground operator, seller, or
         service provider for your trip.
         <br />
