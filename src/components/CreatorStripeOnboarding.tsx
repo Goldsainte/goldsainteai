@@ -16,6 +16,28 @@ interface StripeStatus {
   requirements?: any;
 }
 
+// Translate Stripe requirement keys into human language so an unfinished
+// setup tells the creator WHAT is missing instead of looping generically.
+function describeRequirements(req: any): { actionNeeded: string[]; reviewing: boolean } {
+  const label = (k: string): string => {
+    if (k.includes("external_account")) return "a bank account for payouts";
+    if (k.includes("email")) return "verifying your email with Stripe (check your inbox for Stripe's email)";
+    if (k.includes("dob") || k.includes("first_name") || k.includes("last_name") || k.includes("id_number") || k.includes("verification.document")) return "identity details / ID document";
+    if (k.includes("address")) return "your address";
+    if (k.includes("phone")) return "your phone number";
+    if (k.includes("ssn")) return "the last 4 of your SSN";
+    if (k.includes("url") || k.includes("business_profile")) return "your business details";
+    if (k.includes("tos_acceptance")) return "accepting Stripe's terms";
+    return k.replace(/[._]/g, " ");
+  };
+  const due: string[] = Array.isArray(req?.currently_due) ? req.currently_due : [];
+  const pending: string[] = Array.isArray(req?.pending_verification) ? req.pending_verification : [];
+  return {
+    actionNeeded: [...new Set(due.map(label))],
+    reviewing: due.length === 0 && pending.length > 0,
+  };
+}
+
 export const CreatorStripeOnboarding = () => {
   const [status, setStatus] = useState<StripeStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,12 +67,32 @@ export const CreatorStripeOnboarding = () => {
           title: "Setup Complete!",
           description: "Your payout account has been configured successfully.",
         });
-      } else {
+      } else if (!fresh) {
         toast({
-          title: "Stripe setup isn't finished",
+          title: "Couldn't confirm your Stripe status",
           description:
-            'It looks like you left Stripe before completing setup. Click "Continue Setup" to pick up where you left off.',
+            "We couldn't reach Stripe to check. Give it a moment and refresh — your progress on Stripe is saved.",
         });
+      } else {
+        const { actionNeeded, reviewing } = describeRequirements(fresh.requirements);
+        if (reviewing) {
+          toast({
+            title: "Stripe is reviewing your details",
+            description:
+              "You've submitted everything — Stripe is verifying now (usually minutes, sometimes up to a day). Nothing more to do; we'll show you as ready once they finish.",
+          });
+        } else if (actionNeeded.length > 0) {
+          toast({
+            title: "Stripe still needs a few things",
+            description: `To finish setup, Stripe needs: ${actionNeeded.join("; ")}. Click "Continue Setup" to provide ${actionNeeded.length > 1 ? "them" : "it"}.`,
+          });
+        } else {
+          toast({
+            title: "Stripe setup isn't finished",
+            description:
+              'It looks like you left Stripe before completing setup. Click "Continue Setup" to pick up where you left off.',
+          });
+        }
       }
     })();
   }, []);
