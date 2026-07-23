@@ -11,7 +11,9 @@ import {
   ExternalLink,
   CheckCircle2,
   AlertCircle,
+  Heart,
 } from "lucide-react";
+import { SettingsSectionCard } from "@/components/settings/SettingsSharedSections";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
