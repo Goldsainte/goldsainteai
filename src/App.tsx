@@ -15,7 +15,6 @@ import { SkipNavigation } from "@/components/SkipNavigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import FeatureAnnouncement from "@/components/announcements/FeatureAnnouncement";
-import { OnboardingWelcomeModal } from "@/components/OnboardingWelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -156,7 +155,6 @@ function AppContent() {
   return (
     <div className="min-h-screen flex-1 flex flex-col w-full max-w-full">
       <SkipNavigation />
-      <OnboardingWelcomeModal />
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
       <OnboardingTour />
       <FeatureAnnouncement />
