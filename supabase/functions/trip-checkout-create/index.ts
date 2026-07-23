@@ -556,9 +556,35 @@ Deno.serve(async (req) => {
 
     // Direct charge on the agent's Standard account (Goldsainte's cut as
     // an application fee) — or platform charge for legacy/platform paths.
-    const session = connectAccountId
-      ? await stripe.checkout.sessions.create(sessionCreateParams, { stripeAccount: connectAccountId })
-      : await stripe.checkout.sessions.create(sessionCreateParams);
+    // SELLER-OF-RECORD INVARIANT: a trip is always sold by, and charged to, the
+    // independent travel professional's own Stripe account. Goldsainte is never
+    // the merchant of record on a trip. Every upstream path either resolves a
+    // ready connected account or returns before here (AGENT_NOT_READY,
+    // AGENT_ACCOUNT_UNAVAILABLE, CONCIERGE_INQUIRY_ONLY). If we somehow reach
+    // this point without a connected account, we REFUSE rather than fall back to
+    // charging the platform — there is deliberately no platform-charge path.
+    if (!connectAccountId) {
+      console.error(
+        `[trip-checkout-create] Refused checkout ${tripBookingId}: no connected account resolved at charge time. ` +
+          `Goldsainte will not act as merchant of record for a trip.`
+      );
+      return new Response(
+        JSON.stringify({
+          error:
+            "This trip can only be paid to your travel professional's own account, and it isn't available right now. Please try again shortly or contact support.",
+          code: "NO_SELLER_ACCOUNT",
+        }),
+        { status: 409, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+      );
+    }
+
+    // Direct charge on the travel professional's Standard account, with
+    // Goldsainte's commission taken as an application fee. This is the only
+    // charge path.
+    const session = await stripe.checkout.sessions.create(
+      sessionCreateParams,
+      { stripeAccount: connectAccountId }
+    );
 
     // Update booking with payment details.
     //
