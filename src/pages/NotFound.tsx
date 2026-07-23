@@ -5,7 +5,16 @@ const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    // Asset-like paths (/_astro/x.webp, stale build hashes, bot probes) are
+    // external noise, not users lost in the app — keep them out of the error
+    // stream so route-level 404s stay meaningful.
+    const last = location.pathname.split("/").pop() ?? "";
+    const assetLike = last.includes(".") || location.pathname.startsWith("/_");
+    if (assetLike) {
+      console.info("404 (asset-like, external):", location.pathname);
+    } else {
+      console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    }
   }, [location.pathname]);
 
   return (
