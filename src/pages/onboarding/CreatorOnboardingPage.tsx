@@ -152,7 +152,6 @@ export default function CreatorOnboardingPage() {
 
   // Step 5: Standards & Legal
   const [responseTime, setResponseTime] = useState(24);
-  const [acceptsTransparency, setAcceptsTransparency] = useState(false);
   const [acceptsSafetyPolicy, setAcceptsSafetyPolicy] = useState(false);
   const [tosAccepted, setTosAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
@@ -284,7 +283,7 @@ export default function CreatorOnboardingPage() {
       return Boolean(expenseTravel && expenseLodging && expenseMeals && hostTitle.trim() && hostCapabilities.length > 0);
     }
     if (currentStep === STANDARDS_STEP_INDEX) {
-      return acceptsTransparency && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
+      return transparencyAccepted && acceptsSafetyPolicy && tosAccepted && privacyAccepted && creatorAgreementAccepted;
     }
     return true;
   };
@@ -342,8 +341,11 @@ export default function CreatorOnboardingPage() {
             normalizeHandle(tiktokHandle) || normalizeHandle(instagramHandle) || null,
           website: website || null,
           about_details: (() => {
+            // languages_spoken mirrors the single Languages field ("Your World")
+            // — the duplicate About-section input was removed.
+            const src = { ...aboutDetails, languages_spoken: languagesInput };
             const clean = Object.fromEntries(
-              Object.entries(aboutDetails).filter(([, v]) => (v || "").trim() !== "")
+              Object.entries(src).filter(([, v]) => (v || "").trim() !== "")
             );
             return Object.keys(clean).length ? clean : null;
           })(),
@@ -355,8 +357,8 @@ export default function CreatorOnboardingPage() {
           planning_fee_amount: planningCents,
           itinerary_fee_amount: itineraryCents,
           response_commitment_hours: responseTime,
-          accepts_transparency_agreement: acceptsTransparency,
-          transparency_agreement_signed_at: acceptsTransparency ? now : null,
+          accepts_transparency_agreement: transparencyAccepted,
+          transparency_agreement_signed_at: transparencyAccepted ? now : null,
           accepts_safety_policy: acceptsSafetyPolicy,
           safety_policy_signed_at: acceptsSafetyPolicy ? now : null,
           featured_photos: featuredPhotos.length > 0 ? featuredPhotos : null,
@@ -652,10 +654,6 @@ export default function CreatorOnboardingPage() {
                       <div>
                         <Label className="text-[#0a2225] font-medium">Countries visited</Label>
                         <Input value={aboutDetails.countries_visited || ""} onChange={(e) => setAbout("countries_visited", e.target.value)} placeholder="e.g. 27" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
-                      </div>
-                      <div>
-                        <Label className="text-[#0a2225] font-medium">Languages you speak</Label>
-                        <Input value={aboutDetails.languages_spoken || ""} onChange={(e) => setAbout("languages_spoken", e.target.value)} placeholder="English, Spanish…" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                       <div>
                         <Label className="text-[#0a2225] font-medium">Your travel style in three words</Label>
@@ -1143,29 +1141,6 @@ export default function CreatorOnboardingPage() {
                   </div>
                 </div>
 
-                {/* Transparency */}
-                <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
-                  <div className="flex items-start gap-3">
-                    <Shield className="w-6 h-6 text-[#C7A962] flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-medium text-[#0a2225] mb-2">Transparency Agreement</h3>
-                      <p className="text-sm text-[#6B7280] mb-4">
-                        All communications and transactions must stay on Goldsainte.
-                      </p>
-                      <label className="flex items-start gap-3 cursor-pointer">
-                        <Checkbox
-                          checked={acceptsTransparency}
-                          onCheckedChange={(checked) => setAcceptsTransparency(checked as boolean)}
-                          className="mt-0.5 border-[#C7A962] data-[state=checked]:bg-[#C7A962] data-[state=checked]:border-[#C7A962]"
-                        />
-                        <span className="text-sm text-[#0a2225]">
-                          I agree to keep all communications on Goldsainte. *
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Safety & Conduct */}
                 <div className="bg-[#FDF9F0] rounded-2xl p-6 border border-[#E5DFC6]">
                   <h3 className="font-medium text-[#0a2225] mb-3 flex items-center gap-2">
@@ -1178,6 +1153,14 @@ export default function CreatorOnboardingPage() {
                     <li>• Prioritize traveler privacy at all times</li>
                     <li>• Only recommend vetted, safe experiences</li>
                   </ul>
+                  <a
+                    href="/trust-safety"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mb-4 inline-block text-sm font-medium text-[#8D6B2F] underline underline-offset-4 hover:text-[#0c4d47]"
+                  >
+                    Review the full Trust, Safety & Conduct policy →
+                  </a>
                   <label className="flex items-start gap-3 cursor-pointer">
                     <Checkbox
                       checked={acceptsSafetyPolicy}
