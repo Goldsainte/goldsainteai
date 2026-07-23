@@ -28,18 +28,6 @@ type Announcement = {
 };
 
 const ANNOUNCEMENTS: Announcement[] = [
-  {
-    id: "creator-about-questions-2026-07",
-    audience: ["creator"],
-    eyebrow: "New on Goldsainte",
-    title: "Let travelers get to know you",
-    body:
-      "We added a set of optional questions to your profile — countries visited, the trip you'll never forget, the tip you swear by. Profiles with answers win more requests.",
-    ctaLabel: "Answer them now",
-    ctaTo: "/onboarding/creator",
-    satisfiedWhen: (profile) =>
-      !!profile?.about_details && Object.keys(profile.about_details).length > 0,
-  },
 ];
 
 const seenKey = (announcementId: string, userId: string) =>
