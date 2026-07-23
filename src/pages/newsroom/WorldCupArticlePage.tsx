@@ -463,7 +463,7 @@ export default function WorldCupArticlePage() {
             who've lived it and agents who know how to deliver it.
           </p>
           <Link
-            to="/explore"
+            to="/marketplace"
             className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
             style={{
               background: "#C7A962",
