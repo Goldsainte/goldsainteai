@@ -155,7 +155,7 @@ export const Footer = () => {
             professionals, who are the seller of record and are paid directly
             for your trip. Goldsainte is a technology platform that connects
             travelers with these professionals — we are not a travel agency,
-            tour operator, airline, hotel, or the seller of your travel.
+            tour operator, airline, hotel, or the seller of your travel services.
           </p>
         </div>
 
