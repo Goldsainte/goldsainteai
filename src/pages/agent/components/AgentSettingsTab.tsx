@@ -206,7 +206,7 @@ export function AgentSettingsTab() {
           variant="outline"
           className="w-full sm:w-auto border-[#E5DFC6] text-[#0a2225] hover:bg-[#F6F0E4] rounded-full"
         >
-          <Link to="/agent-application">
+          <Link to="/apply/agent">
             <ExternalLink className="h-4 w-4 mr-2" />
             Update Agency Details
           </Link>
