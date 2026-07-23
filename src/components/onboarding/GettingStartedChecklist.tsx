@@ -218,6 +218,7 @@ const AGENT_ITEMS: ChecklistItem[] = [
 
 export function GettingStartedChecklist({ userId, role }: Props) {
   const [data, setData] = useState<ChecklistData | null>(null);
+  const [stripeCtaBusy, setStripeCtaBusy] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -361,12 +362,35 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                 item.cta.event ? (
                   <button
                     type="button"
-                    onClick={() => {
+                    disabled={stripeCtaBusy}
+                    onClick={async () => {
+                      // The event listener lives inside the earnings tab, which
+                      // may not be mounted — so don't rely on it. If a mounted
+                      // card wants to react (scroll into view), fine; either
+                      // way we take the user straight to Stripe ourselves.
                       window.dispatchEvent(new CustomEvent(item.cta.event!));
+                      setStripeCtaBusy(true);
+                      try {
+                        const { data: { session } } = await supabase.auth.getSession();
+                        if (!session) return;
+                        const { data, error } = await supabase.functions.invoke("stripe-connect-link", {
+                          headers: { Authorization: `Bearer ${session.access_token}` },
+                          body: { origin: window.location.origin },
+                        });
+                        if (!error && data?.url) {
+                          window.location.href = data.url;
+                          return;
+                        }
+                        console.error("[CHECKLIST] stripe-connect-link failed:", error);
+                      } catch (e) {
+                        console.error("[CHECKLIST] stripe-connect-link failed:", e);
+                      } finally {
+                        setStripeCtaBusy(false);
+                      }
                     }}
-                    className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap"
+                    className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap disabled:opacity-60"
                   >
-                    {ctaLabel}
+                    {stripeCtaBusy ? "Opening Stripe…" : ctaLabel}
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 ) : (
