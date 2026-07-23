@@ -164,7 +164,7 @@ project_id = "ktzsgqrqvwtxlimctkaf"
   [functions.send-itinerary-email]
     verify_jwt = true
   [functions.send-notification]
-    verify_jwt = false
+    verify_jwt = true
   [functions.send-password-reset-email]
     verify_jwt = false
   [functions.send-phone-verification]
