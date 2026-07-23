@@ -16,9 +16,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders(req) });
   }
 
+  // SERVICE ROLE: this function reads/writes the caller's own profile row
+  // after verifying their JWT below. The anon key cannot see profile rows
+  // under RLS — which made this check permanently blind to the saved
+  // stripe_account_id and looped every creator at "not finished" forever.
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
   );
 
   try {
