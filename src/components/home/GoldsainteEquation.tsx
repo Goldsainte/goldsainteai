@@ -94,7 +94,7 @@ export function GoldsainteEquation() {
       : { opacity: 0.4, zIndex: 1, filter: "saturate(0.7)", transform: "scale(1)" };
 
   return (
-    <section className="bg-[#f7f3ea] px-4 py-10 sm:px-6 md:py-14">
+    <section id="storefronts" className="scroll-mt-24 bg-[#f7f3ea] px-4 py-10 sm:px-6 md:py-14">
       {/* ── Desktop: framed panel containing the absolute composition ── */}
       <div
         className="relative mx-auto hidden min-h-[700px] max-w-[1240px] overflow-hidden rounded-[28px] border border-[#0a2225]/[0.08] lg:block"
