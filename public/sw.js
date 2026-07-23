@@ -25,6 +25,19 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request).catch(async () => {
+      // caches.match resolves to UNDEFINED on a miss — and respondWith(undefined)
+      // throws "Failed to convert value to 'Response'", killing the request
+      // outright (the bug that broke navigations and API reads). Always
+      // resolve to a real Response: cached copy → offline shell for
+      // navigations → an explicit network-error Response.
+      const cached = await caches.match(event.request);
+      if (cached) return cached;
+      if (event.request.mode === 'navigate') {
+        const shell = await caches.match('/');
+        if (shell) return shell;
+      }
+      return Response.error();
+    })
   );
 });
