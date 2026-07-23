@@ -7,6 +7,17 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     tracesSampleRate: 0.1,
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 1.0,
+    // Noise filter (launch hygiene): these are transient network/browser
+    // conditions, not app bugs — auth token refreshes on flaky wifi, users
+    // navigating away mid-request, extension-blocked calls. Real failures
+    // of the same operations surface through their user-facing error paths.
+    ignoreErrors: [
+      "TypeError: Failed to fetch",
+      "Failed to fetch",
+      "Load failed",
+      "NetworkError when attempting to fetch resource",
+      "AbortError",
+    ],
   });
 }
 
