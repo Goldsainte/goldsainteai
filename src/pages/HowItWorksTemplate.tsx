@@ -82,13 +82,6 @@ export function HowItWorksTemplate({ eyebrow, title, subtitle, steps, finalCta, 
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#0a2225]/40 mb-3">
             {t('howItWorks.preferToWatch', 'Prefer to watch?')}
           </p>
-          <Link
-            to="/help/video-tour"
-            className="inline-flex items-center gap-2 text-[#0c4d47] text-sm border-b border-[#0c4d47] pb-0.5 hover:text-[#0a2225] hover:border-[#0a2225] transition-colors"
-          >
-            <Play className="h-3.5 w-3.5" strokeWidth={1.5} />
-            {t('howItWorks.videoTour', 'Watch a 90-second tour of Goldsainte')}
-          </Link>
         </div>
 
         {/* FINAL CTA */}
