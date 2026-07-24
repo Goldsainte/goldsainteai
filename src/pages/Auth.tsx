@@ -852,17 +852,6 @@ const Auth = () => {
                     New to Goldsainte? Create an account
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const returnTo = getRedirectPathFromSearch(location.search);
-                    navigate(returnTo || '/');
-                  }}
-                  className="block w-full text-sm transition-colors"
-                  style={{ color: '#9A9384' }}
-                >
-                  Continue without signing in
-                </button>
               </div>
             </div>
           </>
