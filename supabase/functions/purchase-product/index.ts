@@ -73,7 +73,9 @@ serve(async (req) => {
 
     // Calculate amounts (70% to creator, 30% platform fee)
     const totalAmount = price * quantity;
-    const platformFee = totalAmount * 0.30;
+    // Flat 7% on every creator rail (founder decision, Jul 23 2026). The
+    // previous hardcoded 30% contradicted every fee promise on the site.
+    const platformFee = totalAmount * 0.07;
     const sellerPayout = totalAmount - platformFee;
 
     // Get seller's Stripe account
