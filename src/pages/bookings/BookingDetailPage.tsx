@@ -1086,12 +1086,29 @@ export default function BookingDetailPage() {
                   </p>
                 </div>
                 <div className="mx-auto mt-6 max-w-[520px]">
-                  <ContractStatusCard
-                    variant="traveler"
-                    bookingId={booking.id}
-                    travelerId={booking.traveler_id}
-                    destination={trip?.destination ?? null}
-                  />
+                  {/* Phase 1 (Jul 24 2026): shows the traveler's e-acceptance of
+                      the professional's OWN client agreement, recorded at
+                      proposal-accept. The contract-builder card is retired with
+                      the builder — Goldsainte authors no agreements. */}
+                  {(booking.metadata as any)?.client_agreement?.url ? (
+                    <div className="rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-5 text-center text-[14px] text-[#0a2225]">
+                      <p>
+                        <span className="font-medium text-[#0c4d47]">✓ Client agreement accepted</span>
+                        {" — "}
+                        {(booking.metadata as any).client_agreement.accepted_name}
+                        {", "}
+                        {new Date((booking.metadata as any).client_agreement.accepted_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                      </p>
+                      <a href={(booking.metadata as any).client_agreement.url} target="_blank" rel="noopener noreferrer"
+                        className="mt-2 inline-block text-[13px] text-[#0c4d47] underline underline-offset-2">
+                        View agreement ↗
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="text-center text-[13.5px] text-[#6B7280]">
+                      Your agreement with this professional is handled directly between you.
+                    </p>
+                  )}
                 </div>
               </section>
             )}
