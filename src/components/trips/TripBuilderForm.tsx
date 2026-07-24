@@ -136,7 +136,14 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         max_participants: initialData.max_participants?.toString() || "",
         min_participants: initialData.min_participants?.toString() || "1",
         trip_type: initialData.trip_type || "",
-        listing_type: (initialData as any).listing_type || listingKind || "trip",
+        // When the listing choice is locked (it now always is — role decides),
+        // the ROLE-DERIVED kind wins over whatever a stale draft carries. This
+        // silently converts pre-Jul-24 creator drafts from "trip" to "tour" on
+        // open, instead of stranding them un-publishable with no visible way
+        // to change type.
+        listing_type: allowListingChoice
+          ? ((initialData as any).listing_type || listingKind || "trip")
+          : (listingKind || (initialData as any).listing_type || "trip"),
         activity_level: initialData.activity_level || "",
         tags: initialData.tags || [],
         highlights: initialData.highlights || [],
