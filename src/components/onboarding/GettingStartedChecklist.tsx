@@ -93,7 +93,7 @@ const CREATOR_ITEMS: ChecklistItem[] = [
   {
     id: "create-content",
     label: "Publish your first product",
-    description: "Create a trip package or sell a digital itinerary guide.",
+    description: "Create a bookable tour or sell a digital itinerary guide.",
     cta: {
       // Resume the creator's existing draft if they have one, else start fresh.
       label: (d) => (d.draftTripId ? "Resume draft" : "Get started"),
