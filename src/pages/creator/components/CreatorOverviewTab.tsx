@@ -89,7 +89,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         </h2>
         <p className="mt-4 md:mt-5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/65">
           The marketplace is full of travelers waiting for the right specialist. Send a proposal or
-          publish a packaged trip ready to book.
+          publish a bookable tour ready to book.
         </p>
 
         <div className="mt-7 md:mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-x-8">
@@ -103,7 +103,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             to="/trip-builder"
             className="group inline-flex items-center justify-center sm:justify-start text-[15px] text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
           >
-            Or package a new trip
+            Or create a bookable tour
             <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
