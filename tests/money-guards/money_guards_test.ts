@@ -306,3 +306,21 @@ Deno.test("guide sales are direct charges with the 7% fee and refuse without a s
   assertContains(GUIDE_CHECKOUT, "stripeAccount: creatorAccountId", "Guide sales must charge on the creator's connected account — never collect into the platform account.");
   assertContains(GUIDE_CHECKOUT, "NO_SELLER_ACCOUNT", "A guide sale without a ready creator payout account must refuse, not silently collect platform-side.");
 });
+
+
+// ---------------------------------------------------------------------------
+// THE CENTS/DOLLARS SEAM, FRONTEND EDITION (Jul 24 2026): the booking
+// confirmation rendered integer cents as dollars ($10 trip → "$1,000.00"),
+// and the proposal card rounded deposits to whole dollars ($2.50 → $3.00,
+// a 30% deposit wearing a 25% label). These pins keep both conversions.
+// ---------------------------------------------------------------------------
+const BOOKING_CONFIRMATION = "src/pages/BookingConfirmation.tsx";
+const PROPOSAL_CARD = "src/components/messaging/ProposalMessageCard.tsx";
+
+Deno.test("booking confirmation converts cents to dollars exactly once", () => {
+  assertContains(BOOKING_CONFIRMATION, ".format(amount / 100)", "trip_bookings money columns are cents; the formatter must divide by 100 or a $10 trip displays as $1,000.");
+});
+
+Deno.test("proposal deposits keep cents precision", () => {
+  assertContains(PROPOSAL_CARD, "Math.round(price * depositPct) / 100", "Whole-dollar rounding turned 25% deposits into 30% on odd totals.");
+});
