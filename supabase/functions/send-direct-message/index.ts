@@ -201,6 +201,34 @@ serve(async (req) => {
       if (!recipientId) recipientId = conciergeId;
     }
 
+    // CONVERSATION-SCOPED SEND: the proposal composer and thread replies pass
+    // only a conversationId. Resolve the counterpart server-side with the same
+    // membership guard the threading code enforces further down. This resolver
+    // was lost in the v2.0 booking-thread rewrite — the recipient check below
+    // ran before conversationId was ever consulted, so every proposal send
+    // died with "recipientId or a resolvable tripId is required" while plain
+    // replies (client-inserted) kept working.
+    if (!recipientId && conversationId) {
+      const { data: convo } = await supabase
+        .from("dm_conversations")
+        .select("id, participant_1, participant_2")
+        .eq("id", conversationId)
+        .maybeSingle();
+      if (!convo) {
+        return new Response(
+          JSON.stringify({ error: "Conversation not found" }),
+          { status: 404, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+      if (convo.participant_1 !== user.id && convo.participant_2 !== user.id) {
+        return new Response(
+          JSON.stringify({ error: "Not a participant in this conversation" }),
+          { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+        );
+      }
+      recipientId = convo.participant_1 === user.id ? convo.participant_2 : convo.participant_1;
+    }
+
     if (!recipientId) {
       return new Response(
         JSON.stringify({ error: "recipientId or a resolvable tripId is required" }),
