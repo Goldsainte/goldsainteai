@@ -17,7 +17,6 @@ const BRAND_TYPE_OPTIONS = [
   { value: "restaurant_bar", label: "Restaurant / Bar" },
   { value: "experience_brand", label: "Experience Brand" },
   { value: "retail_design_brand", label: "Retail / Design Brand" },
-  { value: "tour_operator", label: "Tour Operator" },
   { value: "transportation", label: "Transportation" },
   { value: "other", label: "Other" },
 ];
