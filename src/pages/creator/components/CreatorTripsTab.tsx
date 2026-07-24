@@ -78,7 +78,7 @@ export function CreatorTripsTab() {
           className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white px-6 self-start sm:self-auto shrink-0"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create Trip Package
+          Create Bookable Tour
         </Button>
       </div>
 
@@ -90,7 +90,7 @@ export function CreatorTripsTab() {
 
       {!loading && trips.length === 0 && (
         <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-          <p className="text-[15px] text-[#6B7280]">You haven't created any trips yet.</p>
+          <p className="text-[15px] text-[#6B7280]">You haven't created any tours yet.</p>
           <Button
             onClick={() => navigate("/trip-builder")}
             className="mt-4 rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white"
