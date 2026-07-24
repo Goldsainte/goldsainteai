@@ -323,8 +323,10 @@ export default function TripBuilderPage() {
               onSave={handleSave}
               saving={saving}
               isEditing={!!editId}
-              listingKind={isBrand ? "tour" : "trip"}
-              allowListingChoice={isCreator && !isBrand}
+              // Founder law (Jul 24 2026): trips are the AGENT product. Creators and
+              // brands build Bookable Tours; nobody gets a choice — role decides.
+              listingKind={isBrand || (isCreator && !isAgent) ? "tour" : "trip"}
+              allowListingChoice={false}
             />
           </div>
           <div className="hidden lg:flex flex-col w-60 flex-shrink-0">
