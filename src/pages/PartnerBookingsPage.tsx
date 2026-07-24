@@ -258,7 +258,13 @@ function PartnerBookingRowCard({ isHireBooking, booking,
 
   const reference = `GS-${booking.id.slice(0, 8).toUpperCase()}`;
   const booked = new Date(booking.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  const imgUrl = trip?.destination ? getTripRequestImageUrl(trip.destination) : null;
+  // Use the booking's own cover (loaded by the page and stamped on the row)
+  // first; fall back to a destination stock image. Chat-proposal bookings have
+  // neither — those render the compact card below instead of a giant empty
+  // gradient.
+  const imgUrl =
+    ((booking as any).cover as string | null) ??
+    (trip?.destination ? getTripRequestImageUrl(trip.destination) : null);
   void onStatusChange; void initial; void total;
   return (
     <Link
@@ -266,7 +272,7 @@ function PartnerBookingRowCard({ isHireBooking, booking,
       className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
     >
       {/* Photo IS the card */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className={`relative overflow-hidden ${imgUrl ? "aspect-[4/3]" : "h-36"}`}>
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
           <span className="font-secondary text-xl italic text-[#C7A962]/80">Goldsainte</span>
         </div>
