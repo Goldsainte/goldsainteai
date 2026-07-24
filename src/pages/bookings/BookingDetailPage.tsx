@@ -500,7 +500,12 @@ export default function BookingDetailPage() {
     (booking?.metadata as any)?.destination ||
     (booking?.metadata as any)?.trip_title ||
     null;
-  const heroImage = trip?.cover_image_url || getTripRequestImageUrl(heroDestination);
+  // Chat-proposal bookings have no trip row and no destination — heroImage
+  // must be allowed to be null so the hero renders the branded band instead
+  // of a broken image (the gray void).
+  const heroImage =
+    trip?.cover_image_url ||
+    (heroDestination ? getTripRequestImageUrl(heroDestination) : null);
 
   // Auto-expand Messages only when there's something unread for this booking;
   // otherwise it stays collapsed so money/next-step lead the page.
@@ -699,12 +704,23 @@ export default function BookingDetailPage() {
             {/* ── Minimal hero: image band, then eyebrow + serif title + dates
                  + one status badge, centered. Nothing else. ── */}
             <div className="relative h-[96px] overflow-hidden rounded-2xl">
-              <TripCoverImage
-                src={heroImage}
-                alt={title}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/40 to-[#061418]/[0.03]" />
+              {heroImage ? (
+                <>
+                  <TripCoverImage
+                    src={heroImage}
+                    alt={title}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#061418]/40 to-[#061418]/[0.03]" />
+                </>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#C7A962]/50">
+                    <span className="font-secondary text-xl text-[#C7A962]">{(title || "G").trim().charAt(0).toUpperCase()}</span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962]/70">Goldsainte</span>
+                </div>
+              )}
             </div>
 
             <div className="mt-10 text-center">
