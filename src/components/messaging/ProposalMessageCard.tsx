@@ -35,7 +35,9 @@ export function ProposalMessageCard({
   const meta = message.metadata || {};
   const price: number = Number(meta.price) || 0;
   const depositPct: number = Number(meta.depositPercentage) || 25;
-  const depositAmount = Math.round(price * (depositPct / 100));
+  // Cents-precision: Math.round at whole dollars turned a $2.50 deposit
+  // (25% of $10) into $3.00 — a 30% deposit wearing a 25% label.
+  const depositAmount = Math.round(price * depositPct) / 100;
   // Canonical guest-side platform fee: 3.5% added on top of the deposit
   // (host-side 3.5% is deducted from payout server-side). 7% total, always.
   const GUEST_FEE_RATE = 0.035;
