@@ -19,6 +19,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 
 interface TripBuilderFormProps {
   /** Who is authoring: creators choose trip-vs-tour; tour operators are fixed
@@ -412,7 +413,15 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   {getError("destination") && <p className="text-xs text-red-500 mt-1">{getError("destination")}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Description</Label>
+                  <div className="flex items-center justify-between gap-3">
+                    <Label className={labelClasses}>Description</Label>
+                    <AIRewriteButton
+                      value={formData.description}
+                      onRewrite={(text) => updateField("description", text)}
+                      fieldLabel="Trip description"
+                      persona="travel agent"
+                    />
+                  </div>
                   <Textarea value={formData.description} onChange={(e) => updateField("description", e.target.value)}
                     placeholder="Describe this trip experience..." rows={5} className={textareaClasses} />
                   <p className={helperClasses}>Aim for 150–300 words. Include what makes this trip different from booking it alone.</p>
@@ -662,7 +671,15 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                         </label>
                       </div>
                       <div className="space-y-2">
-                        <Label className={labelClasses}>Description</Label>
+                        <div className="flex items-center justify-between gap-3">
+                          <Label className={labelClasses}>Description</Label>
+                          <AIRewriteButton
+                            value={day.description}
+                            onRewrite={(text) => updateDay(idx, { description: text })}
+                            fieldLabel="Day description"
+                            persona="travel agent"
+                          />
+                        </div>
                         <Textarea value={day.description} onChange={(e) => updateDay(idx, { description: e.target.value })}
                           placeholder="Describe the day's experience..." rows={3} className={textareaClasses} />
                       </div>
