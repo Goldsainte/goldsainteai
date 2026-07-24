@@ -41,6 +41,7 @@ const PILLARS = [
       "PCI Level 1 certified payment processing",
       "Payments go direct to your vetted professional",
       "No card details stored by Goldsainte",
+      "Runs on SOC 2-certified infrastructure (Supabase)",
       "Refund eligibility per our cancellation policy",
     ],
   },
