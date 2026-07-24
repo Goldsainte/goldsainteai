@@ -149,11 +149,12 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             </p>
             <p className="mt-2.5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/65">
               You set your price — your costs and your margin are yours to
-              build in. Travelers pay a 3.5% service fee on top; a matching
-              3.5% platform fee comes out of your payout. That is
-              Goldsainte&apos;s entire take: 7% total, flat, on every booking.
-              Every payment is charged directly on your own Stripe account
-              at booking.
+              build in. Goldsainte&apos;s entire take is 7%, flat, on
+              everything you earn here: bookings, hires, guides, products,
+              and tips. On bookings it&apos;s a 3.5% traveler service fee
+              plus a matching 3.5% from your payout; on everything else,
+              a simple 7% platform fee. Every payment is charged directly
+              on your own Stripe account.
             </p>
           </div>
           <div className="shrink-0 text-center">
@@ -161,7 +162,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
               7<span className="text-2xl">%</span>
             </p>
             <p className="mt-1.5 text-[12.5px] uppercase tracking-[0.2em] text-[#0a2225]/55">
-              Total · 3.5 + 3.5
+              Flat · on everything
             </p>
           </div>
         </div>
