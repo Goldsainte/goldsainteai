@@ -61,7 +61,10 @@ export function CreatorEarningsTab() {
 
 
   const currency = snapshot?.currency || "USD";
-  const total = (snapshot?.pending || 0) + (snapshot?.released || 0);
+  // Lifetime = everything earned on-platform: booking payouts (pending +
+  // released) plus tip net. Tips settle on the creator's own Stripe clock,
+  // so they never pass through Paid/Pending — but they are absolutely earned.
+  const total = (snapshot?.pending || 0) + (snapshot?.released || 0) + (tips?.totalNetCents || 0);
 
   return (
     <div className="space-y-10">
@@ -87,8 +90,8 @@ export function CreatorEarningsTab() {
         />
         <SummaryCard
           label="Lifetime"
-          value={snapshot ? formatMoney(total, currency) : "—"}
-          description="Total earned"
+          value={snapshot || tips ? formatMoney(total, currency) : "—"}
+          description="Total earned — bookings and tips"
           highlight
         />
       </div>
