@@ -609,7 +609,7 @@ export default function AgentDashboard() {
                   <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
                     <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>Travelers post the journeys they want. Pick a brief that fits your expertise.</p>
                     <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>Send a tailored proposal — itinerary, price, and timeline — drafted with Goldsainte AI in under a minute.</p>
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>They accept, sign the contract, and pay the deposit — all without leaving the thread.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>They accept and pay the deposit — all without leaving the thread.</p>
                   </div>
                 </div>
                 <div>
