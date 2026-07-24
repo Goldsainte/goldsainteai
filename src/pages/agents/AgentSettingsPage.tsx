@@ -378,8 +378,18 @@ export default function AgentSettingsPage() {
           <h2 className="font-secondary text-2xl text-[#0a2225]">Client agreement</h2>
           <p className="mt-2 text-[14px] text-[#6B7280]">
             Your own engagement agreement, shown to every traveler and e-accepted
-            before they can pay a deposit. Goldsainte never provides or edits this
-            document — it is yours. (New to this? ASTA provides a member template.)
+            before they can pay a deposit. Goldsainte never provides, edits, or
+            endorses this document — it is yours.
+          </p>
+          <p className="mt-3 text-[13px] text-[#6B7280]">
+            <span className="font-medium text-[#0a2225]">Don't have one yet?</span>{" "}
+            Industry sources license attorney-drafted client agreements directly
+            to advisors:{" "}
+            <a href="https://www.asta.org" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">ASTA</a>{" "}
+            (member template),{" "}
+            <a href="https://travelindustrysolutions.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Travel Industry Solutions</a>,{" "}
+            <a href="https://welcome.traveladvisorresourcecenter.com/courses/legal-templates" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Travel Advisor Resource Center</a>.
+            License from them directly and have your attorney review before use.
           </p>
           {agreementUrl ? (
             <div className="mt-5 flex flex-wrap items-center gap-4 rounded-xl bg-[#0c4d47]/[0.06] p-4 text-[14px]">
