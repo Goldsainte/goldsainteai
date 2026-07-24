@@ -99,10 +99,6 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   ref
 ) {
   const [currentStep, setCurrentStep] = useState(0);
-  const isTour = formData.listing_type === "tour";
-  const noun = isTour ? "tour" : "trip";
-  const Noun = isTour ? "Tour" : "Trip";
-  const steps = getSteps(noun);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [suggestingCover, setSuggestingCover] = useState(false);
   const [coverSuggested, setCoverSuggested] = useState(false);
@@ -124,6 +120,13 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
     minimum_age: "", accommodation_type: "", meals_included: [] as string[],
     departure_dates: [] as string[], instant_booking: false,
   });
+  // Derive AFTER formData exists (const is not hoisted — reading formData
+  // above its declaration threw a ReferenceError that crashed the whole
+  // builder page: the "Something went wrong" on /trip-builder, Jul 24 2026).
+  const isTour = formData.listing_type === "tour";
+  const noun = isTour ? "tour" : "trip";
+  const Noun = isTour ? "Tour" : "Trip";
+  const steps = getSteps(noun);
 
   useEffect(() => {
     if (initialData) {
