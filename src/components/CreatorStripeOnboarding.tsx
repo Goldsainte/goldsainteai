@@ -299,7 +299,7 @@ export const CreatorStripeOnboarding = () => {
 
         <Alert>
           <AlertDescription className="text-xs">
-            <strong>How it works:</strong> Stripe sends payouts directly to your bank account. Traveler payments are held for a short protected window before release, and Goldsainte's commission depends on your creator tier.
+            <strong>How it works:</strong> Every payment is charged directly on your own Stripe account, and Stripe pays out to your bank on your payout schedule. Goldsainte's take is 7%, flat, on everything — the rest is yours automatically.
           </AlertDescription>
         </Alert>
       </CardContent>
