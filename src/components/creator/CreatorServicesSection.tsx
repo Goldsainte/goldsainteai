@@ -98,8 +98,8 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
   // Which hosted (on_trip) offer the public flagship card is showing.
   const [hostedIdx, setHostedIdx] = useState(0);
 
-  const safeTier: CreatorTier = (creatorTier && creatorTier in TIER_COMMISSION ? creatorTier : "bronze") as CreatorTier;
-  const youKeepPct = 100 - TIER_COMMISSION[safeTier];
+  // Flat 7% on every creator rail (founder decision, Jul 23 2026) — tiers retired.
+  const youKeepPct = 93;
 
   const fetchServices = useCallback(async () => {
     const { data } = await supabase
