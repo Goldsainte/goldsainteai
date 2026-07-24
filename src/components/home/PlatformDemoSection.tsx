@@ -108,10 +108,6 @@ export function PlatformDemoSection() {
               ))}
             </ul>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link to="/auth?mode=signup&role=creator"
-                className="rounded-full bg-[#C7A962] px-7 py-3.5 text-[14px] font-medium text-[#0a2225] transition-colors hover:bg-[#E2C57E]">
-                Become a creator
-              </Link>
               <Link to="/apply/agent"
                 className="rounded-full border border-[#f7f3ea]/30 px-7 py-3.5 text-[14px] font-medium text-[#f7f3ea] transition-colors hover:bg-white/10">
                 Join as a specialist
