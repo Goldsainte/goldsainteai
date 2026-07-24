@@ -84,13 +84,6 @@ const TRAVELER_ITEMS: ChecklistItem[] = [
 
 const CREATOR_ITEMS: ChecklistItem[] = [
   {
-    id: "add-media",
-    label: "Add photos & video to your profile",
-    description: "Show travelers who you are — imagery is what gets you chosen.",
-    cta: { label: "Add media", to: "/profile/media" },
-    isComplete: (d) => (d.partnerMediaCount || 0) > 0,
-  },
-  {
     id: "complete-onboarding",
     label: "Complete your creator profile",
     description: "Add a photo, bio, and your niches so travelers can discover you.",
@@ -104,9 +97,16 @@ const CREATOR_ITEMS: ChecklistItem[] = [
       (d.profile?.creator_niches?.length || 0) > 0,
   },
   {
+    id: "add-media",
+    label: "Add photos & video to your profile",
+    description: "Show travelers who you are — imagery is what gets you chosen.",
+    cta: { label: "Add media", to: "/profile/media" },
+    isComplete: (d) => (d.partnerMediaCount || 0) > 0,
+  },
+  {
     id: "connect-stripe",
     label: "Connect your payout account",
-    description: "Set up Stripe Connect to receive commissions on bookings and guide sales.",
+    description: "Set up Stripe so you can get paid — bookings, tips, and guide sales all pay out through your own account.",
     cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
       !!(d.profile?.stripe_charges_enabled || d.profile?.stripe_payouts_enabled || d.profile?.stripe_connect_payouts_enabled),
@@ -130,27 +130,6 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     // "creator_avg_views > 10" was an imported TikTok metric unrelated to sharing.
     // Complete when the creator opens their public profile (the share/preview action).
     isComplete: (d) => !!d.activity?.has_shared_profile,
-  },
-  {
-    id: "read-handbook",
-    label: "Read the Creator Handbook",
-    description: "Five minutes that explain everything — your profile, guides, AI tools, and how you get paid.",
-    cta: { label: "Open the handbook", to: () => "/creator-handbook" },
-    isComplete: (d) => !!d.activity?.has_read_handbook,
-  },
-  {
-    id: "review-tax-info",
-    label: "Review tax information",
-    description: "Goldsainte issues annual tax documents based on your country of residence.",
-    cta: { label: "Learn more", to: "/help/tax-information" },
-    isComplete: () => false,
-  },
-  {
-    id: "set-notifications",
-    label: "Set your notification preferences",
-    description: "Stay on top of new bookings, messages, and tier upgrades.",
-    cta: { label: "Notification settings", to: "/creator-dashboard?tab=settings" },
-    isComplete: (d) => !!d.profile?.notification_preferences,
   },
 ];
 
