@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 
 // ============================================================================
 // AgentSettingsPage (Jul 15, 11 PM build) — "Edit public profile" for agents.
@@ -421,11 +422,27 @@ export default function AgentSettingsPage() {
           <h2 className="font-secondary text-2xl text-[#0a2225]">Your story</h2>
           <div className="mt-6 space-y-6">
             <div>
-              <label className={label}>Our story</label>
+              <div className="flex items-center justify-between gap-3">
+                <label className={label}>Our story</label>
+                <AIRewriteButton
+                  value={form.story}
+                  onRewrite={(text) => setForm((f) => ({ ...f, story: text }))}
+                  fieldLabel="Our story"
+                  persona="travel agent"
+                />
+              </div>
               <textarea className={`${input} min-h-[120px]`} value={form.story} onChange={set("story")} placeholder="Why you do this, in your voice…" />
             </div>
             <div>
-              <label className={label}>Travel style</label>
+              <div className="flex items-center justify-between gap-3">
+                <label className={label}>Travel style</label>
+                <AIRewriteButton
+                  value={form.travel_style}
+                  onRewrite={(text) => setForm((f) => ({ ...f, travel_style: text }))}
+                  fieldLabel="Travel style"
+                  persona="travel agent"
+                />
+              </div>
               <textarea className={`${input} min-h-[120px]`} value={form.travel_style} onChange={set("travel_style")} placeholder="How you like to travel and design trips…" />
             </div>
           </div>
