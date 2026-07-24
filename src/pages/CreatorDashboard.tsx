@@ -487,13 +487,13 @@ export default function CreatorDashboard() {
                 Build something to sell
               </h3>
               <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
-                Turn your taste into bookable trips and digital guides — published in minutes, sold on-platform.
+                Turn your taste into bookable tours and digital guides — published in minutes, sold on-platform.
               </p>
               <Link
                 to="/trip-builder"
                 className="mt-3 inline-block text-sm text-[#0c4d47] underline underline-offset-4 decoration-[#0c4d47]/30 hover:decoration-[#0c4d47]"
               >
-                Open the trip builder →
+                Open the tour builder →
               </Link>
             </div>
             <div>
