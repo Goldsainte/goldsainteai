@@ -497,11 +497,13 @@ export const AppRoutes = () => (
       <Route 
         path="/agent/trips/:tripId/contract" 
         element={
-          <RequireAuth>
-            <RequireAgentTerms>
-              <AgentContractBuilder />
-            </RequireAgentTerms>
-          </RequireAuth>
+          
+            /* Contract builder hidden for launch (founder decision, Jul 24 2026):
+               Goldsainte is not the seller of travel and does not author
+               agent-traveler agreements. Upload-your-own returns post-launch
+               with counsel's blessing. Page stays on disk for the un-hide. */
+            <Navigate to="/agent-dashboard" replace />
+          
         } 
       />
       <Route
