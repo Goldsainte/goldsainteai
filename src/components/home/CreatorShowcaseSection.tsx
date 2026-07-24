@@ -369,9 +369,9 @@ export function CreatorShowcaseSection() {
                   </p>
                   <div className="mt-5 max-w-[380px]">
                     {[
-                      ["Trip bookings", "$1,940.00"],
-                      ["Guide sales", "$186.50"],
-                      ["Affiliate", "$44.75"],
+                      ["Guide sales", "$1,940.00"],
+                      ["Trip bookings", "$186.50"],
+                      ["Tips", "$44.75"],
                     ].map(([k, v], i) => (
                       <div
                         key={k}
