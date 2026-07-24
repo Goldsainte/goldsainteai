@@ -227,7 +227,7 @@ async function handleCheckoutCompleted(session: any) {
             ? `Someone sent you a $${(amountCents / 100).toFixed(2)} tip: “${tipNote}”`
             : `Someone sent you a $${(amountCents / 100).toFixed(2)} tip. Thank you!`,
           entity_type: 'tip',
-          action_url: '/creator/dashboard',
+          action_url: '/creator-dashboard',
           action_label: 'View earnings',
         });
       }
