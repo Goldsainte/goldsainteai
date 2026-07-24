@@ -1,4 +1,3 @@
-import { countryName } from "@/lib/residency";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -79,7 +78,10 @@ export default function AgentPublicProfilePage() {
           supabase
             .from("public_travel_agents" as unknown as "travel_agents")
             .select(
-              "agency_name, country, bio, specializations, destinations, website, travel_style, starting_price_per_night, logo_url, linkedin_url, facebook_url, pinterest_url, languages"
+              // NOTE: the public_travel_agents view exposes no "country" column — requesting
+              // one made PostgREST reject the whole query, nulling the agent record and
+              // silently erasing the business-name title from every agent profile.
+              "agency_name, bio, specializations, destinations, website, travel_style, starting_price_per_night, logo_url, linkedin_url, facebook_url, pinterest_url, languages"
             )
             .eq("user_id", id)
             .maybeSingle(),
@@ -204,7 +206,7 @@ export default function AgentPublicProfilePage() {
         logoUrl={agent?.logo_url}
         businessName={agent?.agency_name}
         tierLabel={profile.agent_verification_status === "verified" ? "Goldsainte Verified" : null}
-        location={countryName((agent as any)?.country) || profile.location}
+        location={profile.location}
         languages={agent?.languages}
         startingPricePerNight={agent?.starting_price_per_night}
         askUsAbout={askUsAbout}
