@@ -32,7 +32,9 @@ export default function AgentSettingsPage() {
   const [loading, setLoading] = useState(true);
   const loadedFor = useRef<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState<"avatar" | "logo" | null>(null);
+  const [uploading, setUploading] = useState<"avatar" | "logo" | "agreement" | null>(null);
+  const [agreementUrl, setAgreementUrl] = useState<string | null>(null);
+  const agreementInput = useRef<HTMLInputElement | null>(null);
   const avatarInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
 
@@ -117,6 +119,53 @@ export default function AgentSettingsPage() {
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       setForm((f) => ({ ...f, [kind === "avatar" ? "avatar_url" : "logo_url"]: data.publicUrl }));
       toast.success(kind === "avatar" ? "Photo uploaded" : "Logo uploaded");
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  // ── Phase 1 agreement gate (Jul 24 2026): the agent's OWN client
+  // agreement, uploaded once. Travelers must e-accept it before any deposit
+  // unlocks. Goldsainte hosts the document and records acceptance — it
+  // authors nothing (see counsel amendment).
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("travel_agents")
+      .select("client_agreement_url")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) =>
+        setAgreementUrl(
+          (data as { client_agreement_url?: string | null } | null)
+            ?.client_agreement_url ?? null,
+        ),
+      );
+  }, [user]);
+
+  const uploadAgreement = async (file: File) => {
+    if (!user) return;
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF");
+      return;
+    }
+    setUploading("agreement");
+    try {
+      const path = `${user.id}/agreement/${Date.now()}.pdf`;
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const { error: uErr } = await supabase
+        .from("travel_agents")
+        .update({ client_agreement_url: data.publicUrl })
+        .eq("user_id", user.id);
+      if (uErr) throw uErr;
+      setAgreementUrl(data.publicUrl);
+      toast.success("Client agreement uploaded");
     } catch (e: any) {
       toast.error(e.message || "Upload failed");
     } finally {
@@ -322,6 +371,39 @@ export default function AgentSettingsPage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Client agreement — the deposit gate */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <h2 className="font-secondary text-2xl text-[#0a2225]">Client agreement</h2>
+          <p className="mt-2 text-[14px] text-[#6B7280]">
+            Your own engagement agreement, shown to every traveler and e-accepted
+            before they can pay a deposit. Goldsainte never provides or edits this
+            document — it is yours. (New to this? ASTA provides a member template.)
+          </p>
+          {agreementUrl ? (
+            <div className="mt-5 flex flex-wrap items-center gap-4 rounded-xl bg-[#0c4d47]/[0.06] p-4 text-[14px]">
+              <span className="font-medium text-[#0c4d47]">✓ Client agreement uploaded</span>
+              <a href={agreementUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0c4d47]">
+                View
+              </a>
+              <button type="button" onClick={() => agreementInput.current?.click()} disabled={uploading === "agreement"}
+                className="underline underline-offset-2 text-[#0a2225]/70">
+                {uploading === "agreement" ? "Uploading…" : "Replace"}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-5 rounded-xl bg-amber-50 p-4 text-[14px] text-amber-900">
+              <p className="font-medium">Required to receive deposits</p>
+              <p className="mt-1">Travelers can't pay you until your agreement is on file.</p>
+              <button type="button" onClick={() => agreementInput.current?.click()} disabled={uploading === "agreement"}
+                className="mt-3 rounded-full bg-[#0c4d47] px-5 py-2 text-[13.5px] text-white disabled:opacity-60">
+                {uploading === "agreement" ? "Uploading…" : "Upload PDF"}
+              </button>
+            </div>
+          )}
+          <input ref={agreementInput} type="file" accept="application/pdf" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadAgreement(f); e.currentTarget.value = ""; }} />
         </section>
 
         {/* Story */}
