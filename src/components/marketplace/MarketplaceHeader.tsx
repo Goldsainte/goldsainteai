@@ -18,7 +18,7 @@ export function MarketplaceHeader() {
           Trips, tours &amp; guides — built by people who've been.
         </h1>
         <p className="mt-2 font-primary text-base md:text-lg text-[#6B7280]">
-          Curated journeys from vetted creators, agents, and tour operators worldwide.
+          Curated journeys from vetted creators and agents worldwide.
         </p>
       </div>
       {/* Trust row renders under the search bar via MarketplaceSearch's slot-free
