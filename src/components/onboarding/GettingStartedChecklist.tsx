@@ -59,27 +59,6 @@ const TRAVELER_ITEMS: ChecklistItem[] = [
     cta: { label: "Post a trip", to: "/post-trip" },
     isComplete: (d) => (d.tripRequests || 0) > 0,
   },
-  {
-    id: "save-trip",
-    label: "Save a trip you love",
-    description: "Build a wishlist of trips for later.",
-    cta: { label: "Browse trips", to: "/marketplace" },
-    isComplete: (d) => (d.savedTrips || 0) > 0,
-  },
-  {
-    id: "read-trust-safety",
-    label: "Read how we protect your trip",
-    description: "Learn how verification, secure Stripe payments, and dispute support keep your money safe.",
-    cta: { label: "Trust & Safety", to: "/trust-safety" },
-    isComplete: () => false,
-  },
-  {
-    id: "set-notifications",
-    label: "Set your notification preferences",
-    description: "Choose email or SMS so you never miss a proposal from a specialist.",
-    cta: { label: "Notification settings", to: "/travel-settings" },
-    isComplete: (d) => !!d.profile?.notification_preferences,
-  },
 ];
 
 const CREATOR_ITEMS: ChecklistItem[] = [
@@ -135,13 +114,6 @@ const CREATOR_ITEMS: ChecklistItem[] = [
 
 const AGENT_ITEMS: ChecklistItem[] = [
   {
-    id: "add-media",
-    label: "Add photos & video to your profile",
-    description: "Show travelers who you are — imagery is what gets you chosen.",
-    cta: { label: "Add media", to: "/profile/media" },
-    isComplete: (d) => (d.partnerMediaCount || 0) > 0,
-  },
-  {
     id: "verify-identity",
     label: "Verify your identity",
     description: "Complete Stripe Identity verification to publish trips.",
@@ -151,9 +123,16 @@ const AGENT_ITEMS: ChecklistItem[] = [
       d.profile?.identity_verified === true,
   },
   {
+    id: "add-media",
+    label: "Add photos & video to your profile",
+    description: "Show travelers who you are — imagery is what gets you chosen.",
+    cta: { label: "Add media", to: "/profile/media" },
+    isComplete: (d) => (d.partnerMediaCount || 0) > 0,
+  },
+  {
     id: "connect-stripe",
     label: "Connect your payout account",
-    description: "Set up Stripe Connect so you can receive payments from travelers.",
+    description: "Set up Stripe so you can get paid — deposits and balances land directly in your account.",
     cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
       !!(
@@ -166,11 +145,11 @@ const AGENT_ITEMS: ChecklistItem[] = [
       ),
   },
   {
-    id: "publish-trip",
-    label: "Publish your first trip",
-    description: "Build a trip listing with itinerary, pricing, and cancellation terms.",
-    cta: { label: "Create trip", to: "/trip-builder" },
-    isComplete: (d) => (d.publishedTrips || 0) > 0,
+    id: "upload-agreement",
+    label: "Upload your client agreement",
+    description: "Your own engagement agreement — travelers e-accept it before any deposit unlocks. Required to receive payments.",
+    cta: { label: "Upload agreement", to: "/agent-settings" },
+    isComplete: (d) => !!(d.agent as any)?.client_agreement_url,
   },
   {
     id: "respond-request",
@@ -178,20 +157,6 @@ const AGENT_ITEMS: ChecklistItem[] = [
     description: "Browse open trip requests and submit a custom proposal.",
     cta: { label: "View requests", to: "/marketplace?tab=trip-requests" },
     isComplete: (d) => (d.proposalsSent || 0) > 0,
-  },
-  {
-    id: "review-tax-info",
-    label: "Review tax and credentials information",
-    description: "Tax documents and credential requirements vary by country. Review what applies to you.",
-    cta: { label: "Learn more", to: "/help/agent-requirements" },
-    isComplete: () => false,
-  },
-  {
-    id: "set-notifications",
-    label: "Set your notification preferences",
-    description: "Get instant alerts for new requests and traveler messages.",
-    cta: { label: "Notification settings", to: "/agent-dashboard?tab=settings" },
-    isComplete: (d) => !!d.profile?.notification_preferences,
   },
 ];
 
@@ -258,7 +223,7 @@ export function GettingStartedChecklist({ userId, role }: Props) {
             client.from("trip_proposals").select("id", { count: "exact", head: true }).eq("agent_id", userId),
             // Stripe status truth lives on travel_agents (written by
             // check-stripe-connect-status) — profiles has no such flags.
-            client.from("travel_agents").select("stripe_charges_enabled, stripe_payouts_enabled, stripe_onboarding_completed").eq("user_id", userId).maybeSingle(),
+            client.from("travel_agents").select("stripe_charges_enabled, stripe_payouts_enabled, stripe_onboarding_completed, client_agreement_url").eq("user_id", userId).maybeSingle(),
           ]);
           stats.publishedTrips = ptCount || 0;
           stats.proposalsSent = pCount || 0;
