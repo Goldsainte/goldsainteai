@@ -177,7 +177,6 @@ export function CreatorHeroSection({
                   New designer
                 </span>
               )}
-              {creatorTier && <TierBadge tier={creatorTier} size="md" />}
             </div>
 
             {title && (
