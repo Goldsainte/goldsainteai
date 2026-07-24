@@ -632,7 +632,7 @@ export default function AgentDashboard() {
                   pay a 3.5% service fee on top; a matching 3.5% platform fee comes out of your
                   payout. That is Goldsainte's entire take: 7% total, flat, on every booking. Every
                   payment is charged directly to your own Stripe account at booking — you're
-                  the merchant of record, with a signed contract behind every trip.
+                  the merchant of record on every trip you sell.
                 </p>
               </div>
               <div className="text-right">
@@ -643,10 +643,27 @@ export default function AgentDashboard() {
               </div>
             </div>
 
+            {/* HOW TO SEND A PROPOSAL — the operational 1-2-3. Agents had no
+                entry point telling them where step one lives (Jul 24 2026). */}
+            <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-6">
+              <p className="text-[12px] uppercase tracking-[0.24em] text-[#8D6B2F]">
+                Send a proposal — step by step
+              </p>
+              <div className="mt-4 space-y-3 text-[15px] text-[#0a2225]">
+                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">1.</i>Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.</p>
+                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">2.</i>Use the <strong>Send a Proposal</strong> panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.</p>
+                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">3.</i>They tap <strong>Accept and Pay Deposit</strong> — charged directly on your Stripe — and the booking appears in Bookings with you.</p>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link to="/marketplace?tab=trip-requests" className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-[13.5px] text-[#FDF9F0] transition-colors hover:bg-[#0a2225]">Browse trip requests</Link>
+                <Link to="/messages" className="rounded-full border border-[#0c4d47]/30 px-5 py-2.5 text-[13.5px] text-[#0a2225] transition-colors hover:bg-[#0c4d47]/5">Open messages</Link>
+              </div>
+            </div>
+
             <div className="flex flex-wrap items-center justify-between gap-3 py-9 text-[15px]">
               <span>
                 <span className="text-[12.5px] uppercase tracking-[0.24em] text-[#8D6B2F]">New here?</span>
-                &nbsp;&nbsp;The full guide to proposals, contracts, payouts, and fees.
+                &nbsp;&nbsp;The full guide to proposals, payouts, and fees.
               </span>
               <Link to="/how-it-works/agent" className="text-[#0a2225] hover:text-[#8D6B2F]">
                 Read the guide →
