@@ -19,12 +19,15 @@ interface ProfileTripsGridProps {
   creatorId: string;
   creatorType?: "creator" | "agent";
   title?: string;
+  /** Render nothing (no "coming soon" card) when there are no trips. */
+  hideWhenEmpty?: boolean;
 }
 
 export function ProfileTripsGrid({
   creatorId,
   creatorType,
   title = "Marketplace Trips",
+  hideWhenEmpty = false,
 }: ProfileTripsGridProps) {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +81,7 @@ export function ProfileTripsGrid({
   }
 
   if (trips.length === 0) {
+    if (hideWhenEmpty) return null;
     return (
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[#7A7151] mb-4">
