@@ -17,6 +17,17 @@ function formatMoney(amountCents: number, currency: string) {
   }).format(amountCents / 100);
 }
 
+// Tips are often sub-dollar amounts — show exact cents so a $0.96 net never
+// truncates to "$0" or rounds up to "$1".
+function formatMoneyExact(amountCents: number, currency: string) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amountCents / 100);
+}
+
 export function CreatorEarningsTab() {
   const [snapshot, setSnapshot] = useState<PartnerEarningSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,14 +99,14 @@ export function CreatorEarningsTab() {
           <div className="flex items-baseline justify-between">
             <h3 className="font-secondary text-[22px] text-[#0a2225]">Tips</h3>
             <p className="text-[15px] text-[#0a2225]/55">
-              {formatMoney(tips.totalNetCents / 100, tips.currency)} from {tips.count} tip{tips.count === 1 ? "" : "s"}
+              {formatMoneyExact(tips.totalNetCents, tips.currency)} from {tips.count} tip{tips.count === 1 ? "" : "s"}
             </p>
           </div>
           <div className="space-y-2">
             {tips.recent.map((t) => (
               <div key={t.id} className="flex items-center justify-between rounded-xl bg-[#FDF9F0] px-4 py-3">
                 <div className="min-w-0">
-                  <p className="font-medium text-[#0a2225]">{formatMoney(t.net_cents / 100, t.currency)}</p>
+                  <p className="font-medium text-[#0a2225]">{formatMoneyExact(t.net_cents, t.currency)}</p>
                   {t.note && <p className="truncate text-[13px] text-[#0a2225]/55">"{t.note}"</p>}
                 </div>
                 <p className="shrink-0 text-[13px] text-[#0a2225]/45">
