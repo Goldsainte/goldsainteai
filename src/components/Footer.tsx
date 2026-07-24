@@ -118,7 +118,7 @@ export const Footer = () => {
             href="https://www.linkedin.com/company/goldsainte/" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225] transition-colors hover:border-[#C7A962] hover:bg-[#C7A962]" 
             aria-label="LinkedIn"
           >
             <Linkedin className="h-5 w-5" />
@@ -127,7 +127,7 @@ export const Footer = () => {
             href="https://www.instagram.com/goldsainteai/" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#4A4A4A] hover:text-[#C7B892] transition-colors" 
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#E5DFC6] text-[#0a2225] transition-colors hover:border-[#C7A962] hover:bg-[#C7A962]" 
             aria-label="Instagram"
           >
             <Instagram className="h-5 w-5" />
@@ -160,14 +160,14 @@ export const Footer = () => {
         </div>
 
         {/* Legal Bottom Bar */}
-        <div className="pt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center">
+        <div className="pt-2 flex flex-col items-center gap-y-2 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-2 sm:gap-y-1">
           {legalLinks.map((l, i) => (
             <span key={l.label} className="flex items-center gap-2">
               <Link to={l.to} className={legalLinkClasses}>{l.label}</Link>
-              {i < legalLinks.length - 1 && <span className="text-[#9A9079]">·</span>}
+              {i < legalLinks.length - 1 && <span className="hidden text-[#9A9079] sm:inline">·</span>}
             </span>
           ))}
-          <span className="text-[#9A9079]">·</span>
+          <span className="hidden text-[#9A9079] sm:inline">·</span>
           <button
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent("show-install-prompt"))}
@@ -175,9 +175,9 @@ export const Footer = () => {
           >
             Install App
           </button>
-          <span className="text-[#9A9079]">·</span>
+          <span className="hidden text-[#9A9079] sm:inline">·</span>
           <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
-          <span className="text-[#9A9079]">·</span>
+          <span className="hidden text-[#9A9079] sm:inline">·</span>
           <LanguageSelector className="gap-2 text-[#9A9079] hover:text-[#E5DFC6] transition-colors" />
         </div>
       </div>
