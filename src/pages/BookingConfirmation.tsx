@@ -94,11 +94,14 @@ export default function BookingConfirmation() {
 
   const bookingRef = booking?.id ? `GS-${booking.id.slice(0, 8).toUpperCase()}` : "";
 
+  // trip_bookings money columns are INTEGER CENTS (the column standard) —
+  // this formatter converts to dollars exactly once. Rendering the raw cents
+  // as dollars is what turned a $10 trip into "$1,000.00" on this page.
   const fmtCurrency = (amount: number, currency: string) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency || "USD",
-    }).format(amount);
+    }).format(amount / 100);
 
   if (isLoading) {
     return (
@@ -214,7 +217,7 @@ export default function BookingConfirmation() {
   const nextSteps = [
     "Your specialist will contact you within 24 hours to confirm trip details.",
     `Your balance of ${balanceDueText} is due before departure.`,
-    "Your itinerary and contract are saved in your dashboard.",
+    "Your itinerary is saved in your dashboard.",
     "Your payment goes directly to your specialist — your seller of record for this trip.",
     "You can message your specialist anytime from your bookings dashboard.",
   ];
