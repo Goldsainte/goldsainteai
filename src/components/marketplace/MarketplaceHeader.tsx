@@ -17,16 +17,15 @@ export function MarketplaceHeader() {
         <h1 className="font-secondary text-[26px] md:text-[34px] font-semibold leading-tight text-[#0a2225]">
           Trips, tours &amp; guides — built by people who've been.
         </h1>
-        <p className="mt-2 font-primary text-base md:text-lg text-[#6B7280]">
-          Curated journeys from vetted creators and agents worldwide.
+        <p className="mx-auto mt-3 max-w-2xl font-primary text-base md:text-lg leading-relaxed text-[#0a2225]/70">
+          Real trips you can actually book — directly from the verified locals and advisors who designed them.
         </p>
       </div>
       {/* Trust row renders under the search bar via MarketplaceSearch's slot-free
           layout — kept here as a sibling so the hero owns its own claims. */}
       <div className="mx-auto max-w-6xl px-4 pb-1">
         <div
-          className="mt-1 flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 font-sans text-xs text-[#9CA3AF]"
-          style={{ fontFamily: "Inter, sans-serif" }}
+          className="mt-1 flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 font-sans text-xs text-[#6B7280]"
         >
           {trust.map((t) => (
             <span key={t} className="inline-flex items-center gap-1.5">
