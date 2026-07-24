@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +31,25 @@ export function ProposalMessageCard({
   tripTitle,
 }: ProposalMessageCardProps) {
   const [accepting, setAccepting] = useState(false);
+  // Paid-state sync: the booking created on acceptance stamps this message's
+  // id into its metadata (proposal_message_id). Both parties' cards discover
+  // it here and stop offering "Accept and Pay" on proposals already paid —
+  // the missing state that made paid proposals look forever-pending.
+  const [acceptedBooking, setAcceptedBooking] = useState<{ id: string; status: string } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("trip_bookings")
+      .select("id, status")
+      .filter("metadata->>proposal_message_id", "eq", message.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data) setAcceptedBooking(data as { id: string; status: string });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [message.id]);
   const [residenceState, setResidenceState] = useState("");
   const meta = message.metadata || {};
   const price: number = Number(meta.price) || 0;
@@ -173,7 +192,15 @@ export function ProposalMessageCard({
           {note}
         </p>
       )}
-      {!isSelf && (
+      {acceptedBooking ? (
+        <div className="mt-4 rounded-xl bg-[#0c4d47]/[0.06] p-3 text-sm text-[#0c4d47]">
+          <span className="font-medium">✓ Deposit paid</span> — this proposal was
+          accepted.{" "}
+          <a href={`/bookings/${acceptedBooking.id}`} className="underline">
+            View booking
+          </a>
+        </div>
+      ) : !isSelf && (
         <div className="mt-4 space-y-3">
           <ResidenceSelect
             value={residenceState}
