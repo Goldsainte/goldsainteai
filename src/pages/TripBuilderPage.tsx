@@ -290,8 +290,19 @@ export default function TripBuilderPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-baseline gap-3 min-w-0">
             <h1 className="font-secondary text-xl sm:text-2xl text-[#0a2225] tracking-tight truncate">
-              {editId ? "Edit Trip" : "New Trip"}
+              {editId
+                ? isBrand || (isCreator && !isAgent) ? "Edit Tour" : "Edit Trip"
+                : isBrand || (isCreator && !isAgent) ? "New Tour" : "New Trip"}
             </h1>
+            {/* Escape hatch: a checklist "Resume draft" is the only path many
+                people ever click — without this link, an unwanted old draft
+                traps them (there is no other visible way to start fresh).
+                Plain <a> on purpose: a full reload guarantees a clean form. */}
+            {editId && (
+              <a href="/trip-builder" className="shrink-0 text-[12.5px] text-[#0c4d47] underline underline-offset-2">
+                Start a new one instead
+              </a>
+            )}
             {lastSaved && (
               <span className="text-xs text-[#9A9384] shrink-0">
                 Saved {formatDistanceToNow(lastSaved)} ago
