@@ -14,6 +14,7 @@ import { ArrayFieldEditor } from "@/components/trips/ArrayFieldEditor";
 import { Loader2, Plus, X, Save, Send, BookOpen, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { confirmDialog } from "@/components/ui/confirm-dialog";
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "AUD", "CAD"];
 
@@ -431,7 +432,15 @@ export default function ItineraryBuilderPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className={labelClasses}>Description</Label>
+                <div className="flex items-center justify-between gap-3">
+                  <Label className={labelClasses}>Description</Label>
+                  <AIRewriteButton
+                    value={form.description}
+                    onRewrite={(text) => update("description", text)}
+                    fieldLabel="Guide description"
+                    persona="travel creator"
+                  />
+                </div>
                 <Textarea className={textareaClasses} rows={5} value={form.description}
                   onChange={(e) => update("description", e.target.value)}
                   placeholder="What travelers will get inside this guide..." />
@@ -474,6 +483,14 @@ export default function ItineraryBuilderPage() {
                             <X className="h-4 w-4" />
                           </button>
                         )}
+                      </div>
+                      <div className="flex justify-end">
+                        <AIRewriteButton
+                          value={d.description}
+                          onRewrite={(text) => patchDay(idx, { description: text })}
+                          fieldLabel="Day description"
+                          persona="travel creator"
+                        />
                       </div>
                       <Textarea className={textareaClasses} rows={3} value={d.description}
                         onChange={(e) => patchDay(idx, { description: e.target.value })}
