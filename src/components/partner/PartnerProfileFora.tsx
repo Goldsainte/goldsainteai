@@ -277,7 +277,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
 
           {askUsAbout.length > 0 && (
             <section className="mt-10">
-              <h3 className={H}>Ask us about</h3>
+              <h3 className={H}>Ask {name.split(" ")[0]} about</h3>
               <div className="mt-4 flex flex-wrap gap-3">
                 {askUsAbout.map((tag) => (
                   <span key={tag} className="rounded-full bg-[#F5F0E0] px-5 py-2.5 text-[15px] text-[#0a2225]">
@@ -344,10 +344,10 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
 
           {/* Reviews */}
           <section className="mt-14">
-            <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Reviews ({reviewCount})</h2>
-            {visibleReviews.length === 0 ? (
-              <p className="mt-4 text-[15px] text-[#6B7280]">No reviews yet.</p>
-            ) : (
+            {reviewCount > 0 && (
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Reviews ({reviewCount})</h2>
+            )}
+            {visibleReviews.length === 0 ? null : (
               <div className="mt-6 grid gap-5 md:grid-cols-2">
                 {visibleReviews.map((r) => (
                   <article key={r.id} className="rounded-3xl bg-[#F5F0E0]/70 p-6">
