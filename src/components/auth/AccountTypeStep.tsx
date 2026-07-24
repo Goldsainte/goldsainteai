@@ -27,11 +27,6 @@ const roleOptions: { type: AccountType; title: string; description: string }[] =
     title: "Travel Agent",
     description: "You design and book trips for clients and want a pipeline of qualified trip requests.",
   },
-  {
-    type: "brand",
-    title: "Tour Operator",
-    description: "You run tours and experiences and want to list bookable tours for Goldsainte travelers.",
-  },
 ];
 
 export function AccountTypeStep({ onComplete, defaultType }: Props) {
