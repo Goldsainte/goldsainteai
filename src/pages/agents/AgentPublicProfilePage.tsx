@@ -56,6 +56,11 @@ export default function AgentPublicProfilePage() {
   const [agent, setAgent] = useState<AgentRow | null>(null);
   const [reviews, setReviews] = useState<PartnerReview[]>([]);
   const [reviewCount, setReviewCount] = useState(0);
+  // Must be declared with the other hooks, ABOVE the loading/not-found early
+  // returns — a hook below a conditional return crashes with React #310 the
+  // moment the return stops firing (the bug that made every agent profile,
+  // and then the whole marketing section, appear dead on Jul 23).
+  const [tipOpen, setTipOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -165,7 +170,6 @@ export default function AgentPublicProfilePage() {
     );
   }
 
-  const [tipOpen, setTipOpen] = useState(false);
   const displayName = profile.display_name || profile.full_name || "Goldsainte Specialist";
   const firstName = displayName.split(" ")[0];
   const askUsAbout = [
