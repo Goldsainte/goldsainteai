@@ -195,6 +195,9 @@ export const AppRoutes = () => (
       <Route path="/bundle/:id" element={<BundleDetailPage />} />
       <Route path="/bundle-builder" element={<BundleBuilder />} />
       <Route path="/creators" element={<CreatorsDirectoryPage />} />
+      {/* Legacy dashboard paths (old notifications link here) — forward to the real dashboard */}
+      <Route path="/creators/dashboard" element={<Navigate to="/creator-dashboard" replace />} />
+      <Route path="/creator/dashboard" element={<Navigate to="/creator-dashboard" replace />} />
       <Route path="/creators/:id" element={<CreatorProfileForaPage />} />
       <Route path="/creators-legacy/:id" element={<CreatorPublicProfilePage />} />
       <Route path="/creators-preview/:id" element={<CreatorProfileForaPage />} />
