@@ -272,9 +272,14 @@ function PartnerBookingRowCard({ isHireBooking, booking,
       className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
     >
       {/* Photo IS the card */}
-      <div className={`relative overflow-hidden ${imgUrl ? "aspect-[4/3]" : "h-36"}`}>
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
-          <span className="font-secondary text-xl italic text-[#C7A962]/80">Goldsainte</span>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        {/* Designed placeholder — uniform grid: every card keeps the same 4:3
+            frame, imageless bookings get a monogram mark instead of a void. */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-[#0c4d47] to-[#0a2225]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#C7A962]/50">
+            <span className="font-secondary text-3xl text-[#C7A962]">{(title || "G").trim().charAt(0).toUpperCase()}</span>
+          </div>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#C7A962]/70">Goldsainte</span>
         </div>
         {imgUrl && (
           <img src={imgUrl} alt={title} loading="lazy"
