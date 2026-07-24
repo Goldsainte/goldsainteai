@@ -92,7 +92,7 @@ export default function AgentPublicProfilePage() {
         const { data: reviewRows, count } = await supabase
           .from("reviews")
           .select("id, comment, rating, created_at, reviewer_id, booking_id", { count: "exact" })
-          .eq("reviewee_id", id)
+          .eq("agent_id", id) // reviews table keys the reviewed party by role: agent_id / creator_id (no reviewee_id column)
           .eq("is_public", true)
           .order("created_at", { ascending: false })
           .limit(30);
