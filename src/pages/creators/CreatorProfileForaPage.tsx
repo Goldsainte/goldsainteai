@@ -274,38 +274,6 @@ export default function CreatorProfileForaPage() {
         }
         contentSlot={
           <>
-            {extra?.ai_summary && (
-              <section className="mt-12 rounded-3xl bg-[#0c4d47]/[0.06] p-6">
-                <p className="text-[13.5px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
-                  Goldsainte AI on {firstName}
-                </p>
-                <p className="mt-3 text-[16px] leading-relaxed text-[#0a2225]/85">
-                  {extra.ai_summary}
-                </p>
-              </section>
-            )}
-            {visitedCountries.length > 0 && (
-              <section className="mt-14">
-                <div className="flex items-baseline justify-between gap-4">
-                  <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Where I've been</h2>
-                  <p className="font-secondary text-xl text-[#8D6B2F]">
-                    {visitedCountries.length} {visitedCountries.length === 1 ? "country" : "countries"}
-                  </p>
-                </div>
-                <div className="mt-6 rounded-3xl bg-white/60 p-4">
-                  <TravelMap visited={visitedCountries} />
-                </div>
-              </section>
-            )}
-            <section className="mt-14">
-              <h2 className="mb-6 font-secondary text-2xl md:text-3xl text-[#0a2225]">Content</h2>
-              <CreatorMediaGallery
-                creatorId={dir.id}
-                fallbackPhotos={null}
-                instagramHandle={extra?.instagram_handle ?? null}
-                isOwnProfile={user?.id === dir.id}
-              />
-            </section>
             {/* Services + on-trip hire. Self-fetches creator_services; renders
                 nothing for public visitors when the creator has no active
                 services, so the section can never appear empty. */}
@@ -321,9 +289,6 @@ export default function CreatorProfileForaPage() {
               <div className="mt-8">
                 <PartnerMediaGallery userId={dir.id} />
               </div>
-            </section>
-            <section className="mt-14">
-              <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Trips inspired by this creator" />
             </section>
             {(extra?.upcoming_trips ?? []).length > 0 && (
               <section className="mt-14">
@@ -356,6 +321,41 @@ export default function CreatorProfileForaPage() {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+            <section className="mt-14">
+              <h2 className="mb-6 font-secondary text-2xl md:text-3xl text-[#0a2225]">Content</h2>
+              <CreatorMediaGallery
+                creatorId={dir.id}
+                fallbackPhotos={null}
+                instagramHandle={extra?.instagram_handle ?? null}
+                isOwnProfile={user?.id === dir.id}
+              />
+            </section>
+            {visitedCountries.length > 0 && (
+              <section className="mt-14">
+                <div className="flex items-baseline justify-between gap-4">
+                  <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Where I've been</h2>
+                  <p className="font-secondary text-xl text-[#8D6B2F]">
+                    {visitedCountries.length} {visitedCountries.length === 1 ? "country" : "countries"}
+                  </p>
+                </div>
+                <div className="mt-6 rounded-3xl bg-white/60 p-4">
+                  <TravelMap visited={visitedCountries} />
+                </div>
+              </section>
+            )}
+            <section className="mt-14">
+              <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Trips inspired by this creator" hideWhenEmpty />
+            </section>
+            {extra?.ai_summary && (
+              <section className="mt-12 rounded-3xl bg-[#0c4d47]/[0.06] p-6">
+                <p className="text-[13.5px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">
+                  Goldsainte AI on {firstName}
+                </p>
+                <p className="mt-3 text-[16px] leading-relaxed text-[#0a2225]/85">
+                  {extra.ai_summary}
+                </p>
               </section>
             )}
             {extra?.open_to_collabs && (
