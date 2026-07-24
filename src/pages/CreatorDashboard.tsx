@@ -26,7 +26,6 @@ import { CreatorPerformanceTab } from "./creator/components/CreatorPerformanceTa
 import { CreatorServicesSection } from "@/components/creator/CreatorServicesSection";
 import { CreatorAffiliateTab } from "./creator/components/CreatorAffiliateTab";
 import { CreatorContentToolsTab } from "./creator/components/CreatorContentToolsTab";
-import { TierBadge, TierBenefitsCard } from "@/components/creator/TierBadge";
 import { useCreatorTierWatcher } from "@/hooks/useCreatorTierWatcher";
 import type { TripProposalStatus } from "@/services/proposalService";
 
@@ -300,12 +299,7 @@ export default function CreatorDashboard() {
       case "services":
         return user?.id ? <CreatorServicesSection creatorId={user.id} isOwnProfile={true} creatorTier={profile?.creator_tier} hideLabel /> : null;
       case "performance":
-        return (
-          <div className="space-y-6">
-            <TierBenefitsCard tier={profile?.creator_tier} />
-            <CreatorPerformanceTab role="creator" />
-          </div>
-        );
+        return <CreatorPerformanceTab role="creator" />;
       case "affiliate":
         return <CreatorAffiliateTab />;
       case "content":
@@ -342,11 +336,6 @@ export default function CreatorDashboard() {
             <p className="mt-2 text-base text-[#0a2225]/70 max-w-xl">
               Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.
             </p>
-            {profile?.creator_tier && (
-              <div className="mt-4">
-                <TierBadge tier={profile.creator_tier} size="md" />
-              </div>
-            )}
           </div>
           {user && (
             <Link
