@@ -1,20 +1,20 @@
-interface TripTrustBadgesProps {
-  totalTravelers?: number;
-}
-
-export function TripTrustBadges({ totalTravelers = 30000 }: TripTrustBadgesProps) {
+// Truth-only trust badges (Jul 24 2026): the previous version claimed
+// "Thousands of Reviews", "handpicked Trip Operators", and a hardcoded
+// 30,000-traveler count — none of which were true pre-launch. Every claim
+// below is verifiable today.
+export function TripTrustBadges() {
   const badges = [
+    {
+      title: "Payments by Stripe",
+      description: "PCI Level 1 certified processing — your card details never touch our servers.",
+    },
+    {
+      title: "Verified Professionals",
+      description: "Every travel agent passes Stripe Identity verification — government ID checked — before they can sell.",
+    },
     {
       title: "Flexible Payment Options",
       description: "Reserve your spot with just 25% down, pay in full, or apply for a payment plan at booking.",
-    },
-    {
-      title: "Trusted Local Experiences",
-      description: "We partner with handpicked Trip Operators worldwide to give you authentic, unforgettable adventures.",
-    },
-    {
-      title: "Thousands of Reviews",
-      description: "Don't just take our word for it, read what real Travelers are saying.",
     },
     {
       title: "Here When You Need Us",
@@ -27,10 +27,10 @@ export function TripTrustBadges({ totalTravelers = 30000 }: TripTrustBadgesProps
       {/* Header */}
       <div className="text-center">
         <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#C7A962]">
-          Join {totalTravelers.toLocaleString()}+ Travelers Who've Booked With Goldsainte
+          Book With Confidence
         </span>
         <p className="mt-2 font-secondary text-xl font-semibold text-[#0a2225]">
-          Explore the world with confidence. You're in great company!
+          Secure payments, verified professionals, real support.
         </p>
       </div>
 
