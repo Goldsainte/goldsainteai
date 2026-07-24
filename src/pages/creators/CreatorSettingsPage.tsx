@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { WORLD_COUNTRIES } from "@/components/partner/worldCountries";
 import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
+import { AIRewriteButton } from "@/components/AIRewriteButton";
 
 // ============================================================================
 // CreatorSettingsPage (Jul 16 AM) — "Edit public profile" for creators,
@@ -439,11 +440,27 @@ export default function CreatorSettingsPage() {
           <h2 className="font-secondary text-2xl text-[#0a2225]">Your story</h2>
           <div className="mt-6 space-y-6">
             <div>
-              <label className={label}>Our story</label>
+              <div className="flex items-center justify-between gap-3">
+                <label className={label}>Our story</label>
+                <AIRewriteButton
+                  value={form.bio}
+                  onRewrite={(text) => setForm((f) => ({ ...f, bio: text }))}
+                  fieldLabel="Our story"
+                  persona="travel creator"
+                />
+              </div>
               <textarea className={`${input} min-h-[120px]`} value={form.bio} onChange={set("bio")} placeholder="Who you are and why you travel, in your voice…" />
             </div>
             <div>
-              <label className={label}>Travel style</label>
+              <div className="flex items-center justify-between gap-3">
+                <label className={label}>Travel style</label>
+                <AIRewriteButton
+                  value={form.travel_style}
+                  onRewrite={(text) => setForm((f) => ({ ...f, travel_style: text }))}
+                  fieldLabel="Travel style"
+                  persona="travel creator"
+                />
+              </div>
               <textarea className={`${input} min-h-[120px]`} value={form.travel_style} onChange={set("travel_style")} placeholder="How you like to travel — this also trains your AI guide writer…" />
             </div>
           </div>
