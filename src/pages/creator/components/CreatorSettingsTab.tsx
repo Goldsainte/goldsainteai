@@ -337,41 +337,22 @@ export function CreatorSettingsTab() {
         )}
       </SettingsSectionCard>
 
-      {/* Creator Tier */}
+      {/* Platform fee — flat 7% on everything (founder decision, Jul 23 2026) */}
       <SettingsSectionCard
         icon={Award}
-        title="Creator Tier"
-        description="Your tier and commission rate"
+        title="Platform fee"
+        description="One flat rate on everything you earn"
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-secondary text-[#0a2225]">
-              {tier.name}
-            </p>
+            <p className="text-2xl font-secondary text-[#0a2225]">7% flat</p>
             <p className="text-[15px] text-[#6B7280]">
-              Platform commission: {(tier.commissionRate * 100).toFixed(0)}%
+              Goldsainte's entire take on bookings, hires, guides, products,
+              and tips. No tiers, no levels — the rest is yours.
             </p>
           </div>
-          <Badge className="bg-[#F6F0E4] text-[#0a2225] hover:bg-[#E5DFC6]">
-            {tier.name}
-          </Badge>
+          <Badge className="bg-[#F6F0E4] text-[#0a2225] hover:bg-[#E5DFC6]">7%</Badge>
         </div>
-        {tier.next ? (
-          <div className="space-y-2">
-            <div className="flex justify-between text-[13px] text-[#6B7280]">
-              <span>Progress to {tier.next.name}</span>
-              <span>
-                ${tier.current.toLocaleString()} / $
-                {tier.next.threshold.toLocaleString()}
-              </span>
-            </div>
-            <Progress value={tier.progress} className="h-2" />
-          </div>
-        ) : (
-          <p className="text-[15px] text-[#0c4d47] font-medium">
-            You've reached the top tier. Thank you for being a top creator!
-          </p>
-        )}
       </SettingsSectionCard>
 
       {/* Notifications */}
