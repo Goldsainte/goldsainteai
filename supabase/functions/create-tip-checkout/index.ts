@@ -2,7 +2,7 @@
 //
 // A tip is the platform's simplest product: a fixed traveler-chosen amount
 // paid DIRECTLY to the recipient's own Stripe account (they are the merchant
-// of record), with Goldsainte's flat platform fee (3.5%) taken as a Stripe
+// of record), with Goldsainte's flat platform fee (7%) taken as a Stripe
 // application_fee. No scheduling, no deliverable, no proposal — it reuses the
 // exact direct-charge model the trip rail uses, so it inherits the same legal
 // posture: Goldsainte never holds the money and is never the seller.
@@ -22,7 +22,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-const TIP_FEE_RATE = 0.035; // Goldsainte's flat platform fee on tips
+const TIP_FEE_RATE = 0.07; // Flat 7% on every creator rail (founder decision, Jul 23 2026)
 const MIN_TIP_CENTS = 100; // $1
 const MAX_TIP_CENTS = 50000; // $500
 
