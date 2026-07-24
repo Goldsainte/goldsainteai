@@ -50,6 +50,23 @@ export function ProposalMessageCard({
       cancelled = true;
     };
   }, [message.id]);
+
+  // ── Phase 1 agreement gate (Jul 24 2026): fetch the agent's OWN client
+  // agreement. Deposits stay locked until the traveler opens it, ticks the
+  // box, and types their name — the industry-standard click-to-accept order
+  // (agreement before money). Runbook step A0.
+  const [agreement, setAgreement] = useState<{ url: string | null; name: string } | "loading">("loading");
+  const [agreementChecked, setAgreementChecked] = useState(false);
+  const [acceptName, setAcceptName] = useState("");
+  useEffect(() => {
+    if (isSelf) return;
+    supabase.functions
+      .invoke("get-agent-agreement", { body: { agentId: message.sender_id } })
+      .then(({ data }) =>
+        setAgreement({ url: data?.url ?? null, name: data?.name || "your travel professional" }),
+      )
+      .catch(() => setAgreement({ url: null, name: "your travel professional" }));
+  }, [isSelf, message.sender_id]);
   const [residenceState, setResidenceState] = useState("");
   const meta = message.metadata || {};
   const price: number = Number(meta.price) || 0;
@@ -65,6 +82,23 @@ export function ProposalMessageCard({
   const note: string = meta.note || "";
 
   const handleAccept = async () => {
+    // Agreement gate first: no agreement on file, or not yet accepted → no money.
+    if (agreement === "loading" || !agreement.url) {
+      toast({
+        title: "Client agreement required",
+        description: "This professional hasn't added their client agreement yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!agreementChecked || !acceptName.trim()) {
+      toast({
+        title: "Accept the client agreement",
+        description: "Open the agreement, check the box, and type your name to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
     // SOT residency gate: enforced server-side in trip-checkout-create.
     if (!residenceState) {
       toast({
@@ -101,6 +135,13 @@ export function ProposalMessageCard({
           metadata: {
             source: "chat_proposal",
             proposal_message_id: message.id,
+            // Acceptance record: who accepted which document, when. The
+            // booking page's Agreement panel reads exactly this.
+            client_agreement: {
+              url: agreement.url,
+              accepted_name: acceptName.trim(),
+              accepted_at: new Date().toISOString(),
+            },
             // Carry the conversation's trip context so My Bookings and the
             // booking page show the SAME cover photo + title as the
             // marketplace card the traveler fell in love with.
@@ -202,6 +243,29 @@ export function ProposalMessageCard({
         </div>
       ) : !isSelf && (
         <div className="mt-4 space-y-3">
+          {agreement === "loading" ? (
+            <p className="text-[12.5px] text-[#9CA3AF]">Loading client agreement…</p>
+          ) : !agreement.url ? (
+            <p className="rounded-lg bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900">
+              {agreement.name} hasn't added their client agreement yet — deposits
+              are locked until they do.
+            </p>
+          ) : (
+            <div className="rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] p-3 text-[13px] text-[#0a2225]">
+              <a href={agreement.url} target="_blank" rel="noopener noreferrer"
+                className="font-medium text-[#0c4d47] underline underline-offset-2">
+                View {agreement.name}'s client agreement ↗
+              </a>
+              <label className="mt-2 flex items-start gap-2">
+                <input type="checkbox" className="mt-0.5" checked={agreementChecked}
+                  onChange={(e) => setAgreementChecked(e.target.checked)} />
+                <span>I have read and agree to this client agreement.</span>
+              </label>
+              <input type="text" value={acceptName} onChange={(e) => setAcceptName(e.target.value)}
+                placeholder="Type your full name to accept"
+                className="mt-2 w-full rounded-md border border-[#E5DFC6] bg-white px-3 py-2 text-[13px]" />
+            </div>
+          )}
           <ResidenceSelect
             value={residenceState}
             onChange={setResidenceState}
@@ -210,7 +274,7 @@ export function ProposalMessageCard({
           />
           <Button
             onClick={handleAccept}
-            disabled={accepting || isSotBlockedState(residenceState)}
+            disabled={accepting || isSotBlockedState(residenceState) || agreement === "loading" || (agreement !== "loading" && !agreement.url) || !agreementChecked || !acceptName.trim()}
             className="w-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white"
           >
             {accepting ? (
