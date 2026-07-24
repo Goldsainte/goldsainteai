@@ -355,7 +355,7 @@ export default function TripBuilderPage() {
                 </div>
                 <div className="p-4 bg-white">
                   <p className="font-medium text-sm text-[#0a2225] truncate">
-                    {previewData?.title || "Your trip title"}
+                    {previewData?.title || (isBrand || (isCreator && !isAgent) ? "Your tour title" : "Your trip title")}
                   </p>
                   <p className="text-xs text-[#9A9384] mt-0.5 flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
@@ -370,7 +370,7 @@ export default function TripBuilderPage() {
                 </div>
               </div>
               <p className="text-xs text-[#9A9384] mt-3 text-center">
-                This is how your trip appears in the marketplace
+                This is how your {isBrand || (isCreator && !isAgent) ? "tour" : "trip"} appears in the marketplace
               </p>
             </div>
           </div>
