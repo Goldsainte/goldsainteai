@@ -277,3 +277,32 @@ Deno.test("no money page reads the dead 'bookings' table", () => {
     );
   }
 });
+
+
+// ---------------------------------------------------------------------------
+// FLAT 7% ON EVERY CREATOR RAIL — founder decision, Jul 23 2026.
+// Before tonight: tips charged 3.5%, product sales a hardcoded 30% that
+// contradicted every fee promise on the site, and guide sales collected into
+// the PLATFORM account with no fee and no creator payout mechanism at all.
+// One number now, one mechanic: 7%, taken as a Stripe application_fee on a
+// direct charge to the creator's connected account.
+// ---------------------------------------------------------------------------
+const TIP_CHECKOUT = "supabase/functions/create-tip-checkout/index.ts";
+const PRODUCT_CHECKOUT = "supabase/functions/purchase-product/index.ts";
+const GUIDE_CHECKOUT = "supabase/functions/itinerary-checkout/index.ts";
+
+Deno.test("tips take the flat 7% platform fee", () => {
+  assertContains(TIP_CHECKOUT, "TIP_FEE_RATE = 0.07", "Tips must charge the flat 7% of Jul 23 2026 — if this is gone, an old file was pasted over the new one.");
+  assertNotContains(TIP_CHECKOUT, "TIP_FEE_RATE = 0.035", "The 3.5% tip fee is retired; 7% flat on every creator rail.");
+});
+
+Deno.test("product sales take 7%, never the legacy 30%", () => {
+  assertContains(PRODUCT_CHECKOUT, "totalAmount * 0.07", "Product sales must charge the flat 7%.");
+  assertNotContains(PRODUCT_CHECKOUT, "totalAmount * 0.30", "The hardcoded 30% product fee silently contradicted the site's fee promises. It must never return.");
+});
+
+Deno.test("guide sales are direct charges with the 7% fee and refuse without a seller account", () => {
+  assertContains(GUIDE_CHECKOUT, "application_fee_amount", "Guide sales must take the 7% as an application fee on a direct charge.");
+  assertContains(GUIDE_CHECKOUT, "stripeAccount: creatorAccountId", "Guide sales must charge on the creator's connected account — never collect into the platform account.");
+  assertContains(GUIDE_CHECKOUT, "NO_SELLER_ACCOUNT", "A guide sale without a ready creator payout account must refuse, not silently collect platform-side.");
+});
