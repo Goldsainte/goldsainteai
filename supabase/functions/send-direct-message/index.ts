@@ -109,7 +109,7 @@ serve(async (req) => {
       );
     }
 
-    let { recipientId, message, conversationId, tripId, tripTitle, attachments, bookingId } = await req.json();
+    let { recipientId, message, conversationId, tripId, tripTitle, attachments, bookingId, messageType, messageMetadata } = await req.json();
 
     if (!message) {
       return new Response(
@@ -440,6 +440,15 @@ serve(async (req) => {
         conversation_id: targetConversationId,
         sender_id: user.id,
         body: filteredMessage,
+        // Restore the rich-card data lost in the v2.0 rewrite: the proposal
+        // card renders only when message_type === "proposal" with its terms in
+        // metadata. Whitelisted server-side so clients can't mint arbitrary
+        // card types.
+        message_type: messageType === "proposal" ? "proposal" : null,
+        metadata:
+          messageType === "proposal" && messageMetadata && typeof messageMetadata === "object"
+            ? messageMetadata
+            : null,
         attachments: safeAttachments,
         filtered_content: flagged ? message : null,
         flagged_for_review: flagged,
