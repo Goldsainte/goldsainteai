@@ -962,11 +962,7 @@ export default function BookingDetailPage() {
                   <summary className="flex cursor-pointer list-none items-center justify-between border-y border-[#0a2225]/[0.14] py-6">
                     <span className="flex items-center">
                       <span
-                        className="text-[34px] font-semibold tracking-[-0.01em] text-[#0a2225]"
-                        style={{
-                          fontFamily:
-                            "'SF Pro Display', 'SF Pro Text', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-                        }}
+                        className="font-secondary text-[34px] tracking-[-0.01em] text-[#0a2225]"
                       >
                         {formatMoney(total, currency)}
                       </span>
@@ -998,7 +994,7 @@ export default function BookingDetailPage() {
                       </span>
                     </div>
                     <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
-                      <span>Paid directly to your specialist</span>
+                      <span>Paid so far</span>
                       <span>{Math.round((anyPaid ? amountPaid : 0) / (total || 1) * 100)}%</span>
                     </div>
                     <p className="mt-4 text-[13px] leading-relaxed text-[#0a2225]/50">
