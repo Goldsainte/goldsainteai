@@ -115,13 +115,22 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   const [activeTags, setActiveTags] = useState<string[]>([]);
 
   // Most common specialties across the loaded set, as filter chips.
+  // Tags are free-typed by creators/agents, so "Adventure", "adventure", and
+  // "ADVENTURE" are the same specialty — group case-insensitively and show one
+  // canonical Title Case chip (founder catch, Jul 25).
   const topTags = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const c of cards) for (const t of c.tags) counts.set(t, (counts.get(t) || 0) + 1);
+    for (const c of cards)
+      for (const t of c.tags) {
+        const k = t.trim().toLowerCase();
+        if (k) counts.set(k, (counts.get(k) || 0) + 1);
+      }
+    const titleCase = (k: string) =>
+      k.replace(/\b\w/g, (ch) => ch.toUpperCase());
     return [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 12)
-      .map(([t]) => t);
+      .map(([k]) => titleCase(k));
   }, [cards]);
 
   const visibleCards = useMemo(() => {
@@ -133,7 +142,10 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
         (c.homeBase ?? "").toLowerCase().includes(q) ||
         c.tags.some((t) => t.toLowerCase().includes(q));
       const matchesTags =
-        activeTags.length === 0 || activeTags.some((t) => c.tags.includes(t));
+        activeTags.length === 0 ||
+        activeTags.some((t) =>
+          c.tags.some((ct) => ct.trim().toLowerCase() === t.trim().toLowerCase())
+        );
       return matchesQuery && matchesTags;
     });
   }, [cards, query, activeTags]);
