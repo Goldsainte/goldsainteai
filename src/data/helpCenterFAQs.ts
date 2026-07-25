@@ -152,7 +152,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'creator-earn',
     question: 'How do creators earn money?',
-    answer: 'Two ways today: tips from travelers on your profile, and being hired for on-trip services — photography sessions, personal guiding, content creation, and more — through trip requests. Hire payments are charged directly to your own Stripe account and you keep 96.5%.',
+    answer: 'Six ways: hosting bookable tours, selling itinerary guides, offering services (trip design, photography, content, and more), joining trips at your day rate, sharing affiliate links (2% of the booking value, paid by Goldsainte), and tips from travelers. Tour, guide, service, and tip payments land directly on your own Stripe account — Goldsainte takes a flat 7%, so you keep 93%.',
     category: 'creator'
   },
   {
