@@ -415,6 +415,11 @@ export function CreatorMediaGallery({
           </div>
         ))}
       </ScrollCarousel>
+      {/* Owners could only add highlights from the EMPTY state — as soon as
+          the first item existed the add controls vanished (founder report,
+          Jul 25). Keep them available under the strip, like the fallback
+          path already does. */}
+      {isOwnProfile && <div className="mt-5">{addHighlightControls}</div>}
     </section>
   );
 }
