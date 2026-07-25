@@ -198,6 +198,21 @@ Deno.serve(async (req) => {
     // payments on bookings that predate attestation are allowed (legacy
     // bookings carry no state and are already confirmed/paid).
     // -------------------------------------------------------------------
+    // FOUNDER DECISION (Jul 24 2026): the SOT residency gate applies to TRIP
+    // purchases. Bookable TOURS are exempt per product direction. If the
+    // listing can't be resolved, the gate stays ON (fail-closed). Counsel
+    // note filed: state SOT statutes' reach over tour listings is a counsel
+    // question; this exemption reverses in one line.
+    let isTourListing = false;
+    const tripIdForGate = (booking as any).trip_id ?? null;
+    if (tripIdForGate) {
+      const { data: gateTrip } = await supabase
+        .from("packaged_trips")
+        .select("listing_type")
+        .eq("id", tripIdForGate)
+        .maybeSingle();
+      isTourListing = (gateTrip as { listing_type?: string | null } | null)?.listing_type === "tour";
+    }
     const SOT_BLOCKED_STATES = ["CA", "FL", "HI", "IA", "WA"];
     const bookingMetaForGate = ((booking as any).metadata ?? {}) as any;
     const attestedState: string | undefined =
@@ -208,7 +223,7 @@ Deno.serve(async (req) => {
     const isPrePaymentBooking = !["confirmed", "paid_in_full", "completed"].includes(
       String(booking.status)
     );
-    if (attestedState && SOT_BLOCKED_STATES.includes(attestedState)) {
+    if (!isTourListing && attestedState && SOT_BLOCKED_STATES.includes(attestedState)) {
       console.warn(
         `[trip-checkout-create] SOT gate declined booking ${tripBookingId}: attested state ${attestedState}`
       );
@@ -221,7 +236,7 @@ Deno.serve(async (req) => {
         { status: 451, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
       );
     }
-    if (!attestedState && isPrePaymentBooking) {
+    if (!isTourListing && !attestedState && isPrePaymentBooking) {
       return new Response(
         JSON.stringify({
           error:
