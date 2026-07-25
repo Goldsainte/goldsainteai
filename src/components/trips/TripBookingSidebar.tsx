@@ -339,10 +339,10 @@ export function TripBookingSidebar({
       {/* Concierge inquiry note */}
       {isPlatformTrip && (
         <div className="mt-6 rounded-xl bg-[#FDF9F0] p-4 text-xs leading-relaxed text-[#7A7151]">
-          This is a Goldsainte Concierge trip. Request it and we\u2019ll connect
+          This is a Goldsainte Concierge trip. Request it and we’ll connect
           you with an independent travel agent in your area who can design and
-          book it for you \u2014 they\u2019ll be your seller of record. Goldsainte
-          provides the marketplace; we don\u2019t sell the trip ourselves.
+          book it for you — they’ll be your seller of record. Goldsainte
+          provides the marketplace; we don’t sell the trip ourselves.
         </div>
       )}
 
