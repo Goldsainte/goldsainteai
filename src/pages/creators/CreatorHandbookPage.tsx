@@ -79,7 +79,7 @@ export default function CreatorHandbookPage() {
 
         <Flow />
         <p className="mt-3 text-center text-[13px] text-[#0a2225]/60">
-          Your fee is a flat 3.5% — you keep 96.5% of your price. Travelers pay their own 3.5%. No invoicing, ever.
+          Goldsainte takes a flat 7% on tours, guides, and tips — you keep 93% of your price, charged directly on your own Stripe. No invoicing, ever.
         </p>
 
         <Section n={1} title="Your profile — the storefront">
