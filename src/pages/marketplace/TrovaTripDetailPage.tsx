@@ -139,17 +139,8 @@ export default function TrovaTripDetailPage() {
         // Build the query - either by id or by slug
         let query = supabase
           .from("packaged_trips")
-          .select(`
-            *,
-            creator:profiles!packaged_trips_creator_id_fkey (
-              id,
-              full_name,
-              username,
-              avatar_url,
-              bio
-            )
-          `);
-        
+          .select("*");
+
         if (isUUID) {
           query = query.eq("id", id);
         } else {
@@ -162,15 +153,22 @@ export default function TrovaTripDetailPage() {
 
         const tripId = tripData.id;
 
-        // Fetch agent profile separately (FK may not be defined in schema cache)
-        let agentProfile = null;
-        if ((tripData as any).agent_id) {
-          const { data: agentData } = await supabase
-            .from("profiles")
+        // ANON-SAFE HOST FETCH (Jul 25): `profiles` is RLS-restricted, so the
+        // old `creator:profiles!...` embed returned NULL for logged-out
+        // visitors — the "Meet Your Host" photo/bio silently vanished for
+        // every real shopper (Andre saw it "on mobile" because his phone was
+        // logged out; desktop was logged in). `public_profiles` is the
+        // anon-readable projection — use it for both creator and agent.
+        let creatorProfile: any = null;
+        let agentProfile: any = null;
+        const hostIds = [(tripData as any).creator_id, (tripData as any).agent_id].filter(Boolean);
+        if (hostIds.length > 0) {
+          const { data: hostRows } = await supabase
+            .from("public_profiles" as unknown as "profiles")
             .select("id, full_name, username, avatar_url, bio")
-            .eq("id", (tripData as any).agent_id)
-            .maybeSingle();
-          agentProfile = agentData;
+            .in("id", hostIds);
+          creatorProfile = (hostRows || []).find((r: any) => r.id === (tripData as any).creator_id) || null;
+          agentProfile = (hostRows || []).find((r: any) => r.id === (tripData as any).agent_id) || null;
         }
 
         // Fetch activities
@@ -193,7 +191,7 @@ export default function TrovaTripDetailPage() {
           .select("*")
           .eq("trip_id", tripId);
 
-        setTrip({ ...(tripData as any), agent: agentProfile } as unknown as TripData);
+        setTrip({ ...(tripData as any), creator: creatorProfile, agent: agentProfile } as unknown as TripData);
         setActivities(activitiesData || []);
         setItineraryDays(daysData || []);
         setAddons(addonsData || []);
@@ -493,19 +491,23 @@ export default function TrovaTripDetailPage() {
               destination={trip.destination}
             />}
 
+            {/* Cancellation and Refund are SEPARATE cards (founder request,
+                Jul 25) — each policy gets its own clearly-labeled section,
+                and Refund renders even when Cancellation is blank. */}
             {trip.cancellation_policy ? (
               <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mb-4">Cancellation Policy</p>
                 <p className="text-sm text-[#5c5c52] leading-relaxed whitespace-pre-wrap">{trip.cancellation_policy}</p>
-                {trip.refund_policy && (
-                  <>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mt-5 mb-3">Refund Policy</p>
-                    <p className="text-sm text-[#5c5c52] leading-relaxed whitespace-pre-wrap">{trip.refund_policy}</p>
-                  </>
-                )}
               </section>
             ) : (
               <TripCancellationPolicySection />
+            )}
+
+            {trip.refund_policy && (
+              <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7151] mb-4">Refund Policy</p>
+                <p className="text-sm text-[#5c5c52] leading-relaxed whitespace-pre-wrap">{trip.refund_policy}</p>
+              </section>
             )}
 
             {trip.terms_conditions && (
