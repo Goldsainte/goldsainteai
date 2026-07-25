@@ -174,7 +174,7 @@ export function CreatorAffiliateTab() {
           How it works: pick a trip or guide, copy your link, and share it anywhere your audience lives — link in bio, stories, captions, newsletters, DMs. Anyone who clicks is credited to you for 30 days, whatever they browse before booking. Your links live here, not on your public profile — you are the channel.
         </p>
         <p className="mb-3 text-[16px] text-[#6B7280]">
-          Earn 2% of the booking value on every booking driven through your link \u2014 paid by Goldsainte, never charged to the traveler or the specialist. Links stay credited for 30 days after a click.
+          Earn 2% of the booking value on every booking driven through your link — paid by Goldsainte, never charged to the traveler or the specialist. Links stay credited for 30 days after a click.
         </p>
         <Input
           placeholder="Search any trip or guide…"
