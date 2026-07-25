@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ============================================================================
@@ -20,6 +20,7 @@ interface DirectoryCard {
   avatarUrl: string | null;
   logoUrl: string | null;
   tags: string[];
+  homeBase: string | null;
 }
 
 const COPY: Record<DirectoryKind, { title: string; subtitle: string; link: (id: string) => string }> = {
@@ -65,6 +66,7 @@ async function fetchCards(kind: DirectoryKind): Promise<DirectoryCard[]> {
           avatarUrl: p.avatar_url,
           logoUrl: r.logo_url ?? null,
           tags: [...new Set([...(r.specializations ?? []), ...(r.destinations ?? [])])] as string[],
+          homeBase: null,
         };
       });
   }
@@ -83,6 +85,7 @@ async function fetchCards(kind: DirectoryKind): Promise<DirectoryCard[]> {
       tags: [
         ...new Set([...(r.creator_niches ?? []), ...(r.content_style_tags ?? [])]),
       ] as string[],
+      homeBase: r.home_base ?? null,
     }));
 }
 
@@ -104,6 +107,44 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   const copy = COPY[kind];
   const [cards, setCards] = useState<DirectoryCard[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // ── Filtering (Jul 25) — the directory will hold thousands of profiles;
+  // search + specialty chips keep it navigable. Client-side over the ranked
+  // set; server-side pagination is the boarded v2 once volume demands it.
+  const [query, setQuery] = useState("");
+  const [activeTags, setActiveTags] = useState<string[]>([]);
+
+  // Most common specialties across the loaded set, as filter chips.
+  const topTags = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of cards) for (const t of c.tags) counts.set(t, (counts.get(t) || 0) + 1);
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 12)
+      .map(([t]) => t);
+  }, [cards]);
+
+  const visibleCards = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return cards.filter((c) => {
+      const matchesQuery =
+        !q ||
+        c.name.toLowerCase().includes(q) ||
+        (c.homeBase ?? "").toLowerCase().includes(q) ||
+        c.tags.some((t) => t.toLowerCase().includes(q));
+      const matchesTags =
+        activeTags.length === 0 || activeTags.some((t) => c.tags.includes(t));
+      return matchesQuery && matchesTags;
+    });
+  }, [cards, query, activeTags]);
+
+  const toggleTag = (t: string) =>
+    setActiveTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  const clearFilters = () => {
+    setQuery("");
+    setActiveTags([]);
+  };
+  const filtersActive = query.trim() !== "" || activeTags.length > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -141,7 +182,57 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
         <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-[#0a2225]/70 md:mt-6 md:text-[18px]">{copy.subtitle}</p>
       </div>
 
-      <div className="mx-auto mt-8 max-w-6xl px-4 md:mt-14">
+      {/* Filter bar */}
+      {!loading && cards.length > 0 && (
+        <div className="mx-auto mt-8 max-w-6xl px-4 md:mt-12">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative min-w-[240px] flex-1 sm:max-w-sm">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={kind === "agent" ? "Search specialists, destinations…" : "Search creators, niches, places…"}
+                className="w-full rounded-full border border-[#E5DFC6] bg-white py-3 pl-11 pr-4 text-[14.5px] text-[#0a2225] outline-none placeholder:text-[#9CA3AF] focus:border-[#C7A962]"
+              />
+            </div>
+            {filtersActive && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[13.5px] text-[#0a2225]/70 hover:text-[#0a2225]"
+              >
+                <X className="h-3.5 w-3.5" /> Clear
+              </button>
+            )}
+            <span className="ml-auto text-[13px] text-[#0a2225]/50">
+              {visibleCards.length} of {cards.length}
+            </span>
+          </div>
+          {topTags.length > 0 && (
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {topTags.map((t) => {
+                const active = activeTags.includes(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => toggleTag(t)}
+                    className={`whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors ${
+                      active
+                        ? "border-[#0c4d47] bg-[#0c4d47] text-[#E5DFC6]"
+                        : "border-[#E5DFC6] bg-white text-[#0a2225]/70 hover:text-[#0a2225]"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mx-auto mt-8 max-w-6xl px-4 md:mt-8">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#C7A962]" />
@@ -153,12 +244,19 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
             </p>
             <p className="mt-2 text-sm text-[#6B7280]">Post your trip and we'll match you.</p>
           </div>
+        ) : visibleCards.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
+            <p className="font-secondary text-xl text-[#0a2225]">No matches</p>
+            <button type="button" onClick={clearFilters} className="mt-3 text-sm text-[#0c4d47] underline underline-offset-4">
+              Clear filters and show everyone
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-6 lg:grid-cols-4">
             {/* Mobile = compact Fora-style 2-up grid (flat rectangular photos,
                 left-aligned name + specialty). sm and up = the original oval-ring
                 editorial cards, unchanged. One markup, responsive classes. */}
-            {cards.map((a) => (
+            {visibleCards.map((a) => (
               <Link
                 key={a.userId}
                 to={copy.link(a.userId)}
