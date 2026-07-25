@@ -12,6 +12,8 @@ interface FAQ {
 }
 
 interface TripFAQAccordionProps {
+  listingType?: string;
+  destination?: string;
   faqs: FAQ[];
 }
 
@@ -58,7 +60,28 @@ const DEFAULT_FAQS: FAQ[] = [
   },
 ];
 
-export function TripFAQAccordion({ faqs = DEFAULT_FAQS }: TripFAQAccordionProps) {
+// Tour listings get tour-shaped questions — meeting points and what to
+// bring, not vaccines and flight inclusions (founder catch, Jul 24).
+// Truly listing-personalized FAQs (AI, per destination) are flagged post-launch.
+const buildTourFaqs = (destination?: string): FAQ[] => {
+  const place = destination || "the area";
+  return [
+    { question: "What's it like on a Goldsainte Tour?", answer: `A small-group experience in ${place}, designed and hosted by the local creator who built it — their spots, their pace, their stories.`, category: "About this tour" },
+    { question: "How does booking work?", answer: "Reserve your spot with the deposit shown. Your host confirms the details in Messages, and any balance is due before the tour per the payment terms above.", category: "About this tour" },
+    { question: "Can I book solo?", answer: "Absolutely — most tours welcome solo travelers, and small groups make it easy to meet people.", category: "About this tour" },
+    { question: "Where do we meet?", answer: `The exact meeting point in ${place} is shared in Messages after you book.`, category: "Logistics" },
+    { question: "What should I bring?", answer: "Comfortable shoes and weather-appropriate clothing are the usual essentials — your host will message anything specific to this tour.", category: "Logistics" },
+    { question: "What if I need to cancel?", answer: "This tour follows the host's cancellation policy shown above — review it before booking.", category: "Logistics" },
+  ];
+};
+
+export function TripFAQAccordion({ faqs, listingType, destination }: TripFAQAccordionProps) {
+  const resolvedFaqs =
+    faqs && faqs.length > 0
+      ? faqs
+      : listingType === "tour"
+        ? buildTourFaqs(destination)
+        : DEFAULT_FAQS;
   // Group FAQs by category
   const groupedFaqs = faqs.reduce((acc, faq) => {
     const category = faq.category || "General";
