@@ -24,6 +24,7 @@ interface TripBookingSidebarProps {
   agentId?: string;
   tripTitle?: string;
   instantBooking?: boolean;
+  listingType?: string;
 }
 
 export function TripBookingSidebar({
@@ -40,7 +41,11 @@ export function TripBookingSidebar({
   agentId,
   tripTitle,
   instantBooking = false,
+  listingType,
 }: TripBookingSidebarProps) {
+  // Tours are exempt from the SOT residency gate (founder decision, Jul 24;
+  // mirrored server-side in trip-checkout-create).
+  const isTourListing = listingType === "tour";
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -109,11 +114,11 @@ export function TripBookingSidebar({
 
     // SOT residency gate: enforced server-side in trip-checkout-create;
     // this is the honest front door.
-    if (!residenceState) {
+    if (!isTourListing && !residenceState) {
       toast.error("Please select your state of residence to continue.");
       return;
     }
-    if (isSotBlockedState(residenceState)) {
+    if (!isTourListing && isSotBlockedState(residenceState)) {
       toast.error("Trip bookings aren't yet available in your state.");
       return;
     }
@@ -142,8 +147,8 @@ export function TripBookingSidebar({
             source: "marketplace_booking",
             guest_service_fee: guestServiceFee,
             guest_service_fee_rate: GUEST_FEE_RATE,
-            residence_state: residenceState,
-            residence_attested_at: new Date().toISOString(),
+            residence_state: isTourListing ? null : residenceState,
+            residence_attested_at: isTourListing ? null : new Date().toISOString(),
           },
         } as any)
         .select("id")
@@ -280,10 +285,10 @@ export function TripBookingSidebar({
           </Button>
         ) : (
           <>
-            <ResidenceSelect value={residenceState} onChange={setResidenceState} />
+            {!isTourListing && <ResidenceSelect value={residenceState} onChange={setResidenceState} />}
             <Button
               onClick={handleRequestToBook}
-              disabled={isLoading || isSotBlockedState(residenceState)}
+              disabled={isLoading || (!isTourListing && isSotBlockedState(residenceState))}
               className="w-full rounded-full bg-[#0C4D47] py-6 text-base font-semibold hover:bg-[#0C4D47]/90"
             >
               {isLoading ? "Sending..." : (instantBooking ? "Book Instantly" : "Reserve with Deposit")}
