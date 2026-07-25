@@ -22,10 +22,10 @@ interface Props {
 }
 
 const TIERS: { value: ServiceTier; label: string; desc: string; icon: any; color: string }[] = [
-  { value: "custom_itinerary", label: "Custom Itinerary", desc: "A personal, day-by-day plan \u2014 built for one traveler, delivered to keep.", icon: PenLine, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
-  { value: "full_trip_design", label: "Full Trip Design", desc: "The whole trip, designed end to end \u2014 your signature work.", icon: Star, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
-  { value: "add_on", label: "Add-On", desc: "A focused extra \u2014 a call, a review, a list worth paying for.", icon: CirclePlus, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
-  { value: "on_trip", label: "On-Trip", desc: "Travel with them, at your day rate \u2014 content, guiding, hosting, and whatever else you declare.", icon: Plane, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "custom_itinerary", label: "Custom Itinerary", desc: "A personal, day-by-day plan — built for one traveler, delivered to keep.", icon: PenLine, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "full_trip_design", label: "Full Trip Design", desc: "The whole trip, designed end to end — your signature work.", icon: Star, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "add_on", label: "Add-On", desc: "A focused extra — a call, a review, a list worth paying for.", icon: CirclePlus, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
+  { value: "on_trip", label: "On-Trip", desc: "Travel with them, at your day rate — content, guiding, hosting, and whatever else you declare.", icon: Plane, color: "text-[#0c4d47] bg-[#FDF9F0] border-[#E5DFC6]" },
 ];
 
 const DELIVERY_OPTIONS = ["2 days", "3 days", "5 days", "7 days", "14 days"];
@@ -86,7 +86,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   }
   const tierHint =
     tier === "on_trip"
-      ? "I join travelers on their own trip as their host \u2014 guiding the days and creating content as we go."
+      ? "I join travelers on their own trip as their host — guiding the days and creating content as we go."
       : tier === "add_on"
       ? "A focused add-on travelers can book alongside a trip."
       : "A personalized travel-planning service.";
@@ -96,12 +96,12 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   }
   function suggestDescription() {
     aiSuggest("description", description.trim() || `${title.trim()}. ${tierHint}`,
-      "editorial, warm, specific \u2014 a premium travel service, two sentences, no hype words");
+      "editorial, warm, specific — a premium travel service, two sentences, no hype words");
   }
   function suggestFaqAnswer(i: number) {
     aiSuggest(`faq-${i}`,
       `Answer this traveler question in one to two plain sentences for the service "${title.trim()}": ${faq[i].question.trim()}`,
-      "plain, direct, reassuring \u2014 one to two sentences, no hype");
+      "plain, direct, reassuring — one to two sentences, no hype");
   }
   function applySuggestion(v: string) {
     if (aiTarget === "title") setTitle(v.replace(/^["']|["']$/g, ""));
@@ -523,7 +523,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   {tier === "on_trip" ? (
                     <div>
                       <label className="text-xs font-medium text-[#6B7280] mb-1 block">What can travelers hire you for?</label>
-                      <p className="text-xs text-[#9CA3AF] mb-2">Pick everything you can genuinely do on their trip \u2014 travelers choose from exactly this list when they hire you.</p>
+                      <p className="text-xs text-[#9CA3AF] mb-2">Pick everything you can genuinely do on their trip — travelers choose from exactly this list when they hire you.</p>
                       <div className="flex flex-wrap gap-1.5">
                         {ON_TRIP_CAPABILITIES.map((c) => (
                           <button key={c.id} type="button" title={c.hint}
