@@ -13,6 +13,7 @@ import { BackButton } from "@/components/ui/BackButton";
 export default function TripBuilderPage() {
   const { user, isLoading: authLoading } = useAuth();
   const { isAgent, isCreator, isBrand, loading: roleLoading } = useUserRole();
+  const listingNoun = isBrand || (isCreator && !isAgent) ? "tour" : "trip";
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
@@ -120,12 +121,12 @@ export default function TripBuilderPage() {
           persistedStatus = tripData?.status === "published" ? "published" : "draft";
           if (persistedStatus === "draft") {
             publishBlocked = true;
-            toast.error("We couldn't verify your payout account just now — your trip was saved as a draft. Please try publishing again.");
+            toast.error("We couldn't verify your payout account just now — your listing was saved as a draft. Please try publishing again.");
           }
         } else if (!prof?.stripe_account_id && !prof?.stripe_connect_account_id) {
           persistedStatus = tripData?.status === "published" ? "published" : "draft";
           publishBlocked = true;
-          toast.error("Connect your Stripe payout account before publishing — we saved your trip as a draft.");
+          toast.error("Connect your Stripe payout account before publishing — we saved your listing as a draft.");
         }
       }
 
@@ -207,8 +208,12 @@ export default function TripBuilderPage() {
         toast.success(
           tripData?.status === "published"
             ? "Your changes are live."
-            : "Your trip is live in the marketplace."
+            : `Your ${listingNoun} is live in the marketplace.`
         );
+        // Show them the LIVE listing — staying inside the builder made a
+        // publish feel like nothing happened (founder catch, Jul 24).
+        navigate(`/marketplace/trip/${savedSlug}`);
+        return tripId ?? null;
       } else if (!publishBlocked && status === "draft" && persistedStatus === "draft") {
         toast.success("Draft saved");
       }
