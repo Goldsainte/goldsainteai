@@ -125,7 +125,7 @@ export function CreatorAffiliateTab() {
         product_name: p.title,
         product_url: url,
         affiliate_code: code,
-        commission_rate: 10.0,
+        commission_rate: 2.0, // % of gross booking value (paid from the platform fee)
         platform: p.kind,
       })
       .select()
@@ -160,7 +160,7 @@ export function CreatorAffiliateTab() {
       <div className="border-t border-[#0a2225]/15 pt-6">
         <h3 className="mb-1 font-secondary text-lg text-[#0a2225]">Generate referral link</h3>
         <p className="mb-3 text-[16px] text-[#6B7280]">
-          Earn 10% of platform commission on every booking driven through your link.
+          Earn 2% of the booking value on every booking driven through your link \u2014 paid by Goldsainte, never charged to the traveler or the specialist. Links stay credited for 30 days after a click.
         </p>
         <Input
           placeholder="Search any trip or guide…"
