@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { BackButton } from "@/components/ui/BackButton";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 
@@ -67,6 +68,7 @@ export default function AgentHandbookPage() {
     <div className="min-h-screen bg-[#FDF9F0] pb-24">
       <Helmet><title>Specialist Handbook · Goldsainte</title></Helmet>
       <div className="mx-auto max-w-3xl px-4 pt-14">
+        <BackButton to="/agent-settings" className="mb-4" />
         <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8D6B2F]">Specialist handbook</p>
         <h1 className="mt-3 font-secondary text-[34px] leading-tight text-[#0a2225] md:text-5xl">How Goldsainte works for you</h1>
         <p className="mt-5 text-[18px] leading-relaxed text-[#0a2225]/80">
