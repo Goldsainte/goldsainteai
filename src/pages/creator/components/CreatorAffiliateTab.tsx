@@ -28,6 +28,11 @@ type Commission = {
 
 type Product = { id: string; title: string; slug?: string | null; kind: "trip" | "guide"; creator_username?: string | null };
 
+// Max links a creator can create in any rolling 30-day window (founder
+// decision, Jul 25) — keeps promotion focused and the directory of codes sane.
+// Hard-enforced server-side by the affiliate_links trigger (SQL 120).
+const MAX_LINKS_PER_30_DAYS = 10;
+
 function genCode() {
   return Math.random().toString(36).slice(2, 10);
 }
@@ -116,6 +121,12 @@ export function CreatorAffiliateTab() {
 
   async function createLink(p: Product) {
     if (!user?.id) return;
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const recent = links.filter((l: any) => new Date(l.created_at).getTime() > cutoff).length;
+    if (recent >= MAX_LINKS_PER_30_DAYS) {
+      toast.error(`You can create up to ${MAX_LINKS_PER_30_DAYS} links every 30 days — focus your promotion on the trips you believe in most.`);
+      return;
+    }
     const code = genCode();
     const url = buildShareUrl(p, code);
     const { data, error } = await supabase
@@ -159,6 +170,9 @@ export function CreatorAffiliateTab() {
 
       <div className="border-t border-[#0a2225]/15 pt-6">
         <h3 className="mb-1 font-secondary text-lg text-[#0a2225]">Generate referral link</h3>
+        <p className="mb-3 text-[13px] leading-relaxed text-[#0a2225]/60">
+          How it works: pick a trip or guide, copy your link, and share it anywhere your audience lives — link in bio, stories, captions, newsletters, DMs. Anyone who clicks is credited to you for 30 days, whatever they browse before booking. Your links live here, not on your public profile — you are the channel.
+        </p>
         <p className="mb-3 text-[16px] text-[#6B7280]">
           Earn 2% of the booking value on every booking driven through your link \u2014 paid by Goldsainte, never charged to the traveler or the specialist. Links stay credited for 30 days after a click.
         </p>
