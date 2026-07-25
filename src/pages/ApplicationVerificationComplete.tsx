@@ -253,7 +253,7 @@ export default function ApplicationVerificationComplete() {
               </li>
             </ol>
             <button
-              onClick={() => navigate("/agent?tab=earnings")}
+              onClick={() => navigate("/agent-dashboard?tab=earnings")}
               className="group inline-flex items-center gap-3 bg-[#0c4d47] text-[#FDF9F0] px-10 py-4 rounded-sm transition-all hover:bg-[#0a2225]"
             >
               <span className="text-[11px] uppercase tracking-[0.22em] font-medium">Continue to dashboard</span>
