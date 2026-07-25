@@ -108,9 +108,10 @@ export function CreatorTripsTab() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h2 className="font-secondary text-2xl text-[#0a2225]">My Trip Packages</h2>
+          {/* Product law: creators sell TOURS — noun-correct copy (item ① polish, Jul 25) */}
+          <h2 className="font-secondary text-2xl text-[#0a2225]">My Tours</h2>
           <p className="mt-1 text-[15px] text-[#6B7280] max-w-md">
-            Create and manage curated trips. New trips go to review before they're bookable on the
+            Create and manage bookable tours. New tours go to review before they're bookable on the
             marketplace — they appear here straight away.
           </p>
         </div>
@@ -137,7 +138,7 @@ export function CreatorTripsTab() {
             className="mt-4 rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Build your first trip
+            Build your first tour
           </Button>
         </div>
       )}
