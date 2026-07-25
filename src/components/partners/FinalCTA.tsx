@@ -21,7 +21,7 @@ export const FinalCTA = () => {
               size="lg"
               variant="secondary"
               className="px-8 py-6 bg-white text-primary hover:bg-white/90"
-              onClick={() => navigate('/transportation-vendor-application')}
+              onClick={() => navigate('/partner')}
             >
               Apply Now to Become a Goldsainte Vendor
               <ArrowRight className="ml-2 h-5 w-5" />
