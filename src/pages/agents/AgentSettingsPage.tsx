@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { WORLD_COUNTRIES } from "@/lib/residency";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { BackButton } from "@/components/ui/BackButton";
 import { Loader2, Camera, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -250,6 +251,7 @@ export default function AgentSettingsPage() {
         <title>Agent Settings · Goldsainte</title>
       </Helmet>
       <div className="mx-auto max-w-3xl px-4 pt-12">
+        <BackButton to="/agent-dashboard" className="mb-4" />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Agent Settings</h1>
