@@ -2,16 +2,22 @@
 // "Thousands of Reviews", "handpicked Trip Operators", and a hardcoded
 // 30,000-traveler count — none of which were true pre-launch. Every claim
 // below is verifiable today.
-export function TripTrustBadges() {
+export function TripTrustBadges({ listingType }: { listingType?: string } = {}) {
+  const isTour = listingType === "tour";
   const badges = [
     {
       title: "Payments by Stripe",
       description: "PCI Level 1 certified processing — your card details never touch our servers.",
     },
-    {
-      title: "Verified Professionals",
-      description: "Every travel agent passes Stripe Identity verification — government ID checked — before they can sell.",
-    },
+    isTour
+      ? {
+          title: "Verified Hosts",
+          description: "Every host completes Stripe-verified onboarding before they can sell — payouts only flow through their own account.",
+        }
+      : {
+          title: "Verified Professionals",
+          description: "Every travel agent passes Stripe Identity verification — government ID checked — before they can sell.",
+        },
     {
       title: "Flexible Payment Options",
       description: "Reserve your spot with just 25% down, pay in full, or apply for a payment plan at booking.",
