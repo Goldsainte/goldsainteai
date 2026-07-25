@@ -541,12 +541,15 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                       className={`${inputClasses} ${getError("duration_days") ? "border-red-400 focus:border-red-400" : ""}`} />
                     {getError("duration_days") && <p className="text-xs text-red-500 mt-1">{getError("duration_days")}</p>}
                   </div>
-                  <div className="space-y-2">
-                    <Label className={labelClasses}>Duration (nights)</Label>
-                    <Input type="number" value={formData.duration_nights}
-                      onChange={(e) => updateField("duration_nights", e.target.value)} placeholder="4" className={inputClasses} />
-                    <p className="text-[11px] text-[#6B7280]">Auto-calculated from days (you can adjust if needed)</p>
-                  </div>
+                  {/* Nights imply lodging — trips only. Hidden for tours (Jul 24). */}
+                  {!isTour && (
+                    <div className="space-y-2">
+                      <Label className={labelClasses}>Duration (nights)</Label>
+                      <Input type="number" value={formData.duration_nights}
+                        onChange={(e) => updateField("duration_nights", e.target.value)} placeholder="4" className={inputClasses} />
+                      <p className="text-[11px] text-[#6B7280]">Auto-calculated from days (you can adjust if needed)</p>
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -593,15 +596,18 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <Input type="number" min={0} value={formData.minimum_age}
                       onChange={(e) => updateField("minimum_age", e.target.value)} placeholder="e.g., 18" className={inputClasses} />
                   </div>
-                  <div className="space-y-2">
-                    <Label className={labelClasses}>Accommodation type</Label>
-                    <Select value={formData.accommodation_type} onValueChange={(v) => updateField("accommodation_type", v)}>
-                      <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
-                      <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
-                        {ACCOMMODATION_TYPES.map((t) => <SelectItem key={t} value={t} className="focus:bg-[#FDF9F0]">{t}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {/* Tours don't lodge travelers — trips only (founder catch, Jul 24). */}
+                  {!isTour && (
+                    <div className="space-y-2">
+                      <Label className={labelClasses}>Accommodation type</Label>
+                      <Select value={formData.accommodation_type} onValueChange={(v) => updateField("accommodation_type", v)}>
+                        <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
+                        <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+                          {ACCOMMODATION_TYPES.map((t) => <SelectItem key={t} value={t} className="focus:bg-[#FDF9F0]">{t}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -706,11 +712,13 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                           placeholder="Add an activity (e.g., Morning game drive)" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className={labelClasses}>Accommodation</Label>
-                          <Input value={day.accommodation} onChange={(e) => updateDay(idx, { accommodation: e.target.value })}
-                            placeholder="e.g., Angama Mara Lodge" className={inputClasses} />
-                        </div>
+                        {!isTour && (
+                          <div className="space-y-2">
+                            <Label className={labelClasses}>Accommodation</Label>
+                            <Input value={day.accommodation} onChange={(e) => updateDay(idx, { accommodation: e.target.value })}
+                              placeholder="e.g., Angama Mara Lodge" className={inputClasses} />
+                          </div>
+                        )}
                         <div className="space-y-2">
                           <Label className={labelClasses}>Meals included</Label>
                           <div className="flex flex-wrap gap-2 pt-1">
@@ -785,7 +793,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         {step.id === "requirements" && (
           <div className="space-y-10">
             <div className="space-y-6">
-              <SectionHeader title="Travel requirements" subtitle="What travelers need to enter the country." />
+              <SectionHeader title="Travel requirements" subtitle={isTour ? "What travelers should know before joining." : "What travelers need to enter the country."} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {([
                   { field: "passport_required" as const, label: "Passport required", description: "Travelers must hold a valid passport" },
@@ -869,6 +877,8 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               )}
             </div>
 
+            {/* Flight logistics are trip-scale — hidden for tours (Jul 24). */}
+            {!isTour && (
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
               <SectionHeader title="Airport information" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -886,6 +896,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 </div>
               </div>
             </div>
+            )}
 
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
               <SectionHeader title="Availability window" />
@@ -908,7 +919,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         {step.id === "policies" && (
           <div className="space-y-10">
             <div className="space-y-6">
-              <SectionHeader title="Payment terms" subtitle="Set your deposit and payment schedule. These appear on your trip listing." />
+              <SectionHeader title="Payment terms" subtitle={`Set your deposit and payment schedule. These appear on your ${noun} listing.`} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Deposit required (%)</Label>
