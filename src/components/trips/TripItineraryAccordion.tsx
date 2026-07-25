@@ -18,7 +18,7 @@ interface ItineraryDay {
   day_number: number;
   title: string;
   description?: string;
-  activities?: ItineraryActivity[];
+  activities?: (ItineraryActivity | string)[];
   meals_included?: string[];
   accommodation?: string;
   accommodation_type?: string;
@@ -26,11 +26,12 @@ interface ItineraryDay {
 }
 
 interface TripItineraryAccordionProps {
+  listingType?: string;
   days: ItineraryDay[];
   totalNights?: number;
 }
 
-export function TripItineraryAccordion({ days, totalNights }: TripItineraryAccordionProps) {
+export function TripItineraryAccordion({ listingType, days, totalNights }: TripItineraryAccordionProps) {
   if (!days || days.length === 0) return null;
 
   const getMealIcon = (meal: string) => {
@@ -69,9 +70,17 @@ export function TripItineraryAccordion({ days, totalNights }: TripItineraryAccor
               )}
 
               {/* Activities */}
-              {day.activities && day.activities.length > 0 && (
+              {/* The builder saves activities as plain strings; older data may
+                  be {name,…} objects. Normalize both and drop empties — blank
+                  entries rendered as rows of empty pin boxes (Jul 24). */}
+              {(() => {
+                const acts = (day.activities || [])
+                  .map((a) => (typeof a === "string" ? { name: a } : a))
+                  .filter((a) => a && typeof a.name === "string" && a.name.trim());
+                if (acts.length === 0) return null;
+                return (
                 <div className="mt-4 space-y-3">
-                  {day.activities.map((activity, actIdx) => (
+                  {acts.map((activity, actIdx) => (
                     <div
                       key={actIdx}
                       className="flex items-start gap-3 rounded-lg bg-white p-3 border border-[#E5DFC6]/50"
@@ -89,7 +98,8 @@ export function TripItineraryAccordion({ days, totalNights }: TripItineraryAccor
                     </div>
                   ))}
                 </div>
-              )}
+                );
+              })()}
 
               {/* Meals */}
               {day.meals_included && day.meals_included.length > 0 && (
@@ -106,8 +116,8 @@ export function TripItineraryAccordion({ days, totalNights }: TripItineraryAccor
                 </div>
               )}
 
-              {/* Accommodation */}
-              {day.accommodation && (
+              {/* Accommodation — trips only; tours don't lodge travelers */}
+              {listingType !== "tour" && day.accommodation && (
                 <div className="mt-4 flex items-start gap-3 rounded-lg bg-white p-3 border border-[#E5DFC6]/50">
                   <Home className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#0C4D47]" />
                   <div>
