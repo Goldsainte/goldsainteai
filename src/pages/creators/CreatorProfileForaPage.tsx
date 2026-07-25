@@ -20,7 +20,7 @@ import { CreatorMediaGallery } from "@/components/creator/CreatorMediaGallery";
 // CreatorProfileForaPage (Phase B preview — Jul 16 AM)
 // The content-first creator profile on the shared Fora chassis:
 // agents read like a magazine, creators play like a feed — same funnel.
-// Center band order: creator CONTENT (media feed) → "Trips inspired by this
+// Center band order: creator CONTENT (media feed) → "Tours by this
 // creator" → reviews → travel ideas (guides) → photos.
 // Preview route: /creators-preview/:id — flips to /creators/:id only after
 // the founder's side-by-side eyeball.
@@ -346,7 +346,7 @@ export default function CreatorProfileForaPage() {
               </section>
             )}
             <section className="mt-14">
-              <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Trips inspired by this creator" hideWhenEmpty />
+              <ProfileTripsGrid creatorId={dir.id} creatorType="creator" title="Tours by this creator" hideWhenEmpty />
             </section>
             {extra?.ai_summary && (
               <section className="mt-12 rounded-3xl bg-[#0c4d47]/[0.06] p-6">
