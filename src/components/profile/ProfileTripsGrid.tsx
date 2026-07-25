@@ -116,7 +116,7 @@ export function ProfileTripsGrid({
         {trips.map((trip) => (
           <Link
             key={trip.id}
-            to={`/trips/${trip.slug}`}
+            to={`/marketplace/trip/${trip.slug}`}
             className="group overflow-hidden rounded-2xl border border-[#E5DFC6] bg-white transition-all hover:border-[#C7B892] hover:shadow-lg"
           >
             <div className="aspect-[16/10] overflow-hidden bg-[#F5F0E0]">
