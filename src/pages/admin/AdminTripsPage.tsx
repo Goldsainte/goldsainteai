@@ -13,6 +13,8 @@ type Trip = {
   destination: string | null;
   cover_image_url: string | null;
   status: string | null;
+  listing_type: string | null;
+  is_curated: boolean | null;
 };
 
 export default function AdminTripsPage() {
@@ -23,6 +25,7 @@ export default function AdminTripsPage() {
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [curatingId, setCuratingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -30,7 +33,7 @@ export default function AdminTripsPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("packaged_trips")
-        .select("id, title, destination, cover_image_url, status")
+        .select("id, title, destination, cover_image_url, status, listing_type, is_curated")
         .order("created_at", { ascending: false });
       if (cancelled) return;
       if (error) {
@@ -58,6 +61,24 @@ export default function AdminTripsPage() {
     }
     setTrips((prev) => prev.map((t) => (t.id === trip.id ? { ...t, status: "published" } : t)));
     toast.success("Trip approved and published");
+  };
+
+  // Editors' Pick flag — controls which marketplace tab a TOUR appears in:
+  // is_curated=true → "Editors' Picks" (default view); false → "From Creators".
+  const toggleCurated = async (trip: Trip) => {
+    const next = !trip.is_curated;
+    setCuratingId(trip.id);
+    const { error } = await supabase
+      .from("packaged_trips")
+      .update({ is_curated: next })
+      .eq("id", trip.id);
+    setCuratingId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setTrips((prev) => prev.map((t) => (t.id === trip.id ? { ...t, is_curated: next } : t)));
+    toast.success(next ? "Added to Editors' Picks" : "Moved to From Creators");
   };
 
   const visibleTrips = statusFilter === "all" ? trips : trips.filter((t) => (t.status || "draft") === statusFilter);
@@ -200,6 +221,25 @@ export default function AdminTripsPage() {
                             <span className="inline-flex rounded-full border border-[#8D6B2F]/40 bg-[#C7A962]/15 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#8D6B2F]">
                               Pending review
                             </span>
+                          )}
+                          {trip.listing_type === "tour" && trip.is_curated && (
+                            <span className="inline-flex rounded-full border border-[#0c4d47]/30 bg-[#0c4d47]/10 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#0c4d47]">
+                              Editors' Pick
+                            </span>
+                          )}
+                          {trip.listing_type === "tour" && (
+                            <button
+                              type="button"
+                              onClick={() => toggleCurated(trip)}
+                              disabled={curatingId === trip.id}
+                              className="inline-flex items-center rounded-full border border-[#E5DFC6] bg-white px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#0a2225]/70 transition-colors hover:bg-[#fdfaf2] disabled:opacity-50"
+                            >
+                              {curatingId === trip.id
+                                ? "Saving…"
+                                : trip.is_curated
+                                  ? "Remove Editors' Pick"
+                                  : "Make Editors' Pick"}
+                            </button>
                           )}
                         </div>
                         <p className="text-xs text-[#8D8D8D]">
