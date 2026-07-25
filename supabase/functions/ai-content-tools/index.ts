@@ -11,7 +11,7 @@ function corsHeaders(req?: Request): Record<string, string> {
 };
 }
 
-type Tool = "caption" | "hashtags" | "rewrite";
+type Tool = "caption" | "hashtags" | "rewrite" | "guide" | "creator_summary";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
 const MODEL = "gpt-4o-mini";
@@ -104,6 +104,41 @@ serve(async (req) => {
       const system =
         "You rewrite travel product descriptions while preserving facts. Output strict JSON: { versions: string[] } with exactly 3 distinct rewrites.";
       const user = `Original description:\n"""${description}"""\n\nRewrite this in a "${tone}" tone. Each version 2-4 sentences. Keep all factual claims unchanged.`;
+      const out = await callOpenAI(system, user);
+      return jsonResponse(req, out);
+    }
+
+    // INPUT-WITHOUT-OUTPUT FIX (Jul 25): the guides page and creator settings
+    // have been sending tool:"guide" and tool:"creator_summary" since launch
+    // prep, but neither handler existed — every call 400'd as "unknown tool"
+    // and surfaced as "Edge Function returned a non-2xx status code".
+
+    if (tool === "guide") {
+      const { destination = "", days = "", notes = "", voice = "" } = body;
+      if (!String(destination).trim()) {
+        return jsonResponse(req, { error: "destination is required" }, 400);
+      }
+      const dayCount = Math.min(Math.max(parseInt(String(days), 10) || 5, 1), 21);
+      const system =
+        'You write premium destination travel guides for a luxury travel marketplace. Output strict JSON: { "title": string, "statement": string, "tags": string[], "body": string, "hotels": [{ "name": string, "description": string, "perks": string[] }] }. "title" is a compelling guide title. "statement" is a 2-3 sentence curator\'s statement in first person. "tags" is 3-6 short lowercase topical tags (no # prefix). "body" is the full guide in markdown with a short intro then a "## Day N" section per day, each with concrete named places and practical tips. "hotels" is 2-3 real, well-known properties in the destination with a one-sentence description and 2-3 realistic perks each. Never invent prices.';
+      const user = `Destination: ${destination}\nDays: ${dayCount}\nMust include: ${notes || "(author's choice)"}\n${
+        voice ? `Author's voice/travel style to write in: ${voice}` : "Voice: confident, warm, editorial."
+      }\nWrite the complete guide.`;
+      const out = await callOpenAI(system, user);
+      return jsonResponse(req, out);
+    }
+
+    if (tool === "creator_summary") {
+      const { name = "This creator", bio = "", travelStyle = "", niches = [], regions = [], countries = 0, guides = [] } = body;
+      const guideLines = (Array.isArray(guides) ? guides : [])
+        .slice(0, 12)
+        .map((g: any) => `- ${g?.title ?? "Untitled"}${Array.isArray(g?.tags) && g.tags.length ? ` (${g.tags.join(", ")})` : ""}`)
+        .join("\n");
+      const system =
+        'You write short professional profile summaries for travel creators on a luxury travel marketplace. Output strict JSON: { "summary": string }. The summary is 2-3 sentences, third person, warm and credible, grounded ONLY in the supplied facts — never invent achievements, follower counts, or destinations not provided.';
+      const user = `Creator: ${name}\nBio: ${bio || "(none)"}\nTravel style: ${travelStyle || "(none)"}\nNiches: ${
+        (Array.isArray(niches) ? niches : []).join(", ") || "(none)"
+      }\nRegions: ${(Array.isArray(regions) ? regions : []).join(", ") || "(none)"}\nCountries visited: ${countries}\nPublished guides:\n${guideLines || "(none yet)"}\nWrite the profile summary.`;
       const out = await callOpenAI(system, user);
       return jsonResponse(req, out);
     }
