@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { BackButton } from "@/components/ui/BackButton";
+import { FeaturedTikTokManager } from "@/components/profile/FeaturedTikTokManager";
 import { Loader2, Camera, ExternalLink} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -434,6 +435,19 @@ export default function CreatorSettingsPage() {
                 isOwnProfile
               />
             )}
+          </div>
+        </section>
+
+        {/* Featured TikToks — feeds the "From my TikTok" section on the public
+            profile. The manager previously lived only on the legacy
+            /travel-settings/general page, so creators couldn't find it. */}
+        <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
+          <h2 className="font-secondary text-2xl text-[#0a2225]">Featured TikToks</h2>
+          <p className={hint}>
+            Paste up to 6 TikTok video links — they play in a "From my TikTok" section on your public profile.
+          </p>
+          <div className="mt-5">
+            {user && <FeaturedTikTokManager userId={user.id} />}
           </div>
         </section>
 
