@@ -229,7 +229,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                     key={t}
                     type="button"
                     onClick={() => toggleTag(t)}
-                    className={`whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors ${
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors ${
                       active
                         ? "border-[#0c4d47] bg-[#0c4d47] text-[#E5DFC6]"
                         : "border-[#E5DFC6] bg-white text-[#0a2225]/70 hover:text-[#0a2225]"
