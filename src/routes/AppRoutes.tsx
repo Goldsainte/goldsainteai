@@ -481,6 +481,11 @@ export const AppRoutes = () => (
       <Route path="/partner" element={<Navigate to="/marketplace" replace />} />
       <Route path="/partner/escrow" element={<Navigate to="/marketplace" replace />} />
       <Route path="/agent/:agentId" element={<Navigate to="/agents/:agentId" replace />} />
+      {/* Stripe Connect return/refresh targets — the agent-application
+          onboarding flow sends people here; before Jul 25 these were
+          unregistered and every completed onboarding landed on a 404. */}
+      <Route path="/stripe-connect/complete" element={<Navigate to="/agent-dashboard?onboarding=complete" replace />} />
+      <Route path="/stripe-connect/refresh" element={<Navigate to="/agent-dashboard?refresh=true" replace />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
       <Route
         path="/agent/earnings"
