@@ -215,7 +215,7 @@ export default function Profile() {
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2"
-                onClick={() => navigate('/dashboard?tab=preferences')}
+                onClick={() => navigate('/travel-settings/general')}
               >
                 <Settings className="h-4 w-4" />
                 Booking Preferences & AI Assistant
