@@ -7,6 +7,9 @@ import { compressImageFile } from "@/lib/imageCompression";
 import { ChevronLeft, Loader2, Upload, X } from "lucide-react";
  
 const MAX_MB = 15;
+// Gallery cap raised 12 → 50 (founder request, Jul 25). Safe because both the
+// upload grid and the public profile gallery already lazy-load images.
+const MAX_GALLERY = 50;
  
 export default function ProfileMediaPage() {
   const navigate = useNavigate();
@@ -78,7 +81,7 @@ export default function ProfileMediaPage() {
     if (!files.length || !userId) return;
     const selected =
       kind === "gallery"
-        ? files.slice(0, Math.max(0, 12 - galleryUrls.length))
+        ? files.slice(0, Math.max(0, MAX_GALLERY - galleryUrls.length))
         : files.slice(0, 1);
     if (kind === "gallery" && selected.length < files.length) {
       toast.error("Gallery holds up to 12 images — extra files were skipped.");
@@ -258,7 +261,7 @@ export default function ProfileMediaPage() {
           <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
             <div className="flex items-baseline justify-between">
               <h2 className="font-secondary text-[20px] text-[#0a2225]">Gallery</h2>
-              <span className="text-[12px] text-[#0a2225]/45">{galleryUrls.length}/12 images</span>
+              <span className="text-[12px] text-[#0a2225]/45">{galleryUrls.length}/{MAX_GALLERY} images</span>
             </div>
             {galleryUrls.length > 0 && (
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -270,7 +273,7 @@ export default function ProfileMediaPage() {
                 ))}
               </div>
             )}
-            {galleryUrls.length < 12 && (
+            {galleryUrls.length < MAX_GALLERY && (
               <div className="mt-4">{uploadTile("gallery", "Add gallery images", true)}</div>
             )}
           </div>
