@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { atHandle, socialUrl } from "@/lib/socialHandles";
@@ -421,6 +422,15 @@ export function CreatorMediaGallery({
 /* Reusable horizontal auto-scroll carousel wrapper */
 function ScrollCarousel({ children }: { children: React.ReactNode }) {
   const speed = 40; // seconds for one full cycle
+
+  // The infinite marquee works by rendering the track twice — seamless with a
+  // full strip, but with only 1–3 items the duplicate is plainly visible (the
+  // "same video twice" report, Jul 25). Below that threshold, render a plain
+  // swipeable row with no duplication and no auto-scroll.
+  const count = React.Children.count(children);
+  if (count < 4) {
+    return <div className="flex gap-4 overflow-x-auto pb-2">{children}</div>;
+  }
 
   return (
     <div className="relative group/carousel">
