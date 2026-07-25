@@ -290,7 +290,7 @@ export default function BookingConfirmation() {
               specialists.
             </p>
             <button
-              onClick={() => navigate(`/reviews/new?booking_id=${booking.id}`)}
+              onClick={() => navigate(`/my-bookings`)}
               className="rounded-full bg-[#0c4d47] text-white px-6 py-2.5 text-sm font-medium"
             >
               Leave a Review
