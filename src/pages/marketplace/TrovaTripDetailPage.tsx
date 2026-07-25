@@ -516,6 +516,7 @@ export default function TrovaTripDetailPage() {
               <TripBookingSidebar
                 tripId={trip.id}
                 tripTitle={trip.title}
+                listingType={(trip as any)?.listing_type}
                 pricePerPerson={trip.original_price || trip.price_per_person || 0}
                 currency={trip.currency || "USD"}
                 spotsAvailable={spotsAvailable || undefined}
