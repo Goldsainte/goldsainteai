@@ -289,9 +289,24 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
             ))}
           </div>
         )}
+        {!tier && !isEdit && (
+          <p className="border-t border-[#E5DFC6] pt-4 text-[12.5px] leading-relaxed text-[#0a2225]/55">
+            Creators sell trip design services, not travel arrangements — you deliver the plan and expertise; travelers book flights, hotels, and suppliers themselves or through a licensed travel specialist.
+          </p>
+        )}
 
         {tier && (
           <>
+            {/* Posture disclosure (founder + counsel, Jul 25): creators sell
+                trip DESIGN services, never travel arrangements. Shown the
+                moment a tier is chosen so every service is created with this
+                understanding. */}
+            {!isEdit && (
+              <div className="rounded-xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 py-3 text-[13px] leading-relaxed text-[#5c5340]">
+                <span className="font-semibold">A quick note on what you're selling:</span>{" "}
+                creators sell trip design services, not travel arrangements. You deliver the plan, the expertise, or your time — travelers book flights, hotels, and suppliers themselves, or through a licensed travel specialist. Don't collect payment for bookings through this service.
+              </div>
+            )}
             {selectedTier && (
               <div className="inline-flex h-9 w-fit items-center gap-1.5 rounded-lg border border-[#E5DFC6] bg-white pl-3 pr-1.5 text-[13px] font-medium text-[#0a2225]">
                 {selectedTier.label}
