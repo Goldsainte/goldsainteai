@@ -83,7 +83,7 @@ export function TripFAQAccordion({ faqs, listingType, destination }: TripFAQAcco
         ? buildTourFaqs(destination)
         : DEFAULT_FAQS;
   // Group FAQs by category
-  const groupedFaqs = faqs.reduce((acc, faq) => {
+  const groupedFaqs = resolvedFaqs.reduce((acc, faq) => {
     const category = faq.category || "General";
     if (!acc[category]) acc[category] = [];
     acc[category].push(faq);
