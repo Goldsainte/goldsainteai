@@ -27,7 +27,6 @@ export const Footer = () => {
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
         { to: "/auth?mode=signup&role=agent", label: "Apply as a Travel Agent" },
-        { to: "/apply/brand", label: "Partner as a Brand" },
       ],
     },
     {
