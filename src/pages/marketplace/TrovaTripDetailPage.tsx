@@ -87,6 +87,19 @@ function isValidUUID(str: string): boolean {
   return uuidRegex.test(str);
 }
 
+
+// YouTube (watch / shorts / youtu.be) and Vimeo URLs → embeddable players.
+// The builder collected video URLs for weeks; nothing ever rendered them
+// (input with no output — Jul 24).
+const toVideoEmbed = (url?: string | null): string | null => {
+  if (!url) return null;
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vm = url.match(/vimeo\.com\/(\d+)/);
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  return null;
+};
+
 export default function TrovaTripDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -456,6 +469,22 @@ export default function TrovaTripDetailPage() {
 
             {trip.activity_level && (
               <TripActivityLevelBadge level={trip.activity_level} />
+            )}
+
+            {toVideoEmbed((trip as any)?.video_url) && (
+              <section className="mb-10">
+                <h2 className="font-secondary text-2xl text-[#0a2225]">Video</h2>
+                <div className="mt-4 overflow-hidden rounded-2xl border border-[#E5DFC6]" style={{ aspectRatio: "16 / 9" }}>
+                  <iframe
+                    src={toVideoEmbed((trip as any)?.video_url)!}
+                    title="Listing video"
+                    className="h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              </section>
             )}
 
             {/* Visa / insurance / alerts are trip-scale — hidden for tours */}
