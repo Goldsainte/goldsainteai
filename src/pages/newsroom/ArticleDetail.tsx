@@ -215,7 +215,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                 .
               </p>
               <Link
-                to="/newsroom/media-kit"
+                to="/newsroom"
                 className="inline-flex items-center gap-2 text-[12.5px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
               >
                 Download brand assets <span aria-hidden>â†’</span>
