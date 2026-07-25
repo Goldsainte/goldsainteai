@@ -144,7 +144,7 @@ export function ContractStatusCard({
         .select("id")
         .single();
       if (error) throw error;
-      navigate(`/agent/trips/${trip.id}/contract?bookingId=${bookingId}`);
+      navigate(`/partner-bookings`);
     } catch (err) {
       console.error("Create contract failed", err);
       setBusy(null);
@@ -154,13 +154,13 @@ export function ContractStatusCard({
   const handleContinue = (e: React.MouseEvent) => {
     stop(e);
     if (contract?.trip_id) {
-      navigate(`/agent/trips/${contract.trip_id}/contract?bookingId=${bookingId}`);
+      navigate("/partner-bookings");
     }
   };
 
   const handleView = (e: React.MouseEvent) => {
     stop(e);
-    if (contract) navigate(`/contract/${contract.id}/sign?type=${variant}`);
+    if (contract) navigate(`/partner-bookings`);
   };
 
   const handleDownload = async (e: React.MouseEvent) => {
