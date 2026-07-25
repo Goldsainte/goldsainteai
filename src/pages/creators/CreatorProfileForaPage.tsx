@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PartnerProfileFora, { type PartnerReview } from "@/components/partner/PartnerProfileFora";
 import { ProfileTripsGrid } from "@/components/profile/ProfileTripsGrid";
+import { TikTokCarousel } from "@/components/TikTokEmbed";
 import { PartnerMediaGallery } from "@/components/PartnerMediaGallery";
 import TravelMap from "@/components/partner/TravelMap";
 import { MessageButton } from "@/components/messaging/MessageButton";
@@ -73,6 +74,7 @@ export default function CreatorProfileForaPage() {
   const [loading, setLoading] = useState(true);
   const [dir, setDir] = useState<DirRow | null>(null);
   const [extra, setExtra] = useState<ExtraRow | null>(null);
+  const [tiktokUrls, setTiktokUrls] = useState<string[]>([]);
   const [reviews, setReviews] = useState<PartnerReview[]>([]);
   const [reviewCount, setReviewCount] = useState(0);
   const [tipOpen, setTipOpen] = useState(false);
@@ -100,6 +102,22 @@ export default function CreatorProfileForaPage() {
         if (cancelled) return;
         setDir((dirRes.data as unknown as DirRow) ?? null);
         setExtra((extraRes.data as unknown as ExtraRow) ?? null);
+
+        // Featured TikToks — read via the anon-safe public_creator_media view
+        // (profiles itself is RLS-hidden from logged-out visitors). Fire-and-
+        // forget: profile renders fine without videos.
+        supabase
+          .from("public_creator_media" as unknown as "profiles")
+          .select("featured_tiktok_videos")
+          .eq("id", id)
+          .maybeSingle()
+          .then(({ data: mediaRow }) => {
+            if (cancelled) return;
+            const vids = Array.isArray((mediaRow as any)?.featured_tiktok_videos)
+              ? ((mediaRow as any).featured_tiktok_videos as any[]).filter((u): u is string => typeof u === "string")
+              : [];
+            setTiktokUrls(vids);
+          });
 
         const { data: reviewRows, count } = await supabase
           .from("reviews")
@@ -342,6 +360,14 @@ export default function CreatorProfileForaPage() {
                 </div>
                 <div className="mt-6 rounded-3xl bg-white/60 p-4">
                   <TravelMap visited={visitedCountries} />
+                </div>
+              </section>
+            )}
+            {tiktokUrls.length > 0 && (
+              <section className="mt-14">
+                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">From my TikTok</h2>
+                <div className="mt-6">
+                  <TikTokCarousel urls={tiktokUrls} />
                 </div>
               </section>
             )}
