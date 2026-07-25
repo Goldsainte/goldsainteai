@@ -259,6 +259,10 @@ export default function CreatorSettingsPage() {
       }
 
       toast.success("Public profile saved");
+      // Land on the finished page: seeing the live profile IS the save
+      // confirmation (founder request, Jul 25 — a toast alone left people
+      // unsure their changes stuck).
+      if (user) navigate(`/creators/${user.id}`);
     } catch (e: any) {
       toast.error(e.message || "Save failed — nothing was changed");
     } finally {
