@@ -444,7 +444,7 @@ export default function TrovaTripDetailPage() {
             )}
 
             {itineraryDays.length > 0 && (
-              <TripItineraryAccordion days={itineraryDays} totalNights={durationNights} />
+              <TripItineraryAccordion days={itineraryDays} totalNights={durationNights} listingType={(trip as any)?.listing_type} />
             )}
 
             <TripAirportsCard
@@ -458,10 +458,11 @@ export default function TrovaTripDetailPage() {
               <TripActivityLevelBadge level={trip.activity_level} />
             )}
 
-            <TripEssentialInfoLinks
+            {/* Visa / insurance / alerts are trip-scale — hidden for tours */}
+            {(trip as any)?.listing_type !== "tour" && <TripEssentialInfoLinks
               essentialInfo={trip.essential_info || undefined}
               destination={trip.destination}
-            />
+            />}
 
             {trip.cancellation_policy ? (
               <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
@@ -485,9 +486,9 @@ export default function TrovaTripDetailPage() {
               </section>
             )}
 
-            <TripTrustBadges />
+            <TripTrustBadges listingType={(trip as any)?.listing_type} />
 
-            <TripFAQAccordion faqs={faqs.length > 0 ? faqs : undefined} />
+            <TripFAQAccordion faqs={faqs.length > 0 ? faqs : undefined} listingType={(trip as any)?.listing_type} destination={trip.destination} />
 
             {similarTrips.length > 0 && (
               <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
@@ -516,8 +517,10 @@ export default function TrovaTripDetailPage() {
               <TripBookingSidebar
                 tripId={trip.id}
                 tripTitle={trip.title}
-                listingType={(trip as any)?.listing_type}
-                pricePerPerson={trip.original_price || trip.price_per_person || 0}
+                // MONEY: the ACTUAL price charges; original_price is a compare-at
+                // display anchor only. The old precedence charged off the
+                // crossed-out number ($100 tour showing/charging From $150).
+                pricePerPerson={trip.price_per_person || trip.original_price || 0}
                 currency={trip.currency || "USD"}
                 spotsAvailable={spotsAvailable || undefined}
                 hostName={trip.creator?.full_name || (isPlatformTrip ? "the Goldsainte Concierge team" : undefined)}
