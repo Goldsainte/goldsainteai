@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AIRewriteButton } from "@/components/AIRewriteButton";
+import { GoogleCityAutocomplete } from "@/components/GoogleCityAutocomplete";
 
 interface TripBuilderFormProps {
   /** Who is authoring: creators choose trip-vs-tour; tour operators are fixed
@@ -422,10 +423,18 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 </div>
                 <div className="space-y-2">
                   <Label className={labelClasses}>Destination *</Label>
-                  <Input value={formData.destination} onChange={(e) => updateField("destination", e.target.value)}
-                    onBlur={() => setTouched((prev) => ({ ...prev, destination: true }))}
-                    placeholder="e.g., Amalfi Coast, Italy"
-                    className={`${inputClasses} ${getError("destination") ? "border-red-400 focus:border-red-400" : ""}`} />
+                  {/* The same Google city autocomplete used everywhere else on
+                      the platform (settings, onboarding, applications) — one
+                      canonical destination input (Jul 24). Free typing still
+                      works; onChange fires per keystroke. */}
+                  <div onBlur={() => setTouched((prev) => ({ ...prev, destination: true }))}>
+                    <GoogleCityAutocomplete
+                      value={formData.destination}
+                      onChange={(v) => updateField("destination", v)}
+                      placeholder="e.g., Amalfi Coast, Italy"
+                      inputClassName={`${inputClasses} ${getError("destination") ? "border-red-400 focus:border-red-400" : ""}`}
+                    />
+                  </div>
                   {getError("destination") && <p className="text-xs text-red-500 mt-1">{getError("destination")}</p>}
                 </div>
                 <div className="space-y-2">
