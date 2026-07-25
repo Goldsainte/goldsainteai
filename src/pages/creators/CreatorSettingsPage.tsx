@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { BackButton } from "@/components/ui/BackButton";
 import { Loader2, Camera, ExternalLink} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -291,6 +292,7 @@ export default function CreatorSettingsPage() {
     <div className="min-h-screen bg-[#FDF9F0] pb-24">
       <Helmet><title>Creator Settings · Goldsainte</title></Helmet>
       <div className="mx-auto max-w-3xl px-4 pt-12">
+        <BackButton to="/creator-dashboard" className="mb-4" />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Creator Settings</h1>
