@@ -44,15 +44,27 @@ const ACCOMMODATION_TYPES = ["Boutique Hotel", "Luxury Resort", "Hostel", "Campi
 const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 const DAY_MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
 
-const CANCELLATION_TEMPLATE = `- Deposit ({deposit_percentage}%) is non-refundable after booking confirmation.
+// Starter templates come in TRIP and TOUR flavors — a 60/30-day departure
+// ladder makes no sense for a Saturday food walk (founder catch, Jul 24).
+const TRIP_CANCELLATION_TEMPLATE = `- Deposit ({deposit_percentage}%) is non-refundable after booking confirmation.
 - Cancellations 60+ days before departure: full refund of balance paid beyond deposit.
 - Cancellations 30–60 days before departure: 50% refund of balance.
 - Cancellations under 30 days before departure: no refund.
 - Trip insurance is strongly recommended.`;
 
-const REFUND_TEMPLATE = `- Refunds are processed within 7–10 business days to the original payment method.
+const TOUR_CANCELLATION_TEMPLATE = `- Deposit ({deposit_percentage}%) is non-refundable after booking confirmation.
+- Cancellations 7+ days before the tour: full refund of the balance beyond the deposit.
+- Cancellations 72 hours–7 days before the tour: 50% refund of the balance.
+- Cancellations under 72 hours: no refund.
+- If the minimum group size isn't met, everyone receives a full refund including the deposit.`;
+
+const TRIP_REFUND_TEMPLATE = `- Refunds are processed within 7–10 business days to the original payment method.
 - In the event of a trip cancellation by the operator, 100% refund will be issued including the deposit.
 - Force majeure events are handled case by case with travel credit offered where possible.`;
+
+const TOUR_REFUND_TEMPLATE = `- Refunds are processed within 7–10 business days to the original payment method.
+- If the host cancels the tour, a 100% refund is issued including the deposit.
+- Weather or safety cancellations are rescheduled or fully refunded — your choice.`;
 
 export type ItineraryDay = {
   day_number: number;
@@ -964,7 +976,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               <SectionHeader title="Cancellation policy" />
               <button type="button"
                 onClick={() => updateField("cancellation_policy",
-                  CANCELLATION_TEMPLATE.replace(/\{deposit_percentage\}/g, formData.deposit_percentage || "25"))}
+                  (isTour ? TOUR_CANCELLATION_TEMPLATE : TRIP_CANCELLATION_TEMPLATE).replace(/\{deposit_percentage\}/g, formData.deposit_percentage || "25"))}
                 className="text-xs text-[#0c4d47] underline">Use template</button>
               <Textarea value={formData.cancellation_policy}
                 onChange={(e) => updateField("cancellation_policy", e.target.value)}
@@ -973,7 +985,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
             <div className="space-y-3 border-t border-[#E5DFC6] pt-10">
               <SectionHeader title="Refund policy" />
-              <button type="button" onClick={() => updateField("refund_policy", REFUND_TEMPLATE)}
+              <button type="button" onClick={() => updateField("refund_policy", isTour ? TOUR_REFUND_TEMPLATE : TRIP_REFUND_TEMPLATE)}
                 className="text-xs text-[#0c4d47] underline">Use template</button>
               <Textarea value={formData.refund_policy}
                 onChange={(e) => updateField("refund_policy", e.target.value)}
@@ -1069,7 +1081,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 disabled={saving || !isValid}
                 className="rounded-full px-6 sm:px-8 bg-[#0a2225] hover:bg-[#0a2225]/90 text-white">
                 {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-                Publish trip
+                Publish {noun}
               </Button>
             </div>
           )}
