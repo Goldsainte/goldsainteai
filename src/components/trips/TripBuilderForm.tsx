@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ListingCompleteness, computeChecks } from "@/components/trips/ListingCompleteness";
 import {
   Save, Send, X, Loader2, Shuffle, CalendarIcon, Sparkles,
   Check, ChevronLeft, ChevronRight,
@@ -118,6 +119,80 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>([]);
   const [departureMode, setDepartureMode] = useState<"flexible" | "fixed">("flexible");
   const [aiLoading, setAiLoading] = useState(false);
+  const [enriching, setEnriching] = useState(false);
+
+  // "Draft with AI" (Jul 25) — sends everything the author has entered to the
+  // enrich_trip tool and fills ONLY the empty spaces with Trova-depth drafts:
+  // expanded day write-ups (durations + meals), accommodation placeholders,
+  // Not Included, FAQs, activity level. Author text is never overwritten, and
+  // the AI is instructed to return "[Hotel name]"-style placeholders instead
+  // of inventing real businesses — review before publishing.
+  const enrichWithAI = async () => {
+    const days = parseInt(formData.duration_days) || itineraryDays.length;
+    if (!formData.destination?.trim() || days <= 0) {
+      toast.info(`Set the destination and ${noun} duration first.`);
+      return;
+    }
+    setEnriching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-content-tools", {
+        body: {
+          tool: "enrich_trip",
+          title: formData.title,
+          destination: formData.destination,
+          duration_days: days,
+          description: formData.description,
+          noun,
+          trip_type: formData.trip_type || "",
+          days: itineraryDays,
+          included: formData.included,
+          not_included: formData.not_included,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const aiDays = (data?.days || []) as Array<any>;
+      if (aiDays.length > 0) {
+        setItineraryDays((prev) => {
+          // Ensure a slot exists for every day the AI drafted
+          const base = [...prev];
+          while (base.length < Math.min(aiDays.length, days)) {
+            base.push({
+              day_number: base.length + 1, title: "", description: "", activities: [],
+              accommodation: "", meals_included: [], is_featured_day: false,
+            });
+          }
+          return base.map((d) => {
+            const a = aiDays.find((x) => Number(x?.day_number) === d.day_number);
+            if (!a) return d;
+            return {
+              ...d,
+              title: d.title?.trim() ? d.title : a.title || d.title,
+              description: d.description?.trim() ? d.description : a.description || d.description,
+              activities: (d.activities?.length ? d.activities : a.activities) || [],
+              accommodation: d.accommodation?.trim() ? d.accommodation : a.accommodation || "",
+              meals_included: (d.meals_included?.length ? d.meals_included : a.meals_included) || [],
+            };
+          });
+        });
+      }
+      if ((formData.not_included || []).length === 0 && Array.isArray(data?.not_included)) {
+        updateField("not_included", data.not_included.filter((x: any) => typeof x === "string"));
+      }
+      if ((formData.faqs || []).length === 0 && Array.isArray(data?.faqs)) {
+        updateField("faqs", data.faqs.filter((f: any) => f?.question && f?.answer));
+      }
+      if (!formData.activity_level && typeof data?.activity_level === "string" && ACTIVITY_LEVELS.includes(data.activity_level)) {
+        updateField("activity_level", data.activity_level);
+      }
+      toast.success("Draft filled in — review every section, and replace [bracketed placeholders] with your real hotels and venues before publishing.");
+    } catch (e: any) {
+      toast.error(e.message || "Couldn't draft the listing — try again.");
+    } finally {
+      setEnriching(false);
+    }
+  };
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     title: "", description: "", destination: "", price_per_person: "", original_price: "",
@@ -939,6 +1014,19 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
         {step.id === "policies" && (
           <div className="space-y-10">
+            <div className="space-y-4">
+              <ListingCompleteness formData={formData} itineraryDays={itineraryDays} noun={noun} />
+              {computeChecks({ formData, itineraryDays, noun }).some((c) => !c.done) && (
+                <button
+                  type="button"
+                  onClick={enrichWithAI}
+                  disabled={enriching}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-6 py-3 text-[14px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225] disabled:opacity-60"
+                >
+                  {enriching ? "Drafting your listing…" : "Draft missing sections with AI"}
+                </button>
+              )}
+            </div>
             <div className="space-y-6">
               <SectionHeader title="Payment terms" subtitle={`Set your deposit and payment schedule. These appear on your ${noun} listing.`} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
