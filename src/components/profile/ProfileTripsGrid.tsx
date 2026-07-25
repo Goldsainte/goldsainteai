@@ -89,12 +89,12 @@ export function ProfileTripsGrid({
         </h2>
         <div className="rounded-2xl border border-[#E5DFC6] bg-gradient-to-br from-white to-[#F5F0E0]/50 p-8 text-center">
           <p className="font-secondary text-lg text-[#0a2225]">
-            Trips coming soon
+            {creatorType === "agent" ? "Trips coming soon" : "Tours coming soon"}
           </p>
           <p className="mt-1 text-sm text-[#6B7280]">
             {creatorType === "agent"
               ? "This specialist is building their trip collection."
-              : "This creator is building their trip collection."}
+              : "This creator is building their tour collection."}
           </p>
         </div>
       </section>
@@ -108,7 +108,12 @@ export function ProfileTripsGrid({
           {title}
         </h2>
         <span className="text-xs text-[#8C8470]">
-          {trips.length} {trips.length === 1 ? "trip" : "trips"}
+          {/* Product law: agents sell trips, creators sell TOURS — the noun
+              must match the audience (founder catch, Jul 25). */}
+          {trips.length}{" "}
+          {creatorType === "agent"
+            ? trips.length === 1 ? "trip" : "trips"
+            : trips.length === 1 ? "tour" : "tours"}
         </span>
       </div>
 
