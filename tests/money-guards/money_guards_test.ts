@@ -324,3 +324,8 @@ Deno.test("booking confirmation converts cents to dollars exactly once", () => {
 Deno.test("proposal deposits keep cents precision", () => {
   assertContains(PROPOSAL_CARD, "Math.round(price * depositPct) / 100", "Whole-dollar rounding turned 25% deposits into 30% on odd totals.");
 });
+
+
+Deno.test("listing sidebar charges the real price, not the compare-at anchor", () => {
+  assertContains("src/pages/marketplace/TrovaTripDetailPage.tsx", "trip.price_per_person || trip.original_price", "original_price is a crossed-out display anchor; putting it first charged travelers the fake pre-discount number.");
+});
