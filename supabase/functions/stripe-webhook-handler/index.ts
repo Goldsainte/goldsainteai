@@ -963,7 +963,13 @@ async function notifyAndEmailOnBookingConfirmed(tripBookingId: string, session: 
 }
 
 /**
- * Credits an affiliate referrer 10% of the platform commission (platform = 7% of gross).
+ * Credits an affiliate referrer commission_rate% OF THE GROSS booking value
+ * (default 2%), paid out of Goldsainte's 7% platform fee. Founder decision
+ * Jul 25 (option "b"): the old semantics (10% of the platform fee ≈ 0.7% of
+ * gross) contradicted the "10%" shown to creators and was too small to
+ * motivate anyone. SAFETY CLAMP: the commission can never exceed the platform
+ * fee itself, so referred bookings always net positive for Goldsainte even if
+ * a rate is misconfigured.
  * Idempotency: relies on at-most-once webhook dispatch per session.
  */
 async function creditAffiliateCommission(args: {
@@ -1008,9 +1014,13 @@ async function creditAffiliateCommission(args: {
     }
 
     const PLATFORM_FEE_RATE = 0.07;
-    const referrerShare = (Number(link.commission_rate) || 10) / 100; // default 10%
+    const DEFAULT_AFFILIATE_RATE = 2; // % of gross
+    const grossShare = (Number(link.commission_rate) || DEFAULT_AFFILIATE_RATE) / 100;
     const platformCommission = args.grossAmount * PLATFORM_FEE_RATE;
-    const commissionAmount = Number((platformCommission * referrerShare).toFixed(2));
+    // rate% of gross, hard-capped at the platform fee (economics guard)
+    const commissionAmount = Number(
+      Math.min(args.grossAmount * grossShare, platformCommission).toFixed(2)
+    );
     if (commissionAmount <= 0) return;
 
     await supabaseClient.from('affiliate_commissions').insert({
