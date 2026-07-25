@@ -558,6 +558,14 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         initialTier={pendingTier}
         initialStep={declareJump ? 3 : 0}
       />
+
+      {/* Posture disclosure (Jul 25): services are design/planning work, not
+          travel arrangements — shown to travelers wherever services render. */}
+      {hasAny && (
+        <p className="mt-6 text-[12.5px] leading-relaxed text-[#0a2225]/50">
+          Creator services are trip design and planning services, not travel arrangements. Flights, hotels, and other travel are booked by you, or through a licensed travel specialist.
+        </p>
+      )}
     </div>
   );
 }
@@ -593,7 +601,7 @@ const TIERS = [
     icon: Star,
     tag: "Most comprehensive",
     features: [
-      "End-to-end planning, including bookings",
+      "End-to-end planning \u2014 a complete, ready-to-book plan",
       "Restaurant and experience recommendations",
       "Priority support available for travelers",
     ],
