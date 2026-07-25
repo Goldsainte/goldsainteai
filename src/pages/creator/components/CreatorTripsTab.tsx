@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Plus, Pencil, Eye, ImageIcon } from "lucide-react";
+import { Loader2, Plus, Pencil, Eye, ImageIcon, EyeOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type CreatorTrip = {
   id: string;
@@ -38,6 +43,8 @@ export function CreatorTripsTab() {
   const { user } = useAuth();
   const [trips, setTrips] = useState<CreatorTrip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<CreatorTrip | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -62,6 +69,40 @@ export function CreatorTripsTab() {
       cancelled = true;
     };
   }, [user]);
+
+  const unpublish = async (trip: CreatorTrip) => {
+    setBusyId(trip.id);
+    const { error } = await supabase
+      .from("packaged_trips")
+      .update({ status: "draft" })
+      .eq("id", trip.id)
+      .eq("creator_id", user!.id);
+    setBusyId(null);
+    if (error) { toast.error("Couldn't unpublish. Try again."); return; }
+    setTrips((prev) => prev.map((t) => (t.id === trip.id ? { ...t, status: "draft" } : t)));
+    toast.success("Tour unpublished — it's now a draft and off the marketplace.");
+  };
+
+  const doDelete = async (trip: CreatorTrip) => {
+    // Money-safe: a tour that has ever been booked can never be deleted, only
+    // unpublished, so booking history keeps pointing at a real listing.
+    if ((trip.booking_count ?? 0) > 0) {
+      toast.error("This tour has bookings and can't be deleted — unpublish it instead.");
+      setConfirmDelete(null);
+      return;
+    }
+    setBusyId(trip.id);
+    const { error } = await supabase
+      .from("packaged_trips")
+      .delete()
+      .eq("id", trip.id)
+      .eq("creator_id", user!.id);
+    setBusyId(null);
+    setConfirmDelete(null);
+    if (error) { toast.error("Couldn't delete. Try again."); return; }
+    setTrips((prev) => prev.filter((t) => t.id !== trip.id));
+    toast.success("Tour deleted.");
+  };
 
   return (
     <div className="space-y-6">
@@ -169,12 +210,62 @@ export function CreatorTripsTab() {
                       </Link>
                     )}
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    {status === "published" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={busyId === trip.id}
+                        onClick={() => unpublish(trip)}
+                        className="rounded-full text-[#6B7280] hover:bg-[#F6F0E4] flex-1"
+                      >
+                        {busyId === trip.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <><EyeOff className="h-3.5 w-3.5 mr-1.5" />Unpublish</>
+                        )}
+                      </Button>
+                    )}
+                    {(trip.booking_count ?? 0) === 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={busyId === trip.id}
+                        onClick={() => setConfirmDelete(trip)}
+                        className="rounded-full text-[#b4453c] hover:bg-[#b4453c]/10 flex-1"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                        Delete
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
       )}
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this tour?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{confirmDelete?.title || "Untitled tour"}" will be permanently removed. This can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => confirmDelete && doDelete(confirmDelete)}
+              className="bg-[#b4453c] hover:bg-[#9a3a32] text-white"
+            >
+              Delete tour
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
