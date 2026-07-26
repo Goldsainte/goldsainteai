@@ -19,6 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
+import { AgentDirectRequestsTab } from "@/pages/agents/components/AgentDirectRequestsTab";
 import { JobCompletionModal } from "@/components/JobCompletionModal";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
 import { AgentAnalyticsDashboard } from "@/components/AgentAnalyticsDashboard";
@@ -48,7 +49,7 @@ export default function AgentDashboard() {
   // "earnings" must be allowlisted: the Getting Started checklist and the
   // post-verification page both deep-link to ?tab=earnings, which silently
   // fell back to the Desk while the tab was missing.
-  const AGENT_TABS = ["available", "my-bids", "creator-collabs", "guides", "earnings", "analytics", "performance", "availability", "verification", "settings"] as const;
+  const AGENT_TABS = ["available", "direct", "my-bids", "creator-collabs", "guides", "earnings", "analytics", "performance", "availability", "verification", "settings"] as const;
   const requestedTab = searchParams.get("tab");
   const initialTab = AGENT_TABS.includes(requestedTab as (typeof AGENT_TABS)[number])
     ? (requestedTab as string)
@@ -545,6 +546,9 @@ export default function AgentDashboard() {
           <div className="flex items-center gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabBtn("desk", "Desk")}
             {tabBtn("available", `Briefs (${jobs.length})`)}
+            {/* Direct requests were invisible to agents entirely — the Briefs
+                tab reads marketplace_jobs, a different table (Jul 26). */}
+            {tabBtn("direct", "Direct requests")}
             {tabBtn("my-bids", `Pipeline (${myBids.length})`)}
             {/* creator-collabs tab hidden for launch — unfinished feature, undecided economics (see handoff) */}
             {tabBtn("guides", "Catalog")}
@@ -737,6 +741,10 @@ export default function AgentDashboard() {
               }}
             />
           </TabsContent>
+
+            <TabsContent value="direct">
+              <AgentDirectRequestsTab />
+            </TabsContent>
 
             <TabsContent value="earnings">
               <StripeConnectOnboarding />
