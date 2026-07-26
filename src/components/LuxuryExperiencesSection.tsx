@@ -96,7 +96,7 @@ export const LuxuryExperiencesSection = () => {
                   </p>
                   <div className="flex items-center gap-2 text-luxury-gold">
                     <span className="text-xs sm:text-sm tracking-wider uppercase">Explore Collection</span>
-                    <span className="transform group-hover:translate-x-2 transition-transform duration-300">â†’</span>
+                    <span className="transform group-hover:translate-x-2 transition-transform duration-300">→</span>
                   </div>
                 </div>
               </div>
