@@ -88,7 +88,19 @@ const CREATOR_ITEMS: ChecklistItem[] = [
     description: "Set up Stripe so you can get paid — bookings, tips, and guide sales all pay out through your own account.",
     cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
-      !!(d.profile?.stripe_charges_enabled || d.profile?.stripe_payouts_enabled || d.profile?.stripe_connect_payouts_enabled),
+      // Also accept onboarding-completed/account-active (Jul 26): right after
+      // Stripe onboarding, details_submitted is true while charges/payouts
+      // capabilities can lag by minutes — so a creator saw "Account Status:
+      // Active" on the earnings tab while this step stayed unchecked. The
+      // AGENT version of this step already accepts onboarding_completed;
+      // creators now match.
+      !!(
+        d.profile?.stripe_charges_enabled ||
+        d.profile?.stripe_payouts_enabled ||
+        d.profile?.stripe_connect_payouts_enabled ||
+        d.profile?.stripe_onboarding_completed ||
+        d.profile?.stripe_account_status === "active"
+      ),
   },
   {
     id: "create-content",
