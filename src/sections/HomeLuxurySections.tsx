@@ -127,7 +127,7 @@ const PersonaCarouselCard: React.FC<PersonaCarouselCardProps & { index: number }
             onClick={(e) => e.stopPropagation()}
             className="mt-2.5 inline-block text-[13px] font-medium text-[#F5EFE1]/80 hover:text-white hover:underline transition-colors duration-200"
           >
-            {browseLabel} â†’
+            {browseLabel} →
           </Link>
         )}
       </div>
@@ -190,9 +190,9 @@ export const BuiltForEverySideSection: React.FC = () => {
 
       {/* Refined scroll hint for mobile with gold arrows */}
       <p className="mt-8 text-center text-[11px] uppercase tracking-[0.18em] text-[#8B8B8B] lg:hidden font-light">
-        <span className="text-[#C7A962]">â†</span>
+        <span className="text-[#C7A962]">←</span>
         <span className="mx-2">Swipe to explore</span>
-        <span className="text-[#C7A962]">â†’</span>
+        <span className="text-[#C7A962]">→</span>
       </p>
     </section>
   );
