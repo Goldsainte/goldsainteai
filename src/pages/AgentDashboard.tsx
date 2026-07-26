@@ -653,20 +653,33 @@ export default function AgentDashboard() {
 
             {/* HOW TO SEND A PROPOSAL — the operational 1-2-3. Agents had no
                 entry point telling them where step one lives (Jul 24 2026). */}
-            <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-6">
+            {/* PROPOSAL STEPS — rebuilt Jul 26. Previously flex rows with a
+                hanging numeral: wrapped lines sat ragged against the number and
+                the text ran the full container width, so long sentences were
+                hard to track. Now a hairline rail with the numeral seated ON it
+                — the same roman-numeral treatment already used on the Desk
+                intro and the verification step, so this reads as house language
+                rather than a new pattern — and the measure is capped so lines
+                break where the eye expects. */}
+            <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-6 sm:p-8">
               <p className="text-[12px] uppercase tracking-[0.24em] text-[#8D6B2F]">
                 Send a proposal — step by step
               </p>
-              <div className="mt-4 space-y-3 text-[15px] text-[#0a2225]">
-                {/* Each step's prose lives in ONE span: with the text loose,
-                    flex made every inline node its own column and the bold
-                    phrases wrapped over the surrounding words (founder
-                    report, Jul 26). */}
-                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">1.</i><span>Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.</span></p>
-                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">2.</i><span>Use the <strong>Send a Proposal</strong> panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.</span></p>
-                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">3.</i><span>They tap <strong>Accept and Pay Deposit</strong> — charged directly on your Stripe — and the booking appears in Bookings with you.</span></p>
-              </div>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <ol className="mt-7 max-w-[64ch] space-y-7 border-l border-[#E5DFC6] text-[15px] leading-relaxed text-[#0a2225]">
+                <li className="relative pl-9">
+                  <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">i</span>
+                  Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.
+                </li>
+                <li className="relative pl-9">
+                  <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">ii</span>
+                  Use the <strong className="font-medium">Send a Proposal</strong> panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.
+                </li>
+                <li className="relative pl-9">
+                  <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">iii</span>
+                  They tap <strong className="font-medium">Accept and Pay Deposit</strong> — charged directly on your Stripe — and the booking appears in Bookings with you.
+                </li>
+              </ol>
+              <div className="mt-8 flex flex-wrap gap-3 pl-9">
                 <Link to="/marketplace?tab=trip-requests" className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-[13.5px] text-[#FDF9F0] transition-colors hover:bg-[#0a2225]">Browse trip requests</Link>
                 <Link to="/messages" className="rounded-full border border-[#0c4d47]/30 px-5 py-2.5 text-[13.5px] text-[#0a2225] transition-colors hover:bg-[#0c4d47]/5">Open messages</Link>
               </div>
