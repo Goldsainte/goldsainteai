@@ -229,8 +229,16 @@ export default function GuidePage() {
   // wanted to ask a question was pushed into a booking brief. The rail is now
   // the conversational route (Message) and the bottom band is the commercial
   // one (Request a trip).
+  // WRONG PARAM (fixed Jul 26). Guides are authored by CREATORS, but this sent
+  // `agentId=<creator user id>`. PostTripPage's agentId branch forces
+  // wantsRole="agent" and resolves the recipient from travel_agents — where a
+  // creator has no row — so preferredAgentUserId stayed null, nobody was
+  // notified, and the brief fell through to the OPEN marketplace. A direct
+  // request to Tanya became a public post (founder report). `fromCreator` is
+  // the creator path: it sets wantsRole="creator" and resolves the name from
+  // creator_directory.
   const requestTrip = () =>
-    navigate(`/post-trip?agentId=${guide.author_id}&agentName=${encodeURIComponent(displayAs)}`);
+    navigate(`/post-trip?fromCreator=${guide.author_id}&creatorName=${encodeURIComponent(displayAs)}`);
 
   const AuthorRail = (
     <div className="rounded-2xl bg-[#F0EADA]/80 p-7">
