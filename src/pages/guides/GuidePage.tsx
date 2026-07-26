@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { MessageButton } from "@/components/messaging/MessageButton";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -223,7 +224,13 @@ export default function GuidePage() {
     );
 
   const displayAs = author?.businessName || author?.name || "your specialist";
-  const contact = () => navigate(`/post-trip?agentId=${guide.author_id}&agentName=${encodeURIComponent(displayAs)}`);
+  // Two DIFFERENT intents were wired to the same handler (Jul 26): both
+  // "Contact" buttons opened the trip-request form, so a reader who just
+  // wanted to ask a question was pushed into a booking brief. The rail is now
+  // the conversational route (Message) and the bottom band is the commercial
+  // one (Request a trip).
+  const requestTrip = () =>
+    navigate(`/post-trip?agentId=${guide.author_id}&agentName=${encodeURIComponent(displayAs)}`);
 
   const AuthorRail = (
     <div className="rounded-2xl bg-[#F0EADA]/80 p-7">
@@ -243,10 +250,12 @@ export default function GuidePage() {
       <p className="mt-5 leading-relaxed text-[#0a2225]/85">
         Let's talk about customizing this itinerary for you. Or, about other destinations.
       </p>
-      <button type="button" onClick={contact}
-        className="mt-6 w-full rounded-lg bg-[#0a2225] px-6 py-4 text-[13px] font-medium uppercase tracking-[0.14em] text-[#f7f3ea] hover:bg-[#0c4d47]">
-        Contact {displayAs}
-      </button>
+      <MessageButton
+        recipientId={guide.author_id}
+        recipientName={displayAs}
+        label={`Message ${displayAs}`}
+        className="mt-6 w-full rounded-lg bg-[#0a2225] px-6 py-4 text-[13px] font-medium uppercase tracking-[0.14em] text-[#f7f3ea] hover:bg-[#0c4d47]"
+      />
     </div>
   );
 
@@ -332,11 +341,14 @@ export default function GuidePage() {
           {/* Bottom contact band */}
           <section className="mt-16 rounded-2xl bg-[#F0EADA]/80 px-6 py-14 text-center">
             <p className="mx-auto max-w-xl font-secondary text-3xl leading-snug text-[#0a2225]">
-              Unlock a seamless trip by contacting {displayAs} to book.
+              Want this itinerary shaped around your dates and taste?
             </p>
-            <button type="button" onClick={contact}
+            <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-[#0a2225]/70">
+              Send {displayAs} the details and receive a proposal back.
+            </p>
+            <button type="button" onClick={requestTrip}
               className="mt-8 rounded-lg bg-[#0a2225] px-8 py-4 text-[13px] font-medium uppercase tracking-[0.14em] text-[#f7f3ea] hover:bg-[#0c4d47]">
-              Contact {displayAs}
+              Request a trip
             </button>
           </section>
         </div>
