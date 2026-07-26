@@ -84,6 +84,62 @@ async function filterList(list: unknown): Promise<string[] | undefined> {
   return kept;
 }
 
+// ============================================================================
+// BRAND ENFORCEMENT (Jul 26).
+//
+// 19 legacy senders build raw HTML and post it straight to Resend, so real
+// customers received unstyled or half-styled mail — a tip notification, a
+// purchase confirmation — while the branded pipeline sent beautiful ones.
+// Hand-templating 19 functions hours before launch is not a safe change; this
+// guard is already the single choke point every legacy sender passes through,
+// so branding is enforced HERE instead.
+//
+// Behaviour: if payload.html is not already inside a Goldsainte shell, wrap it.
+// Detection is deliberately generous — any of several house markers counts as
+// branded — because a false "unbranded" reading only double-wraps (ugly),
+// while a false "branded" reading lets an unbranded mail through (the bug).
+// Anything already rendered by _layout.tsx, brandEmail.ts or the transactional
+// templates passes untouched.
+// ============================================================================
+const LOGO_URL =
+  "https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png";
+
+const BRAND_MARKERS = [
+  LOGO_URL,
+  "This is an automated message",
+  "Playfair Display",
+  "#f7f3ea",
+  "goldsainte-branded",
+];
+
+function looksBranded(html: string): boolean {
+  if (!html) return true; // nothing to brand (text-only send)
+  return BRAND_MARKERS.some((m) => html.includes(m));
+}
+
+/** Wrap arbitrary body HTML in the house shell. Mirrors brandEmail.ts. */
+function brandWrap(inner: string, subject?: string): string {
+  const heading = (subject || "Goldsainte").replace(/[<>]/g, "");
+  return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!--goldsainte-branded-->
+</head>
+<body style="margin:0;padding:0;background:#f7f3ea;font-family:'Helvetica Neue',Arial,sans-serif;color:#0a2225;">
+  <div style="width:100%;background:#f7f3ea;padding:48px 16px;">
+    <div style="max-width:560px;margin:0 auto;background:#f7f3ea;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr>
+        <td align="center" style="padding:8px 0 28px;"><img src="${LOGO_URL}" alt="Goldsainte" style="height:22px;width:auto;max-width:240px;display:block;margin:0 auto;"/></td>
+      </tr></tbody></table>
+      <hr style="border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 28px;"/>
+      <h1 style="font-family:Georgia,serif;font-weight:400;font-size:30px;line-height:1.2;color:#0a2225;margin:0 0 20px;text-align:center;letter-spacing:-0.01em;">${heading}</h1>
+      <div style="font-size:15px;line-height:1.7;color:#0a2225;">${inner}</div>
+      <p style="font-size:13px;line-height:1.7;color:#0a2225;opacity:0.8;text-align:center;margin:40px 0 0;">If you have any questions, please contact <a href="mailto:support@goldsainte.com" style="color:#0c4d47;">Goldsainte Support</a>.</p>
+      <p style="font-size:10px;letter-spacing:0.1em;color:#0a2225;opacity:0.45;text-align:center;text-transform:uppercase;padding:16px 0 0;">This is an automated message from Goldsainte</p>
+    </div>
+  </div>
+</body></html>`;
+}
+
 const originalFetch = globalThis.fetch;
 
 globalThis.fetch = async function guardedFetch(
@@ -135,6 +191,12 @@ globalThis.fetch = async function guardedFetch(
       payload.to = filteredTo;
       if (filteredCc !== undefined) payload.cc = filteredCc;
       if (filteredBcc !== undefined) payload.bcc = filteredBcc;
+
+      // Enforce house branding on any raw-HTML sender (see note above).
+      if (typeof payload.html === "string" && !looksBranded(payload.html)) {
+        console.log("[resend-guard] wrapping unbranded email", { subject: payload.subject });
+        payload.html = brandWrap(payload.html, payload.subject);
+      }
 
       const newInit: RequestInit = {
         ...init,
