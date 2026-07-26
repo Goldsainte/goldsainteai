@@ -659,13 +659,13 @@ export default function AgentDashboard() {
                 hard to track. Now a hairline rail with the numeral seated ON it
                 — the same roman-numeral treatment already used on the Desk
                 intro and the verification step, so this reads as house language
-                rather than a new pattern — and the measure is capped so lines
-                break where the eye expects. */}
+                rather than a new pattern. No max-width: this card is wide and
+                capping the measure just left a dead column of white space. */}
             <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-6 sm:p-8">
               <p className="text-[12px] uppercase tracking-[0.24em] text-[#8D6B2F]">
                 Send a proposal — step by step
               </p>
-              <ol className="mt-7 max-w-[64ch] space-y-7 border-l border-[#E5DFC6] text-[15px] leading-relaxed text-[#0a2225]">
+              <ol className="mt-7 space-y-7 border-l border-[#E5DFC6] text-[15px] leading-relaxed text-[#0a2225]">
                 <li className="relative pl-9">
                   <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">i</span>
                   Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.
