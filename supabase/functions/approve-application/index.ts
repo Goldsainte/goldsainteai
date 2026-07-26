@@ -317,10 +317,23 @@ async function approveAgentApplication(
         .eq("id", applicationId)
         .maybeSingle();
       if (app?.email) {
+        // RESEND IDEMPOTENCY TRAP (Jul 26). The fanout keys this email as
+        // `welcome-pro-approved-<id>` and send-transactional-email passes that
+        // straight to Resend as an Idempotency-Key. Resend caches by key, so
+        // after the FIRST approval attempt consumed the key, every later
+        // approval of the same application (tonight: the re-clicks needed
+        // while we fixed provisioning) was silently swallowed as a
+        // "duplicate" — success toast, status flipped, no email. Bucketing
+        // the key by hour keeps rapid-retry protection while letting a
+        // deliberate re-approval actually deliver.
+        const hourBucket = new Date().toISOString().slice(0, 13);
         await supabaseClient.functions.invoke("email-fanout", {
-          body: { event: "agent_application.approved", record: app },
+          body: {
+            event: "agent_application.approved",
+            record: { ...app, _keySuffix: hourBucket },
+          },
         });
-        logger.info("Approval email dispatched", { applicationId });
+        logger.info("Approval email dispatched", { applicationId, hourBucket });
       }
     } catch (e) {
       // Never fail an approval because an email didn't send.
