@@ -241,32 +241,13 @@ async function handleCheckoutCompleted(session: any) {
         try {
           const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
           if (RESEND_API_KEY) {
-            const esc = (str: string) =>
-              str.replace(/[&<>"']/g, (c) =>
-                (({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>)[c] ?? c)
-              );
+            // (esc() removed Jul 26 — React templates escape automatically)
             const amountFmt = `$${(amountCents / 100).toFixed(2)}`;
             const netFmt = `$${(netCents / 100).toFixed(2)}`;
             const sentDate = new Date().toLocaleDateString('en-US', {
               year: 'numeric', month: 'long', day: 'numeric',
             });
-            const sendTipEmail = async (label: string, payload: Record<string, unknown>) => {
-              try {
-                const res = await fetch('https://api.resend.com/emails', {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': `Bearer ${RESEND_API_KEY}`,
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(payload),
-                });
-                if (!res.ok) {
-                  console.error(`Tip email (${label}) rejected by Resend`, res.status, await res.text());
-                }
-              } catch (e) {
-                console.error(`Tip email (${label}) failed to send`, e);
-              }
-            };
+            // (direct-Resend tip helper removed Jul 26 — all tip mail goes through send-transactional-email)
 
             const { data: recipientProfile } = await supabaseClient
               .from('profiles')
@@ -278,23 +259,23 @@ async function handleCheckoutCompleted(session: any) {
 
             if (recipientProfile?.email) {
               const firstName = (recipientProfile.full_name || recipientProfile.display_name || 'there').split(' ')[0];
-              await sendTipEmail('recipient', {
-                from: 'Goldsainte <hello@goldsainte.com>',
-                to: recipientProfile.email,
-                subject: `You received a ${amountFmt} tip 🎉`,
-                html: `
-                  <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; background: #f7f3ea; color: #0a2225;">
-                    <p style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #C7A962; margin: 0 0 24px;">Goldsainte</p>
-                    <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">You received a tip 🎉</h1>
-                    <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">Hi ${esc(firstName)},</p>
-                    <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">Someone sent you a <strong>${amountFmt}</strong> tip on Goldsainte.</p>
-                    ${tipNote ? `<p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px; padding: 12px 16px; background: #ffffff; border-left: 3px solid #C7A962; font-style: italic;">\u201C${esc(tipNote)}\u201D</p>` : ''}
-                    <p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">After the platform fee, <strong>${netFmt}</strong> is yours \u2014 it arrives through your connected Stripe account on your usual payout schedule.</p>
-                    <a href="https://goldsainte.ai/creator-dashboard" style="display: inline-block; background: #0c4d47; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500;">View earnings</a>
-                    <hr style="border: none; border-top: 1px solid #E5DFC6; margin: 32px 0 16px;" />
-                    <p style="font-size: 11px; color: #9A9384; margin: 0;">\u00A9 2026 Goldsainte. The smarter travel marketplace.</p>
-                  </div>
-                `,
+              // BRANDED (Jul 26): was ad-hoc inline HTML sent straight to Resend,
+              // bypassing the transactional system — no fee table, no payout
+              // expectations, off-house footer. Now the branded 'tip-received'
+              // template via the same sender as every other Goldsainte email.
+              await supabaseClient.functions.invoke('send-transactional-email', {
+                body: {
+                  templateName: 'tip-received',
+                  recipientEmail: recipientProfile.email,
+                  idempotencyKey: `tip-received-${session.id}`,
+                  templateData: {
+                    firstName,
+                    amount: amountFmt,
+                    net: netFmt,
+                    fee: `$${((amountCents - netCents) / 100).toFixed(2)}`,
+                    note: tipNote || undefined,
+                  },
+                },
               });
             }
 
@@ -311,21 +292,18 @@ async function handleCheckoutCompleted(session: any) {
                 : undefined);
 
             if (tipperEmail) {
-              await sendTipEmail('receipt', {
-                from: 'Goldsainte <hello@goldsainte.com>',
-                to: tipperEmail,
-                subject: `Your ${amountFmt} tip to ${recipientName} \u2014 receipt`,
-                html: `
-                  <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; background: #f7f3ea; color: #0a2225;">
-                    <p style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #C7A962; margin: 0 0 24px;">Goldsainte</p>
-                    <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">Your tip receipt</h1>
-                    <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">This confirms your <strong>${amountFmt}</strong> tip to <strong>${esc(recipientName)}</strong> on ${sentDate}.</p>
-                    ${tipNote ? `<p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">Your note: <em>\u201C${esc(tipNote)}\u201D</em></p>` : ''}
-                    <p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">Your payment was processed securely by Stripe and paid directly to ${esc(recipientName)}. Thank you for supporting the people who make travel special.</p>
-                    <hr style="border: none; border-top: 1px solid #E5DFC6; margin: 32px 0 16px;" />
-                    <p style="font-size: 11px; color: #9A9384; margin: 0;">\u00A9 2026 Goldsainte. The smarter travel marketplace.</p>
-                  </div>
-                `,
+              await supabaseClient.functions.invoke('send-transactional-email', {
+                body: {
+                  templateName: 'tip-receipt',
+                  recipientEmail: tipperEmail,
+                  idempotencyKey: `tip-receipt-${session.id}`,
+                  templateData: {
+                    amount: amountFmt,
+                    recipientName,
+                    date: sentDate,
+                    note: tipNote || undefined,
+                  },
+                },
               });
             }
           }
