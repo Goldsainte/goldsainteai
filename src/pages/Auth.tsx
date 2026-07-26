@@ -31,6 +31,10 @@ const passwordSchema = z.string()
 type AuthStep = 'account-type' | 'email' | 'signin' | 'signup' | 'forgot-password' | 'verify-email' | 'profile';
 type AccountType = 'traveler' | 'creator' | 'agent' | 'brand' | null;
 
+// Roles a visitor may self-select at signup. 'brand' is deliberately absent —
+// see the note in selectedAccountType below.
+const SIGNUP_ROLES = ['traveler', 'creator', 'agent'];
+
 const AUTH_FLOW_STORAGE_KEY = 'goldsainte:authFlow';
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
@@ -73,7 +77,7 @@ const Auth = () => {
   
   const getInitialStep = (): AuthStep => {
     if (mode === 'signup') {
-      if (roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl)) {
+      if (roleFromUrl && SIGNUP_ROLES.includes(roleFromUrl)) {
         return 'email';
       }
       return 'account-type';
@@ -82,9 +86,18 @@ const Auth = () => {
   };
   
   const [step, setStep] = useState<AuthStep>(persistedFlow?.step ?? getInitialStep);
-  const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(
-    persistedFlow?.selectedAccountType ?? (roleFromUrl && ['traveler', 'creator', 'agent', 'brand'].includes(roleFromUrl) ? roleFromUrl : null)
-  );
+  const [selectedAccountType, setSelectedAccountType] = useState<AccountType>(() => {
+    // Only these three roles can sign up. 'brand' (surfaced as "Tour Operator")
+    // was removed Jul 25: the tour-operator surface is hidden and both
+    // /brand/onboarding and /apply/brand redirect to the homepage, so anyone
+    // who picked it filled in their details and was silently dumped on "/"
+    // with no account and no application. Stale persisted values are dropped
+    // here too, so an in-flight brand signup can't resume into the dead end.
+    const persisted = persistedFlow?.selectedAccountType;
+    if (persisted && SIGNUP_ROLES.includes(persisted)) return persisted;
+    if (roleFromUrl && SIGNUP_ROLES.includes(roleFromUrl)) return roleFromUrl as AccountType;
+    return null;
+  });
   const [email, setEmail] = useState(persistedFlow?.email ?? '');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState(persistedFlow?.firstName ?? '');
@@ -711,7 +724,6 @@ const Auth = () => {
                 { type: 'traveler' as AccountType, label: 'Traveler', desc: 'Book and plan luxury travel experiences' },
                 { type: 'creator' as AccountType, label: 'Creator', desc: 'Share travel content and inspire others' },
                 { type: 'agent' as AccountType, label: 'Travel Agent', desc: 'Professional agents · Application required' },
-                { type: 'brand' as AccountType, label: 'Tour Operator', desc: 'Tour & experience operators · Application required' },
               ]).map(({ type, label, desc }) => (
                 <button
                   key={type}
