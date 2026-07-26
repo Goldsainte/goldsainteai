@@ -116,8 +116,12 @@ Deno.serve(async (req) => {
       }
 
       case 'agent_application.approved': {
+        // _keySuffix (hour bucket) lets a deliberate re-approval send again —
+        // Resend caches by Idempotency-Key, and a constant key swallowed every
+        // approval email after the first attempt (Jul 26).
+        const suffix = record._keySuffix ? `-${record._keySuffix}` : ''
         results.push(await send('welcome-professional', record.email,
-          `welcome-pro-approved-${record.id}`,
+          `welcome-pro-approved-${record.id}${suffix}`,
           { name: record.first_name || 'there', accountType: 'agent' }))
         break
       }
