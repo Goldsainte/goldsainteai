@@ -444,7 +444,13 @@ serve(async (req) => {
         // card renders only when message_type === "proposal" with its terms in
         // metadata. Whitelisted server-side so clients can't mint arbitrary
         // card types.
-        message_type: messageType === "proposal" ? "proposal" : null,
+        // MUST NOT BE NULL (fixed Jul 26). The column is
+        // `message_type text NOT NULL DEFAULT 'text'` — a DEFAULT only applies
+        // when the key is OMITTED. Passing an explicit null overrides it and
+        // trips the not-null constraint, so EVERY ordinary person-to-person
+        // message failed with 23502 while proposal cards went through. Fall
+        // back to the same 'text' the column intends.
+        message_type: messageType === "proposal" ? "proposal" : "text",
         metadata:
           messageType === "proposal" && messageMetadata && typeof messageMetadata === "object"
             ? messageMetadata
