@@ -480,19 +480,24 @@ function AgentApplicationFormInner() {
       }
       return true;
     }
+    // STEP-ALIGNMENT FIX (Jul 25). The wizard is 5 steps —
+    // stepLabels = [Business, Credentials, Insurance & Legal, Documents,
+    // Verification] — but validation was still mapped to an older layout that
+    // had a "Sales & Presence" step. Step 3 renders Insurance & Legal while
+    // its validation demanded `primaryFocus` and `whyGoldsainte`, NEITHER OF
+    // WHICH IS RENDERED ANYWHERE in this form. Both are therefore always
+    // empty, so every applicant was hard-blocked at "Continue to Documents"
+    // by a toast naming a field they could not see: no agent could finish an
+    // application. Validation now matches what each step actually shows.
     if (currentStep === 3) {
-      if (formData.primaryFocus.length === 0) {
-        toast({ title: "Select at least one primary focus", variant: "destructive" });
-        return false;
-      }
-      if (!formData.whyGoldsainte?.trim()) return missing("Why Goldsainte");
-      return true;
-    }
-    if (currentStep === 4) {
       if (!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor) {
         toast({ title: "Please accept all legal agreements", variant: "destructive" });
         return false;
       }
+      return true;
+    }
+    if (currentStep === 4) {
+      // Documents step — Step10Documents owns its own upload requirements.
       return true;
     }
     return true;
