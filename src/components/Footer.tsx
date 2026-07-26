@@ -10,7 +10,14 @@ export const Footer = () => {
 
   const headingClasses = "font-secondary text-xs uppercase tracking-[0.18em] text-[#0a2225] mb-4";
   const linkClasses = "text-[#4A4A4A] hover:text-[#C7B892] transition-colors";
-  const legalLinkClasses = "text-xs text-[#9A9079] hover:text-[#C7B892] transition-colors";
+  // `inline-flex items-center` is load-bearing, not decoration: index.css
+  // applies a global 44px touch-target min-height to BOTH <a> and <button>.
+  // As flex items each legal item gets a 44px-tall box, but a link renders its
+  // text at the TOP of that box while a button centers its text — which put
+  // "Install App" exactly (44-16)/2 = 14px lower than its neighbours on every
+  // screen size (founder report, Jul 25). Centering the content of both
+  // element types aligns them while keeping the accessible touch target.
+  const legalLinkClasses = "inline-flex items-center text-xs text-[#9A9079] hover:text-[#C7B892] transition-colors";
 
   const columns = [
     {
