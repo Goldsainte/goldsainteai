@@ -116,6 +116,34 @@ export async function createAgentAccountFromApplication(
         applicationId,
         userId: application.user_id,
       });
+      // COMPLETE THE APPROVAL EVEN ON THE IDEMPOTENT PATH (Jul 26).
+      // Andre's account was provisioned by an earlier click while the helper
+      // still wrote status back as "verified". Every re-approve after that
+      // took THIS early exit — returning success without ever advancing the
+      // application — so the admin saw "approved successfully" toasts while
+      // the queue stayed at Awaiting Review forever. If provisioning is
+      // already done but the application row hasn't caught up, finish it here.
+      if (application.status !== "approved") {
+        const nowIso = new Date().toISOString();
+        const { error: catchupError } = await supabase
+          .from("agent_applications")
+          .update({
+            status: "approved",
+            admin_reviewer_id: opts.adminUserId ?? application.admin_reviewer_id ?? null,
+            reviewed_at: application.reviewed_at ?? nowIso,
+            approved_at: application.approved_at ?? nowIso,
+            updated_at: nowIso,
+          })
+          .eq("id", applicationId);
+        if (catchupError) {
+          log.error("Failed to advance already-provisioned application to approved", {
+            applicationId,
+            error: catchupError,
+          });
+          return { success: false, error: `application update failed: ${catchupError.message}` };
+        }
+        log.info("Advanced already-provisioned application to approved", { applicationId });
+      }
       return {
         success: true,
         userId: application.user_id,
