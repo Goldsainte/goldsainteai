@@ -368,7 +368,7 @@ export default function MediaKit() {
             <button
               onClick={() => {
                 toast.promise(downloadLogoAssets(), {
-                  loading: "Preparing logo assetsâ€¦",
+                  loading: "Preparing logo assets…",
                   success: "Logo assets downloaded",
                   error: "Download failed. Please try again.",
                 });
