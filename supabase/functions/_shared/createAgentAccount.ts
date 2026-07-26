@@ -144,6 +144,13 @@ export async function createAgentAccountFromApplication(
         }
         log.info("Advanced already-provisioned application to approved", { applicationId });
       }
+      // Same catch-up for the dashboard flag: rows provisioned before this
+      // fix have is_verified=false and show the review banner forever.
+      await supabase
+        .from("travel_agents")
+        .update({ is_verified: true })
+        .eq("user_id", application.user_id)
+        .eq("is_verified", false);
       return {
         success: true,
         userId: application.user_id,
@@ -297,6 +304,11 @@ export async function createAgentAccountFromApplication(
         bio: bioParts.join(" — ") || null,
         website: application.website || null,
         status: "active",
+        // The "Application under review" banner on the agent dashboard reads
+        // travel_agents.is_verified — provisioning set it on PROFILES but
+        // never here, so a fully approved agent still saw "being reviewed by
+        // our team" on their own dashboard (founder report, Jul 26).
+        is_verified: true,
         is_accepting_requests: true,
         onboarded_at: nowIso,
         created_at: nowIso,
