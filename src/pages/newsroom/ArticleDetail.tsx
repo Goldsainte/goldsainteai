@@ -33,7 +33,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
   });
 
   if (isLoading) {
-    return <div className="max-w-3xl mx-auto px-6 py-32 text-center text-[#0a2225]/50">Loadingâ€¦</div>;
+    return <div className="max-w-3xl mx-auto px-6 py-32 text-center text-[#0a2225]/50">Loading…</div>;
   }
   if (!article) return <Navigate to="/newsroom" replace />;
 
@@ -218,7 +218,7 @@ export default function ArticleDetail({ expectedType }: { expectedType: "press_r
                 to="/newsroom"
                 className="inline-flex items-center gap-2 text-[12.5px] uppercase tracking-[0.25em] text-[#0c4d47] hover:text-[#0a3d39]"
               >
-                Download brand assets <span aria-hidden>â†’</span>
+                Download brand assets <span aria-hidden>→</span>
               </Link>
             </div>
             <div className="bg-[#F6F0E4] rounded-xl p-6 md:p-8">
