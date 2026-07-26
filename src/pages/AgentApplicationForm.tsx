@@ -727,6 +727,14 @@ function AgentApplicationFormInner() {
       setApplicationId(clientId);
       localStorage.setItem('agent_application_email', formData.email);
       localStorage.setItem('agent_application_id', clientId);
+      // The application is now on file — drop the working draft. Leaving it
+      // meant that anyone who navigated back to /apply/agent got "Draft
+      // restored" and a half-finished form, which read as though their
+      // submission had been lost (founder report, Jul 25).
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_DRAFT_STORAGE_KEY);
+      } catch { /* storage unavailable — non-fatal */ }
       setStep(5);
 
       // Send confirmation email (non-blocking) via the unified transactional
@@ -1127,9 +1135,9 @@ function AgentApplicationFormInner() {
               <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Final step</p>
               <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">Verify your identity</h3>
               <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
-                Completing Stripe Identity verification activates your advisor account
-                <strong className="text-[#0a2225]"> immediately</strong> — there is no waiting period
-                or admin review. Takes 2–3 minutes.
+                Identity verification confirms who you are — it takes 2–3 minutes. Once it's
+                done, our team reviews your credentials and insurance, and we'll email you a
+                decision <strong className="text-[#0a2225]">within one to two business days</strong>.
               </p>
             </div>
 
