@@ -76,7 +76,7 @@ const About = () => {
         {
           icon: DollarSign,
           title: "Industry-Leading Payouts",
-          description: "Creators earn 85â€“92% commission depending on tier. Agents keep the full value of the trips they design, less a small marketplace fee. Payouts settle via Stripe Connect."
+          description: "Goldsainte’s fee is a flat 7% on every rail. Creators keep 93% on tours, guides, and tips, charged directly on their own Stripe. Agents keep 96.5% of their quoted price, with travelers paying a 3.5% service fee on top. Payouts settle via Stripe Connect."
         },
         {
           icon: BarChart3,
@@ -461,7 +461,7 @@ const About = () => {
             to="/terms" 
             className="inline-flex items-center text-primary hover:underline font-medium"
           >
-            View Full Terms of Service Document â†’
+            View Full Terms of Service Document →
           </Link>
         </div>
         
@@ -474,7 +474,7 @@ const About = () => {
             <h3 className="font-semibold text-base mb-3 text-foreground">A1-A3: Introduction</h3>
             <p className="text-sm sm:text-base text-foreground"><strong>A1:</strong> Certain terms in these Terms have specific meanings. Please refer to the Goldsainte Dictionary at the end of these Terms for clarity.</p>
             <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A2:</strong> By using Goldsainte's platform or completing a booking, you agree to these Terms and their conditions, including mandatory arbitration for most disputes (see A20 for opt-out procedures) and waiver of class-action rights.</p>
-            <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurateâ„¢ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
+            <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurate™ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
           </div>
 
           <div>
@@ -656,7 +656,7 @@ const About = () => {
             to="/what-we-do" 
             className="inline-flex items-center text-primary hover:underline font-medium"
           >
-            View Full Service Details â†’
+            View Full Service Details →
           </Link>
         </div>
         
@@ -680,7 +680,7 @@ const About = () => {
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">How We Make Money</h3>
-            <p className="text-sm sm:text-base text-foreground">Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
+            <p className="text-sm sm:text-base text-foreground">Goldsainte earns a flat 7% platform fee on bookings — typically 3.5% from the travel professional and a 3.5% service fee paid by the traveler at checkout. We don't sell placement: there are no paid badges and no pay-for-visibility anywhere on the marketplace.</p>
           </div>
 
           <div>
@@ -838,7 +838,7 @@ const About = () => {
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Agent Bidding Model</h4>
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Competitive Agent Marketplace:</strong> Travel agents bid for bookings, creating value for travelers and ensuring high-quality service.</p>
-              <p><strong>Revenue Optimization:</strong> Success fees and service commissions drive predictable revenue for the platform.</p>
+              <p><strong>Revenue Model:</strong> One flat 7% platform fee — simple for professionals to price around and predictable for the platform.</p>
               <p><strong>Data-Driven Matching:</strong> AI matches agents to travelers based on expertise, location, and previous performance.</p>
             </div>
           </div>
@@ -882,11 +882,9 @@ const About = () => {
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Diverse Revenue Streams</h4>
             <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-              <p><strong>Agent Commissions:</strong> Service + success fees from agent bookings.</p>
+              <p><strong>Platform Fee:</strong> A flat 7% across custom trips, tours, itinerary guides, creator services, and tips.</p>
               <p><strong>Creator Partnerships:</strong> Content monetization, affiliate deals, and brand collaborations.</p>
-              <p><strong>Vendor Subscriptions:</strong> Multi-tiered plans (Bronzeâ€“Platinum) with marketing, analytics, and exposure benefits.</p>
-              <p><strong>Platform Fees:</strong> Co-curated trip commissions and premium package fees.</p>
-              <p><strong>Future Revenue Opportunities:</strong> Traveler subscriptions, premium listings, API/B2B offerings, and loyalty programs.</p>
+                                          <p><strong>Future Revenue Opportunities:</strong> Traveler subscriptions, premium listings, API/B2B offerings, and loyalty programs.</p>
             </div>
           </div>
         </div>
@@ -904,9 +902,9 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Vision & Roadmap</h3>
           <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
-            <p><strong>Near-Term (0â€“6 months):</strong> AI-powered trip planning and agent matching, expanded agent and creator network, creator monetization, and dynamic pricing.</p>
-            <p><strong>Mid-Term (6â€“12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
-            <p><strong>Long-Term (12â€“24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
+            <p><strong>Near-Term (0–6 months):</strong> AI-powered trip planning and agent matching, expanded agent and creator network, creator monetization, and dynamic pricing.</p>
+            <p><strong>Mid-Term (6–12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
+            <p><strong>Long-Term (12–24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
           </div>
         </div>
 
