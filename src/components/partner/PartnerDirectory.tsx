@@ -113,6 +113,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   // set; server-side pagination is the boarded v2 once volume demands it.
   const [query, setQuery] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [activeCountries, setActiveCountries] = useState<string[]>([]);
 
   // Most common specialties across the loaded set, as filter chips.
   // Tags are free-typed by creators/agents, so "Adventure", "adventure", and
@@ -133,6 +134,49 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
       .map(([k]) => titleCase(k));
   }, [cards]);
 
+  // COUNTRY FILTER (Jul 26). home_base is free text — "Santorini, Greece",
+  // "Charlotte, NC, USA", "Dehradun, Uttarakhand, India", "Morocco" — so the
+  // country is the last comma-separated segment. Common variants are folded
+  // together so "USA", "US" and "United States" are one chip.
+  const COUNTRY_ALIASES: Record<string, string> = {
+    usa: "United States",
+    us: "United States",
+    "u.s.": "United States",
+    "u.s.a.": "United States",
+    "united states of america": "United States",
+    uk: "United Kingdom",
+    "u.k.": "United Kingdom",
+    england: "United Kingdom",
+    scotland: "United Kingdom",
+    wales: "United Kingdom",
+    uae: "United Arab Emirates",
+  };
+
+  const countryOf = (homeBase: string | null): string | null => {
+    if (!homeBase) return null;
+    const last = homeBase.split(",").pop()?.trim();
+    if (!last) return null;
+    const key = last.toLowerCase();
+    return (
+      COUNTRY_ALIASES[key] ??
+      last.replace(/\b\w/g, (ch) => ch.toUpperCase())
+    );
+  };
+
+  // Countries present in the loaded set, most common first. Agents don't
+  // populate home_base, so this list is naturally empty for that directory
+  // and the row hides itself.
+  const topCountries = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of cards) {
+      const country = countryOf(c.homeBase);
+      if (country) counts.set(country, (counts.get(country) || 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([k]) => k);
+  }, [cards]);
+
   const visibleCards = useMemo(() => {
     const q = query.trim().toLowerCase();
     return cards.filter((c) => {
@@ -146,17 +190,29 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
         activeTags.some((t) =>
           c.tags.some((ct) => ct.trim().toLowerCase() === t.trim().toLowerCase())
         );
-      return matchesQuery && matchesTags;
+      const matchesCountry =
+        activeCountries.length === 0 ||
+        (() => {
+          const country = countryOf(c.homeBase);
+          return !!country && activeCountries.includes(country);
+        })();
+      return matchesQuery && matchesTags && matchesCountry;
     });
-  }, [cards, query, activeTags]);
+  }, [cards, query, activeTags, activeCountries]);
 
   const toggleTag = (t: string) =>
     setActiveTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  const toggleCountry = (c: string) =>
+    setActiveCountries((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+    );
   const clearFilters = () => {
     setQuery("");
     setActiveTags([]);
+    setActiveCountries([]);
   };
-  const filtersActive = query.trim() !== "" || activeTags.length > 0;
+  const filtersActive =
+    query.trim() !== "" || activeTags.length > 0 || activeCountries.length > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -216,9 +272,9 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                 <X className="h-3.5 w-3.5" /> Clear
               </button>
             )}
-            <span className="ml-auto text-[13px] text-[#0a2225]/50">
-              {visibleCards.length} of {cards.length}
-            </span>
+            {/* Roster size removed Jul 26 (founder call): the marketplace's
+                exact headcount isn't something visitors need — and early on it
+                reads as scarcity rather than curation. */}
           </div>
           {topTags.length > 0 && (
             <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -236,6 +292,31 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                     }`}
                   >
                     {t}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {topCountries.length > 0 && (
+            <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <span className="shrink-0 self-center pr-1 text-[11px] uppercase tracking-[0.16em] text-[#8D6B2F]">
+                Country
+              </span>
+              {topCountries.map((c) => {
+                const active = activeCountries.includes(c);
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => toggleCountry(c)}
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors ${
+                      active
+                        ? "border-[#0c4d47] bg-[#0c4d47] text-[#E5DFC6]"
+                        : "border-[#E5DFC6] bg-white text-[#0a2225]/70 hover:text-[#0a2225]"
+                    }`}
+                  >
+                    {c}
                   </button>
                 );
               })}
@@ -264,7 +345,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-6 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-6 lg:grid-cols-4 xl:grid-cols-5">
             {/* Mobile = compact Fora-style 2-up grid (flat rectangular photos,
                 left-aligned name + specialty). sm and up = the original oval-ring
                 editorial cards, unchanged. One markup, responsive classes. */}
