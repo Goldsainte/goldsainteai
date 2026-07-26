@@ -130,16 +130,27 @@ export default function PostTripPage() {
       setPreferredAgentId(agentId);
       setWantsRole("agent");
       sessionStorage.setItem("goldsainte:agentId", agentId);
-      // The agent profile page passes the display name in the URL; use it
-      // directly. agentId is travel_agents.id (not a user id), so name
-      // fallback and the notification target both come from travel_agents,
-      // which is publicly readable for active agents.
+      // WRONG KEY (fixed Jul 26). The comment claimed agentId is
+      // travel_agents.id, but AgentPublicProfilePage passes `profile.id` from
+      // public_profiles — a USER id. Looking that up as travel_agents.id never
+      // matched, so preferredAgentUserId stayed null and the agency-name
+      // fallback never fired; the notification only landed because
+      // notifyUserId falls back to preferredAgentId, which happened to be the
+      // right user id by luck. Query by user_id, and accept a travel_agents.id
+      // too so any older link still resolves.
       const agentNameParam = searchParams.get("agentName");
       if (agentNameParam) setPreferredName(agentNameParam);
-      supabase.from("travel_agents").select("agency_name, user_id").eq("id", agentId).maybeSingle().then(({ data }) => {
-        if (!agentNameParam && data?.agency_name) setPreferredName(data.agency_name);
-        if (data?.user_id) setPreferredAgentUserId(data.user_id);
-      });
+      supabase
+        .from("travel_agents")
+        .select("id, agency_name, user_id")
+        .or(`user_id.eq.${agentId},id.eq.${agentId}`)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!agentNameParam && data?.agency_name) setPreferredName(data.agency_name);
+          // Always a USER id from here on — that is what the notification
+          // targets and what the direct-request inbox filters on.
+          if (data?.user_id) setPreferredAgentUserId(data.user_id);
+        });
     }
   }, [searchParams]);
 
