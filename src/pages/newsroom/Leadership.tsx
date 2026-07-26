@@ -119,7 +119,7 @@ export default function Leadership() {
                     rel="noopener noreferrer"
                     className="text-[10px] uppercase tracking-[0.25em] text-[#0c4d47] hover:underline mt-5 inline-block"
                   >
-                    LinkedIn â†’
+                    LinkedIn →
                   </a>
                 )}
               </div>
