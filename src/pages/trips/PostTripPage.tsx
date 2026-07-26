@@ -523,7 +523,30 @@ export default function PostTripPage() {
   // Budget & pace labels
   const budgetLabels: [BudgetLevel, string][] = [["accessible", "Thoughtful"], ["elevated", "Elevated"], ["ultra_luxury", "Ultra-luxury"]];
   const paceLabels: [Pace, string][] = [["slow", "Slow & leisurely"], ["balanced", "Balanced"], ["packed", "See everything"]];
-  const roleLabels: [WantsRole, string][] = [["creator", "Creators only"], ["agent", "Travel agents only"], ["both", "Creators & agents"]];
+  // WHAT YOU'RE ASKING FOR (Jul 26). "Creators only / Travel agents only" asks
+  // the traveler to know our org chart. They don't — and the two produce very
+  // different things: a creator DESIGNS an itinerary (a plan you take away and
+  // book yourself), an agent ARRANGES and books the trip and is the seller of
+  // record. Same brief, different deliverable, so the question is now framed
+  // by outcome with the role named underneath.
+  const roleOptions: { value: WantsRole; label: string; detail: string }[] = [
+    {
+      value: "agent",
+      label: "Book it for me",
+      detail: "A travel specialist arranges and books the trip end to end.",
+    },
+    {
+      value: "creator",
+      label: "Design my itinerary",
+      detail: "A creator designs the plan — you book the pieces yourself.",
+    },
+    {
+      value: "both",
+      label: "I'm open to either",
+      detail: "Hear from both, then decide.",
+    },
+  ];
+  const roleLabels: [WantsRole, string][] = roleOptions.map((o) => [o.value, o.label]);
 
   const introSteps = [
     { num: 1, title: "Choose your destination" },
@@ -963,11 +986,29 @@ export default function PostTripPage() {
                   placeholder="Allergies, accessibility needs, non-negotiables..." />
               </div>
               <div>
-                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">Who should respond?</label>
-                <div className="flex flex-wrap gap-2">
-                  {roleLabels.map(([value, label]) => (
-                    <Pill key={value} selected={wantsRole === value} onClick={() => setWantsRole(value)}>{label}</Pill>
-                  ))}
+                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">
+                  What are you looking for?
+                </label>
+                <div className="grid gap-2.5">
+                  {roleOptions.map((o) => {
+                    const selected = wantsRole === o.value;
+                    return (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => setWantsRole(o.value)}
+                        className={cn(
+                          "rounded-xl border px-4 py-3 text-left transition-colors",
+                          selected
+                            ? "border-[#0c4d47] bg-[#0c4d47]/[0.06]"
+                            : "border-[#E5DFC6] bg-white hover:border-[#C7A962]"
+                        )}
+                      >
+                        <span className="block text-[15px] font-medium text-[#0a2225]">{o.label}</span>
+                        <span className="mt-0.5 block text-[13px] leading-relaxed text-[#6B7280]">{o.detail}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </>
