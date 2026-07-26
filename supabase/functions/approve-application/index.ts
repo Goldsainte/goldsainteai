@@ -291,20 +291,43 @@ async function approveAgentApplication(
   sendWelcome: boolean,
   logger: Logger
 ): Promise<{ success: boolean; userId?: string; error?: string }> {
-  // Agent approval is now self-serve via Stripe Identity. This endpoint
-  // remains as a manual safety net (and so the admin dashboard can
-  // re-run provisioning if the webhook ever fails). It calls the same
-  // shared helper the webhook uses and never issues a temp password.
-  logger.info("Manual agent provisioning requested", { applicationId, adminUserId });
+  // ADMIN REVIEW GATE (Jul 25). Agent approval is no longer self-serve: this
+  // endpoint IS the activation path. Identity verification only confirms who
+  // the applicant is; an admin approving here is what provisions the account.
+  logger.info("Agent approval requested", { applicationId, adminUserId });
   const result = await createAgentAccountFromApplication(applicationId, {
     adminUserId,
     approvalNotes,
     logger,
   });
-  // sendWelcome is intentionally ignored for agents — the agent sets
-  // their own password during the application flow, so there is nothing
-  // to mail.
-  void sendWelcome;
+
+  // The "your account is live" email used to fire at identity verification —
+  // i.e. before anyone had reviewed the application. It now fires HERE, once
+  // the account genuinely exists. No temp password: the agent set their own
+  // during the application flow.
+  if (result?.success && sendWelcome) {
+    try {
+      const supabaseClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data: app } = await supabaseClient
+        .from("agent_applications")
+        .select("id, email, first_name")
+        .eq("id", applicationId)
+        .maybeSingle();
+      if (app?.email) {
+        await supabaseClient.functions.invoke("email-fanout", {
+          body: { event: "agent_application.approved", record: app },
+        });
+        logger.info("Approval email dispatched", { applicationId });
+      }
+    } catch (e) {
+      // Never fail an approval because an email didn't send.
+      logger.warn("Failed to dispatch agent approval email", { error: String(e) });
+    }
+  }
+
   return result;
 }
 
