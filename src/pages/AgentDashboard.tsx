@@ -45,7 +45,10 @@ export default function AgentDashboard() {
   // Deep-linkable tabs (?tab=guides etc.) — the guide builder's Stripe popup
   // and Stripe Connect returns (?stripe=success) both need to land on Guides,
   // where the payout card lives for agents.
-  const AGENT_TABS = ["available", "my-bids", "creator-collabs", "guides", "analytics", "performance", "availability", "verification", "settings"] as const;
+  // "earnings" must be allowlisted: the Getting Started checklist and the
+  // post-verification page both deep-link to ?tab=earnings, which silently
+  // fell back to the Desk while the tab was missing.
+  const AGENT_TABS = ["available", "my-bids", "creator-collabs", "guides", "earnings", "analytics", "performance", "availability", "verification", "settings"] as const;
   const requestedTab = searchParams.get("tab");
   const initialTab = AGENT_TABS.includes(requestedTab as (typeof AGENT_TABS)[number])
     ? (requestedTab as string)
@@ -387,6 +390,7 @@ export default function AgentDashboard() {
   }
 
   const MORE_TABS = [
+    { key: "earnings", label: "Payouts" },
     { key: "analytics", label: "Analytics" },
     { key: "availability", label: "Availability" },
     { key: "verification", label: "Verification" },
@@ -516,7 +520,11 @@ export default function AgentDashboard() {
           </div>
         )}
 
-        <StripeConnectOnboarding />
+        {/* Payment setup moved out of the Desk (founder call, Jul 26) — same
+            treatment as creators, where Stripe lives in its own tab instead of
+            a full-width box mid-page. The Getting Started checklist's
+            "Connect Stripe" CTA already pointed at ?tab=earnings — a tab that
+            didn't exist until now. */}
 
         {pendingTripsCount > 0 && (
           <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/40 bg-white px-6 py-5">
@@ -650,9 +658,13 @@ export default function AgentDashboard() {
                 Send a proposal — step by step
               </p>
               <div className="mt-4 space-y-3 text-[15px] text-[#0a2225]">
-                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">1.</i>Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.</p>
-                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">2.</i>Use the <strong>Send a Proposal</strong> panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.</p>
-                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">3.</i>They tap <strong>Accept and Pay Deposit</strong> — charged directly on your Stripe — and the booking appears in Bookings with you.</p>
+                {/* Each step's prose lives in ONE span: with the text loose,
+                    flex made every inline node its own column and the bold
+                    phrases wrapped over the surrounding words (founder
+                    report, Jul 26). */}
+                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">1.</i><span>Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.</span></p>
+                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">2.</i><span>Use the <strong>Send a Proposal</strong> panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.</span></p>
+                <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">3.</i><span>They tap <strong>Accept and Pay Deposit</strong> — charged directly on your Stripe — and the booking appears in Bookings with you.</span></p>
               </div>
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link to="/marketplace?tab=trip-requests" className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-[13.5px] text-[#FDF9F0] transition-colors hover:bg-[#0a2225]">Browse trip requests</Link>
@@ -709,6 +721,10 @@ export default function AgentDashboard() {
               }}
             />
           </TabsContent>
+
+            <TabsContent value="earnings">
+              <StripeConnectOnboarding />
+            </TabsContent>
 
             <TabsContent value="availability">
               {agent && (
