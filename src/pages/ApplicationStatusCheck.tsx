@@ -83,12 +83,38 @@ export default function ApplicationStatusCheck() {
         .limit(1)
         .maybeSingle() as any;
 
-      const application = agentApp || brandApp;
+      let application = agentApp || brandApp;
+      let fallbackType: 'agent' | 'brand' | null = null;
+
+      // RLS FALLBACK (Jul 26). The direct queries above run with the user's
+      // session, and agent_applications RLS only exposes rows where
+      // user_id = auth.uid(). Provisioning links the application to the
+      // PROVISIONED account, which may not be the account the person is
+      // signed in with — so this page told an approved applicant "We couldn't
+      // find an application linked to your account." The edge function
+      // verifies the caller's JWT server-side and looks up by their verified
+      // email with the service role.
+      if (!application) {
+        for (const t of ['agent', 'brand'] as const) {
+          try {
+            const { data: fnData } = await supabase.functions.invoke('get-application-status', {
+              body: { self: true, applicationType: t },
+            });
+            if ((fnData as any)?.found) {
+              application = (fnData as any).application;
+              fallbackType = t;
+              break;
+            }
+          } catch (e) {
+            console.error('self status fallback failed', e);
+          }
+        }
+      }
 
       if (application) {
         setStatus({
           ...application,
-          type: agentApp ? 'agent' : 'brand',
+          type: fallbackType ?? (agentApp ? 'agent' : 'brand'),
         });
       } else {
         setError("We couldn't find an application linked to your account.");
