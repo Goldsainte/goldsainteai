@@ -4,6 +4,9 @@
 //   2. Sends a direct Resend alert email (BYPASSES the queue — the queue may be the thing that's broken)
 // On recovery: marks open alerts as resolved.
 
+// Brand + suppression enforcement (Jul 26) — this was the only raw Resend
+// sender not passing through the guard.
+import "../_shared/resend-guard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
