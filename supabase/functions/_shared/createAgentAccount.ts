@@ -287,11 +287,19 @@ export async function createAgentAccountFromApplication(
       log.warn("Failed to assign agent role (non-fatal)", { error: roleError });
     }
 
-    // agent_applications — mark verified + linked
+    // agent_applications — mark APPROVED + linked.
+    // This wrote back status:"verified" — correct in the auto-provision era,
+    // when "verified" was the terminal state and nothing came after it. Under
+    // the admin review gate it is not: this helper now runs ONLY from
+    // approve-application, so reaching here means an admin approved the
+    // application. Leaving it "verified" meant a successful approval silently
+    // did nothing visible — the admin queue still read "Awaiting Review", the
+    // applicant's status page still read "Under Review", and the same
+    // application could be approved over and over (founder report, Jul 26).
     const { error: updateError } = await supabase
       .from("agent_applications")
       .update({
-        status: "verified",
+        status: "approved",
         user_id: userId,
         admin_reviewer_id: opts.adminUserId ?? null,
         reviewed_at: nowIso,
