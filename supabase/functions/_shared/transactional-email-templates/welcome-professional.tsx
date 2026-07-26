@@ -9,14 +9,21 @@ interface WelcomeProfessionalProps {
 }
 
 export const WelcomeProfessionalEmail = ({ name, accountType = 'agent' }: WelcomeProfessionalProps) => {
+  // DEAD LINKS (fixed Jul 26): '/agent', '/brand' and '/creator' are not
+  // registered routes — the main CTA of the welcome email 404'd. The real
+  // dashboards are '-dashboard' suffixed.
   const dashboardPath =
-    accountType === 'brand' ? '/brand' : accountType === 'creator' ? '/creator' : '/agent'
+    accountType === 'brand'
+      ? '/partner-bookings'
+      : accountType === 'creator'
+        ? '/creator-dashboard'
+        : '/agent-dashboard'
   return (
     <AuthEmailLayout
-      title={"You're verified — your account is live"}
+      title={"You're approved — your account is live"}
       headline={name ? `You're all set, ${name}.` : `You're all set.`}
       tagline={`A curated marketplace of the world's most trusted travel specialists, creators, and brands.`}
-      lede={`Identity verification is complete and your Goldsainte account is now live. The final step before you start receiving trip requests is connecting Stripe so you can be paid on-platform.`}
+      lede={`Your application has been reviewed and approved — your Goldsainte account is now live. The final step before you start receiving trip requests is connecting Stripe so you can be paid on-platform.`}
       steps={[
         `Connect Stripe Connect — required to receive payouts.`,
         `Complete your public profile — this is your storefront.`,
@@ -31,7 +38,7 @@ export const WelcomeProfessionalEmail = ({ name, accountType = 'agent' }: Welcom
 
 export const template = {
   component: WelcomeProfessionalEmail,
-  subject: "You're verified — your Goldsainte account is live",
-  displayName: 'Welcome — Specialist (post-verification)',
+  subject: "You're approved — your Goldsainte account is live",
+  displayName: 'Welcome — Specialist (post-approval)',
   previewData: { name: 'Maison Atelier', accountType: 'agent' },
 } satisfies TemplateEntry
