@@ -33,6 +33,11 @@ export const Footer = () => {
       heading: "JOIN GOLDSAINTE",
       links: [
         { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
+        // Restored Jul 26. Creator is one of the three live signup roles
+        // (SIGNUP_ROLES in Auth.tsx) and has a card in the picker, but the
+        // footer link went missing during the tour-operator cleanup — leaving
+        // creators with no footer entry point at all.
+        { to: "/auth?mode=signup&role=creator", label: "Join as a Creator" },
         { to: "/auth?mode=signup&role=agent", label: "Apply as a Travel Agent" },
       ],
     },
