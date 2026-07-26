@@ -143,6 +143,54 @@ const ACCREDITATION_OPTIONS: { value: string; label: string }[] = [
 // Types where a credential number is meaningful and therefore required.
 const ACCREDITATION_NEEDS_NUMBER = ["IATA", "IATAN", "ARC", "CLIA", "TIDS", "TRUE", "ATIA", "ABTA", "ATOL", "TICO", "CPBC", "OPC", "ACTA", "OTHER"];
 
+// Soft format check on the credential number (Jul 25). Deliberately WIDE and
+// advisory only — it never blocks submission. Published sources disagree on
+// exact lengths (IATA agency codes appear as 7 or 8 digits, sometimes written
+// 03-7256848 with a location prefix; individual agent ID cards are 10; ARC is
+// 8), so anything narrower would reject real agents. This catches typos,
+// letters in a digits-only field, and obvious placeholder junk — nothing more.
+// Real verification needs IATA CheckACode / ARC Check (paid APIs, post-launch).
+const NUMERIC_ACCREDITATIONS: Record<string, { min: number; max: number; hint: string }> = {
+  IATA:  { min: 7, max: 10, hint: "IATA numeric codes are usually 7–8 digits (agent ID cards are 10)." },
+  IATAN: { min: 7, max: 10, hint: "IATAN numbers are usually 7–8 digits." },
+  ARC:   { min: 8, max: 8,  hint: "ARC numbers are 8 digits." },
+  TIDS:  { min: 7, max: 10, hint: "TIDS codes are usually 8 digits." },
+  CLIA:  { min: 5, max: 10, hint: "CLIA numbers are usually 8 digits." },
+};
+
+function isRepeated(v: string) {
+  return /^(\d)\1+$/.test(v);
+}
+function isSequential(v: string) {
+  if (v.length < 4 || !/^\d+$/.test(v)) return false;
+  for (let i = 1; i < v.length; i++) {
+    if (Number(v[i]) !== Number(v[i - 1]) + 1) return false;
+  }
+  return true;
+}
+
+/** Returns an advisory message, or null when nothing looks off. */
+function checkAccreditationNumber(type: string, raw: string): string | null {
+  const value = (raw || "").trim();
+  if (!value) return null;
+  const cleaned = value.replace(/[\s\-\/.]/g, "");
+  if (isRepeated(cleaned) || isSequential(cleaned)) {
+    return "That looks like placeholder text rather than a real credential number.";
+  }
+  const spec = NUMERIC_ACCREDITATIONS[type];
+  if (spec) {
+    if (!/^\d+$/.test(cleaned)) {
+      return `${spec.hint} Yours contains letters or symbols — worth double-checking.`;
+    }
+    if (cleaned.length < spec.min || cleaned.length > spec.max) {
+      return `${spec.hint} Yours has ${cleaned.length} digits — worth double-checking.`;
+    }
+    return null;
+  }
+  if (cleaned.length < 3) return "That looks too short — double-check your credential number.";
+  return null;
+}
+
 const CERTIFICATION_GROUPS: { group: string; items: string[] }[] = [
   { group: "The Travel Institute (US)", items: [
     "TAP® — Travel Agent Proficiency",
@@ -887,6 +935,12 @@ function AgentApplicationFormInner() {
                     className={luxuryInputClasses}
                     placeholder="Your credential number"
                   />
+                  {checkAccreditationNumber(formData.accreditationType, formData.accreditationNumber) && (
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#8D6B2F]">
+                      {checkAccreditationNumber(formData.accreditationType, formData.accreditationNumber)}{" "}
+                      You can still continue — we confirm credentials during review.
+                    </p>
+                  )}
                 </div>
               )}
               {(formData.accreditationType === "HOST" || formData.hostAgencyName) && (
