@@ -18,6 +18,8 @@ import { template as newMessageTraveler } from './new-message-traveler.tsx'
 import { template as tripReminder } from './trip-reminder.tsx'
 import { template as reviewRequest } from './review-request.tsx'
 import { template as welcomeProfessional } from './welcome-professional.tsx'
+import { template as tipReceived } from './tip-received.tsx'
+import { template as tipReceipt } from './tip-receipt.tsx'
 import { template as newTripMatch } from './new-trip-match.tsx'
 import { template as newInquiryProfessional } from './new-inquiry-professional.tsx'
 import { template as proposalAccepted } from './proposal-accepted.tsx'
@@ -48,6 +50,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'trip-reminder': tripReminder,
   'review-request': reviewRequest,
   'welcome-professional': welcomeProfessional,
+  'tip-received': tipReceived,
+  'tip-receipt': tipReceipt,
   'new-trip-match': newTripMatch,
   'new-inquiry-professional': newInquiryProfessional,
   'proposal-accepted': proposalAccepted,
