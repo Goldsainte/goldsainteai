@@ -56,6 +56,38 @@ export async function createAgentAccountFromApplication(
     error: (...a: any[]) => console.error("[createAgentAccount]", ...a),
   };
 
+  // USERNAME DERIVATION (Jul 26). Provisioning used
+  // `application.email.split("@")[0]` verbatim, so "andre.powell@..." produced
+  // "andre.powell" — which violates the profiles.username_format CHECK
+  // (`^[a-z0-9-]{3,30}$`, no dots). Every approval died with
+  // "profiles upsert failed: ... violates check constraint username_format",
+  // surfacing in the admin desk only as a generic non-2xx.
+  // This mirrors the same sanitise-and-deduplicate logic the backfill
+  // migration used: strip to [a-z0-9-], pad short handles from the user id,
+  // clamp to 28 chars, then append -2, -3 … until the handle is free.
+  const deriveUsername = async (email: string, uid: string): Promise<string> => {
+    let base = (email.split("@")[0] || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "");
+    if (base.length < 3) base += uid.replace(/-/g, "").slice(0, 6);
+    base = base.slice(0, 28);
+    if (base.length < 3) base = `agent${uid.replace(/-/g, "").slice(0, 6)}`;
+
+    let candidate = base;
+    for (let n = 2; n < 50; n++) {
+      const { data: taken } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("username", candidate)
+        .neq("id", uid)
+        .maybeSingle();
+      if (!taken) return candidate;
+      candidate = `${base.slice(0, 28)}-${n}`;
+    }
+    // Last resort: guaranteed-unique handle.
+    return `agent-${uid.replace(/-/g, "").slice(0, 12)}`;
+  };
+
   // 1. Load application
   const { data: application, error: fetchError } = await supabase
     .from("agent_applications")
@@ -189,7 +221,7 @@ export async function createAgentAccountFromApplication(
       {
         id: userId,
         email: application.email,
-        username: application.email.split("@")[0],
+        username: await deriveUsername(application.email, userId),
         first_name: application.first_name,
         last_name: application.last_name,
         phone: application.phone || null,
