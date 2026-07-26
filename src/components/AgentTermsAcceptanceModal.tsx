@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -17,6 +18,10 @@ interface AgentTermsAcceptanceModalProps {
 export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTermsAcceptanceModalProps) => {
   const { toast } = useToast();
   const [accepting, setAccepting] = useState(false);
+  // Shown INSIDE the dialog: the destructive toast rendered underneath the
+  // modal overlay, so the applicant saw a red sliver they couldn't read or
+  // dismiss (founder report, Jul 26).
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [vendorAccepted, setVendorAccepted] = useState(false);
@@ -28,6 +33,7 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
     if (!allAccepted) return;
 
     setAccepting(true);
+    setErrorMessage(null);
     try {
       const { error } = await supabase.functions.invoke('record-terms-acceptance', {
         body: {
@@ -47,21 +53,28 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
       });
 
       onAccepted();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error accepting terms:', error);
-      toast({
-        title: "Error",
-        description: "Failed to record acceptance. Please try again.",
-        variant: "destructive"
-      });
+      // functions.invoke hides the real reason in error.context — read it.
+      let detail = 'Failed to record acceptance. Please try again.';
+      try {
+        const res = error?.context;
+        if (res?.json) {
+          const body = await res.clone().json();
+          if (body?.error) detail = String(body.error);
+        }
+      } catch { /* keep generic */ }
+      setErrorMessage(detail);
     } finally {
       setAccepting(false);
     }
   };
 
+  const navigate = useNavigate();
+
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-4xl max-h-[90vh]" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-4xl max-h-[90vh] [&>button]:hidden" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-2xl">Agent Agreement Required</DialogTitle>
           <DialogDescription>
@@ -204,6 +217,15 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
         </ScrollArea>
 
         <DialogFooter>
+          {/* The dialog's built-in X rendered but was wired to a no-op
+              (onOpenChange={() => {}}) — a visible control that does nothing.
+              It's hidden now; this link is the honest way out. Agreement is
+              required for the agent dashboard, not for the rest of the site. */}
+          {errorMessage && (
+            <div className="mb-3 rounded-xl border border-[#5b2c2c]/30 bg-[#f0d1d1] px-4 py-3 text-sm text-[#5b2c2c]" role="alert">
+              {errorMessage}
+            </div>
+          )}
           <Button
             onClick={handleAcceptAll}
             disabled={!allAccepted || accepting}
@@ -219,6 +241,13 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
               'Accept All & Continue'
             )}
           </Button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="mt-3 w-full text-center text-sm text-[#6B7280] underline underline-offset-4 hover:text-[#0a2225]"
+          >
+            Not now — return to the homepage
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
