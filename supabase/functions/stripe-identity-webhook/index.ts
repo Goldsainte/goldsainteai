@@ -264,6 +264,43 @@ async function logAuditEvent(
 }
 
 /**
+ * Human-readable verification failure reason.
+ * MIRRORS `friendlyReason()` in src/pages/ApplicationVerificationComplete.tsx
+ * so the email an applicant receives says exactly what the status screen says.
+ * Stripe's raw codes ("selfie_face_mismatch") must never reach an applicant.
+ */
+function friendlyFailureReason(code?: string | null, fallback?: string | null): string {
+  switch (code) {
+    case "document_expired":
+      return "Your ID document is expired. Please upload a current one.";
+    case "document_unverified_other":
+    case "document_photo_unverified":
+    case "document_photo_mismatch":
+      return "Your ID photo was unclear or unreadable. Please retake it in good lighting and try again.";
+    case "document_type_not_supported":
+      return "That document type isn't supported. Try a passport, driver's license, or national ID card.";
+    case "selfie_unverified_other":
+    case "selfie_face_mismatch":
+    case "selfie_document_missing_photo":
+      return "Your selfie didn't match the photo on your ID. Please retake your selfie.";
+    case "selfie_manipulated":
+      return "We couldn't accept that selfie. Please retake it as a live photo, no filters.";
+    case "id_number_mismatch":
+    case "id_number_unverified_other":
+    case "name_mismatch":
+      return "The name or ID number didn't match what you entered on your application.";
+    case "consent_declined":
+      return "Verification was canceled before it finished. You can retry it now.";
+    case "device_not_supported":
+      return "Your device didn't support Stripe Identity. Please retry from a phone with a camera.";
+    case "under_supported_age":
+      return "You must be 18 or older to be verified.";
+    default:
+      return fallback || "Verification could not be completed.";
+  }
+}
+
+/**
  * Send notification to applicant
  */
 async function sendApplicantNotification(
@@ -602,14 +639,29 @@ async function updateAgentApplication(
       status,
     });
 
-    // Send failure notification
-    await sendApplicantNotification(
-      application.email,
-      `${application.first_name} ${application.last_name}`,
-      "failed",
-      "agent",
-      last_error?.reason
-    );
+    // BRANDED EMAIL (Jul 26). Genuine verification failures — blurry document,
+    // selfie mismatch, canceled session — used to go out through the legacy
+    // inline-HTML service, which is off-brand and pasted Stripe's raw error
+    // text. They now use the branded `identity-verification-update` template
+    // via the same fanout as every other Goldsainte email, with the SAME
+    // human-readable reason the status page shows. This is an "issue", not a
+    // decline: the applicant can retry.
+    try {
+      await supabaseClient.functions.invoke("email-fanout", {
+        body: {
+          event: "agent_application.identity_issue",
+          record: {
+            id: application.id,
+            email: application.email,
+            first_name: application.first_name,
+            stripe_verification_status: status,
+            rejection_reason: friendlyFailureReason(last_error?.code, last_error?.reason),
+          },
+        },
+      });
+    } catch (e) {
+      logger.warn("Failed to dispatch identity-issue email", { error: String(e) });
+    }
 
     logger.info("Agent application updated to failed", {
       applicationId: application.id,
