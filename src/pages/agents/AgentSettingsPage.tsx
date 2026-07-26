@@ -3,7 +3,7 @@ import { WORLD_COUNTRIES } from "@/lib/residency";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { BackButton } from "@/components/ui/BackButton";
-import { Loader2, Camera, ExternalLink } from "lucide-react";
+import { Loader2, Camera, ExternalLink, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -398,14 +398,23 @@ export default function AgentSettingsPage() {
             <a href="https://welcome.traveladvisorresourcecenter.com/courses/legal-templates" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Travel Advisor Resource Center</a>.
             License from them directly and have your attorney review before use.
           </p>
+          {/* ALIGNMENT (Jul 26). A bare <span>, <a> and <button> in one flex
+              row compute different box heights — the check glyph and the
+              button's UA line-height don't match the link's — so the three
+              items sat at visibly different heights. Each is now an
+              inline-flex box with the same leading, so they cannot disagree. */}
           {agreementUrl ? (
-            <div className="mt-5 flex flex-wrap items-center gap-4 rounded-xl bg-[#0c4d47]/[0.06] p-4 text-[14px]">
-              <span className="font-medium text-[#0c4d47]">✓ Client agreement uploaded</span>
-              <a href={agreementUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0c4d47]">
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl bg-[#0c4d47]/[0.06] p-4 text-[14px] leading-none">
+              <span className="inline-flex items-center gap-1.5 font-medium leading-none text-[#0c4d47]">
+                <Check className="h-4 w-4 shrink-0" strokeWidth={2} />
+                Client agreement uploaded
+              </span>
+              <a href={agreementUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center whitespace-nowrap leading-none underline underline-offset-2 text-[#0c4d47]">
                 View
               </a>
               <button type="button" onClick={() => agreementInput.current?.click()} disabled={uploading === "agreement"}
-                className="underline underline-offset-2 text-[#0a2225]/70">
+                className="inline-flex items-center whitespace-nowrap leading-none underline underline-offset-2 text-[#0a2225]/70 disabled:opacity-60">
                 {uploading === "agreement" ? "Uploading…" : "Replace"}
               </button>
             </div>
