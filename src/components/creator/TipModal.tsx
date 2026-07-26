@@ -107,7 +107,9 @@ export function TipModal({ open, onOpenChange, recipientId, recipientName }: Tip
             Or enter an amount
           </label>
           <div className="relative">
-            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-[#6B7280]">$</span>
+            {/* The "$" sits INSIDE the field, so the input's left padding must
+                clear it at every breakpoint. See the className note below. */}
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[15px] leading-none text-[#6B7280]">$</span>
             <Input
               type="number"
               min={1}
@@ -118,7 +120,14 @@ export function TipModal({ open, onOpenChange, recipientId, recipientName }: Tip
                 setSelected(null);
               }}
               placeholder="Custom"
-              className="pl-8"
+              /* pl-8 ALONE IS NOT ENOUGH (Jul 26). The base Input class is
+                 `px-3 sm:px-4`; tailwind-merge only drops the conflicting
+                 UNPREFIXED class, so `px-3` was removed while `sm:px-4`
+                 survived and won back the left padding on every screen above
+                 mobile — which is why "$" and "Custom" collided on desktop no
+                 matter how much pl-* was added. The sm: variant has to be
+                 overridden explicitly. */
+              className="pl-9 sm:pl-10"
             />
           </div>
         </div>
