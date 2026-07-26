@@ -158,6 +158,23 @@ const NUMERIC_ACCREDITATIONS: Record<string, { min: number; max: number; hint: s
   CLIA:  { min: 5, max: 10, hint: "CLIA numbers are usually 8 digits." },
 };
 
+// PHONE NORMALISATION (Jul 25). agent_applications carries a database CHECK
+// constraint: phone ~ '^\\+?[1-9]\\d{1,14}$' (E.164 — optional +, first digit
+// 1-9, 2-15 digits, NO spaces, dashes or brackets). The form wrote the raw
+// input straight through, so an ordinary "(704) 555-1234" or "+1 704-555-1234"
+// was rejected by Postgres at the very end with an unreadable message —
+// killing BOTH final submission and "Save & finish later". We now normalise
+// before writing, and check at step 1 where the field actually lives.
+function normalizePhone(raw: string): string {
+  const value = (raw || "").trim();
+  const hasPlus = value.startsWith("+");
+  const digits = value.replace(/\D/g, "");
+  return digits ? (hasPlus ? "+" : "") + digits : "";
+}
+function isValidPhone(raw: string): boolean {
+  return /^\+?[1-9]\d{1,14}$/.test(normalizePhone(raw));
+}
+
 function isRepeated(v: string) {
   return /^(\d)\1+$/.test(v);
 }
@@ -458,6 +475,14 @@ function AgentApplicationFormInner() {
         return false;
       }
       if (!formData.phone?.trim()) return missing("Phone");
+      if (!isValidPhone(formData.phone)) {
+        toast({
+          title: "Check your phone number",
+          description: "Use international format, e.g. +1 7045551234. A number starting with 0 needs its country code instead.",
+          variant: "destructive",
+        });
+        return false;
+      }
       if (!formData.agencyName?.trim()) return missing("Agency name");
       if (!formData.businessType) return missing("Business type");
       return true;
@@ -661,7 +686,7 @@ function AgentApplicationFormInner() {
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
-          phone: formData.phone,
+          phone: normalizePhone(formData.phone),
           date_of_birth: formData.dateOfBirth || null,
           agency_name: formData.agencyName,
           business_type: normalizedBusinessType,
