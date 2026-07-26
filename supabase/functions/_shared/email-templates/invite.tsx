@@ -16,11 +16,14 @@ export const InviteEmail = ({ confirmationUrl }: InviteEmailProps) => (
     lede="Accept your invitation below to activate your account and begin curating your journey."
     cta={{ label: 'Accept invitation', url: confirmationUrl }}
     steps={[
+      // ROLE-NEUTRAL (Jul 26). Invitations go to travelers, creators and
+      // agents; these steps assumed a traveler ("concierge dashboard",
+      // "our specialists can tailor recommendations to you") which reads
+      // wrong to an invited specialist.
       'Accept your invitation to activate your account and secure your profile.',
-      "You'll be signed in automatically and guided to your concierge dashboard.",
-      'Complete your profile so our specialists can tailor recommendations to your taste.',
-      'Browse curated trips across 50+ countries, designed by certified specialists and trusted creators.',
-      'Request a trip or book directly — every reservation is protected on-platform.',
+      "You'll be signed in automatically and taken to your dashboard.",
+      'Complete your profile — it is what other people on Goldsainte see.',
+      'Everything runs on-platform: messages, agreements and payments alike, per our Terms.',
     ]}
   />
 )
