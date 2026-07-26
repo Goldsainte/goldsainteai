@@ -39,10 +39,37 @@ serve(async (req) => {
   }
 
   try {
-    const { applicationId, sessionId, applicationType } = await req.json().catch(() => ({}));
+    const { applicationId, sessionId, applicationType, self } = await req.json().catch(() => ({}));
 
-    if (!applicationId && !sessionId) {
-      return json(req, { error: "applicationId or sessionId is required" }, 400);
+    // SELF MODE (Jul 26). The /application/status page runs with the user's
+    // SESSION, but agent_applications RLS only exposes rows where
+    // user_id = auth.uid(). Provisioning links the application to the
+    // provisioned account, which is not necessarily the account the person is
+    // signed in with (Andre: signed in as his original account, application
+    // linked to the newly provisioned one) — so the page said "We couldn't
+    // find an application linked to your account" about an application that
+    // plainly exists. In self mode we verify the caller's JWT and look their
+    // application up BY THE VERIFIED EMAIL with the service role. No email is
+    // accepted from the request body, so this can't be used to probe other
+    // people's applications.
+    let selfEmail: string | null = null;
+    if (self) {
+      const authHeader = req.headers.get("Authorization") || "";
+      const jwt = authHeader.replace(/^Bearer\s+/i, "");
+      if (!jwt) return json(req, { error: "auth_required" }, 401);
+      const authClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+      );
+      const { data: userData, error: userErr } = await authClient.auth.getUser(jwt);
+      if (userErr || !userData?.user?.email) {
+        return json(req, { error: "auth_required" }, 401);
+      }
+      selfEmail = userData.user.email.toLowerCase().trim();
+    }
+
+    if (!applicationId && !sessionId && !selfEmail) {
+      return json(req, { error: "applicationId, sessionId, or self is required" }, 400);
     }
     const table =
       applicationType === "brand" ? "brand_applications" : "agent_applications";
@@ -55,12 +82,20 @@ serve(async (req) => {
     // Minimal projection — deliberately excludes PII beyond a first name used
     // to greet the applicant on screen.
     const columns =
-      "id, first_name, status, stripe_verification_status, stripe_verification_session_id, rejection_reason";
+      "id, first_name, status, stripe_verification_status, stripe_verification_session_id, rejection_reason, created_at";
 
     let query = supabase.from(table).select(columns);
-    query = applicationId
-      ? query.eq("id", applicationId)
-      : query.eq("stripe_verification_session_id", sessionId);
+    if (applicationId) {
+      query = query.eq("id", applicationId);
+    } else if (sessionId) {
+      query = query.eq("stripe_verification_session_id", sessionId);
+    } else {
+      const emailColumn = table === "brand_applications" ? "primary_contact_email" : "email";
+      query = query
+        .eq(emailColumn, selfEmail!)
+        .order("created_at", { ascending: false })
+        .limit(1);
+    }
 
     const { data, error } = await query.maybeSingle();
 
