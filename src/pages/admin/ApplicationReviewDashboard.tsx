@@ -614,27 +614,36 @@ const AgentApplicationDetail: React.FC<{
 
       {/* Action Buttons - Show based on status */}
       <div className="flex flex-wrap gap-2">
+        {/* REVIEW QUEUE (Jul 25). Under the old auto-activation model a
+            "verified" application needed no admin action, so this branch showed
+            an informational alert and only offered a button when provisioning
+            had FAILED (!user_id). Now that provisioning happens exclusively on
+            admin approval, "verified" IS the review queue — it must always
+            offer Approve and Reject, or no agent can ever be activated. */}
         {application.status === 'verified' && (
-          <Alert className="w-full bg-[#cfe8d7] border-[#0c4d47]/20 rounded-xl">
-            <CheckCheck className="h-4 w-4 text-[#0c4d47]" />
-            <AlertDescription className="text-[#0c4d47]">
-              Identity verified — agent account is live. No admin action needed.
-              {!application.user_id && (
-                <span className="block mt-2 text-[#5b2c2c]">
-                  ⚠ Account record missing (webhook may have failed). Click below to re-run provisioning.
-                </span>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-        {application.status === 'verified' && !application.user_id && (
-          <Button
-            onClick={onApprove}
-            className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
-          >
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Re-run Account Provisioning
-          </Button>
+          <>
+            <Alert className="w-full bg-[#cfe8d7] border-[#0c4d47]/20 rounded-xl">
+              <CheckCheck className="h-4 w-4 text-[#0c4d47]" />
+              <AlertDescription className="text-[#0c4d47]">
+                Identity verified by Stripe. Review their credentials, insurance and licence below, then approve to activate the account — or reject with a reason.
+              </AlertDescription>
+            </Alert>
+            <Button
+              onClick={onApprove}
+              className="bg-[#0c4d47] hover:bg-[#0a3d3a] text-[#E5DFC6] rounded-xl"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Approve &amp; activate account
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onReject}
+              className="border-[#5b2c2c]/30 text-[#5b2c2c] hover:bg-[#f0d1d1] rounded-xl"
+            >
+              <XCircle className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+          </>
         )}
         {application.status === 'pending_verification' && (
           <>
@@ -1531,11 +1540,14 @@ export default function AdminApplicationsPage() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Brands Awaiting Review</p>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Awaiting Review</p>
+                  {/* Counted brands only, so verified AGENTS sat in the queue
+                      invisibly — the card read 0 while an agent was waiting.
+                      verifiedAgents was already computed, just never shown. */}
                   <p className="text-3xl font-secondary text-[#0a2225] mt-1">
-                    {stats.verifiedBrands}
+                    {stats.verifiedAgents + stats.verifiedBrands}
                   </p>
-                  <p className="text-[11px] text-[#6B7280] mt-1">Agents auto-activate after verification</p>
+                  <p className="text-[11px] text-[#6B7280] mt-1">Identity verified — awaiting your approval</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-[#f5e9c5] flex items-center justify-center">
                   <Clock className="h-6 w-6 text-[#6d5223]" />
