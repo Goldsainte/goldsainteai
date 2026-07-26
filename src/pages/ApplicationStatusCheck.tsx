@@ -12,9 +12,11 @@ const STATUS_COPY: Record<string, { label: string; note: string }> = {
     label: "Awaiting Identity Verification",
     note: "Complete your Stripe Identity verification to activate your account. Until then, your application remains on hold.",
   },
+  // "verified" now means identity confirmed, application with the review team —
+  // it no longer means the account is live (admin review gate, Jul 25).
   verified: {
-    label: "Account Active",
-    note: "Your identity is confirmed and your account is active. Sign in with the email and password you used to apply.",
+    label: "Under Review",
+    note: "Your identity is confirmed. Our team is reviewing your credentials and insurance, and we'll email you a decision — typically within one to two business days.",
   },
   approved: {
     label: "Account Active",
@@ -161,7 +163,10 @@ export default function ApplicationStatusCheck() {
     label: statusKey ? statusKey.replace(/_/g, " ") : "Pending",
     note: "Your application is in our queue. We will notify you via email as soon as the next step is available.",
   };
-  const isApproved = statusKey === "verified" || statusKey === "approved";
+  // "verified" is identity-confirmed-awaiting-review, NOT an active account.
+  // Treating it as approved is what rendered "Account Active" to an applicant
+  // who had not been approved (and, tonight, to one who was rejected).
+  const isApproved = statusKey === "approved";
   const isRejected = statusKey === "rejected";
 
   return (
@@ -280,6 +285,8 @@ export default function ApplicationStatusCheck() {
                           ? "Active — sign in to access your dashboard"
                           : isRejected
                           ? "Suspended pending review outcome"
+                          : statusKey === "verified"
+                          ? "Pending approval by our review team"
                           : "Awaiting verification completion"}
                       </p>
                     </div>
