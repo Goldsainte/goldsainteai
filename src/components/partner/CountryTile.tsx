@@ -99,10 +99,14 @@ export function CountryTile({ country, active, onToggle }: CountryTileProps) {
       aria-pressed={active}
       className="group flex w-[86px] shrink-0 flex-col items-center gap-2 focus:outline-none"
     >
+      {/* Colours match TravelMap exactly (Jul 26): an unlit country there is
+          #EDE5D1 on cream, a lit one is Goldsainte gold #C7A962 with a #FDF9F0
+          hairline. Same language here, so a selected country in this filter
+          reads as the same "lit" state people see on the map. */}
       <span
         className={`flex h-[72px] w-[72px] items-center justify-center rounded-2xl border transition-colors ${
           active
-            ? "border-[#C7A962] bg-[#0c4d47]"
+            ? "border-[#C7A962] bg-[#FDF9F0]"
             : "border-[#E5DFC6] bg-white group-hover:border-[#C7A962]"
         }`}
       >
@@ -113,14 +117,16 @@ export function CountryTile({ country, active, onToggle }: CountryTileProps) {
             role="img"
             aria-label={country}
           >
+            {/* Lit = Goldsainte gold, exactly as on the map. Unlit = the
+                map's own resting stone (#EDE5D1), deepening on hover so the
+                tile responds before it's chosen. */}
             <path
               d={shape.d}
-              fill={active ? "#C7A962" : "#0c4d47"}
-              fillOpacity={active ? 1 : 0.55}
-              stroke={active ? "#C7A962" : "#0c4d47"}
-              strokeWidth={0.35}
-              strokeOpacity={0.6}
+              fill={active ? "#C7A962" : "#EDE5D1"}
+              stroke={active ? "#C7A962" : "#D9CFB4"}
+              strokeWidth={0.4}
               vectorEffect="non-scaling-stroke"
+              className={active ? "" : "transition-colors group-hover:fill-[#E2C57E]"}
             />
           </svg>
         ) : (
