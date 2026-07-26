@@ -315,7 +315,16 @@ export default function Marketplace() {
         .eq("status", "open")
         // On-trip HIRE requests are addressed to one named creator/agent —
         // they must never appear on the public board for strangers to bid on.
-        .filter("source_metadata->>hire_on_trip", "is", null);
+        .filter("source_metadata->>hire_on_trip", "is", null)
+        // SAME REASONING, WIDER (Jul 26). A request sent from someone's guide
+        // or profile carries preferred_creator_id / preferred_agent_id — it is
+        // addressed to ONE named person, and the confirmation literally says
+        // "sent directly to <name>". Those were still landing on the public
+        // board, so a traveller who thought they'd written privately to Tanya
+        // had their brief open for strangers to bid on (founder report). The
+        // named recipient still sees it via their own direct-request view.
+        .is("preferred_creator_id", null)
+        .is("preferred_agent_id", null);
 
       // Destination filter
       if (filters.destination) {
