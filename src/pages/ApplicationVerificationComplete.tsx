@@ -94,6 +94,33 @@ export default function ApplicationVerificationComplete() {
           lookupError = res.error;
         }
 
+        // CROSS-DEVICE FALLBACK (Jul 25). Stripe Identity is normally finished
+        // on a phone that scanned the desktop's QR code, so it has no session
+        // and RLS returns nothing for the direct query above — the phone said
+        // "We Couldn't Locate Your Application" while the desktop showed the
+        // same application as received. This edge function reads the row with
+        // the service role and returns only status fields.
+        if (!row && (applicationId || urlSessionId)) {
+          try {
+            const { data: fnData } = await supabase.functions.invoke(
+              "get-application-status",
+              {
+                body: {
+                  applicationId: applicationId || undefined,
+                  sessionId: !applicationId ? urlSessionId : undefined,
+                  applicationType,
+                },
+              },
+            );
+            if ((fnData as any)?.found) {
+              row = (fnData as any).application;
+              lookupError = null;
+            }
+          } catch (e) {
+            console.error("status fallback failed", e);
+          }
+        }
+
         if (cancelled) return;
 
         if (!applicationId && !urlSessionId) {
