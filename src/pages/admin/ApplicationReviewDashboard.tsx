@@ -257,13 +257,28 @@ const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
             <p className="text-sm text-[#0c4d47]">
               <strong>What happens next:</strong>
             </p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-[#0c4d47]/80">
-              <li>A Supabase Auth account will be created</li>
-              <li>Profile and {applicationType} records will be created</li>
-              <li>Temporary password will be generated</li>
-              <li>Welcome email will be sent with login credentials (if enabled)</li>
-              <li>Applicant can immediately log in and start using the platform</li>
-            </ul>
+            {/* This list was brand-flavoured and shown to BOTH types (Jul 25).
+                For AGENTS none of the credential steps are true: the agent
+                already created their own account (and may have used Google),
+                so approval reuses that login, issues no temporary password,
+                and the welcome email carries no credentials. */}
+            {applicationType === 'agent' ? (
+              <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-[#0c4d47]/80">
+                <li>Their existing login is kept — no new account, no temporary password</li>
+                <li>Profile and agent records are created</li>
+                <li>The agent role is granted, unlocking the advisor dashboard</li>
+                <li>A welcome email confirms they're approved (no credentials — they already have a login)</li>
+                <li>They can sign in and start work immediately</li>
+              </ul>
+            ) : (
+              <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-[#0c4d47]/80">
+                <li>A Supabase Auth account will be created</li>
+                <li>Profile and brand records will be created</li>
+                <li>Temporary password will be generated</li>
+                <li>Welcome email will be sent with login credentials (if enabled)</li>
+                <li>Applicant can immediately log in and start using the platform</li>
+              </ul>
+            )}
           </div>
 
           <div>
@@ -292,7 +307,7 @@ const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
               className="h-4 w-4 rounded border-[#E5DFC6] text-[#0c4d47] focus:ring-[#C7A962]"
             />
             <Label htmlFor="sendWelcomeEmail" className="cursor-pointer text-[#0a2225]">
-              Send welcome email with login credentials
+              {applicationType === 'agent' ? 'Send approval email' : 'Send welcome email with login credentials'}
             </Label>
           </div>
         </div>
