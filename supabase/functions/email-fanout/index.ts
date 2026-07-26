@@ -68,10 +68,16 @@ Deno.serve(async (req) => {
         break
       }
 
-      case 'agent_application.approved':
+      // SHADOWED CASE REMOVED (Jul 26). A leftover auto-provision-era case for
+      // 'agent_application.approved' / 'brand_application.approved' sat here
+      // doing nothing but `break`. JS resolves duplicate case labels to the
+      // FIRST match, so every approval event died in this empty case and the
+      // real 'agent_application.approved' sender further down was unreachable
+      // — the approved email never sent, ever, despite the dispatch running.
+      // Brand approvals keep the old no-op behaviour explicitly below.
       case 'brand_application.approved': {
-        // Approval email is sent by notify-applicant-status-change.
-        // Welcome — Specialist now fires post-Identity verification from stripe-identity-webhook.
+        // Brand approval email is handled by approve-application directly
+        // (sendWelcomeEmail with temp password); nothing to do in the fanout.
         break
       }
 
