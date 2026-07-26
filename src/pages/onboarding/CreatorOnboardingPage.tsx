@@ -872,7 +872,13 @@ export default function CreatorOnboardingPage() {
                   />
                   {countrySearch.trim().length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {WORLD_COUNTRIES.filter((c) => c.name.toLowerCase().includes(countrySearch.trim().toLowerCase()))
+                      {/* Match aliases too — travellers search "Grand Cayman",
+                          "St Barths", "USVI", not the formal country name. */}
+                      {WORLD_COUNTRIES.filter((c) => {
+                        const q = countrySearch.trim().toLowerCase();
+                        if (c.name.toLowerCase().includes(q)) return true;
+                        return (c.aliases ?? []).some((a) => a.toLowerCase().includes(q));
+                      })
                         .slice(0, 8)
                         .map((c) => (
                           <button key={c.name} type="button"
