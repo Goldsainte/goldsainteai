@@ -700,7 +700,10 @@ export default function AgentDashboard() {
             {/* Payout setup lives here for agents: guide publishing requires
                 stripe_charges_enabled, and mounting this card runs the status
                 check that syncs it. Agents can't reach /creator-dashboard. */}
-            <CreatorStripeOnboarding />
+            {/* Return to THIS dashboard, not /creator-dashboard — that route
+                redirects non-creators to /traveler, which is where agents
+                finishing Stripe were being dumped (founder report, Jul 26). */}
+            <CreatorStripeOnboarding returnPath="/agent-dashboard?tab=guides" />
             {/* Same guides studio creators use — itinerary_products is scoped
                 per-user by RLS, so agents author and sell their own guides. */}
             <CreatorGuidesTab />
