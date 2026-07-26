@@ -115,14 +115,32 @@ export default function ApplicationVerificationComplete() {
         setFirstName(row.first_name ?? null);
         setLastName(row.last_name ?? null);
 
-        const verified =
-          row.status === "verified" || row.stripe_verification_status === "verified";
+        // ORDER MATTERS (fixed Jul 25). This used to test `verified` FIRST, and
+        // `verified` was true whenever STRIPE said verified — even if our own
+        // status was "rejected". Stripe only proves the document is genuine and
+        // the selfie matches; our webhook additionally rejects when the name on
+        // the ID doesn't match the name on the application. A real applicant
+        // was rejected for exactly that reason and this page still told them
+        // "You're In". Our application status is now authoritative, and a
+        // terminal negative is evaluated before any success path.
         const failedStatuses = new Set(["failed", "rejected"]);
         const failed =
           failedStatuses.has(row.status) ||
           (row.stripe_verification_status &&
             ["canceled", "requires_input"].includes(row.stripe_verification_status) &&
             row.rejection_reason);
+        const verified =
+          !failed &&
+          (row.status === "verified" || row.stripe_verification_status === "verified");
+
+        if (failed) {
+          const code = (row.stripe_verification_report as any)?.last_error?.code as
+            | string
+            | undefined;
+          setReason(friendlyReason(code, row.rejection_reason));
+          setStatus("failed");
+          return;
+        }
 
         if (verified) {
           if (applicationType === "brand") {
@@ -133,15 +151,6 @@ export default function ApplicationVerificationComplete() {
             localStorage.removeItem("agent_application_email");
           }
           setStatus("success");
-          return;
-        }
-
-        if (failed) {
-          const code = (row.stripe_verification_report as any)?.last_error?.code as
-            | string
-            | undefined;
-          setReason(friendlyReason(code, row.rejection_reason));
-          setStatus("failed");
           return;
         }
 
