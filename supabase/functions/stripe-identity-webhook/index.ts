@@ -483,13 +483,29 @@ async function updateAgentApplication(
         expected_last_name: application.last_name,
       });
 
-      await sendApplicantNotification(
-        application.email,
-        `${application.first_name} ${application.last_name}`,
-        "failed",
-        "agent",
-        "The name on the government ID you uploaded does not match the name on your application. If this is a clerical issue (e.g., a maiden name or middle name), please contact support.",
-      );
+      // BRANDED EMAIL (Jul 25). This used to call the legacy email-service,
+      // which renders an off-brand "Identity Verification Issue" note telling
+      // the applicant to retake their photo in better lighting — useless
+      // advice when the real problem is that the ID name doesn't match the
+      // application. This is a DECLINE, so it now uses the branded
+      // application-declined-professional template via the same fanout that
+      // sends every other Goldsainte email.
+      try {
+        await supabaseClient.functions.invoke("email-fanout", {
+          body: {
+            event: "agent_application.declined",
+            record: {
+              id: application.id,
+              email: application.email,
+              first_name: application.first_name,
+              rejection_reason:
+                "The name on the government ID you uploaded does not match the name on your application. If this is a clerical issue — a maiden name, a middle name, or a shortened first name — reply to this email and our team will help you sort it out.",
+            },
+          },
+        });
+      } catch (e) {
+        logger.warn("Failed to dispatch decline email", { error: String(e) });
+      }
 
       logger.info("Agent application rejected for name mismatch", {
         applicationId: application.id,
