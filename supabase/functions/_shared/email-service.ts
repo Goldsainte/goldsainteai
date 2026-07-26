@@ -663,11 +663,21 @@ The Goldsainte Team
       <p>We encountered an issue with the identity verification for your ${accountType} application.</p>
       
       <div class="alert alert-warning">
-        <strong>Verification Status:</strong> Failed<br>
-        ${data.reason ? `<strong>Reason:</strong> ${data.reason}` : ""}
+        ${data.reason
+          ? `<strong>What happened:</strong> ${data.reason}`
+          : `<strong>Verification Status:</strong> Could not be completed`}
       </div>
       
-      <p>To complete your application, please retry the identity verification process:</p>
+      ${data.reason
+        ? /* A specific reason means the generic "retake your photo" advice is
+             wrong and confusing — a name mismatch is not a lighting problem
+             (founder report, Jul 25). Show the reason and route to support. */
+          `<p>Please read the note above carefully. If you believe this is a mistake — for example a maiden name, a middle name, or a clerical difference — reply to this email or contact our team and we'll help you sort it out.</p>
+      
+      <div style="text-align: center;">
+        <a href="mailto:${SUPPORT_EMAIL}" class="button">Contact support</a>
+      </div>`
+        : `<p>To complete your application, please retry the identity verification process:</p>
       
       <ol>
         <li>Ensure you have a valid government-issued ID (passport, driver's license, or national ID card)</li>
@@ -678,7 +688,7 @@ The Goldsainte Team
       
       <div style="text-align: center;">
         <a href="${FRONTEND_URL}/apply/${data.applicationType}/verify" class="button">Retry Verification</a>
-      </div>
+      </div>`}
       
       <div class="divider"></div>
       
