@@ -15,9 +15,14 @@ export const MagicLinkEmail = ({ confirmationUrl }: MagicLinkEmailProps) => (
     lede="Click the button below to sign in to your Goldsainte account. This link expires shortly for your security."
     cta={{ label: 'Sign in to Goldsainte', url: confirmationUrl }}
     steps={[
+      // ROLE-NEUTRAL (Jul 26). Magic links are issued to travelers, creators
+      // and agents alike, but these steps described a traveler's concierge
+      // dashboard and "planning with your specialist" — wrong for the two
+      // roles that ARE the specialists. The hook doesn't reliably know the
+      // role on a sign-in link, so this stays accurate for everyone.
       "You'll be signed in automatically and returned to where you left off.",
-      'Review your concierge dashboard, saved trips, and recent inquiries.',
-      'Continue planning with your specialist or browse new curated journeys.',
+      'Your dashboard opens with whatever needs your attention first.',
+      'This link is single-use and expires shortly — request a new one anytime.',
     ]}
   />
 )
