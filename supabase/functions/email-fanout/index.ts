@@ -75,14 +75,31 @@ Deno.serve(async (req) => {
         break
       }
 
-      case 'agent_application.identity_verified':
+      // ADMIN REVIEW GATE (Jul 25). "welcome-professional" tells the applicant
+      // their account is LIVE. For AGENTS that is now only true after an admin
+      // approves — identity verification alone no longer activates anything, so
+      // firing it here emailed people that they were live while they sat in the
+      // review queue. Agents get it on `agent_application.approved` instead.
+      // BRANDS still auto-provision at verification, so their behaviour is
+      // unchanged.
+      case 'agent_application.identity_verified': {
+        // Intentionally silent: the applicant already sees "Application
+        // Received — with our team for review" on screen, and the decision
+        // email follows from approve/reject.
+        break
+      }
+
       case 'brand_application.identity_verified': {
-        const isAgent = event === 'agent_application.identity_verified'
-        const email = isAgent ? record.email : record.primary_contact_email
-        const name = isAgent ? record.first_name : record.primary_contact_name
-        results.push(await send('welcome-professional', email,
+        results.push(await send('welcome-professional', record.primary_contact_email,
           `welcome-pro-verified-${record.id}`,
-          { name: name || 'there', accountType: isAgent ? 'agent' : 'brand' }))
+          { name: record.primary_contact_name || 'there', accountType: 'brand' }))
+        break
+      }
+
+      case 'agent_application.approved': {
+        results.push(await send('welcome-professional', record.email,
+          `welcome-pro-approved-${record.id}`,
+          { name: record.first_name || 'there', accountType: 'agent' }))
         break
       }
 
