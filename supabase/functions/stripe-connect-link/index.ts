@@ -31,8 +31,22 @@ serve(async (req) => {
       typeof body?.country === "string" && /^[A-Za-z]{2}$/.test(body.country.trim())
         ? body.country.trim().toUpperCase()
         : "US";
-    const RETURN_URL = `${origin}/creator-dashboard?stripe=success`;
-    const REFRESH_URL = `${origin}/creator-dashboard?stripe=refresh`;
+    // RETURN PATH (Jul 26). Hard-coding /creator-dashboard stranded AGENTS:
+    // the agent dashboard mounts this same payout card in its Guides tab
+    // (guide publishing needs charges_enabled), so an agent finishing Stripe
+    // was returned to /creator-dashboard, which redirects non-creators to
+    // /traveler. They landed on the traveler Studio wondering what happened,
+    // and the agent-side status sync never ran. Callers may now pass the path
+    // they want to come back to; creators keep the old behaviour by default.
+    const rawReturnPath = typeof body?.returnPath === "string" ? body.returnPath : "";
+    // Only accept our own same-site paths — never an absolute URL.
+    const returnPath =
+      rawReturnPath.startsWith("/") && !rawReturnPath.startsWith("//")
+        ? rawReturnPath
+        : "/creator-dashboard";
+    const joiner = returnPath.includes("?") ? "&" : "?";
+    const RETURN_URL = `${origin}${returnPath}${joiner}stripe=success`;
+    const REFRESH_URL = `${origin}${returnPath}${joiner}stripe=refresh`;
 
     console.log("[STRIPE-CONNECT-LINK] Request started, origin:", origin);
     // Auth: require a logged-in user
