@@ -1394,6 +1394,29 @@ export default function AdminApplicationsPage() {
   });
 
   // Handle approval
+  // supabase.functions.invoke() collapses EVERY non-2xx into the useless
+  // string "Edge Function returned a non-2xx status code" — the real reason
+  // ("Approval failed: <cause>") is sitting in the response body on
+  // error.context. Without this an admin sees a generic failure and has no
+  // idea whether it's a missing field, a provisioning error, or auth.
+  const edgeErrorMessage = async (error: any, fallback: string) => {
+    try {
+      const res = error?.context;
+      if (res && typeof res.json === "function") {
+        const body = await res.clone().json();
+        const detail = body?.message || body?.error;
+        if (detail) return String(detail);
+      }
+      if (res && typeof res.text === "function") {
+        const txt = await res.clone().text();
+        if (txt) return txt.slice(0, 300);
+      }
+    } catch {
+      /* fall through to the generic message */
+    }
+    return error?.message || fallback;
+  };
+
   const handleApprove = async (notes: string, sendEmail: boolean) => {
     if (!selectedApplication) return;
 
@@ -1408,7 +1431,7 @@ export default function AdminApplicationsPage() {
         },
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await edgeErrorMessage(error, 'Failed to approve application'));
 
       // Refresh applications
       await fetchApplications();
@@ -1434,7 +1457,7 @@ export default function AdminApplicationsPage() {
         },
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await edgeErrorMessage(error, 'Request failed'));
 
       // Refresh applications
       await fetchApplications();
@@ -1462,7 +1485,7 @@ export default function AdminApplicationsPage() {
         })
         .eq('id', selectedApplication.id);
 
-      if (error) throw error;
+      if (error) throw new Error(await edgeErrorMessage(error, 'Request failed'));
 
       toast.success('Verification skipped - application marked as verified');
       setSkipVerificationDialogOpen(false);
