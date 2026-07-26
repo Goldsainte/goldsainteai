@@ -158,26 +158,26 @@ export const Footer = () => {
           </p>
         </div>
 
-        {/* Legal Bottom Bar */}
-        <div className="pt-2 flex flex-col items-center gap-y-2 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-2 sm:gap-y-1">
-          {legalLinks.map((l, i) => (
-            <span key={l.label} className="flex items-center gap-2">
-              <Link to={l.to} className={legalLinkClasses}>{l.label}</Link>
-              {i < legalLinks.length - 1 && <span className="hidden text-[#9A9079] sm:inline">·</span>}
-            </span>
-          ))}
-          <span className="hidden text-[#9A9079] sm:inline">·</span>
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("show-install-prompt"))}
-            className={legalLinkClasses}
-          >
-            Install App
-          </button>
-          <span className="hidden text-[#9A9079] sm:inline">·</span>
-          <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
-          <span className="hidden text-[#9A9079] sm:inline">·</span>
-          <LanguageSelector className="gap-2 text-[#9A9079] hover:text-[#E5DFC6] transition-colors" />
+        {/* Legal Bottom Bar — one compact wrapping row on EVERY breakpoint
+            (Tory Burch treatment, founder request Jul 25). Previously the row
+            collapsed to a tall vertical stack on mobile. */}
+        <div className="pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5 text-center">
+            {legalLinks.map((l) => (
+              <Link key={l.label} to={l.to} className={legalLinkClasses}>{l.label}</Link>
+            ))}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("show-install-prompt"))}
+              className={legalLinkClasses}
+            >
+              Install App
+            </button>
+          </div>
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
+            <LanguageSelector className="gap-2 text-[#9A9079] hover:text-[#E5DFC6] transition-colors" />
+          </div>
         </div>
       </div>
     </footer>
