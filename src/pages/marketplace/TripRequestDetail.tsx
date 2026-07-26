@@ -770,10 +770,43 @@ export default function TripRequestDetail() {
       <div className="mx-auto max-w-5xl px-4 pb-14">
         <div className="border-t border-[#0a2225]/15 pt-8">
           <h2 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-            {request.hireOnTrip ? "How this works, start to finish" : "How it works"}
+            {isRequestOwner
+              ? "What happens next"
+              : request.hireOnTrip
+              ? "How this works, start to finish"
+              : "How it works"}
           </h2>
+          {/* AUDIENCE FIX (Jul 26). These steps are written for the SPECIALIST
+              answering a brief — "review the brief", "submit your proposal",
+              "get paid". The traveller who POSTED the request sees this page
+              too (the sidebar even says "you can't submit a proposal to
+              yourself"), and was being told to price and deliver their own
+              trip. Owners now get the traveller's side of the same process. */}
           <div className="mt-8 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
-            {(request.hireOnTrip
+            {(isRequestOwner
+              ? [
+                  {
+                    t: "Specialists review your brief",
+                    b: "Agents and creators who work your destination see your dates, budget and inspiration. If you sent this to someone directly, it goes to them first.",
+                  },
+                  {
+                    t: "Proposals arrive here",
+                    b: "Each one lands on this page with an itinerary, a price and a timeline. You'll be notified as they come in — there's no obligation to accept any of them.",
+                  },
+                  {
+                    t: "Ask questions in Messages",
+                    b: "Message anyone who proposes before you decide. Everything stays on-platform, so you always have a record.",
+                  },
+                  {
+                    t: "Accept the one you want",
+                    b: "Accepting creates your booking and takes a 25% deposit through secure Stripe checkout. The balance is due before departure.",
+                  },
+                  {
+                    t: "Nothing to pay until then",
+                    b: "Posting a request and receiving proposals is free. You only pay when you accept one.",
+                  },
+                ]
+              : request.hireOnTrip
               ? [
                   {
                     t: "Review the request",
@@ -846,8 +879,14 @@ export default function TripRequestDetail() {
                 <p className="font-secondary text-[17px] text-[#0a2225]">Due before departure, same secure checkout</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
-                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Your payout</p>
-                <p className="font-secondary text-[17px] text-[#0a2225]">96.5% of your price, paid straight to your Stripe account</p>
+                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">
+                  {isRequestOwner ? "What you pay" : "Your payout"}
+                </p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">
+                  {isRequestOwner
+                    ? "The proposal price — Goldsainte's fee is already included, never added at checkout"
+                    : "96.5% of your price, paid straight to your Stripe account"}
+                </p>
               </div>
             </div>
             <p className="mt-7 text-[16px] leading-relaxed text-[#0a2225]/75">
