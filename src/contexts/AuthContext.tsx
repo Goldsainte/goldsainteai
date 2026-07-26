@@ -246,12 +246,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Log successful sign in
       if (data.user) {
+        // Pass the token from THIS response — the client session may not have
+        // propagated yet, which made log-activity answer 401 (Jul 26).
         await logActivity({
           action: 'user_login',
           entity_type: 'auth',
           entity_id: data.user.id,
           details: { email: normalizedEmail, timestamp: new Date().toISOString() }
-        });
+        }, data.session?.access_token);
       }
 
       try {
@@ -326,7 +328,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             account_type: accountType || 'traveler',
             timestamp: new Date().toISOString() 
           }
-        });
+        }, data.session?.access_token);
         
         setUser(data.user);
         setSession(data.session);
