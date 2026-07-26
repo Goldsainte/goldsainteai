@@ -58,6 +58,9 @@ type AgentApplicationData = {
   businessLicenseNumber: string;
   yearsExperience: string;
   // Step 2: Credentials
+  accreditationType: string;
+  accreditationNumber: string;
+  certifications: string[];
   iataNumber: string;
   arcNumber: string;
   cliaNumber: string;
@@ -109,6 +112,75 @@ const normalizeBusinessType = (value: unknown): BusinessType | "" => {
   return LEGACY_BUSINESS_TYPE_MAP[normalized] ?? "";
 };
 
+// ---------------------------------------------------------------------------
+// CREDENTIALS (rebuilt Jul 25, researched against the issuing bodies).
+// The old form asked for IATA / ARC / CLIA / Host Agency as four optional
+// free-text boxes, which conflated two different things: an ACCREDITATION is
+// the booking identity a supplier pays commission to (an agent has exactly
+// one, or books under a host agency's), while a CERTIFICATION is professional
+// education (an agent may hold none, one, or several). They are now asked
+// separately and neither can be skipped.
+// Sources: IATA/IATAN/TIDS, ARC, CLIA EMBARC, CCRA TRUE, ATIA (formerly AFTA
+// ATAS), ABTA/ATOL, TICO, Consumer Protection BC, OPC Québec, ACTA.
+const ACCREDITATION_OPTIONS: { value: string; label: string }[] = [
+  { value: "IATA", label: "IATA Numeric Code" },
+  { value: "IATAN", label: "IATAN (United States)" },
+  { value: "ARC", label: "ARC (United States)" },
+  { value: "CLIA", label: "CLIA / EMBARC ID" },
+  { value: "TIDS", label: "TIDS (IATA, non-ticketing)" },
+  { value: "TRUE", label: "TRUE (CCRA)" },
+  { value: "ATIA", label: "ATIA / ATAS accredited (Australia)" },
+  { value: "ABTA", label: "ABTA member (United Kingdom)" },
+  { value: "ATOL", label: "ATOL holder (United Kingdom)" },
+  { value: "TICO", label: "TICO registered (Ontario, Canada)" },
+  { value: "CPBC", label: "Consumer Protection BC (Canada)" },
+  { value: "OPC", label: "OPC registered (Québec, Canada)" },
+  { value: "ACTA", label: "ACTA member (Canada)" },
+  { value: "OTHER", label: "Other national accreditation" },
+  { value: "HOST", label: "I book under a host agency's accreditation" },
+  { value: "NONE", label: "None yet — application in progress" },
+];
+// Types where a credential number is meaningful and therefore required.
+const ACCREDITATION_NEEDS_NUMBER = ["IATA", "IATAN", "ARC", "CLIA", "TIDS", "TRUE", "ATIA", "ABTA", "ATOL", "TICO", "CPBC", "OPC", "ACTA", "OTHER"];
+
+const CERTIFICATION_GROUPS: { group: string; items: string[] }[] = [
+  { group: "The Travel Institute (US)", items: [
+    "TAP® — Travel Agent Proficiency",
+    "CTA® — Certified Travel Associate",
+    "CTC® — Certified Travel Counselor",
+    "CTIE® — Certified Travel Industry Executive",
+  ]},
+  { group: "ASTA (US)", items: ["VTA — Verified Travel Advisor"] },
+  { group: "CLIA — North America", items: [
+    "CCC — Certified Cruise Counsellor",
+    "ACC — Accredited Cruise Counsellor",
+    "MCC — Master Cruise Counsellor",
+    "ECC — Elite Cruise Counsellor",
+    "Travel Agency Executive",
+  ]},
+  { group: "CLIA — Europe", items: [
+    "Cruise Ambassador",
+    "Master Cruise Certification",
+  ]},
+  { group: "ACTA (Canada)", items: [
+    "CTC — Certified Travel Counsellor (ACTA)",
+    "CTM — Certified Travel Manager (ACTA)",
+  ]},
+  { group: "IATA training", items: [
+    "IATA Foundation Diploma in Travel & Tourism",
+    "IATA Consultant Diploma",
+  ]},
+  { group: "Australia", items: [
+    "Certificate III in Travel (SIT30222)",
+    "Certificate IV / Diploma of Travel & Tourism",
+  ]},
+  { group: "Other", items: [
+    "Destination or niche specialist program",
+    "Other certification",
+    "None yet — working toward certification",
+  ]},
+];
+
 const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 focus:ring-offset-0 rounded-lg placeholder:text-sm box-border";
 const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
@@ -141,6 +213,9 @@ function AgentApplicationFormInner() {
     website: "",
     businessLicenseNumber: "",
     yearsExperience: "",
+    accreditationType: "",
+    accreditationNumber: "",
+    certifications: [] as string[],
     iataNumber: "",
     arcNumber: "",
     cliaNumber: "",
@@ -340,6 +415,17 @@ function AgentApplicationFormInner() {
       return true;
     }
     if (currentStep === 2) {
+      if (!formData.accreditationType) return missing("Accreditation");
+      if (ACCREDITATION_NEEDS_NUMBER.includes(formData.accreditationType) && !formData.accreditationNumber?.trim()) {
+        return missing("Accreditation number");
+      }
+      if (formData.accreditationType === "HOST" && !formData.hostAgencyName?.trim()) {
+        return missing("Host agency name");
+      }
+      if (formData.certifications.length === 0) {
+        toast({ title: "Select at least one certification", description: "Choose \"None yet\" if you don't hold one.", variant: "destructive" });
+        return false;
+      }
       if (formData.specializations.length === 0) {
         toast({ title: "Select at least one specialization", variant: "destructive" });
         return false;
@@ -758,24 +844,89 @@ function AgentApplicationFormInner() {
             <p className="text-sm text-[#6B7280] -mt-4">Share your professional credentials and areas of expertise.</p>
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">IATA Number</Label>
-                <Input value={formData.iataNumber} onChange={(e) => setFormData({ ...formData, iataNumber: e.target.value })} className={luxuryInputClasses} placeholder="Optional" />
+                <Label className="text-sm font-medium text-[#0a2225]">How are you accredited to sell travel? *</Label>
+                <Select
+                  value={formData.accreditationType}
+                  onValueChange={(v) => {
+                    // Mirror into the legacy columns so the saved application
+                    // keeps the same shape (license_number / arc / clia).
+                    const n = formData.accreditationNumber?.trim() || "";
+                    setFormData({
+                      ...formData,
+                      accreditationType: v,
+                      iataNumber: ["IATA", "IATAN", "TIDS"].includes(v) ? n : "",
+                      arcNumber: v === "ARC" ? n : "",
+                      cliaNumber: v === "CLIA" ? n : "",
+                    });
+                  }}
+                >
+                  <SelectTrigger className={luxuryInputClasses}><SelectValue placeholder="Select your accreditation" /></SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {ACCREDITATION_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value} className="focus:bg-[#FDF9F0]">{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">ARC Number</Label>
-                <Input value={formData.arcNumber} onChange={(e) => setFormData({ ...formData, arcNumber: e.target.value })} className={luxuryInputClasses} placeholder="Optional" />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">CLIA Number</Label>
-                <Input value={formData.cliaNumber} onChange={(e) => setFormData({ ...formData, cliaNumber: e.target.value })} className={luxuryInputClasses} placeholder="Optional" />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Host Agency</Label>
-                <Input value={formData.hostAgencyName} onChange={(e) => setFormData({ ...formData, hostAgencyName: e.target.value })} className={luxuryInputClasses} placeholder="If applicable" />
-              </div>
-              <div className="md:col-span-2">
-                <Label className="text-sm font-medium text-[#0a2225]">Other Certifications</Label>
-                <Input value={formData.otherCertifications} onChange={(e) => setFormData({ ...formData, otherCertifications: e.target.value })} className={luxuryInputClasses} placeholder="CTA, CTC, etc." />
+              {ACCREDITATION_NEEDS_NUMBER.includes(formData.accreditationType) && (
+                <div>
+                  <Label className="text-sm font-medium text-[#0a2225]">Accreditation number *</Label>
+                  <Input
+                    value={formData.accreditationNumber}
+                    onChange={(e) => {
+                      const n = e.target.value;
+                      const t = formData.accreditationType;
+                      setFormData({
+                        ...formData,
+                        accreditationNumber: n,
+                        iataNumber: ["IATA", "IATAN", "TIDS"].includes(t) ? n : formData.iataNumber,
+                        arcNumber: t === "ARC" ? n : formData.arcNumber,
+                        cliaNumber: t === "CLIA" ? n : formData.cliaNumber,
+                      });
+                    }}
+                    className={luxuryInputClasses}
+                    placeholder="Your credential number"
+                  />
+                </div>
+              )}
+              {(formData.accreditationType === "HOST" || formData.hostAgencyName) && (
+                <div>
+                  <Label className="text-sm font-medium text-[#0a2225]">
+                    Host agency{formData.accreditationType === "HOST" ? " *" : ""}
+                  </Label>
+                  <Input value={formData.hostAgencyName} onChange={(e) => setFormData({ ...formData, hostAgencyName: e.target.value })} className={luxuryInputClasses} placeholder="Agency you book under" />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-[#0a2225]">Professional certifications *</Label>
+              <p className="text-xs text-[#6B7280] mt-1">
+                Select every credential you hold — or "None yet". Credentials are self-reported and confirmed during review.
+              </p>
+              <div className="mt-3 space-y-4 rounded-xl border border-[#E5DFC6] bg-white p-4 max-h-80 overflow-y-auto">
+                {CERTIFICATION_GROUPS.map(({ group, items }) => (
+                  <div key={group}>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6B2F]">{group}</p>
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                      {items.map((cert) => (
+                        <label key={cert} className="flex items-start gap-2.5 text-sm text-[#0a2225]">
+                          <Checkbox
+                            checked={formData.certifications.includes(cert)}
+                            onCheckedChange={(checked) => {
+                              const next = checked
+                                ? [...formData.certifications, cert]
+                                : formData.certifications.filter((c: string) => c !== cert);
+                              setFormData({ ...formData, certifications: next, otherCertifications: next.join(", ") });
+                            }}
+                            className="mt-0.5"
+                          />
+                          <span>{cert}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
