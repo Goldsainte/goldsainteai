@@ -224,8 +224,17 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
 
   console.log('Rendering email template', { emailType, confirmationUrl: confirmationUrl.substring(0, 60) + '...' })
 
+  // Role, so the signup email can describe the RIGHT next steps. Set at
+  // signup in Auth.tsx (options.data.account_type) and carried on the auth
+  // user. Without it every new account got traveler instructions.
+  const accountType =
+    (user?.user_metadata?.account_type as string | undefined) ??
+    (user?.raw_user_meta_data?.account_type as string | undefined) ??
+    undefined
+
   const templateProps = {
     siteName: SITE_NAME,
+    accountType,
     siteUrl: `https://${ROOT_DOMAIN}`,
     recipient: recipientEmail,
     confirmationUrl,
