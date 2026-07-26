@@ -451,10 +451,15 @@ serve(async (req) => {
         // message failed with 23502 while proposal cards went through. Fall
         // back to the same 'text' the column intends.
         message_type: messageType === "proposal" ? "proposal" : "text",
+        // SAME DEFECT AS message_type — the very next line of the same
+        // migration: `metadata jsonb NOT NULL DEFAULT '{}'::jsonb`. An
+        // explicit null overrides the default and trips 23502. Postgres only
+        // reports ONE not-null violation per attempt, so fixing message_type
+        // simply revealed this one and messaging stayed broken (Jul 26).
         metadata:
           messageType === "proposal" && messageMetadata && typeof messageMetadata === "object"
             ? messageMetadata
-            : null,
+            : {},
         attachments: safeAttachments,
         filtered_content: flagged ? message : null,
         flagged_for_review: flagged,
