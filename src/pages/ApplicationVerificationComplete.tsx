@@ -207,9 +207,7 @@ export default function ApplicationVerificationComplete() {
     status === "loading"
       ? "One moment"
       : status === "success"
-      ? applicationType === "agent"
-        ? "You're In"
-        : "Application Received"
+      ? "Application Received"
       : status === "pending_review"
       ? "Still Confirming"
       : status === "failed"
@@ -233,39 +231,16 @@ export default function ApplicationVerificationComplete() {
           </div>
         )}
 
-        {status === "success" && applicationType === "agent" && (
+        {/* ADMIN REVIEW GATE (founder decision, Jul 25). The agent branch used
+            to headline "You're In", state the advisor account was live, and
+            push straight to the dashboard — while the identity webhook is the
+            only thing that had run. Provisioning now happens only on admin
+            approval, so verification means "identity confirmed, application
+            with our team". Agents and brands share the same honest copy. */}
+        {status === "success" && (
           <>
             <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-md mx-auto mb-12">
-              Your identity is verified and your Goldsainte advisor account is live. Three short steps remain before you can take your first booking.
-            </p>
-            <ol className="text-left max-w-sm mx-auto space-y-5 mb-14 border-l border-[#E5DFC6] pl-6">
-              <li>
-                <span className="block text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-1.5">01 — Dashboard</span>
-                <span className="text-base text-[#0a2225]/80">Open your advisor dashboard</span>
-              </li>
-              <li>
-                <span className="block text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-1.5">02 — Payouts</span>
-                <span className="text-base text-[#0a2225]/80">Connect Stripe to enable payouts</span>
-              </li>
-              <li>
-                <span className="block text-[10px] uppercase tracking-[0.28em] text-[#C7A962] mb-1.5">03 — Publish</span>
-                <span className="text-base text-[#0a2225]/80">Publish your first trip in Trip Builder</span>
-              </li>
-            </ol>
-            <button
-              onClick={() => navigate("/agent-dashboard?tab=earnings")}
-              className="group inline-flex items-center gap-3 bg-[#0c4d47] text-[#FDF9F0] px-10 py-4 rounded-sm transition-all hover:bg-[#0a2225]"
-            >
-              <span className="text-[11px] uppercase tracking-[0.22em] font-medium">Continue to dashboard</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
-            </button>
-          </>
-        )}
-
-        {status === "success" && applicationType !== "agent" && (
-          <>
-            <p className="text-base text-[#0a2225]/70 leading-relaxed max-w-md mx-auto mb-12">
-              Your identity has been verified. Our team will review your brand application and return with a decision within one to two business days.
+              Your identity has been verified and your application is now with our team for review. We'll email you as soon as a decision is made — typically within one to two business days.
             </p>
             <Link
               to="/application/status"
