@@ -32,17 +32,27 @@ Deno.serve(async (req) => {
                       'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
-    // Record acceptance
+    // Record acceptance — IDEMPOTENT (fixed Jul 26).
+    // agent_terms_acceptance has UNIQUE(agent_id, terms_version), and this
+    // used a plain INSERT followed by a travel_agents UPDATE. If the insert
+    // succeeded but the update failed, every retry hit the unique constraint
+    // — the applicant was permanently stuck at "Failed to record acceptance"
+    // with no way past the agreement modal (founder report). Upserting on the
+    // unique pair makes retries safe; re-accepting the same version is a
+    // no-op, not an error.
     const { error: insertError } = await supabaseClient
       .from('agent_terms_acceptance')
-      .insert({
-        agent_id: agentId,
-        terms_version: termsVersion,
-        privacy_version: privacyVersion,
-        vendor_version: vendorVersion,
-        ip_address: ipAddress,
-        user_agent: userAgent
-      });
+      .upsert(
+        {
+          agent_id: agentId,
+          terms_version: termsVersion,
+          privacy_version: privacyVersion,
+          vendor_version: vendorVersion,
+          ip_address: ipAddress,
+          user_agent: userAgent
+        },
+        { onConflict: 'agent_id,terms_version', ignoreDuplicates: true }
+      );
 
     if (insertError) throw insertError;
 
