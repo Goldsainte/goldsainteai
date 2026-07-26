@@ -171,7 +171,7 @@ export default function NewsroomLanding() {
               disabled={submitting}
               className="flex-shrink-0 px-5 sm:px-6 py-3 text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.2em] uppercase border-t sm:border-t-0 sm:border-l border-[#E5DFC6] hover:bg-[#f0ead9] disabled:opacity-50"
             >
-              {submitting ? "â€¦" : "Subscribe"}
+              {submitting ? "…" : "Subscribe"}
             </button>
           </form>
         </div>
