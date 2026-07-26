@@ -38,7 +38,16 @@ function describeRequirements(req: any): { actionNeeded: string[]; reviewing: bo
   };
 }
 
-export const CreatorStripeOnboarding = () => {
+interface CreatorStripeOnboardingProps {
+  /**
+   * Same-site path Stripe returns to. Defaults to the creator dashboard.
+   * The agent dashboard mounts this card too and must pass its own path,
+   * otherwise agents are bounced to /traveler on return (Jul 26).
+   */
+  returnPath?: string;
+}
+
+export const CreatorStripeOnboarding = ({ returnPath }: CreatorStripeOnboardingProps = {}) => {
   const [status, setStatus] = useState<StripeStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [onboarding, setOnboarding] = useState(false);
@@ -156,7 +165,7 @@ export const CreatorStripeOnboarding = () => {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: { origin: window.location.origin },
+        body: { origin: window.location.origin, returnPath },
       });
 
       if (error) {
