@@ -96,6 +96,25 @@ Deno.serve(async (req) => {
         break
       }
 
+      // Branded decline — replaces the legacy off-brand "Identity Verification
+      // Issue" mail for rejections (e.g. ID/application name mismatch).
+      case 'agent_application.declined': {
+        results.push(await send('application-declined-professional', record.email,
+          `app-declined-${record.id}`,
+          { recipientName: record.first_name || 'there', adminNotes: record.rejection_reason || '' }))
+        break
+      }
+
+      // Branded status change for genuine verification problems (bad scan,
+      // canceled session, more info required) — NOT a decline.
+      case 'agent_application.identity_issue': {
+        results.push(await send('identity-verification-update', record.email,
+          `identity-issue-${record.id}-${record.stripe_verification_status || 'update'}`,
+          { verificationStatus: record.stripe_verification_status || 'requires attention',
+            statusDetail: record.rejection_reason || '' }))
+        break
+      }
+
       case 'agent_application.approved': {
         results.push(await send('welcome-professional', record.email,
           `welcome-pro-approved-${record.id}`,
