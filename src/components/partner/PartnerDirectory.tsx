@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { CountryTile } from "./CountryTile";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,20 +120,8 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   // Tags are free-typed by creators/agents, so "Adventure", "adventure", and
   // "ADVENTURE" are the same specialty — group case-insensitively and show one
   // canonical Title Case chip (founder catch, Jul 25).
-  const topTags = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const c of cards)
-      for (const t of c.tags) {
-        const k = t.trim().toLowerCase();
-        if (k) counts.set(k, (counts.get(k) || 0) + 1);
-      }
-    const titleCase = (k: string) =>
-      k.replace(/\b\w/g, (ch) => ch.toUpperCase());
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 12)
-      .map(([k]) => titleCase(k));
-  }, [cards]);
+  // topTags removed Jul 26 with the specialty chip row — the computation had
+  // no remaining consumer. Search still matches tags directly.
 
   // COUNTRY FILTER (Jul 26). home_base is free text — "Santorini, Greece",
   // "Charlotte, NC, USA", "Dehradun, Uttarakhand, India", "Morocco" — so the
@@ -276,50 +265,22 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                 exact headcount isn't something visitors need — and early on it
                 reads as scarcity rather than curation. */}
           </div>
-          {topTags.length > 0 && (
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {topTags.map((t) => {
-                const active = activeTags.includes(t);
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => toggleTag(t)}
-                    className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors ${
-                      active
-                        ? "border-[#0c4d47] bg-[#0c4d47] text-[#E5DFC6]"
-                        : "border-[#E5DFC6] bg-white text-[#0a2225]/70 hover:text-[#0a2225]"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          {/* Specialty chips removed Jul 26 (founder call): country is the
+              only filter for now — one clear axis beats two competing ones.
+              Search still matches niches, so "adventure" typed in the box
+              still works. A second layer is a deliberate decision to make
+              after seeing this one in use. */}
 
           {topCountries.length > 0 && (
-            <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <span className="shrink-0 self-center pr-1 text-[11px] uppercase tracking-[0.16em] text-[#8D6B2F]">
-                Country
-              </span>
-              {topCountries.map((c) => {
-                const active = activeCountries.includes(c);
-                return (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => toggleCountry(c)}
-                    className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors ${
-                      active
-                        ? "border-[#0c4d47] bg-[#0c4d47] text-[#E5DFC6]"
-                        : "border-[#E5DFC6] bg-white text-[#0a2225]/70 hover:text-[#0a2225]"
-                    }`}
-                  >
-                    {c}
-                  </button>
-                );
-              })}
+            <div className="mt-6 flex items-end gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {topCountries.map((c) => (
+                <CountryTile
+                  key={c}
+                  country={c}
+                  active={activeCountries.includes(c)}
+                  onToggle={toggleCountry}
+                />
+              ))}
             </div>
           )}
         </div>
