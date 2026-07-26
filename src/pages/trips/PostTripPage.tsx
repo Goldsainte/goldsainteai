@@ -118,8 +118,13 @@ export default function PostTripPage() {
       sessionStorage.setItem("goldsainte:fromCreator", fromCreator);
       // profiles is RLS-locked to own-row reads; creator_directory is the
       // public window over creator rows (type borrowed from profiles).
+      // Use the name passed in the URL immediately (same courtesy the agent
+      // path already gets) so the header doesn't flash a placeholder while the
+      // lookup runs.
+      const creatorNameParam = searchParams.get("creatorName");
+      if (creatorNameParam) setPreferredName(creatorNameParam);
       supabase.from("creator_directory" as unknown as "profiles").select("display_name").eq("id", fromCreator).maybeSingle().then(({ data }) => {
-        if (data?.display_name) setPreferredName(data.display_name);
+        if (!creatorNameParam && data?.display_name) setPreferredName(data.display_name);
       });
     } else if (agentId) {
       setPreferredAgentId(agentId);
@@ -507,7 +512,7 @@ export default function PostTripPage() {
       type="button"
       onClick={onClick}
       className={cn(
-        "px-4 py-1.5 rounded-full border text-xs font-medium transition-colors",
+        "px-5 py-2.5 rounded-full border text-[15px] font-medium transition-colors",
         selected
           ? "bg-[#0c4d47] border-[#0c4d47] text-[#E5DFC6]"
           : "bg-[#f7f3ea] border-[#E5DFC6] text-[#4a4a4a] hover:border-[#BFAD72]"
@@ -706,32 +711,32 @@ export default function PostTripPage() {
 
           <div className="mt-6 space-y-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#6B7280]">Where is your trip? *</label>
+              <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Where is your trip? *</label>
               <input className={F} value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="e.g. Rome & the Amalfi Coast" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Starts *</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Starts *</label>
                 <input type="date" className={F} value={startsOn} onChange={(e) => setStartsOn(e.target.value)} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Ends *</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Ends *</label>
                 <input type="date" className={F} value={endsOn} onChange={(e) => setEndsOn(e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Adults</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Adults</label>
                 <input type="number" min="1" className={F} value={adults} onChange={(e) => setAdults(e.target.value)} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#6B7280]">Children</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Children</label>
                 <input type="number" min="0" className={F} value={children} onChange={(e) => setChildren(e.target.value)} />
               </div>
             </div>
             {serviceCaps.length > 0 && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#6B7280]">What do you need {hireFirstName} for? *</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">What do you need {hireFirstName} for? *</label>
                 <div className="flex flex-wrap gap-1.5">
                   {serviceCaps.map((id) => (
                     <button key={id} type="button"
@@ -748,7 +753,7 @@ export default function PostTripPage() {
               </div>
             )}
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#6B7280]">
+              <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">
                 Anything {hireFirstName} should know? <span className="text-[#9CA3AF]">(optional)</span>
               </label>
               <textarea rows={3} className={F} value={specialNotes} onChange={(e) => setSpecialNotes(e.target.value)}
@@ -814,7 +819,7 @@ export default function PostTripPage() {
                 <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-[#0a2225]">Direct Request</p>
-                  <p className="text-xs text-[#4a4a4a] mt-0.5">
+                  <p className="text-[14px] text-[#4a4a4a] mt-0.5">
                     This trip will be sent directly to <span className="font-semibold">{preferredName}</span>
                   </p>
                 </div>
@@ -827,7 +832,7 @@ export default function PostTripPage() {
                 <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-[#0a2225]">Pre-filled from AI Collection</p>
-                  <p className="text-xs text-[#4a4a4a] mt-0.5">
+                  <p className="text-[14px] text-[#4a4a4a] mt-0.5">
                     <span className="font-semibold">{itineraryPrefill.title}</span> — {itineraryPrefill.nights} nights in {itineraryPrefill.destination}
                   </p>
                 </div>
@@ -852,14 +857,14 @@ export default function PostTripPage() {
           {currentStep === 0 && (
             <>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">
                   Destination <span className="text-red-500">*</span>
                 </label>
                 <input type="text" value={destination} onChange={e => setDestination(e.target.value)}
                   className={inputCls} placeholder="Amalfi Coast, Paris & Provence, Bali..." />
               </div>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">
                   Departing from <span className="text-red-500">*</span>
                 </label>
                 <input type="text" value={departureCity} onChange={e => setDepartureCity(e.target.value)}
@@ -867,20 +872,20 @@ export default function PostTripPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">
                     Start date <span className="text-red-500">*</span>
                   </label>
                   <input type="date" value={startsOn} onChange={e => setStartsOn(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">
                     End date <span className="text-red-500">*</span>
                   </label>
                   <input type="date" value={endsOn} onChange={e => setEndsOn(e.target.value)} className={inputCls} />
                 </div>
               </div>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Trip nickname <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Trip nickname <span className="text-red-500">*</span></label>
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                   className={inputCls} placeholder="Example: Amalfi anniversary escape" />
               </div>
@@ -892,33 +897,33 @@ export default function PostTripPage() {
             <>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Adults</label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Adults</label>
                   <input type="number" min={1} value={adults} onChange={e => setAdults(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Children</label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Children</label>
                   <input type="number" min={0} value={children} onChange={e => setChildren(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Occasion <span className="text-red-500">*</span></label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Occasion <span className="text-red-500">*</span></label>
                   <input type="text" value={occasion} onChange={e => setOccasion(e.target.value)}
                     className={inputCls} placeholder="Honeymoon, birthday..." />
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Budget from (total) <span className="text-red-500">*</span></label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Budget from (total) <span className="text-red-500">*</span></label>
                   <input type="number" min={0} value={budgetMin} onChange={e => setBudgetMin(e.target.value)}
                     className={inputCls} placeholder="e.g. 7000" />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Budget to (total) <span className="text-red-500">*</span></label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Budget to (total) <span className="text-red-500">*</span></label>
                   <input type="number" min={0} value={budgetMax} onChange={e => setBudgetMax(e.target.value)}
                     className={inputCls} placeholder="e.g. 12000" />
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">Budget style</label>
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">Budget style</label>
                 <div className="flex flex-wrap gap-2">
                   {budgetLabels.map(([value, label]) => (
                     <Pill key={value} selected={budgetLevel === value} onClick={() => setBudgetLevel(value)}>{label}</Pill>
@@ -932,12 +937,12 @@ export default function PostTripPage() {
           {currentStep === 2 && (
             <>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Accommodation style <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Accommodation style <span className="text-red-500">*</span></label>
                 <input type="text" value={accommodationStyle} onChange={e => setAccommodationStyle(e.target.value)}
                   className={inputCls} placeholder="Design hotels, villas, all-inclusive..." />
               </div>
               <div>
-                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">Trip pace</label>
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">Trip pace</label>
                 <div className="flex flex-wrap gap-2">
                   {paceLabels.map(([value, label]) => (
                     <Pill key={value} selected={pace === value} onClick={() => setPace(value)}>{label}</Pill>
@@ -945,7 +950,7 @@ export default function PostTripPage() {
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">What matters most? <span className="text-red-500">*</span></label>
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">What matters most? <span className="text-red-500">*</span></label>
                 <div className="flex flex-wrap gap-2">
                   {interestOptions.map(label => (
                     <Pill key={label} selected={interests.includes(label)} onClick={() => toggleInterest(label)}>{label}</Pill>
@@ -954,7 +959,7 @@ export default function PostTripPage() {
               </div>
               {aestheticTags.length > 0 && (
                 <div>
-                  <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">Aesthetic tags</label>
+                  <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">Aesthetic tags</label>
                   <div className="flex flex-wrap gap-2">
                     {aestheticTags.map(tag => (
                       <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#BFAD72] bg-[#FDFBF5] text-xs text-[#0a2225]">
@@ -974,19 +979,19 @@ export default function PostTripPage() {
           {currentStep === 3 && (
             <>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">How flexible are you? <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">How flexible are you? <span className="text-red-500">*</span></label>
                 <textarea value={flexibility} onChange={e => setFlexibility(e.target.value)}
                   className={cn(inputCls, "min-h-[100px] resize-none")}
                   placeholder="Dates can move, happy to consider nearby towns..." />
               </div>
               <div>
-                <label className="block mb-1.5 text-xs text-[#4a4a4a] font-medium">Special notes <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Special notes <span className="text-red-500">*</span></label>
                 <textarea value={specialNotes} onChange={e => setSpecialNotes(e.target.value)}
                   className={cn(inputCls, "min-h-[120px] resize-none")}
                   placeholder="Allergies, accessibility needs, non-negotiables..." />
               </div>
               <div>
-                <label className="block mb-2 text-xs text-[#4a4a4a] font-medium">
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">
                   What are you looking for?
                 </label>
                 <div className="grid gap-2.5">
@@ -1074,7 +1079,7 @@ export default function PostTripPage() {
         </div>
 
         {/* Error */}
-        {error && <p className="mt-4 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-4 text-[14px] text-red-600">{error}</p>}
 
         {/* Navigation */}
         <div className="flex items-center justify-between mt-10 md:mt-14">
