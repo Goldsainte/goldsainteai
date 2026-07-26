@@ -16,17 +16,19 @@ export const useEngagementFraud = () => {
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
 
-  const getUserIP = async (): Promise<string | null> => {
-    try {
-      // Try to get IP from a public API
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip || null;
-    } catch (error) {
-      console.error('Failed to get IP:', error);
-      return null;
-    }
-  };
+  // IP LOOKUP REMOVED (Jul 26). This called api.ipify.org from the browser on
+  // every engagement action. Three problems, all live:
+  //   1. Ad/tracker blockers block it, so it threw "TypeError: Load failed"
+  //      and surfaced as an error in monitoring for a real user session.
+  //   2. It sent our users' IP addresses to an unrelated third party.
+  //   3. A browser-reported IP is trivially spoofable, so it was weak evidence
+  //      for a FRAUD control in the first place.
+  // can_perform_engagement takes p_ip_address with DEFAULT NULL and guards
+  // every use with `IF p_ip_address IS NOT NULL`, so omitting it simply skips
+  // the per-IP limb; the per-user limbs (account age, rate ceilings) still
+  // apply. Proper fix is server-side: read the caller IP from request headers
+  // in an edge function and pass it through. Tracked for post-launch.
+  const getUserIP = async (): Promise<string | null> => null;
 
   const checkEngagement = async (
     actionType: 'like' | 'comment' | 'share' | 'follow'
