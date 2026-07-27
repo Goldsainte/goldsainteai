@@ -124,7 +124,21 @@ export default function PostTripPage() {
       const creatorNameParam = searchParams.get("creatorName");
       if (creatorNameParam) setPreferredName(creatorNameParam);
       supabase.from("creator_directory" as unknown as "profiles").select("display_name").eq("id", fromCreator).maybeSingle().then(({ data }) => {
-        if (!creatorNameParam && data?.display_name) setPreferredName(data.display_name);
+        if (data?.display_name) {
+          if (!creatorNameParam) setPreferredName(data.display_name);
+        } else {
+          // BLACK-HOLE GUARD (Jul 26, found by flow fuzzing). A bad or stale
+          // ?fromCreator= (deleted account, mistyped link, copied URL) was
+          // accepted verbatim: the brief was written addressed to a user who
+          // doesn't exist, so — post-226 — literally nobody could read it. The
+          // traveller still saw "sent directly to …". Fall back to the open
+          // board so the request at least reaches someone.
+          console.warn("fromCreator did not resolve; posting to the open board instead", fromCreator);
+          setPreferredCreatorId(null);
+          setPreferredName(null);
+          setWantsRole("both");
+          sessionStorage.removeItem("goldsainte:fromCreator");
+        }
       });
     } else if (agentId) {
       setPreferredAgentId(agentId);
@@ -146,10 +160,20 @@ export default function PostTripPage() {
         .or(`user_id.eq.${agentId},id.eq.${agentId}`)
         .maybeSingle()
         .then(({ data }) => {
-          if (!agentNameParam && data?.agency_name) setPreferredName(data.agency_name);
-          // Always a USER id from here on — that is what the notification
-          // targets and what the direct-request inbox filters on.
-          if (data?.user_id) setPreferredAgentUserId(data.user_id);
+          if (data?.user_id) {
+            if (!agentNameParam && data?.agency_name) setPreferredName(data.agency_name);
+            // Always a USER id from here on — that is what the notification
+            // targets and what the direct-request inbox filters on.
+            setPreferredAgentUserId(data.user_id);
+            setPreferredAgentId(data.user_id);
+          } else {
+            // Same black-hole guard as the creator path above.
+            console.warn("agentId did not resolve; posting to the open board instead", agentId);
+            setPreferredAgentId(null);
+            setPreferredName(null);
+            setWantsRole("both");
+            sessionStorage.removeItem("goldsainte:agentId");
+          }
         });
     }
   }, [searchParams]);
