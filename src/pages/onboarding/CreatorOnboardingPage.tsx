@@ -121,6 +121,8 @@ export default function CreatorOnboardingPage() {
   const [showWelcomeCard, setShowWelcomeCard] = useState(false);
 
   // Step 1: About You
+  // The username already on the profile, so we can avoid rewriting it.
+  const [existingUsername, setExistingUsername] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
@@ -183,11 +185,12 @@ export default function CreatorOnboardingPage() {
       if (!user) return;
       const { data } = await supabase
         .from("profiles")
-        .select("display_name, full_name, avatar_url, bio, home_base, primary_platform, tiktok_handle, instagram_handle, website, creator_niches, content_style_tags, creator_budget_levels, destinations_focus_tags, cover_image_url, featured_photos, preferred_brand_tiers, preferred_hotel_brands, aesthetic_alignment, pricing_model, planning_fee_amount, itinerary_fee_amount, response_commitment_hours, stripe_account_id")
+        .select("username, display_name, full_name, avatar_url, bio, home_base, primary_platform, tiktok_handle, instagram_handle, website, creator_niches, content_style_tags, creator_budget_levels, destinations_focus_tags, cover_image_url, featured_photos, preferred_brand_tiers, preferred_hotel_brands, aesthetic_alignment, pricing_model, planning_fee_amount, itinerary_fee_amount, response_commitment_hours, stripe_account_id")
         .eq("id", user.id)
         .maybeSingle();
       if (!data) return;
 
+      setExistingUsername((data as any).username ?? null);
       if (data.display_name) setDisplayName(data.display_name);
       else if (data.full_name) setDisplayName(data.full_name);
       if (data.avatar_url) setAvatarUrl(data.avatar_url);
@@ -353,8 +356,25 @@ export default function CreatorOnboardingPage() {
           // Adopt the social handle as the platform username (TikTok first —
           // this is a TikTok-creator marketplace — else Instagram), so
           // creators are searchable by the handle everyone knows them by.
-          username:
-            toUsername(tiktokHandle) || toUsername(instagramHandle) || null,
+          // ONLY WRITE username WHEN IT GENUINELY CHANGES (Jul 26).
+          // Two bugs came from writing it unconditionally:
+          //   1. profiles has a BEFORE UPDATE trigger enforcing a 30-day
+          //      username cooldown. Saving a bio or a photo re-sent the same
+          //      derived username, tripped the cooldown, and failed the whole
+          //      save with 23514 — "Username can only be changed once every
+          //      30 days" — on a field the user never touched.
+          //   2. With both handle fields empty this evaluated to null, wiping
+          //      an existing username (e.g. a Concierge desk's 'gs-cusco')
+          //      and breaking that profile's URL. The cooldown trigger skips
+          //      nulls, so nothing caught it.
+          // Keeping the current value when there's nothing better means the
+          // trigger only ever sees a real rename — which is what it's for.
+          ...(() => {
+            const derived = toUsername(tiktokHandle) || toUsername(instagramHandle);
+            if (!derived) return {};                        // nothing to set — leave it alone
+            if (derived === existingUsername) return {};     // unchanged — don't trip the cooldown
+            return { username: derived };
+          })(),
           website: website || null,
           about_details: (() => {
             // languages_spoken mirrors the single Languages field ("Your World")
@@ -477,7 +497,11 @@ export default function CreatorOnboardingPage() {
       setShowWelcomeCard(true);
     } catch (error: any) {
       console.error("Error saving creator profile:", error);
-      toast.error("Failed to save your profile. Please try again.");
+      // Show what actually went wrong. The generic "Please try again" hid a
+      // Postgres message that named the cause in plain English — a 30-day
+      // username cooldown — and cost an hour of guessing (Jul 26).
+      const detail = error?.message || error?.error_description || "";
+      toast.error(detail ? `Couldn't save: ${detail}` : "Failed to save your profile. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
