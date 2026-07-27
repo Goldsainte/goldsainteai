@@ -88,6 +88,30 @@ export function useDirectMessages() {
     }
   }, [user]);
 
+// supabase.functions.invoke() flattens EVERY non-2xx into the same opaque
+// "Edge Function returned a non-2xx status code". send-direct-message has
+// fifteen distinct rejections — blocked conversation, not a participant,
+// recipient unresolvable, message required — and the user saw none of them
+// (founder report, Jul 26: red toast, unreadable). The real message is in the
+// response body on error.context.
+const edgeMessage = async (error: any, fallback: string): Promise<string> => {
+  try {
+    const res = error?.context;
+    if (res && typeof res.json === "function") {
+      const body = await res.clone().json();
+      const detail = body?.error || body?.message;
+      if (detail) return String(detail);
+    }
+    if (res && typeof res.text === "function") {
+      const txt = await res.clone().text();
+      if (txt) return txt.slice(0, 300);
+    }
+  } catch {
+    /* fall through to the generic message */
+  }
+  return error?.message || fallback;
+};
+
   const sendMessage = useCallback(
     async (
       recipientId: string,
@@ -112,7 +136,7 @@ export function useDirectMessages() {
         },
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await edgeMessage(error, "Request failed"));
       
       // Refresh conversations after sending
       await fetchConversations();
@@ -136,7 +160,7 @@ export function useDirectMessages() {
         body: { conversationId, action },
       });
 
-      if (error) throw error;
+      if (error) throw new Error(await edgeMessage(error, "Request failed"));
       
       // Refresh conversations after action
       await fetchConversations();
@@ -219,7 +243,7 @@ export function useConversationMessages(conversationId: string | null) {
         .eq("is_deleted", false)
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) throw new Error(await edgeMessage(error, "Request failed"));
       setMessages(data || []);
     } catch (e) {
       console.error("Error fetching messages:", e);
