@@ -272,7 +272,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
         {/* ── Scrolling column ─────────────────────────────────────────── */}
         <div className="mt-10 min-w-0 lg:mt-0">
           {businessName && (
-            <h1 className="font-secondary text-5xl leading-tight text-[#0a2225] md:text-6xl">{businessName}</h1>
+            <h1 className="font-secondary break-words text-4xl leading-tight text-[#0a2225] sm:text-5xl md:text-6xl">{businessName}</h1>
           )}
 
           {askUsAbout.length > 0 && (
