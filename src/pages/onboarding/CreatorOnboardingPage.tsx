@@ -273,7 +273,16 @@ export default function CreatorOnboardingPage() {
   const canProceed = () => {
     // Index-aware (the Portfolio step may be hidden — see SHOW_PORTFOLIO_STEP).
     if (currentStep === 0) {
-      return displayName.trim().length > 0 && bio.trim().length > 0 && homeBase.trim().length > 0;
+      // Profile photo is now REQUIRED (Jul 28). A creator card without a face
+      // is the weakest thing on the directory — five of nineteen shipped that
+      // way. Enforced here rather than at submit so the person sees it while
+      // they're still on the step that has the uploader.
+      return (
+        avatarUrl.trim().length > 0 &&
+        displayName.trim().length > 0 &&
+        bio.trim().length > 0 &&
+        homeBase.trim().length > 0
+      );
     }
     if (currentStep === 1) {
       if (primaryPlatform.length === 0) return false;
@@ -634,7 +643,7 @@ export default function CreatorOnboardingPage() {
                   <p className="text-[#6B7280]">How travelers will discover you</p>
                 </div>
 
-                <div className="flex justify-center mb-6">
+                <div className="mb-6 flex flex-col items-center gap-3">
                   <ProfilePhotoUploader
                     userId={user?.id || ""}
                     currentAvatarUrl={avatarUrl || null}
@@ -642,6 +651,16 @@ export default function CreatorOnboardingPage() {
                     onUploadComplete={setAvatarUrl}
                     size="lg"
                   />
+                  <div className="text-center">
+                    <p className="text-[14px] font-medium text-[#0a2225]">
+                      Profile photo <span className="text-[#8D6B2F]">*</span>
+                    </p>
+                    <p className="mt-0.5 text-[13px] leading-relaxed text-[#6B7280]">
+                      {avatarUrl
+                        ? "Looking good — travelers choose people, not placeholders."
+                        : "Required. Travelers browse faces first — a photo is what gets you chosen."}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
