@@ -10,7 +10,10 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const ADMIN_EMAIL = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'admin@goldsainte.ai'
+// Fallback repointed 29 Jul: admin@goldsainte.ai was never a real inbox, so
+// new-applicant / new-trip / dispute alerts silently went nowhere. The env
+// var, when set in Supabase secrets, still wins over this default.
+const ADMIN_EMAIL = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || 'support@goldsainte.com'
 
 const supabase = createClient(supabaseUrl, serviceKey)
 
