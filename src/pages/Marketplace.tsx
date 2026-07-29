@@ -81,10 +81,10 @@ export default function Marketplace() {
   // Standalone tours search: "I'm in New York, just show me tours" without a
   // trip search. Draft commits on submit (Enter / Search) so we don't hit the
   // Viator function per keystroke; falls back to the main destination filter.
-  // Tours sub-view: "Editors' Picks" (default) vs "From Creators" — two
-  // filtered views of the admin-only packaged_trips.is_curated flag
-  // (decision LOCKED Jul 25). Toggle lives on /admin/trips.
-  const [toursView, setToursView] = useState<"editors" | "creators">("editors");
+  // Editors'/Creators tours split removed 29 Jul (founder call, reversing the
+  // Jul 25 lock): the Tours tab now shows all native tours in one grid.
+  // packaged_trips.is_curated and the /admin/trips toggle remain but no longer
+  // affect this page.
   const [tourSearchDraft, setTourSearchDraft] = useState(searchParams.get("tq") ?? "");
   const [tourQuery, setTourQuery] = useState(searchParams.get("tq") ?? "");
 
@@ -507,15 +507,14 @@ export default function Marketplace() {
         t.destination?.toLowerCase().includes(q) ||
         t.title?.toLowerCase().includes(q);
       const p = Number(t.price_per_person ?? 0);
-      const matchesView = toursView === "editors" ? !!t.is_curated : !t.is_curated;
-      return matchesView && matchesQuery && p >= min && p <= max && matchesDuration(t.duration_days, filters.durationBucket);
+      return matchesQuery && p >= min && p <= max && matchesDuration(t.duration_days, filters.durationBucket);
     });
     const sorted = [...rows];
     if (filters.sortBy === "price-low") sorted.sort((a: any, b: any) => (a.price_per_person ?? 0) - (b.price_per_person ?? 0));
     else if (filters.sortBy === "price-high") sorted.sort((a: any, b: any) => (b.price_per_person ?? 0) - (a.price_per_person ?? 0));
     else if (filters.sortBy === "top-rated") sorted.sort((a: any, b: any) => (b.view_count ?? 0) - (a.view_count ?? 0));
     return sorted;
-  }, [tours, toursView, toursLocation, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
+  }, [tours, toursLocation, filters.minPrice, filters.maxPrice, filters.durationBucket, filters.sortBy]);
 
   const priceChipActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
 
@@ -712,57 +711,12 @@ export default function Marketplace() {
       /* Native tours first (packaged_trips listing_type='tour'), then
          clearly-labeled Viator partner inventory in identical card
          dimensions. The empty state shows only when BOTH are empty. */
-      const toursSubTabs = (
-        <div
-          className="mb-6 inline-flex items-center rounded-full border border-[#E5DFC6] bg-white p-1"
-          style={{ fontFamily: "Inter, sans-serif" }}
-          role="tablist"
-          aria-label="Tour collections"
-        >
-          {([
-            { id: "editors", label: "Editors' Picks" },
-            { id: "creators", label: "From Creators" },
-          ] as const).map(({ id, label }) => {
-            const active = toursView === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setToursView(id)}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-[#0c4d47] text-[#E5DFC6]"
-                    : "text-[#6B7280] hover:text-[#0a2225]"
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      );
       return (
         <>
           {toursSearchBar}
-          {toursSubTabs}
           {filteredTours?.length ? (
             <div className="mb-8">
               <LiveTripGrid trips={filteredTours as any} />
-            </div>
-          ) : toursView === "editors" && (tours?.length ?? 0) > 0 && !toursLocation ? (
-            /* No tours flagged is_curated yet — honest note instead of a
-               silently empty default tab, with a one-tap path to inventory. */
-            <div className="mb-8 rounded-2xl border border-dashed border-[#E5DFC6] bg-white/60 p-8 text-center">
-              <p className="font-secondary text-lg text-[#0a2225]">Editors' picks are being selected</p>
-              <button
-                type="button"
-                onClick={() => setToursView("creators")}
-                className="mt-3 text-sm text-[#0c4d47] underline underline-offset-4 hover:text-[#073331]"
-              >
-                Browse all tours from creators
-              </button>
             </div>
           ) : null}
           {/* ⚠ PROTECTED — "Top destinations" (TourDestinationBrowse) must be
