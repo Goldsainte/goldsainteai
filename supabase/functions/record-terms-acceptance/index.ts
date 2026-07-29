@@ -20,17 +20,50 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { agentId, termsVersion, privacyVersion, vendorVersion } = await req.json();
-
-    if (!agentId || !termsVersion || !privacyVersion || !vendorVersion) {
-      throw new Error('Missing required fields');
-    }
+    const body = await req.json();
+    const { agentId, termsVersion, privacyVersion, vendorVersion } = body;
+    // Scroll-through evidence (29 Jul): client-attested open/scroll times and
+    // a SHA-256 of the text shown. accepted_at is ALWAYS the server clock.
+    const openedAt = body.openedAt ?? null;
+    const scrolledToBottomAt = body.scrolledToBottomAt ?? null;
+    const contentHash = body.contentHash ?? null;
 
     // Get IP and user agent from request
     const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0] || 
                       req.headers.get('x-real-ip') || 
                       'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
+
+    // ---- Creator branch: identity comes from the caller's JWT, not the body ----
+    if (body.kind === 'creator') {
+      const authHeader = req.headers.get('Authorization') ?? '';
+      const jwt = authHeader.replace(/^Bearer\s+/i, '');
+      const { data: userData, error: userError } = await supabaseClient.auth.getUser(jwt);
+      if (userError || !userData?.user) {
+        return new Response(JSON.stringify({ error: 'Not authenticated' }),
+          { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 401 });
+      }
+      const agreementVersion = body.agreementVersion || '1.0';
+      const { error: cErr } = await supabaseClient
+        .from('creator_terms_acceptance')
+        .upsert({
+          user_id: userData.user.id,
+          agreement_version: agreementVersion,
+          content_hash: contentHash,
+          opened_at: openedAt,
+          scrolled_to_bottom_at: scrolledToBottomAt,
+          ip_address: ipAddress,
+          user_agent: userAgent,
+        }, { onConflict: 'user_id,agreement_version', ignoreDuplicates: true });
+      if (cErr) throw cErr;
+      console.log(`Creator agreement evidence recorded for ${userData.user.id}`);
+      return new Response(JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders(req), 'Content-Type': 'application/json' }, status: 200 });
+    }
+
+    if (!agentId || !termsVersion || !privacyVersion || !vendorVersion) {
+      throw new Error('Missing required fields');
+    }
 
     // Record acceptance — IDEMPOTENT (fixed Jul 26).
     // agent_terms_acceptance has UNIQUE(agent_id, terms_version), and this
@@ -49,7 +82,10 @@ Deno.serve(async (req) => {
           privacy_version: privacyVersion,
           vendor_version: vendorVersion,
           ip_address: ipAddress,
-          user_agent: userAgent
+          user_agent: userAgent,
+          content_hash: contentHash,
+          opened_at: openedAt,
+          scrolled_to_bottom_at: scrolledToBottomAt
         },
         { onConflict: 'agent_id,terms_version', ignoreDuplicates: true }
       );
