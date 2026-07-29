@@ -174,6 +174,9 @@ export default function CreatorOnboardingPage() {
   const [tosAccepted, setTosAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [creatorAgreementAccepted, setCreatorAgreementAccepted] = useState(false);
+  // Scroll-through evidence from the embedded agreement (opened / reached
+  // bottom / content hash) — recorded server-side after successful submit.
+  const [creatorAgreementEvidence, setCreatorAgreementEvidence] = useState<import("@/components/legal/ScrollGatedAgreement").AgreementEvidence | null>(null);
   const [transparencyAccepted, setTransparencyAccepted] = useState(false);
 
 
@@ -451,6 +454,25 @@ export default function CreatorOnboardingPage() {
         }
       } catch (cpErr) {
         console.error("creator_profiles save failed:", cpErr);
+      }
+
+      // ---- Evidence: record the scroll-through acceptance server-side ----
+      // Server clock + caller IP + user agent via record-terms-acceptance.
+      // Fire-and-forget: evidence failing to record must never block a
+      // creator from finishing onboarding (acceptance itself is already
+      // stored on the profile above).
+      try {
+        await supabase.functions.invoke("record-terms-acceptance", {
+          body: {
+            kind: "creator",
+            agreementVersion: "1.0",
+            openedAt: creatorAgreementEvidence?.openedAt ?? null,
+            scrolledToBottomAt: creatorAgreementEvidence?.scrolledToBottomAt ?? null,
+            contentHash: creatorAgreementEvidence?.contentHash ?? null,
+          },
+        });
+      } catch (evErr) {
+        console.error("agreement evidence recording failed:", evErr);
       }
 
       // ---- v2: Get Hired \u2014 create the on_trip service so they finish hireable ----
@@ -1246,6 +1268,7 @@ export default function CreatorOnboardingPage() {
                   onPrivacyChange={setPrivacyAccepted}
                   creatorAgreementAccepted={creatorAgreementAccepted}
                   onCreatorAgreementChange={setCreatorAgreementAccepted}
+                  onCreatorAgreementEvidence={setCreatorAgreementEvidence}
                   transparencyAccepted={transparencyAccepted}
                   onTransparencyChange={setTransparencyAccepted}
                 />
