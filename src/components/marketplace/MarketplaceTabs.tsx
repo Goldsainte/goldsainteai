@@ -13,10 +13,10 @@ interface MarketplaceTabsProps {
    horizontally scrollable. */
 export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceTabsProps) {
   const tabs = [
+    { id: "trip-requests", label: "Trip Requests", shortLabel: "Requests", Icon: PenLine },
     { id: "trips", label: "Handpicked Trips", shortLabel: "Trips", Icon: Map },
     { id: "tours", label: "Tours", shortLabel: "Tours", Icon: Ticket },
     { id: "itinerary-guides", label: "Itinerary Guides", shortLabel: "Guides", Icon: BookOpen },
-    { id: "trip-requests", label: "Trip Requests", shortLabel: "Requests", Icon: PenLine },
   ] as const;
 
   return (
