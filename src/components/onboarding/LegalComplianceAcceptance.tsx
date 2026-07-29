@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileText, Shield, Users, ExternalLink, CheckCircle, Eye } from "lucide-react";
+import { FileText, Shield, Users, ExternalLink, CheckCircle, Eye, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ScrollGatedAgreement, type AgreementEvidence } from "@/components/legal/ScrollGatedAgreement";
+import { CreatorAgreementBody } from "@/components/legal/CreatorAgreementBody";
 
 interface LegalComplianceAcceptanceProps {
   tosAccepted: boolean;
@@ -11,6 +13,9 @@ interface LegalComplianceAcceptanceProps {
   onPrivacyChange: (accepted: boolean) => void;
   creatorAgreementAccepted: boolean;
   onCreatorAgreementChange: (accepted: boolean) => void;
+  /** Scroll-through evidence for the Creator Partnership Agreement —
+   *  fires when the reader reaches the end of the embedded document. */
+  onCreatorAgreementEvidence?: (evidence: AgreementEvidence) => void;
   transparencyAccepted: boolean;
   onTransparencyChange: (accepted: boolean) => void;
 }
@@ -29,10 +34,15 @@ export function LegalComplianceAcceptance({
   onPrivacyChange,
   creatorAgreementAccepted,
   onCreatorAgreementChange,
+  onCreatorAgreementEvidence,
   transparencyAccepted,
   onTransparencyChange,
 }: LegalComplianceAcceptanceProps) {
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
+  // The Creator Partnership Agreement is embedded and scroll-gated (founder
+  // decision 29 Jul, Apple-style): its checkbox stays locked until the reader
+  // has scrolled the full document. The other three remain link + checkbox.
+  const [creatorAgreementRead, setCreatorAgreementRead] = useState(false);
 
   const documents = [
     {
@@ -70,11 +80,12 @@ export function LegalComplianceAcceptance({
     {
       id: "creator",
       title: "Creator Partnership Agreement",
-      description: "Specific terms for creators on Goldsainte",
+      description: "Read the full agreement below — the checkbox unlocks at the end",
       icon: Users,
       accepted: creatorAgreementAccepted,
       onChange: onCreatorAgreementChange,
       link: "/legal/creator-agreement",
+      scrollGated: true,
       summary: [
         "Commission structure and payout terms",
         "Content guidelines and brand representation",
@@ -148,32 +159,34 @@ export function LegalComplianceAcceptance({
                   </div>
                   <p className="text-sm text-[#6B7280] mb-3">{doc.description}</p>
 
-                  <div className="flex items-center gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setExpandedDoc(expandedDoc === doc.id ? null : doc.id)
-                      }
-                      className="text-xs border-[#E5DFC6] hover:border-[#C7A962]"
-                    >
-                      {expandedDoc === doc.id ? "Hide Summary" : "View Summary"}
-                    </Button>
-                    <a
-                      href={doc.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.open(doc.link, '_blank', 'noopener,noreferrer');
-                      }}
-                      className="text-xs text-[#C7A962] hover:underline flex items-center gap-1"
-                    >
-                      Full Document <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
+                  {!(doc as any).scrollGated && (
+                    <div className="flex items-center gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setExpandedDoc(expandedDoc === doc.id ? null : doc.id)
+                        }
+                        className="text-xs border-[#E5DFC6] hover:border-[#C7A962]"
+                      >
+                        {expandedDoc === doc.id ? "Hide Summary" : "View Summary"}
+                      </Button>
+                      <a
+                        href={doc.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          window.open(doc.link, '_blank', 'noopener,noreferrer');
+                        }}
+                        className="text-xs text-[#C7A962] hover:underline flex items-center gap-1"
+                      >
+                        Full Document <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -193,14 +206,38 @@ export function LegalComplianceAcceptance({
                 </div>
               )}
 
+              {(doc as any).scrollGated && (
+                <div className="mt-4">
+                  <ScrollGatedAgreement
+                    onCompleted={(evidence) => {
+                      setCreatorAgreementRead(true);
+                      onCreatorAgreementEvidence?.(evidence);
+                    }}
+                  >
+                    <CreatorAgreementBody />
+                  </ScrollGatedAgreement>
+                </div>
+              )}
+
               <div className="mt-4 ml-16">
-                <label className="flex items-start gap-3 cursor-pointer">
+                <label
+                  className={cn(
+                    "flex items-start gap-3",
+                    (doc as any).scrollGated && !creatorAgreementRead
+                      ? "cursor-not-allowed opacity-60"
+                      : "cursor-pointer"
+                  )}
+                >
                   <Checkbox
                     checked={doc.accepted}
+                    disabled={(doc as any).scrollGated && !creatorAgreementRead}
                     onCheckedChange={(checked) => doc.onChange(checked as boolean)}
                     className="mt-0.5 border-[#C7A962] data-[state=checked]:bg-[#C7A962] data-[state=checked]:border-[#C7A962]"
                   />
-                  <span className="text-sm text-[#0a2225]">
+                  <span className="text-sm text-[#0a2225] inline-flex items-center gap-1.5">
+                    {(doc as any).scrollGated && !creatorAgreementRead && (
+                      <Lock className="w-3.5 h-3.5 text-[#6B7280]" />
+                    )}
                     I have read and agree to the {doc.title}{" "}
                     <span className="text-[#6B7280]">(v{CURRENT_VERSIONS[doc.id as keyof typeof CURRENT_VERSIONS]})</span>
                   </span>
