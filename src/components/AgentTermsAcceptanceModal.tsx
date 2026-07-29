@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollGatedAgreement, type AgreementEvidence } from '@/components/legal/ScrollGatedAgreement';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,6 +22,10 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
   // modal overlay, so the applicant saw a red sliver they couldn't read or
   // dismiss (founder report, Jul 26).
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Scroll gate (29 Jul): checkboxes unlock only after the reader has
+  // scrolled the full document container; evidence rides along to the server.
+  const [readToEnd, setReadToEnd] = useState(false);
+  const [evidence, setEvidence] = useState<AgreementEvidence | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [vendorAccepted, setVendorAccepted] = useState(false);
@@ -41,7 +45,10 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
           termsVersion: 'v1.0',
           privacyVersion: 'v1.0',
           vendorVersion: 'v1.0',
-          transparencyVersion: 'v1.0'
+          transparencyVersion: 'v1.0',
+          openedAt: evidence?.openedAt ?? null,
+          scrolledToBottomAt: evidence?.scrolledToBottomAt ?? null,
+          contentHash: evidence?.contentHash ?? null
         }
       });
 
@@ -82,7 +89,13 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+        <ScrollGatedAgreement
+          heightClassName="h-[440px]"
+          onCompleted={(ev) => {
+            setReadToEnd(true);
+            setEvidence(ev);
+          }}
+        >
           <div className="space-y-8">
             {/* Terms of Service */}
             <div>
@@ -105,7 +118,8 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
               </div>
               <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
                 <Checkbox 
-                  id="terms" 
+                  id="terms"
+                  disabled={!readToEnd} 
                   checked={termsAccepted}
                   onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
                 />
@@ -138,7 +152,8 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
               </div>
               <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
                 <Checkbox 
-                  id="privacy" 
+                  id="privacy"
+                  disabled={!readToEnd} 
                   checked={privacyAccepted}
                   onCheckedChange={(checked) => setPrivacyAccepted(checked as boolean)}
                 />
@@ -171,7 +186,8 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
               </div>
               <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
                 <Checkbox 
-                  id="vendor" 
+                  id="vendor"
+                  disabled={!readToEnd} 
                   checked={vendorAccepted}
                   onCheckedChange={(checked) => setVendorAccepted(checked as boolean)}
                 />
@@ -204,7 +220,8 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
               </div>
               <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
                 <Checkbox 
-                  id="transparency" 
+                  id="transparency"
+                  disabled={!readToEnd} 
                   checked={transparencyAccepted}
                   onCheckedChange={(checked) => setTransparencyAccepted(checked as boolean)}
                 />
@@ -214,7 +231,7 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
               </div>
             </div>
           </div>
-        </ScrollArea>
+        </ScrollGatedAgreement>
 
         <DialogFooter>
           {/* The dialog's built-in X rendered but was wired to a no-op
