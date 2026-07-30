@@ -641,6 +641,21 @@ function AgentApplicationFormInner() {
         throw new Error(msg);
       }
 
+      // Optional supporting documents (30 Jul): uploaded one by one under a
+      // single field name — server adds a timestamp so paths never collide.
+      const supportingDocumentPaths: Array<{ name: string; path: string }> = [];
+      for (const extra of (formData.supportingDocumentFiles ?? []) as File[]) {
+        try {
+          const path = await handleFileUpload(extra, 'supporting_document', authUser.id, formData.email);
+          supportingDocumentPaths.push({ name: extra.name, path });
+        } catch (uploadErr: any) {
+          setStep(4);
+          const msg = uploadErr?.message || `Failed to upload ${extra.name}. Please try again.`;
+          setFormData((prev: any) => ({ ...prev, __documentUploadError: msg }));
+          throw new Error(msg);
+        }
+      }
+
       const extendedData = {
         arcNumber: formData.arcNumber,
         cliaNumber: formData.cliaNumber,
@@ -648,6 +663,7 @@ function AgentApplicationFormInner() {
         instagramHandle: formData.instagramHandle,
         tiktokHandle: formData.tiktokHandle,
         linkedinProfileUrl: formData.linkedinProfileUrl,
+        supportingDocumentPaths,
       };
 
       // Resolve the canonical application id for this agent:
@@ -1132,22 +1148,24 @@ function AgentApplicationFormInner() {
         return (
           <div className="space-y-8">
             <div>
-              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Final step</p>
-              <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">Verify your identity</h3>
-              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
+                <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Verify Your Identity</h3>
+              </div>
+              <p className="mb-6 text-sm text-[#6B7280] ml-4 max-w-xl leading-relaxed">
                 Identity verification confirms who you are — it takes 2–3 minutes. Once it's
                 done, our team reviews your credentials and insurance, and we'll email you a
                 decision <strong className="text-[#0a2225]">within one to two business days</strong>.
               </p>
             </div>
 
-            <div className="border-y border-[#0a2225]/10 py-7">
-              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Have ready</p>
-              <div className="mt-4 space-y-3.5 text-[15.5px] leading-relaxed text-[#0a2225]/80">
-                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>A government-issued photo ID — passport or driver's license.</p>
-                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>A device with a camera, for a quick selfie match.</p>
-                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>About two minutes of your time.</p>
-              </div>
+            <div className="rounded-xl border-2 border-dashed border-[#E5DFC6] bg-[#FDF9F0]/50 p-5">
+              <p className="text-sm font-medium text-[#0a2225] mb-3">Have ready</p>
+              <ul className="space-y-2.5 text-sm leading-relaxed text-[#0a2225]/80">
+                <li className="flex gap-3"><CheckCircle2 className="h-4.5 w-4.5 mt-0.5 shrink-0 text-[#C7A962]" />A government-issued photo ID — passport or driver's license.</li>
+                <li className="flex gap-3"><CheckCircle2 className="h-4.5 w-4.5 mt-0.5 shrink-0 text-[#C7A962]" />A device with a camera, for a quick selfie match.</li>
+                <li className="flex gap-3"><CheckCircle2 className="h-4.5 w-4.5 mt-0.5 shrink-0 text-[#C7A962]" />About two minutes of your time.</li>
+              </ul>
             </div>
 
             <Button
