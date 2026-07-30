@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollGatedAgreement, type AgreementEvidence } from '@/components/legal/ScrollGatedAgreement';
+import { AgentAgreementBody } from '@/components/legal/AgentAgreementBody';
+import { ExternalLink } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,138 +99,66 @@ export const AgentTermsAcceptanceModal = ({ open, agentId, onAccepted }: AgentTe
           }}
         >
           <div className="space-y-8">
-            {/* Terms of Service */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <FileText className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">Terms of Service</h3>
-              </div>
-              <div className="text-sm space-y-2 text-muted-foreground">
-                <p className="font-medium">1. Platform Usage</p>
-                <p>As a registered travel agent, you agree to use this platform professionally and ethically...</p>
-                
-                <p className="font-medium mt-4">2. Service Standards</p>
-                <p>You commit to providing high-quality service, responding promptly to inquiries, and maintaining professionalism...</p>
-                
-                <p className="font-medium mt-4">3. Commission Structure</p>
-                <p>Commission rates are set per package. Platform fees are automatically deducted from earnings...</p>
-                
-                <p className="font-medium mt-4">4. Liability & Insurance</p>
-                <p>You maintain appropriate insurance and accept responsibility for services you provide...</p>
-              </div>
-              <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
-                <Checkbox 
-                  id="terms"
-                  disabled={!readToEnd} 
-                  checked={termsAccepted}
-                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                />
-                <label htmlFor="terms" className="text-sm font-medium cursor-pointer">
-                  I have read and agree to the Terms of Service
-                </label>
+            {/* The FULL Agent Partnership Agreement — the same words as
+                /legal/agent-agreement (30 Jul: replaced the old bullet
+                summaries; agents were accepting text that wasn't the
+                agreement, and one summary line about fee deduction
+                contradicted it). */}
+            <AgentAgreementBody />
+
+            <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/60 p-4">
+              <p className="mb-2 text-sm font-medium text-[#0a2225]">Also part of your agreement</p>
+              <p className="mb-3 text-xs text-[#6B7280]">These platform-wide policies apply to every account and are incorporated by reference. Each opens in a new tab.</p>
+              <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm">
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#0c4d47] underline underline-offset-2">Terms of Service <ExternalLink className="h-3 w-3" /></a>
+                <a href="/privacy-cookies" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#0c4d47] underline underline-offset-2">Privacy &amp; Cookies <ExternalLink className="h-3 w-3" /></a>
+                <a href="/transparency-agreement" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#0c4d47] underline underline-offset-2">Transparency Agreement <ExternalLink className="h-3 w-3" /></a>
               </div>
             </div>
 
-            <Separator />
-
-            {/* Privacy Policy */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Shield className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">Privacy Policy</h3>
-              </div>
-              <div className="text-sm space-y-2 text-muted-foreground">
-                <p className="font-medium">1. Data Collection</p>
-                <p>We collect agent profile information, booking data, and communication records...</p>
-                
-                <p className="font-medium mt-4">2. Data Usage</p>
-                <p>Your data is used to facilitate bookings, process payments, and improve platform services...</p>
-                
-                <p className="font-medium mt-4">3. Data Sharing</p>
-                <p>Information is shared with customers for booking purposes. We never sell personal data...</p>
-                
-                <p className="font-medium mt-4">4. Data Security</p>
-                <p>We employ industry-standard security measures to protect your information...</p>
-              </div>
-              <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
-                <Checkbox 
-                  id="privacy"
-                  disabled={!readToEnd} 
-                  checked={privacyAccepted}
-                  onCheckedChange={(checked) => setPrivacyAccepted(checked as boolean)}
-                />
-                <label htmlFor="privacy" className="text-sm font-medium cursor-pointer">
-                  I have read and agree to the Privacy Policy
-                </label>
-              </div>
+            <div className="flex items-center space-x-2 p-3 bg-secondary rounded-lg">
+              <Checkbox
+                id="terms"
+                disabled={!readToEnd}
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+              />
+              <label htmlFor="terms" className="text-sm font-medium cursor-pointer">
+                I have read and agree to the Terms of Service
+              </label>
             </div>
-
-            <Separator />
-
-            {/* Vendor Agreement */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Building className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">Vendor Agreement</h3>
-              </div>
-              <div className="text-sm space-y-2 text-muted-foreground">
-                <p className="font-medium">1. Independent Contractor Status</p>
-                <p>You operate as an independent contractor, not an employee of the platform...</p>
-                
-                <p className="font-medium mt-4">2. Package Creation & Pricing</p>
-                <p>You have full control over your packages, pricing, and terms within platform guidelines...</p>
-                
-                <p className="font-medium mt-4">3. Payment Terms</p>
-                <p>Payments are processed within 5 business days after trip completion. Platform fees apply...</p>
-                
-                <p className="font-medium mt-4">4. Cancellation & Refunds</p>
-                <p>You must honor your stated cancellation policies. Dispute resolution follows platform procedures...</p>
-              </div>
-              <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
-                <Checkbox 
-                  id="vendor"
-                  disabled={!readToEnd} 
-                  checked={vendorAccepted}
-                  onCheckedChange={(checked) => setVendorAccepted(checked as boolean)}
-                />
-                <label htmlFor="vendor" className="text-sm font-medium cursor-pointer">
-                  I have read and agree to the Vendor Agreement
-                </label>
-              </div>
+            <div className="flex items-center space-x-2 p-3 bg-secondary rounded-lg">
+              <Checkbox
+                id="privacy"
+                disabled={!readToEnd}
+                checked={privacyAccepted}
+                onCheckedChange={(checked) => setPrivacyAccepted(checked as boolean)}
+              />
+              <label htmlFor="privacy" className="text-sm font-medium cursor-pointer">
+                I have read and agree to the Privacy & Cookies Policy
+              </label>
             </div>
-
-            <Separator />
-
-            {/* Transparency Agreement */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Eye className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">Transparency Agreement</h3>
-              </div>
-              <div className="text-sm space-y-2 text-muted-foreground">
-                <p className="font-medium">1. On-Platform Communication</p>
-                <p>All campaign communications and transactions must stay on the Goldsainte Platform. No external DMs, calls, or side deals...</p>
-                
-                <p className="font-medium mt-4">2. Pricing & Fee Transparency</p>
-                <p>Clearly represent pricing, commissions, and any markups. No misleading quotes or hidden costs...</p>
-                
-                <p className="font-medium mt-4">3. Sponsored Content Disclosure</p>
-                <p>Disclose any compensation, gifted stays, or affiliate relationships when promoting experiences...</p>
-                
-                <p className="font-medium mt-4">4. AI & Recommendations</p>
-                <p>You are responsible for verifying AI-assisted suggestions. AI may not reflect real-time availability...</p>
-              </div>
-              <div className="flex items-center space-x-2 mt-4 p-3 bg-secondary rounded-lg">
-                <Checkbox 
-                  id="transparency"
-                  disabled={!readToEnd} 
-                  checked={transparencyAccepted}
-                  onCheckedChange={(checked) => setTransparencyAccepted(checked as boolean)}
-                />
-                <label htmlFor="transparency" className="text-sm font-medium cursor-pointer">
-                  I have read and agree to the <a href="/transparency-agreement" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Transparency Agreement</a>
-                </label>
-              </div>
+            <div className="flex items-center space-x-2 p-3 bg-secondary rounded-lg">
+              <Checkbox
+                id="vendor"
+                disabled={!readToEnd}
+                checked={vendorAccepted}
+                onCheckedChange={(checked) => setVendorAccepted(checked as boolean)}
+              />
+              <label htmlFor="vendor" className="text-sm font-medium cursor-pointer">
+                I have read and agree to the Agent Partnership Agreement above
+              </label>
+            </div>
+            <div className="flex items-center space-x-2 p-3 bg-secondary rounded-lg">
+              <Checkbox
+                id="transparency"
+                disabled={!readToEnd}
+                checked={transparencyAccepted}
+                onCheckedChange={(checked) => setTransparencyAccepted(checked as boolean)}
+              />
+              <label htmlFor="transparency" className="text-sm font-medium cursor-pointer">
+                I have read and agree to the Transparency Agreement
+              </label>
             </div>
           </div>
         </ScrollGatedAgreement>
