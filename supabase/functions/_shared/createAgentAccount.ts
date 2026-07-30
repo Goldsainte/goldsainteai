@@ -268,6 +268,12 @@ export async function createAgentAccountFromApplication(
         username: await deriveUsername(application.email, userId),
         first_name: application.first_name,
         last_name: application.last_name,
+        // The applicant's stated name must win (30 Jul): a pre-existing
+        // profile (e.g. a support/traveler account that later applied) kept
+        // its old full_name, so the dashboard greeted an approved agent by
+        // the wrong name entirely.
+        full_name: `${application.first_name} ${application.last_name}`.trim(),
+        display_name: `${application.first_name} ${application.last_name}`.trim(),
         phone: application.phone || null,
         account_type: "agent",
         role: "agent",
