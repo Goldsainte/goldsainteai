@@ -81,7 +81,16 @@ export async function createAgentAccountFromApplication(
         .eq("username", candidate)
         .neq("id", uid)
         .maybeSingle();
-      if (!taken) return candidate;
+      // Reserved names (e.g. "support", "admin") are enforced by a DB
+      // trigger on profiles — treat them as taken here so provisioning
+      // rolls to "-2" instead of failing the whole approval (found 30 Jul:
+      // approving support@goldsainte.com died on username "support").
+      const { data: reserved } = await supabase
+        .from("reserved_usernames")
+        .select("username")
+        .eq("username", candidate)
+        .maybeSingle();
+      if (!taken && !reserved) return candidate;
       candidate = `${base.slice(0, 28)}-${n}`;
     }
     // Last resort: guaranteed-unique handle.
