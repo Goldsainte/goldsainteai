@@ -53,6 +53,20 @@ export const useUserRole = () => {
     };
 
     checkRoles();
+
+    // Roles can change while a session is open (admin approval in another
+    // tab, terms acceptance, provisioning). Without this, the header kept
+    // presenting an approved agent as a traveler until a full reload
+    // (observed 30 Jul). Refetch whenever the window regains focus.
+    const refetchOnFocus = () => {
+      if (document.visibilityState === 'visible') checkRoles();
+    };
+    window.addEventListener('focus', refetchOnFocus);
+    document.addEventListener('visibilitychange', refetchOnFocus);
+    return () => {
+      window.removeEventListener('focus', refetchOnFocus);
+      document.removeEventListener('visibilitychange', refetchOnFocus);
+    };
   }, [user]);
 
   return { 
