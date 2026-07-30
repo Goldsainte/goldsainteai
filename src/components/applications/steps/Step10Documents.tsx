@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Upload, AlertCircle } from "lucide-react";
+import { Upload, AlertCircle, X, FilePlus } from "lucide-react";
 import { useState } from "react";
 
 interface Step10Props {
@@ -30,6 +30,38 @@ function validateFile(file: File): string | null {
 
 export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const MAX_SUPPORTING_DOCS = 5;
+
+  const handlePickMultiple = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    if (!picked.length) return;
+    const existing: File[] = formData.supportingDocumentFiles ?? [];
+    const room = MAX_SUPPORTING_DOCS - existing.length;
+    if (room <= 0) {
+      setErrors((prev) => ({ ...prev, supportingDocumentFiles: `Maximum ${MAX_SUPPORTING_DOCS} additional documents.` }));
+      return;
+    }
+    const accepted: File[] = [];
+    for (const file of picked.slice(0, room)) {
+      const err = validateFile(file);
+      if (err) {
+        setErrors((prev) => ({ ...prev, supportingDocumentFiles: err }));
+        continue;
+      }
+      accepted.push(file);
+    }
+    if (accepted.length) {
+      setErrors((prev) => { const n = { ...prev }; delete n.supportingDocumentFiles; return n; });
+      setFormData({ ...formData, supportingDocumentFiles: [...existing, ...accepted] });
+    }
+  };
+
+  const removeSupportingDoc = (idx: number) => {
+    const existing: File[] = formData.supportingDocumentFiles ?? [];
+    setFormData({ ...formData, supportingDocumentFiles: existing.filter((_: File, i: number) => i !== idx) });
+  };
 
   const handlePick = (fieldKey: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -104,6 +136,41 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
               )}
               {errors.insuranceCertificateFile && (
                 <p className="mt-2 text-xs text-red-600">{errors.insuranceCertificateFile}</p>
+              )}
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="supportingDocumentFiles" className="text-sm font-medium text-[#0a2225]">
+              Additional Documents <span className="font-normal text-[#6B7280]">(optional — accreditations, references, bonding, up to 5)</span>
+            </Label>
+            <div className="mt-1.5 border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] bg-[#FDF9F0]/50 rounded-xl p-4 transition-colors cursor-pointer">
+              <Input
+                id="supportingDocumentFiles"
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,application/pdf,image/*"
+                className="cursor-pointer"
+                onChange={handlePickMultiple}
+              />
+              {(formData.supportingDocumentFiles ?? []).length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {(formData.supportingDocumentFiles as File[]).map((f, i) => (
+                    <li key={`${f.name}-${i}`} className="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 text-xs text-[#0c4d47]">
+                      <span className="truncate">✓ {f.name}</span>
+                      <button
+                        type="button"
+                        aria-label={`Remove ${f.name}`}
+                        onClick={() => removeSupportingDoc(i)}
+                        className="ml-3 shrink-0 rounded p-0.5 text-[#6B7280] hover:bg-[#FDF9F0] hover:text-[#0a2225]"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {errors.supportingDocumentFiles && (
+                <p className="mt-2 text-xs text-red-600">{errors.supportingDocumentFiles}</p>
               )}
             </div>
           </div>
