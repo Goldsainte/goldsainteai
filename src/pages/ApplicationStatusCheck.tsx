@@ -142,21 +142,20 @@ export default function ApplicationStatusCheck() {
   // ────────────────────────────────────────────────
   if (!authLoading && !user) {
     return (
-      <div className="flex-1 bg-[#FDF9F0] px-3 sm:px-4 py-16 text-[#0a2225]">
+      <div className="flex-1 bg-[#FDF9F0] px-4 py-20 text-[#0a2225]">
         <section className="mx-auto w-full max-w-xl">
-          <div className="rounded-2xl border border-[#E5DFC6] bg-white p-8 text-center shadow-sm md:p-10">
-            <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">Check Your Application Status</h1>
-            <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-[#6B7280]">
-              Sign in with the email you used to apply and we'll show you exactly where things stand.
-            </p>
-            <Link
-              to={signInHref}
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm text-[#E5DFC6] transition-colors hover:bg-[#073331]"
-            >
-              Sign in
-              <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
-            </Link>
-          </div>
+          <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Application status</p>
+          <h1 className="mt-3 font-secondary text-4xl leading-tight md:text-5xl">Where things stand.</h1>
+          <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-[#0a2225]/55">
+            Sign in with the email you used to apply and we'll show you exactly where things stand.
+          </p>
+          <Link
+            to={signInHref}
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-sm text-[#E5DFC6] transition-colors hover:bg-[#073331]"
+          >
+            Sign in
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+          </Link>
         </section>
       </div>
     );
@@ -183,147 +182,100 @@ export default function ApplicationStatusCheck() {
   const isRejected = statusKey === "rejected";
 
   return (
-    <div className="flex-1 bg-[#FDF9F0] px-3 sm:px-4 py-10 md:py-16 text-[#0a2225]">
+    <div className="flex-1 bg-[#FDF9F0] px-4 py-14 md:py-20 text-[#0a2225]">
+      {/* Editorial treatment matching the agent-dashboard baseline (30 Jul):
+          kicker + large serif + gold roman numerals + hairlines. Truthful
+          status copy from files 162/177 unchanged; no dossier vocabulary. */}
       <section className="mx-auto w-full max-w-4xl">
-        <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6 md:p-10 shadow-sm">
-          {/* HEADER — same accent-bar family as the application steps */}
-          <header className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="mb-3 flex items-center gap-3">
-                <div className="h-8 w-1 rounded-full bg-[#C7A962]" />
-                <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">{tierLabel}</h2>
-              </div>
-              <p className="ml-4 text-sm text-[#6B7280]">
-                {status ? `Filed ${formatLongDate(status.created_at)}` : "Your application at a glance"}
-              </p>
-            </div>
-            <p className="ml-4 text-xs text-[#6B7280] md:ml-0 md:text-right">
-              Reference<br />
-              <span className="font-medium text-[#0a2225]">{status ? `GS-${shortRef(status.id)}` : "—"}</span>
-            </p>
-          </header>
-
-          {/* LOADING / ERROR */}
-          {(loading || authLoading) && !status && (
-            <p className="mb-8 text-sm text-[#6B7280]">Checking your application…</p>
-          )}
-          {error && !loading && (
-            <div className="mb-8 flex items-start gap-3 rounded-xl border border-[#C7A962]/60 bg-[#FDF9F0] p-4">
-              <p className="text-sm text-[#0a2225]/80">{error}</p>
-            </div>
-          )}
-
+        <header className="mb-10">
+          <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Application status</p>
+          <h2 className="mt-3 font-secondary text-4xl leading-tight md:text-5xl">{tierLabel}</h2>
           {status && (
-            <>
-              {/* STATUS BANNER */}
-              <div
-                className={`mb-8 rounded-xl p-6 ${
-                  isApproved
-                    ? "bg-[#0c4d47] text-[#E5DFC6]"
-                    : isRejected
-                    ? "border border-red-200 bg-red-50 text-red-900"
-                    : "border border-[#C7A962]/60 bg-[#FDF9F0] text-[#0a2225]"
-                }`}
-              >
-                <h3 className="font-secondary text-xl md:text-2xl">{statusCopy.label}</h3>
-                <p className={`mt-2 text-sm leading-relaxed ${isApproved ? "text-[#E5DFC6]/85" : isRejected ? "text-red-800" : "text-[#0a2225]/70"}`}>
-                  {statusCopy.note}
-                </p>
-                <p className={`mt-4 text-xs ${isApproved ? "text-[#E5DFC6]/60" : "text-[#6B7280]"}`}>
-                  Signed in as {user?.email}
-                </p>
-              </div>
-
-              {/* PROGRESS */}
-              <div className="mb-8">
-                <p className="mb-4 text-sm font-medium text-[#0a2225]">Where things stand</p>
-
-                <div className="flex items-start gap-4">
-                  <div className="flex flex-col items-center pt-1">
-                    <div
-                      className={`mb-2 h-3 w-3 rounded-full ${
-                        status.stripe_verification_status === "verified"
-                          ? "bg-[#0c4d47]"
-                          : "animate-pulse border-2 border-[#C7A962]"
-                      }`}
-                    />
-                    <div className="h-10 w-px bg-[#E5DFC6]" />
-                  </div>
-                  <div className="pb-8">
-                    <p className="mb-1 text-sm font-medium text-[#0a2225]">Identity verification</p>
-                    <p className="text-sm text-[#6B7280]">
-                      {status.stripe_verification_status === "verified"
-                        ? "Confirmed"
-                        : status.stripe_verification_status === "pending"
-                        ? "Awaiting Stripe Identity completion"
-                        : "Not yet started"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="-mt-2 flex items-start gap-4">
-                  <div className="flex flex-col items-center pt-1">
-                    <div
-                      className={`mb-2 h-3 w-3 rounded-full ${
-                        isApproved
-                          ? "bg-[#0c4d47]"
-                          : isRejected
-                          ? "border-2 border-[#0a2225]/30"
-                          : "animate-pulse border-2 border-[#C7A962]"
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <p className={`mb-1 text-sm font-medium ${isRejected ? "text-[#0a2225]/60" : "text-[#0a2225]"}`}>
-                      Account activation
-                    </p>
-                    <p className="text-sm text-[#6B7280]">
-                      {isApproved
-                        ? "Active — sign in to access your dashboard"
-                        : isRejected
-                        ? "Suspended pending review outcome"
-                        : statusKey === "verified"
-                        ? "Pending approval by our review team"
-                        : "Awaiting verification completion"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* REJECTION NOTE */}
-              {isRejected && status.rejection_reason && (
-                <div className="mb-8 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0]/60 p-5">
-                  <p className="mb-2 text-sm font-medium text-[#0a2225]">Note from our review team</p>
-                  <p className="text-sm leading-relaxed text-[#0a2225]/80">{status.rejection_reason}</p>
-                </div>
-              )}
-
-              {/* FOOTNOTE + ACTIONS */}
-              <p className="mb-6 text-xs leading-relaxed text-[#6B7280]">
-                All communications and payments must remain on platform. If you have a question about your
-                application, contact our concierge team rather than the reviewer directly.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={() => checkStatus()}
-                  disabled={loading}
-                  className="rounded-full border border-[#E5DFC6] px-5 py-2 text-sm text-[#0a2225] transition-colors hover:border-[#C7A962] disabled:opacity-40"
-                >
-                  {loading ? "Refreshing…" : "Refresh status"}
-                </button>
-                {isApproved && (
-                  <Link
-                    to="/auth"
-                    className="rounded-full bg-[#0c4d47] px-5 py-2 text-sm text-[#E5DFC6] transition-colors hover:bg-[#073331]"
-                  >
-                    Sign in to dashboard
-                  </Link>
-                )}
-              </div>
-            </>
+            <p className="mt-4 text-[15px] text-[#0a2225]/55">
+              Filed {formatLongDate(status.created_at)} · Reference GS-{shortRef(status.id)} · {user?.email}
+            </p>
           )}
-        </div>
+        </header>
+
+        {(loading || authLoading) && !status && (
+          <p className="mb-10 text-[15px] text-[#0a2225]/55">Checking your application…</p>
+        )}
+        {error && !loading && (
+          <div className="mb-10 border-l-2 border-[#C7A962] pl-5">
+            <p className="text-[15px] leading-relaxed text-[#0a2225]/80">{error}</p>
+          </div>
+        )}
+
+        {status && (
+          <>
+            <div className="border-y border-[#0a2225]/10 py-9">
+              <h3 className="font-secondary text-2xl md:text-3xl">{statusCopy.label}</h3>
+              <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#0a2225]/55">{statusCopy.note}</p>
+            </div>
+
+            <div className="border-b border-[#0a2225]/10 py-9">
+              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Where things stand</p>
+              <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
+                <p className="flex gap-4">
+                  <i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>
+                  <span>
+                    <span className="font-medium text-[#0a2225]">Identity verification — </span>
+                    {status.stripe_verification_status === "verified"
+                      ? "confirmed."
+                      : status.stripe_verification_status === "pending"
+                      ? "awaiting Stripe Identity completion."
+                      : "not yet started."}
+                  </span>
+                </p>
+                <p className="flex gap-4">
+                  <i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>
+                  <span>
+                    <span className={`font-medium ${isRejected ? "text-[#0a2225]/60" : "text-[#0a2225]"}`}>Account activation — </span>
+                    {isApproved
+                      ? "active. Sign in to access your dashboard."
+                      : isRejected
+                      ? "suspended pending review outcome."
+                      : statusKey === "verified"
+                      ? "pending approval by our review team."
+                      : "awaiting verification completion."}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {isRejected && status.rejection_reason && (
+              <div className="border-b border-[#0a2225]/10 py-9">
+                <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Note from our review team</p>
+                <p className="mt-4 max-w-2xl font-secondary text-lg italic leading-relaxed text-[#0a2225]/80">
+                  {status.rejection_reason}
+                </p>
+              </div>
+            )}
+
+            <p className="mt-9 max-w-2xl text-[13px] leading-relaxed text-[#0a2225]/45">
+              All communications and payments must remain on platform. If you have a question about your
+              application, contact our concierge team rather than the reviewer directly.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <button
+                onClick={() => checkStatus()}
+                disabled={loading}
+                className="rounded-full border border-[#0a2225]/20 px-6 py-2.5 text-sm transition-colors hover:border-[#C7A962] disabled:opacity-40"
+              >
+                {loading ? "Refreshing…" : "Refresh status"}
+              </button>
+              {isApproved && (
+                <Link
+                  to="/auth"
+                  className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm text-[#E5DFC6] transition-colors hover:bg-[#073331]"
+                >
+                  Sign in to dashboard
+                </Link>
+              )}
+            </div>
+          </>
+        )}
       </section>
     </div>
   );
