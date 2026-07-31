@@ -593,6 +593,67 @@ const LuxuryBadge: React.FC<{ children: React.ReactNode; variant?: 'default' | '
 // APPLICATION DETAIL VIEW - AGENT
 // ============================================================================
 
+/* ApplicationDocumentsList (30 Jul) — the old section read `application.documents`,
+   a legacy field nothing populates, so admins saw "No documents uploaded" for
+   every application even though the required license/insurance uploads were
+   sitting in storage. Real locations: document_business_license,
+   document_insurance_cert, and extended_data.supportingDocumentPaths (261).
+   Files open via short-lived signed URLs — the admin storage SELECT policy
+   on 'application-documents' (migration 20260524010028) authorizes this. */
+const ApplicationDocumentsList: React.FC<{ application: any }> = ({ application }) => {
+  const docs: Array<{ label: string; path: string }> = [];
+  if (application.document_business_license) {
+    docs.push({ label: 'Business License', path: application.document_business_license });
+  }
+  if (application.document_insurance_cert) {
+    docs.push({ label: 'E&O Insurance Certificate', path: application.document_insurance_cert });
+  }
+  for (const extra of (application.extended_data?.supportingDocumentPaths ?? [])) {
+    if (extra?.path) docs.push({ label: extra.name || 'Supporting document', path: extra.path });
+  }
+
+  const openDoc = async (path: string) => {
+    const { data, error } = await supabase.storage
+      .from('application-documents')
+      .createSignedUrl(path, 600);
+    if (error || !data?.signedUrl) {
+      toast.error(error?.message || 'Could not open document');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  if (docs.length === 0) {
+    return <p className="text-sm text-[#6B7280]">No documents uploaded</p>;
+  }
+  return (
+    <div className="space-y-2">
+      {docs.map((doc) => (
+        <div
+          key={doc.path}
+          className="flex items-center justify-between p-3 border border-[#E5DFC6] rounded-xl hover:bg-[#F5EFE1] transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5 text-[#C7A962]" />
+            <div>
+              <p className="font-medium text-sm text-[#0a2225]">{doc.label}</p>
+              <p className="text-xs text-[#6B7280] break-all">{doc.path.split('/').pop()}</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => openDoc(doc.path)}
+            className="text-[#0c4d47] hover:bg-[#d4e7dd]"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AgentApplicationDetail: React.FC<{
   application: AgentApplication;
   onApprove: () => void;
@@ -842,34 +903,7 @@ const AgentApplicationDetail: React.FC<{
           <LuxuryCardTitle icon={FileText}>Uploaded Documents</LuxuryCardTitle>
         </LuxuryCardHeader>
         <LuxuryCardContent>
-          {application.documents && application.documents.length > 0 ? (
-            <div className="space-y-2">
-              {application.documents.map((doc: any, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border border-[#E5DFC6] rounded-xl hover:bg-[#F5EFE1] transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-[#C7A962]" />
-                    <div>
-                      <p className="font-medium text-sm text-[#0a2225]">{doc.type}</p>
-                      <p className="text-xs text-[#6B7280]">{doc.fileName}</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(doc.url, '_blank')}
-                    className="text-[#0c4d47] hover:bg-[#d4e7dd]"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-[#6B7280]">No documents uploaded</p>
-          )}
+          <ApplicationDocumentsList application={application} />
         </LuxuryCardContent>
       </LuxuryCard>
 
