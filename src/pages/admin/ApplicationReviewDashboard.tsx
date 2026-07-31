@@ -205,6 +205,30 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 // LUXURY APPROVAL DIALOG
 // ============================================================================
 
+/* Application reference (30 Jul) — SAME derivation as the applicant status
+   page (GS- + first 8 hex of the row id). Callers read this over the phone;
+   until now the admin search couldn't resolve it. refMatches() is forgiving:
+   "GS-D78E800A", "gsd78e800a", "d78e800a" all hit. */
+const appRef = (id: string) => `GS-${id.replace(/-/g, '').slice(0, 8).toUpperCase()}`;
+const refMatches = (id: string, query: string) => {
+  const q = query.toLowerCase().replace(/^gs-?/, '').replace(/-/g, '');
+  if (q.length < 4) return false; // too short to be a deliberate ref lookup
+  return id.replace(/-/g, '').toLowerCase().startsWith(q);
+};
+/* Phone lookup (30 Jul): phones are stored E.164 ("+19804750399") but a
+   caller reads "980-475-0399" — so match on digits only, and accept a match
+   anywhere in the number so the country code never gets in the way. Minimum
+   7 digits so short numeric strings (years, zips) don't false-positive. */
+const phoneMatches = (phone: string | null | undefined, query: string) => {
+  const qDigits = query.replace(/\D/g, '');
+  if (qDigits.length < 7) return false;
+  return (phone || '').replace(/\D/g, '').includes(qDigits);
+};
+/* Full-name lookup (30 Jul): first/last were only matched separately, so
+   searching "Andre Powell" — the way a caller says it — matched nothing. */
+const fullNameMatches = (first: string | null | undefined, last: string | null | undefined, query: string) =>
+  `${first || ''} ${last || ''}`.trim().toLowerCase().includes(query.toLowerCase());
+
 const ApprovalDialog: React.FC<ApprovalDialogProps> = ({
   open,
   onClose,
@@ -751,6 +775,7 @@ const AgentApplicationDetail: React.FC<{
             {application.first_name} {application.last_name}
           </h2>
           <p className="text-[#6B7280] mt-1">{application.agency_name}</p>
+          <p className="text-xs text-[#6B7280] mt-1">Reference {appRef(application.id)}</p>
           <div className="mt-3">
             <StatusBadge status={application.status} />
           </div>
@@ -1487,7 +1512,10 @@ export default function AdminApplicationsPage() {
       (app.first_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (app.last_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (app.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (app.agency_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+      (app.agency_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fullNameMatches(app.first_name, app.last_name, searchQuery) ||
+      phoneMatches(app.phone, searchQuery) ||
+      refMatches(app.id, searchQuery);
 
     const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
 
@@ -1498,7 +1526,9 @@ export default function AdminApplicationsPage() {
     const matchesSearch =
       (app.brand_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (app.primary_contact_email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (app.primary_contact_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+      (app.primary_contact_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      phoneMatches((app as any).primary_contact_phone ?? (app as any).phone, searchQuery) ||
+      refMatches(app.id, searchQuery);
 
     const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
 
