@@ -5,7 +5,8 @@
  * purchases; earnings. Data comes from the admin-gated admin-user-lookup
  * edge function (service role), so no per-table RLS gaps.
  * Route: /admin/user-lookup */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -66,6 +67,15 @@ export default function AdminUserLookupPage() {
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [detail, setDetail] = useState<any>(null);
   const [selected, setSelected] = useState<any>(null);
+  const [searchParams] = useSearchParams();
+
+  // Deep link (30 Jul): /admin/user-lookup?userId=<id> opens that person's
+  // ledger immediately — this is how names on /admin/users arrive here.
+  useEffect(() => {
+    const deepLinkId = searchParams.get('userId');
+    if (deepLinkId) void openUser({ id: deepLinkId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const runSearch = async () => {
     if (query.trim().length < 2) return;
