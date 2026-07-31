@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { Download, Search, ShieldCheck, ShieldOff } from "lucide-react";
 
 type Role = "admin" | "agent" | "brand" | "moderator" | "user";
@@ -25,6 +26,7 @@ const ACCOUNT_TYPES: AccountType[] = ["traveler", "creator", "agent", "brand"];
 
 export default function AdminUsersPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -271,8 +273,19 @@ export default function AdminUsersPage() {
                     return (
                       <tr key={u.id} className="border-t border-[#E5DFC6]/60 hover:bg-[#F7F3EA]/40">
                         <td className="px-4 py-3">
-                          <div className="font-medium">{u.full_name || u.display_name || u.username || "—"}</div>
-                          <div className="text-[12px] text-[#4a4a4a]">{u.email || u.id.slice(0, 8)}</div>
+                          {/* 30 Jul: names open the per-person ledger — the
+                              natural expectation ("click Tanya, see her tips")
+                              had no path; /admin/user-lookup existed unlisted. */}
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/admin/user-lookup?userId=${u.id}`)}
+                            className="text-left group"
+                          >
+                            <div className="font-medium group-hover:underline decoration-[#C7A962] underline-offset-4">
+                              {u.full_name || u.display_name || u.username || "—"}
+                            </div>
+                            <div className="text-[12px] text-[#4a4a4a]">{u.email || u.id.slice(0, 8)}</div>
+                          </button>
                         </td>
                         <td className="px-4 py-3">
                           <select
