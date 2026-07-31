@@ -260,7 +260,31 @@ async function sendRejectionEmail(
 ): Promise<void> {
   try {
     if (applicationType === "agent") {
-      await sendAgentRejectionEmail(email, firstName, rejectionReason, allowResubmission);
+      // 30 Jul: route through email-fanout's branded decline
+      // ('application-declined-professional') instead of the legacy
+      // pre-branding sender — admins rejecting from the review panel were
+      // sending the old unbranded template. _keySuffix (hour bucket) lets a
+      // re-decline after resubmission send again despite Resend's
+      // idempotency cache (same lesson as approvals, Jul 26).
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      const { error: fanoutError } = await supabaseAdmin.functions.invoke("email-fanout", {
+        body: {
+          event: "agent_application.declined",
+          record: {
+            id: crypto.randomUUID(), // only used for the idempotency key base
+            email,
+            first_name: firstName,
+            rejection_reason: allowResubmission
+              ? `${rejectionReason}\n\nYou are welcome to address the above and resubmit your application.`
+              : rejectionReason,
+            _keySuffix: String(Math.floor(Date.now() / 3600000)),
+          },
+        },
+      });
+      if (fanoutError) throw fanoutError;
     } else {
       await sendBrandRejectionEmail(
         email,
