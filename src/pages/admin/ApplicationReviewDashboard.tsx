@@ -474,11 +474,13 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
               <SelectTrigger className="mt-2 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962]">
                 <SelectValue placeholder="Select a rejection reason template" />
               </SelectTrigger>
-              {/* z-[60] (30 Jul): this Select lives inside a Dialog; both
-                  portal at z-50, and if the overlay wins the stacking race the
-                  menu opens invisibly behind it — reported as "there are no
-                  templates". Lifting the menu one layer removes the race. */}
-              <SelectContent position="popper" className="z-[60] bg-white border-[#E5DFC6] rounded-xl">
+              {/* 30 Jul, second pass: the real defect was app-wide — Dialogs
+                  here sit at z-[10000]/[10001] while the Select menu base was
+                  z-[1000], so EVERY select menu inside EVERY dialog opened
+                  invisibly behind the overlay. Fixed at the root in
+                  ui/select.tsx (z-[10002]); the z-[60] previously added here
+                  actually LOWERED the menu via tailwind-merge and is removed. */}
+              <SelectContent position="popper" className="bg-white border-[#E5DFC6] rounded-xl">
                 {templates.map((template) => (
                   <SelectItem key={template.value} value={template.value}>
                     {template.label}
@@ -604,6 +606,69 @@ const LuxuryBadge: React.FC<{ children: React.ReactNode; variant?: 'default' | '
    document_insurance_cert, and extended_data.supportingDocumentPaths (261).
    Files open via short-lived signed URLs — the admin storage SELECT policy
    on 'application-documents' (migration 20260524010028) authorizes this. */
+/* FullApplicationResponses (30 Jul) — renders EVERY answer generically so the
+   review panel can never again silently omit fields (audit: 109 collected,
+   37 saved, ~18 saved-but-hidden). Sources, newest first:
+   extended_data.applicationSnapshot (complete, apps submitted after 276),
+   legacy extended_data keys, and saved columns the curated cards never showed.
+   Empty values are skipped; keys are humanized; arrays and booleans formatted. */
+const FullApplicationResponses: React.FC<{ application: any }> = ({ application }) => {
+  const humanize = (k: string) =>
+    k.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2')
+     .replace(/\b\w/g, (c) => c.toUpperCase());
+  const fmt = (v: unknown): string | null => {
+    if (v === null || v === undefined || v === '') return null;
+    if (Array.isArray(v)) return v.length ? v.map(String).join(', ') : null;
+    if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+    if (typeof v === 'object') return null; // nested objects handled separately
+    return String(v);
+  };
+
+  const rows: Array<[string, string]> = [];
+  const seen = new Set<string>();
+  const push = (key: string, value: unknown) => {
+    const norm = key.replace(/_/g, '').toLowerCase();
+    if (seen.has(norm)) return;
+    const f = fmt(value);
+    if (f === null) return;
+    seen.add(norm);
+    rows.push([humanize(key), f]);
+  };
+
+  const snapshot = application.extended_data?.applicationSnapshot ?? null;
+  if (snapshot) {
+    for (const [k, v] of Object.entries(snapshot)) push(k, v);
+  }
+  for (const [k, v] of Object.entries(application.extended_data ?? {})) {
+    if (k === 'applicationSnapshot' || k === 'supportingDocumentPaths') continue;
+    push(k, v);
+  }
+  // Saved columns the curated cards never displayed — matters most for
+  // applications filed BEFORE the snapshot existed (their dropped fields are
+  // unrecoverable, but everything that WAS saved now shows).
+  for (const col of [
+    'why_goldsainte', 'host_agency_name', 'annual_sales_volume',
+    'average_trip_value', 'monthly_bookings', 'primary_focus', 'destinations',
+    'tax_id', 'business_registration_number', 'business_postal_code',
+    'date_of_birth', 'year_established', 'insurance_coverage_amount',
+    'accepted_terms', 'accepted_privacy', 'accepted_vendor',
+  ]) push(col, application[col]);
+
+  if (rows.length === 0) {
+    return <p className="text-sm text-[#6B7280]">No further responses recorded.</p>;
+  }
+  return (
+    <div className="grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2">
+      {rows.map(([label, value]) => (
+        <div key={label}>
+          <p className="text-[11px] uppercase tracking-wide text-[#6B7280]">{label}</p>
+          <p className="mt-0.5 text-sm text-[#0a2225] break-words">{value}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const ApplicationDocumentsList: React.FC<{ application: any }> = ({ application }) => {
   const docs: Array<{ label: string; path: string }> = [];
   if (application.document_business_license) {
@@ -908,6 +973,15 @@ const AgentApplicationDetail: React.FC<{
         </LuxuryCardHeader>
         <LuxuryCardContent>
           <ApplicationDocumentsList application={application} />
+        </LuxuryCardContent>
+      </LuxuryCard>
+
+      <LuxuryCard>
+        <LuxuryCardHeader>
+          <LuxuryCardTitle icon={FileText}>Full Application Responses</LuxuryCardTitle>
+        </LuxuryCardHeader>
+        <LuxuryCardContent>
+          <FullApplicationResponses application={application} />
         </LuxuryCardContent>
       </LuxuryCard>
 
