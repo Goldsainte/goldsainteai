@@ -352,6 +352,17 @@ export default function TripRequestDetail() {
   }
 
   const isRequestOwner = user?.id === request.userId;
+
+  // Canonical page per role (31 Jul): the OWNER's home for a request is the
+  // journey page at /trip-requests/:id (progress timeline, redesign) — this
+  // marketplace view is for specialists sizing up the brief. Before this,
+  // "My Requests" on desktop landed owners here while mobile My Trips landed
+  // them on the journey — two designs for one trip (founder screenshots).
+  // Every old link, notification, and redirect now converges by role.
+  if (isRequestOwner) {
+    return <Navigate to={`/trip-requests/${request.id}`} replace />;
+  }
+
   const travelerName = travelerProfile?.full_name || "A Goldsainte Traveler";
 
   const tripDetailsGrid = [
