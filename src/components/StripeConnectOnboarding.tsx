@@ -50,6 +50,9 @@ export const StripeConnectOnboarding = () => {
       if (error) throw error;
       setStatus(data);
       setStatusCheckFailed(false);
+      // Tell listeners (Getting Started checklist) the Stripe truth changed
+      // — the payout card and the checklist must move together (31 Jul).
+      window.dispatchEvent(new Event('gs:stripe-status-updated'));
       return data as StripeConnectStatus;
     } catch (error: any) {
       // Background poll failure: report to Sentry via console.error (nothing
