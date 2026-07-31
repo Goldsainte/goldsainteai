@@ -602,9 +602,28 @@ async function updateAgentApplication(
     logger.info("Agent application updated to verified", {
       applicationId: application.id,
     });
+  } else if (status === "processing") {
+    // 'processing' is Stripe's TRANSIENT state — the session is being checked
+    // and normally resolves to 'verified' moments later. Before 30 Jul this
+    // branch marked the application "failed" and emailed the applicant
+    // "Verification could not be completed" — a false alarm sent to EVERY
+    // applicant, and (since Stripe doesn't guarantee webhook order) a late
+    // 'processing' event could clobber a real verification. Now: record the
+    // sub-status only, never regress a settled application, no email.
+    if (application.status === "pending_verification" || application.status === "failed") {
+      await supabaseClient
+        .from("agent_applications")
+        .update({
+          stripe_verification_status: status,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", application.id);
+    }
+    logger.info("Verification processing — transient, no action", {
+      applicationId: application.id,
+    });
   } else if (
     status === "requires_input" ||
-    status === "processing" ||
     status === "canceled"
   ) {
     newStatus = "failed";
@@ -1000,9 +1019,23 @@ async function updateBrandApplication(
     logger.info("Brand application updated to verified", {
       applicationId: application.id,
     });
+  } else if (status === "processing") {
+    // Transient — see agent branch above. Brand signup is closed but the
+    // path stays correct for if/when it reopens.
+    if (application.status === "pending_verification" || application.status === "failed") {
+      await supabaseClient
+        .from("brand_applications")
+        .update({
+          stripe_verification_status: status,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", application.id);
+    }
+    logger.info("Verification processing — transient, no action", {
+      applicationId: application.id,
+    });
   } else if (
     status === "requires_input" ||
-    status === "processing" ||
     status === "canceled"
   ) {
     newStatus = "failed";
