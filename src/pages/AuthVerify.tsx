@@ -21,6 +21,34 @@ const AuthVerify = () => {
   const [searchParams] = useSearchParams();
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Dead-link recovery (31 Jul): the error copy said "request a new one" but
+  // offered no way to do it. Real cause discovered launch morning: an auth
+  // email-hook timeout voided the token server-side while the email still
+  // delivered — a valid-looking link that could never work. The hook is fixed
+  // (respond-first, file 303); this is the self-service path for any dead
+  // link: expired, scanner-eaten, or superseded.
+  const [resendEmail, setResendEmail] = useState('');
+  const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle');
+
+  const handleResend = async () => {
+    const target = resendEmail.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(target)) return;
+    setResendState('sending');
+    try {
+      if (type === 'recovery') {
+        await supabase.auth.resetPasswordForEmail(target, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+      } else {
+        await supabase.auth.resend({ type: 'signup', email: target });
+      }
+    } catch (e) {
+      console.error('[AuthVerify] resend failed', e);
+    }
+    // Always show the same neutral confirmation — never reveal whether an
+    // email is registered (account-enumeration hygiene).
+    setResendState('sent');
+  };
 
   const tokenHash = searchParams.get('token') ?? searchParams.get('token_hash') ?? '';
   const type = (searchParams.get('type') ?? 'signup') as any;
@@ -102,6 +130,38 @@ const AuthVerify = () => {
         {error ? (
           <div className="mt-7 space-y-4">
             <p className="text-sm text-red-600" role="alert">{error}</p>
+
+            {resendState === 'sent' ? (
+              <p className="text-sm text-[#0c4d47]">
+                If an account exists for that address, a fresh link is on its way — check your inbox.
+              </p>
+            ) : (
+              <div className="space-y-2 text-left">
+                <label htmlFor="resend-email" className="text-xs font-medium text-[#0a2225]">
+                  Enter your email and we'll send a new link
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="resend-email"
+                    type="email"
+                    value={resendEmail}
+                    onChange={(e) => setResendEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleResend()}
+                    placeholder="you@example.com"
+                    className="h-11 flex-1 rounded-xl border border-[#E5DFC6] bg-white px-4 text-sm text-[#0a2225] outline-none focus:border-[#C7A962]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendState === 'sending'}
+                    className="h-11 shrink-0 rounded-xl bg-[#0c4d47] px-4 text-sm font-medium text-[#E5DFC6] transition-colors hover:bg-[#073331] disabled:opacity-50"
+                  >
+                    {resendState === 'sending' ? 'Sending…' : 'Send new link'}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
               onClick={() => navigate('/marketplace', { replace: true })}
