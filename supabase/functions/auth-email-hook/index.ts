@@ -218,8 +218,16 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
   // Build a branded confirmation URL. The /auth/verify page calls verifyOtp()
   // client-side, so the raw Supabase project URL never appears in outbound emails.
   // Pass redirect_to through so recovery flows land on /reset-password.
+  // Slim link (31 Jul): a full URL nested inside the query string
+  // (redirect_to=https%3A%2F%2F...) is a classic spam heuristic — a strict
+  // receiving server content-rejected our confirmation email (SMTP 550,
+  // "Content Rejected") while accepting our plain-linked marketing email to
+  // the same mailbox. Only embed redirect_to when it actually differs from
+  // the default homepage; AuthVerify already falls back to /auth/callback
+  // when the param is absent.
+  const isDefaultRedirect = redirectTo === `https://${ROOT_DOMAIN}` || redirectTo === `https://${ROOT_DOMAIN}/`
   const confirmationUrl = emailData.token_hash
-    ? `https://${ROOT_DOMAIN}/auth/verify?token=${emailData.token_hash}&type=${emailType}&redirect_to=${encodeURIComponent(redirectTo)}`
+    ? `https://${ROOT_DOMAIN}/auth/verify?token=${emailData.token_hash}&type=${emailType}${isDefaultRedirect ? '' : `&redirect_to=${encodeURIComponent(redirectTo)}`}`
     : redirectTo
 
   console.log('Rendering email template', { emailType, confirmationUrl: confirmationUrl.substring(0, 60) + '...' })
