@@ -341,7 +341,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
 
       <button
         type="button"
-        onClick={() => navigate("/post-trip")}
+        onClick={() => navigate("/get-matched")} // AI front door (31 Jul); wizard remains at /post-trip
         className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#0c4d47] px-8 py-4 text-[15px] font-medium text-[#f7f3ea] shadow-[0_10px_30px_rgba(10,34,37,0.30)] transition-colors hover:bg-[#0a2225]"
       >
         Get matched <ArrowRight className="h-4 w-4" />
