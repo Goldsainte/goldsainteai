@@ -202,6 +202,32 @@ export default function AdminUserLookupPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <Section title={`Agent Applications (${(detail.applications ?? []).length})`}>
+                {(detail.applications ?? []).length === 0 ? (
+                  <p className="text-sm text-[#6B7280]">
+                    No application on file — this person selected the agent path at signup
+                    but has not completed the Documents step of the application.
+                  </p>
+                ) : (
+                  <div className="divide-y divide-[#E5DFC6]">
+                    {(detail.applications ?? []).map((a: any) => (
+                      <div key={a.id} className="py-2.5 text-sm">
+                        <p className="text-[#0a2225]">
+                          {a.agency_name || 'Unnamed agency'} · <span className="capitalize">{String(a.status || '').replace(/_/g, ' ')}</span>
+                        </p>
+                        <p className="text-xs text-[#6B7280]">
+                          Ref GS-{String(a.id).replace(/-/g, '').slice(0, 8).toUpperCase()} · filed {when(a.created_at)}
+                          {a.stripe_verification_status ? ` · identity ${a.stripe_verification_status}` : ' · identity not started'}
+                          {a.rejected_at ? ` · rejected ${when(a.rejected_at)}` : ''}
+                        </p>
+                        {a.rejection_reason && (
+                          <p className="mt-1 text-xs italic text-[#6B7280]">"{a.rejection_reason}"</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Section>
               <Section title={`Trip Requests (${detail.tripRequests.length})`}>
                 <RowList rows={detail.tripRequests} empty="No trip requests." />
               </Section>
