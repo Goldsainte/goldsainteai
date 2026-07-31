@@ -70,14 +70,18 @@ export default function SpecialistsFoundingPage() {
         <hr className="my-16 border-0 border-t border-[#0a2225]/10" />
         <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[1fr_auto]">
           <p className="max-w-xl text-[16px] leading-relaxed text-[#0a2225]/80">
-            You set your price — your costs and your margin are yours to build in.
-            Goldsainte's platform fee is a flat 3.5% on what you sell, charged at
-            booking. Everything else is yours, paid straight to your own Stripe
-            account.
+            You set your price — your costs and your margin are yours to build
+            in. Goldsainte's platform fee is a flat 3.5%, charged at booking;
+            the rest lands in your own Stripe account, because you're the
+            merchant of record on every trip you sell.
           </p>
+          {/* Accent, not billboard (31 Jul): sized to the hero's weight class,
+              and captioned truthfully — 3.5% is GOLDSAINTE'S only fee; the
+              agent, as merchant of record, still bears standard Stripe
+              processing. "Your only fee" overclaimed and is gone. */}
           <div className="md:text-right">
-            <p className="font-secondary text-[72px] leading-none text-[#0a2225] md:text-[88px]">3.5%</p>
-            <p className="mt-2 text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Flat · Your only fee</p>
+            <p className="font-secondary text-[44px] leading-none text-[#0a2225] md:text-[56px]">3.5%</p>
+            <p className="mt-2 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Goldsainte's flat platform fee</p>
           </div>
         </div>
 
