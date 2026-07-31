@@ -474,7 +474,11 @@ const RejectionDialog: React.FC<RejectionDialogProps> = ({
               <SelectTrigger className="mt-2 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962]">
                 <SelectValue placeholder="Select a rejection reason template" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
+              {/* z-[60] (30 Jul): this Select lives inside a Dialog; both
+                  portal at z-50, and if the overlay wins the stacking race the
+                  menu opens invisibly behind it — reported as "there are no
+                  templates". Lifting the menu one layer removes the race. */}
+              <SelectContent position="popper" className="z-[60] bg-white border-[#E5DFC6] rounded-xl">
                 {templates.map((template) => (
                   <SelectItem key={template.value} value={template.value}>
                     {template.label}
