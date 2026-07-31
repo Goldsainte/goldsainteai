@@ -244,60 +244,71 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     newEmail: user.new_email,
   }
 
-  let html: string
-  let text: string
-  try {
-    html = await renderAsync(React.createElement(EmailTemplate, templateProps))
-    console.log('HTML render complete, rendering plain text')
-    text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
-    console.log('Plain text render complete')
-  } catch (renderErr) {
-    const msg = renderErr instanceof Error ? renderErr.message : String(renderErr)
-    console.error('Email template render failed', { emailType, error: msg })
-    return new Response(
-      JSON.stringify({ error: 'Template render failed', detail: msg }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
-  console.log('Sending via Resend', { to: recipientEmail, subject: EMAIL_SUBJECTS[emailType] })
-
-  // Send via Resend (same provider used throughout this project).
-  try {
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: `Goldsainte <support@${FROM_DOMAIN}>`,
-        to: [recipientEmail],
-        subject: EMAIL_SUBJECTS[emailType] || 'Notification',
-        html,
-        text,
-      }),
-    })
-
-    if (!resendResponse.ok) {
-      const errorBody = await resendResponse.text()
-      console.error('Resend API error', { status: resendResponse.status, body: errorBody, emailType })
-      return new Response(
-        JSON.stringify({ error: 'Failed to send email' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+  // ---- Respond-first, send-in-background (31 Jul) ----
+  // Supabase Auth waits at most 5s for this hook. Cold start + TWO React
+  // template renders + the Resend round-trip regularly overran that, so Auth
+  // reported "Failed to reach hook within maximum time of 5 seconds" to the
+  // signer-upper — a FALSE failure: the account existed and the email arrived
+  // moments later (observed live, 31 Jul, first signup of launch morning).
+  // Now: signature is verified above (synchronously — forged calls still get
+  // 401), then we acknowledge Auth immediately and render+send in the
+  // background via EdgeRuntime.waitUntil, with one retry. A background send
+  // failure is logged loudly and the user can use the resend-confirmation UI;
+  // that trade beats failing every slow-start signup at the front door.
+  const renderAndSend = async () => {
+    let html: string
+    let text: string
+    try {
+      html = await renderAsync(React.createElement(EmailTemplate, templateProps))
+      text = await renderAsync(React.createElement(EmailTemplate, templateProps), { plainText: true })
+    } catch (renderErr) {
+      const msg = renderErr instanceof Error ? renderErr.message : String(renderErr)
+      console.error('[auth-email-hook] template render failed (background)', { emailType, error: msg })
+      return
     }
-    console.log('Resend API success', { status: resendResponse.status })
-  } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
-    console.error('Failed to send auth email', { error: errorMsg, emailType })
-    return new Response(
-      JSON.stringify({ error: 'Failed to send email' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+
+    const sendOnce = async (): Promise<boolean> => {
+      const resendResponse = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: `Goldsainte <support@${FROM_DOMAIN}>`,
+          to: [recipientEmail],
+          subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+          html,
+          text,
+        }),
+      })
+      if (!resendResponse.ok) {
+        const errorBody = await resendResponse.text()
+        console.error('[auth-email-hook] Resend API error (background)', { status: resendResponse.status, body: errorBody, emailType })
+        return false
+      }
+      return true
+    }
+
+    try {
+      let ok = await sendOnce()
+      if (!ok) {
+        await new Promise((r) => setTimeout(r, 1500))
+        ok = await sendOnce()
+      }
+      if (ok) console.log('[auth-email-hook] auth email sent', { emailType, email: recipientEmail })
+      else console.error('[auth-email-hook] auth email FAILED after retry — user must use resend-confirmation', { emailType, email: recipientEmail })
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      console.error('[auth-email-hook] background send threw', { error: errorMsg, emailType })
+    }
   }
 
-  console.log('Auth email sent successfully', { emailType, email: recipientEmail })
+  // Keep the work alive after we respond; fall back to fire-and-forget if
+  // the runtime ever lacks waitUntil.
+  const runtime = (globalThis as any).EdgeRuntime
+  if (runtime?.waitUntil) runtime.waitUntil(renderAndSend())
+  else renderAndSend()
 
   return new Response(
     JSON.stringify({ success: true }),
