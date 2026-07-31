@@ -74,6 +74,7 @@ const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashbo
 const ContractSignPage = lazy(() => import('@/pages/contracts/ContractSignPage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
+const GetMatchedPage = lazy(() => import('@/pages/trips/GetMatchedPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
 
 const ProposalDetailPage = lazy(() => import('@/pages/proposals/ProposalDetailPage'));
@@ -400,6 +401,10 @@ export const AppRoutes = () => (
       <Route
         path="/post-trip"
         element={<RequireAuth><PostTripPage /></RequireAuth>}
+      />
+      <Route
+        path="/get-matched"
+        element={<RequireAuth><GetMatchedPage /></RequireAuth>}
       />
       <Route
         path="/trip-requests/:tripRequestId"
