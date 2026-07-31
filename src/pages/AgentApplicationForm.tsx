@@ -656,6 +656,20 @@ function AgentApplicationFormInner() {
         }
       }
 
+      // Complete answer snapshot (30 Jul): audit found the wizard collects
+      // 109 fields but the upsert persisted only 37 — accreditation org/number,
+      // certifications, seller-of-travel registrations, bond/E&O details and
+      // ~75 more were silently dropped, so admins could never review them.
+      // Snapshotting ALL of formData (minus files/internals) means no field —
+      // present or future — can be dropped again.
+      const applicationSnapshot: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(formData)) {
+        if (key.startsWith('__')) continue;
+        if (value instanceof File) continue;
+        if (Array.isArray(value) && value.some((v) => v instanceof File)) continue;
+        applicationSnapshot[key] = value;
+      }
+
       const extendedData = {
         arcNumber: formData.arcNumber,
         cliaNumber: formData.cliaNumber,
@@ -664,6 +678,7 @@ function AgentApplicationFormInner() {
         tiktokHandle: formData.tiktokHandle,
         linkedinProfileUrl: formData.linkedinProfileUrl,
         supportingDocumentPaths,
+        applicationSnapshot,
       };
 
       // Resolve the canonical application id for this agent:
