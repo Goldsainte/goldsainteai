@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WORLD_COUNTRIES } from "@/lib/residency";
+import { taxIdInfoFor } from "@/lib/taxIdByCountry";
 import { Label } from "@/components/ui/label";
 import { AIRewriteButton } from "@/components/AIRewriteButton";
 import { Textarea } from "@/components/ui/textarea";
@@ -515,6 +516,14 @@ function AgentApplicationFormInner() {
     // by a toast naming a field they could not see: no agent could finish an
     // application. Validation now matches what each step actually shows.
     if (currentStep === 3) {
+      if (!formData.taxIdEIN?.trim()) {
+        toast({
+          title: `${taxIdInfoFor(formData.businessCountry).label} required`,
+          description: "Enter your business tax identifier for the country you selected.",
+          variant: "destructive",
+        });
+        return false;
+      }
       if (!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor) {
         toast({ title: "Please accept all legal agreements", variant: "destructive" });
         return false;
@@ -1112,8 +1121,19 @@ function AgentApplicationFormInner() {
             </div>
 
             <div>
-              <Label className="text-sm font-medium text-[#0a2225]">Tax ID / EIN</Label>
-              <Input value={formData.taxIdEIN} onChange={(e) => setFormData({ ...formData, taxIdEIN: e.target.value })} className={luxuryInputClasses} placeholder="XX-XXXXXXX" />
+              {/* Localized per business country (31 Jul): a UK agency asked
+                  for an "EIN" doesn't know what that is. Label/format follow
+                  the country chosen in step 1; required as of today. */}
+              <Label className="text-sm font-medium text-[#0a2225]">{taxIdInfoFor(formData.businessCountry).label} *</Label>
+              <Input
+                value={formData.taxIdEIN}
+                onChange={(e) => setFormData({ ...formData, taxIdEIN: e.target.value })}
+                className={luxuryInputClasses}
+                placeholder={taxIdInfoFor(formData.businessCountry).placeholder}
+              />
+              {taxIdInfoFor(formData.businessCountry).helper && (
+                <p className="mt-1.5 text-xs text-[#6B7280]">{taxIdInfoFor(formData.businessCountry).helper}</p>
+              )}
             </div>
 
             {/* Legal Acceptance */}
