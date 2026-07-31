@@ -1762,10 +1762,10 @@ export default function AdminApplicationsPage() {
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
                   <Input
-                    placeholder="Search by name, email, or company..."
+                    placeholder="Search by name, phone, email, company, or GS- reference..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-11 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962] focus:border-[#C7A962] bg-white"
+                    className="pl-11 sm:pl-11 border-[#E5DFC6] rounded-xl focus:ring-[#C7A962] focus:border-[#C7A962] bg-white"
                   />
                 </div>
               </div>
