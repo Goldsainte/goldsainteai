@@ -83,6 +83,7 @@ serve(async (req: Request) => {
       tipsReceived, tipsGiven,
       guidePurchases, bundlePurchases,
       earnings,
+      applicationsAll,
     ] = await Promise.all([
       admin.from("profiles").select("*").eq("id", userId).maybeSingle(),
       admin.from("travel_agents").select("id, agency_name, status, terms_accepted, stripe_connect_account_id, created_at").eq("user_id", userId).maybeSingle(),
@@ -95,6 +96,11 @@ serve(async (req: Request) => {
       admin.from("itinerary_purchases").select("*").eq("buyer_id", userId).order("created_at", { ascending: false }).limit(LIMIT),
       admin.from("bundle_purchases").select("*").eq("buyer_id", userId).order("created_at", { ascending: false }).limit(LIMIT),
       admin.from("earnings_ledger").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(LIMIT),
+      // Applications, matched by user_id OR the profile's email — pre-auth
+      // application rows can exist before user_id is linked.
+      admin.from("agent_applications")
+        .select("id, user_id, email, status, agency_name, stripe_verification_status, created_at, reviewed_at, rejected_at, rejection_reason")
+        .order("created_at", { ascending: false }).limit(LIMIT),
     ]);
 
     // Bookings where this person was the SERVICING side (agent id is the
@@ -105,6 +111,12 @@ serve(async (req: Request) => {
       bookingsAsAgent = r.data ?? [];
     }
     const bookingsAsCreator = await admin.from("bookings").select("*").eq("creator_id", userId).order("created_at", { ascending: false }).limit(LIMIT);
+
+    const profileEmail = (profile.data?.email || "").toLowerCase();
+    const applications = (applicationsAll.data ?? []).filter(
+      (a: any) => a.user_id === userId ||
+        (profileEmail && (a.email || "").toLowerCase() === profileEmail),
+    );
 
     const sumCents = (rows: any[] | null, key: string) =>
       (rows ?? []).reduce((acc, r) => acc + (Number(r[key]) || 0), 0);
@@ -131,6 +143,7 @@ serve(async (req: Request) => {
         guides: guidePurchases.data ?? [],
         bundles: bundlePurchases.data ?? [],
       },
+      applications,
       earnings: {
         entries: earnings.data ?? [],
         totalCents: sumCents(earnings.data, "amount"),
