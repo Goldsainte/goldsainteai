@@ -130,7 +130,7 @@ export function AgentAgreementBody() {
         </CardContent></Card>
 
         <Card><CardHeader><SectionHeader icon={Mail} number="18" title="Contact" /></CardHeader><CardContent className="space-y-3 leading-relaxed">
-          <p>For questions about this Agreement, contact <a href="mailto:partners@goldsainte.com" className="text-[#0c4d47] underline">partners@goldsainte.com</a>.</p>
+          <p>For questions about this Agreement, contact <a href="mailto:support@goldsainte.com" className="text-[#0c4d47] underline">support@goldsainte.com</a>.</p>
         </CardContent></Card>
       </div>
   );
