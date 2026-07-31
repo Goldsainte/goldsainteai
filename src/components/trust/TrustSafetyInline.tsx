@@ -1,11 +1,13 @@
 // src/components/trust/TrustSafetyInline.tsx
 export function TrustSafetyInline() {
   return (
-    <div className="rounded-2xl bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-2 text-[10px] text-[#4a4a4a]">
-      <p className="font-semibold text-[10px] mb-1">
+    /* Editorial restyle 31 Jul — shared by trip request + both proposal
+       pages, so all three shed the 10px card at once. Copy unchanged. */
+    <div className="border-l-2 border-[#C7A962] pl-5 py-1">
+      <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F] mb-2">
         Stay protected on Goldsainte
       </p>
-      <p>
+      <p className="text-[14px] leading-relaxed text-[#0a2225]/70">
         Please keep trip details and payment discussion in this chat. Avoid
         sharing phone numbers, email addresses, direct payment links or bank
         details. When trips move off-platform, we&apos;re no longer able to
