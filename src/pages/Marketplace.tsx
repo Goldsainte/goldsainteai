@@ -118,11 +118,16 @@ export default function Marketplace() {
     if (filters.infants && filters.infants > 0) params.set("infants", filters.infants.toString());
     if (filters.pets && filters.pets > 0) params.set("pets", filters.pets.toString());
     if (tourQuery) params.set("tq", tourQuery);
-    // Real navigation (tab switch, destination selection) PUSHES a history
-    // entry so the browser back button walks back through it; mere filter
-    // tweaks REPLACE so they don't spam history.
+    // Real navigation (tab switch, search) PUSHES a history entry so the
+    // browser back button walks back through it; mere filter tweaks REPLACE.
+    // CRITICAL (31 Jul): initial normalization must also REPLACE. Arriving at
+    // bare /marketplace, tab is null and the old check (null !== 'trips')
+    // PUSHED ?tab=trips — so pressing Back landed on bare /marketplace, which
+    // re-ran this effect and pushed forward again: a back-button trap that
+    // bounced every visitor entering the marketplace, forever.
+    const prevTab = searchParams.get("tab");
     const navChanged =
-      searchParams.get("tab") !== activeTab ||
+      (prevTab !== null && prevTab !== activeTab) ||
       (searchParams.get("tq") ?? "") !== tourQuery;
     setSearchParams(params, { replace: !navChanged });
     // eslint-disable-next-line react-hooks/exhaustive-deps
