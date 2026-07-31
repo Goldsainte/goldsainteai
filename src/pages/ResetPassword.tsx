@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from "@/components/ui/password-input";
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
@@ -230,9 +231,8 @@ const ResetPassword = () => {
           <form onSubmit={handleResetPassword} className="space-y-6">
             <div className="space-y-2.5">
               <Label htmlFor="password" className="text-sm uppercase tracking-[0.18em] text-muted-foreground">New password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter a new password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -245,9 +245,8 @@ const ResetPassword = () => {
 
             <div className="space-y-2.5">
               <Label htmlFor="confirm-password" className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Confirm new password</Label>
-              <Input
+              <PasswordInput
                 id="confirm-password"
-                type="password"
                 placeholder="Re-enter your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
