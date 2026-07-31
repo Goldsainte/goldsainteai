@@ -221,7 +221,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
   const isHireReq = Boolean((req as any).source_metadata?.hire_on_trip);
   return (
     <Link
-      to={`/trip-request/${req.id}`}
+      to={`/trip-requests/${req.id}`} // journey page — canonical owner view (31 Jul)
       className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-[#E5DFC6] transition-all duration-300 hover:ring-[#C7A962]/70 hover:shadow-[0_10px_36px_-14px_rgba(10,34,37,0.25)]"
     >
       <div className={`relative overflow-hidden ${imgUrl ? "aspect-[4/3]" : "min-h-[150px]"}`}>
