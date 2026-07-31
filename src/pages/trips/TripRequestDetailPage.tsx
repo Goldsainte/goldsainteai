@@ -141,6 +141,29 @@ export default function TripRequestDetailPage() {
   const isPartner = !isTraveler && (accountType === "creator" || accountType === "agent");
   const canDelete = isTraveler || isAdmin;
 
+  // Ported from the marketplace owner view (31 Jul) so nothing is lost when
+  // owners are redirected here: Close pulls the request off the marketplace
+  // (status "cancelled") but keeps the record; Delete removes it entirely.
+  const [closing, setClosing] = useState(false);
+  const handleCloseRequest = async () => {
+    if (!trip || !window.confirm("Close this trip request? It will leave the open marketplace immediately and agents and creators will no longer be able to submit proposals.")) return;
+    setClosing(true);
+    try {
+      const { error } = await supabase
+        .from("trip_requests")
+        .update({ status: "cancelled" })
+        .eq("id", trip.id);
+      if (error) throw error;
+      setTrip({ ...trip, status: "cancelled" } as any);
+      toast.success("Your request is closed and off the marketplace.");
+    } catch (err: any) {
+      console.error("Failed to close trip request", err);
+      toast.error(err.message || "Could not close the request");
+    } finally {
+      setClosing(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!trip) return;
     setDeleting(true);
@@ -193,6 +216,16 @@ export default function TripRequestDetailPage() {
           {canDelete && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
+                {trip?.status === "open" && (
+                  <button
+                    type="button"
+                    onClick={handleCloseRequest}
+                    disabled={closing}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#0a2225]/15 bg-white px-3 py-1.5 text-[12px] text-[#0a2225]/70 transition-colors hover:border-[#C7A962] disabled:opacity-50"
+                  >
+                    {closing ? "Closing…" : "Close request"}
+                  </button>
+                )}
                 <button
                   type="button"
                   disabled={deleting}
@@ -348,9 +381,18 @@ export default function TripRequestDetailPage() {
                     state: "done",
                   },
                   {
-                    title: total > 0 ? "Reviewed by specialists" : "Specialists are reviewing",
+                    // Direct requests are private to ONE named recipient (the
+                    // marketplace filter from Jul 26 keeps them off the public
+                    // board) — the copy must not imply plural "specialists".
+                    title: total > 0
+                      ? "Reviewed and responded"
+                      : preferredCreatorName
+                      ? `Awaiting ${preferredCreatorName}'s response`
+                      : "Specialists are reviewing",
                     desc: total > 0
                       ? "Your brief has been picked up and responded to."
+                      : preferredCreatorName
+                      ? "Direct requests are private — only they can see and respond to this brief."
                       : "Proposals typically arrive within a day or two.",
                     state: total > 0 ? "done" : "current",
                   },
