@@ -111,7 +111,11 @@ serve(async (req: Request) => {
         `<p>You started joining Goldsainte's advisor network but didn't get the chance to finish your application. It takes about ten minutes — your details, credentials, and a quick identity check — and travelers on the marketplace are posting trips right now.</p>
          <p>Your progress on the form is saved in your browser, so you can continue right where you stopped.</p>`,
         "Finish my application",
-        "https://goldsainte.ai/apply/agent",
+        // Sign-in-first deep link (30 Jul): the wizard's saved draft is keyed
+        // to the signed-in user, and a signed-out visitor gets a blank form
+        // with no sign-in prompt until step 4. /auth honors ?redirect= —
+        // already-signed-in visitors pass straight through to the wizard.
+        "https://goldsainte.ai/auth?redirect=%2Fapply%2Fagent",
       );
       if (ok) {
         sent++;
