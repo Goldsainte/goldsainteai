@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { edgeErrorMessage } from '@/lib/edgeErrorMessage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -1442,6 +1443,39 @@ export default function AdminApplicationsPage() {
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  // Stalled-at-signup (30 Jul): agent-typed profiles with no application row —
+  // invisible until now (the Yassine case). Loaded via nudge-stalled-agents
+  // dryRun; the button below triggers a real branded nudge send.
+  const [stalledAgents, setStalledAgents] = useState<any[]>([]);
+  const [stalledOpen, setStalledOpen] = useState(false);
+  const [nudging, setNudging] = useState(false);
+
+  const loadStalled = async () => {
+    try {
+      const { data } = await supabase.functions.invoke('nudge-stalled-agents', {
+        body: { dryRun: true },
+      });
+      if (data?.stalled) setStalledAgents(data.stalled);
+    } catch { /* card shows 0 on failure; non-critical */ }
+  };
+  useEffect(() => { loadStalled(); }, []);
+
+  const sendNudges = async () => {
+    setNudging(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('nudge-stalled-agents', {
+        body: { dryRun: false },
+      });
+      if (error) throw new Error(await edgeErrorMessage(error, 'Nudge send failed'));
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Nudge emails sent to ${data.sent} stalled applicant${data.sent === 1 ? '' : 's'}`);
+      await loadStalled();
+    } catch (e: any) {
+      toast.error(e.message || 'Nudge send failed');
+    } finally {
+      setNudging(false);
+    }
+  };
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Dialog states
@@ -1750,6 +1784,49 @@ export default function AdminApplicationsPage() {
                   <AlertTriangle className="h-6 w-6 text-[#856404]" />
                 </div>
               </div>
+            </div>
+          </LuxuryCard>
+
+          <LuxuryCard>
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-[#6B7280] uppercase tracking-wide">Stalled at Signup</p>
+                  <p className="text-3xl font-secondary text-[#0a2225] mt-1">{stalledAgents.length}</p>
+                  <p className="text-[11px] text-[#6B7280] mt-1">Chose the agent path, never started an application</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#f0d9d1] flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-[#8a4b2f]" />
+                </div>
+              </div>
+              {stalledAgents.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setStalledOpen((v) => !v)}
+                    className="text-xs text-[#0c4d47] underline underline-offset-2"
+                  >
+                    {stalledOpen ? 'Hide list' : 'Show who'}
+                  </button>
+                  {stalledOpen && (
+                    <div className="max-h-40 space-y-1.5 overflow-y-auto">
+                      {stalledAgents.map((p) => (
+                        <p key={p.id} className="text-xs text-[#0a2225]">
+                          {p.name || p.email} <span className="text-[#6B7280]">· joined {new Date(p.joined).toLocaleDateString()}{p.lastNudged ? ` · nudged ${new Date(p.lastNudged).toLocaleDateString()}` : ''}</span>
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={sendNudges}
+                    disabled={nudging}
+                    className="w-full rounded-xl bg-[#0c4d47] text-[#E5DFC6] hover:bg-[#073331]"
+                  >
+                    {nudging ? 'Sending…' : 'Send nudge emails now'}
+                  </Button>
+                </div>
+              )}
             </div>
           </LuxuryCard>
         </div>
