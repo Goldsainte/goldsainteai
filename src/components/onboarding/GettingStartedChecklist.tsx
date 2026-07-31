@@ -256,6 +256,22 @@ export function GettingStartedChecklist({ userId, role }: Props) {
       }
     };
     load();
+
+    // Live sync (31 Jul): the Stripe payout card and this checklist read the
+    // same travel_agents columns but this effect ran once per mount — connect
+    // Stripe in another tab of the same page and the checklist stayed stale
+    // forever. Reload on the Stripe components' announcement and on window
+    // focus (covers returning from the Stripe onboarding redirect).
+    const refetch = () => load();
+    const onFocus = () => { if (document.visibilityState === "visible") load(); };
+    window.addEventListener("gs:stripe-status-updated", refetch);
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+    return () => {
+      window.removeEventListener("gs:stripe-status-updated", refetch);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
   }, [userId, role]);
 
   const handleDismiss = () => {
