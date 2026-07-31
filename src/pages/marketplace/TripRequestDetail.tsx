@@ -182,9 +182,18 @@ export default function TripRequestDetail() {
         hireCapabilities: Array.isArray(sourceMeta.hire_capabilities) ? sourceMeta.hire_capabilities : [],
       };
 
-      setRequest(mappedRequest);
-
       const isRequestOwner = user?.id === tripData.user_id;
+
+      // Canonical page per role (31 Jul, v2): owners live on the journey page
+      // at /trip-requests/:id; this marketplace view is for specialists.
+      // Redirect from the loader — v1 early-returned mid-render, violating
+      // the rules of hooks and crashing this page for owners only.
+      if (isRequestOwner) {
+        navigate(`/trip-requests/${id}`, { replace: true });
+        return;
+      }
+
+      setRequest(mappedRequest);
 
       if (isRequestOwner) {
         const { data: proposalsData, error: proposalsError } = await supabase
@@ -352,17 +361,6 @@ export default function TripRequestDetail() {
   }
 
   const isRequestOwner = user?.id === request.userId;
-
-  // Canonical page per role (31 Jul): the OWNER's home for a request is the
-  // journey page at /trip-requests/:id (progress timeline, redesign) — this
-  // marketplace view is for specialists sizing up the brief. Before this,
-  // "My Requests" on desktop landed owners here while mobile My Trips landed
-  // them on the journey — two designs for one trip (founder screenshots).
-  // Every old link, notification, and redirect now converges by role.
-  if (isRequestOwner) {
-    return <Navigate to={`/trip-requests/${request.id}`} replace />;
-  }
-
   const travelerName = travelerProfile?.full_name || "A Goldsainte Traveler";
 
   const tripDetailsGrid = [
