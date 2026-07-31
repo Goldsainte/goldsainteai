@@ -34,6 +34,7 @@ const AdminWaitlistPage = lazy(() => import('@/pages/admin/AdminWaitlistPage'));
 const SeedConciergeDesks = lazy(() => import('@/pages/admin/SeedConciergeDesks'));
 const AdminEmailDLQPage = lazy(() => import('@/pages/admin/AdminEmailDLQPage'));
 const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
+const AdminUserLookupPage = lazy(() => import('@/pages/admin/AdminUserLookupPage'));
 
 const OpsEscrowDashboardPage = lazy(() => import('@/pages/OpsEscrowDashboardPage'));
 const AgentPublicProfilePage = lazy(() => import('@/pages/agents/AgentPublicProfilePage'));
@@ -566,6 +567,7 @@ export const AppRoutes = () => (
       <Route path="/admin/agents" element={<AdminAgentsPage />} />
       <Route path="/admin/creators" element={<AdminCreatorsPage />} />
       <Route path="/admin/users" element={<AdminUsersPage />} />
+      <Route path="/admin/user-lookup" element={<AdminUserLookupPage />} />
       <Route path="/admin/bookings" element={<AdminBookingsPage />} />
       <Route path="/admin/disputes" element={<AdminDisputesPage />} />
       <Route path="/admin/trips" element={<AdminTripsPage />} />
