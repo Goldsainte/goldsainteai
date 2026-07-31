@@ -1,7 +1,7 @@
 // src/pages/trips/TripRequestDetailPage.tsx
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
+import { Check,
   ArrowLeft,
   ArrowRight,
   MapPin,
@@ -78,7 +78,25 @@ export default function TripRequestDetailPage() {
   const [deleting, setDeleting] = useState(false);
 
   const navigate = useNavigate();
+  // Journey timeline (31 Jul): the booking page's "step by step" device,
+  // adapted for requests — founder ask, with an honesty constraint: only
+  // stages the data can PROVE. "Creator acknowledged / working on it" needs
+  // creator-side signals that don't exist yet (phase 2).
+  const [preferredCreatorName, setPreferredCreatorName] = useState<string | null>(null);
   const { isAdmin } = useUserRole();
+
+  useEffect(() => {
+    const pid = (trip as any)?.preferred_creator_id;
+    if (!pid) { setPreferredCreatorName(null); return; }
+    supabase
+      .from("profiles")
+      .select("display_name, full_name, username")
+      .eq("id", pid)
+      .maybeSingle()
+      .then(({ data }) => {
+        setPreferredCreatorName(data?.display_name || data?.full_name || data?.username || null);
+      });
+  }, [(trip as any)?.preferred_creator_id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -242,9 +260,9 @@ export default function TripRequestDetailPage() {
                   {(trip.travelers_adults || trip.travelers_children) && (
                     <span className="inline-flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      {trip.travelers_adults || 0} adults
-                      {typeof trip.travelers_children === "number"
-                        ? ` • ${trip.travelers_children} children`
+                      {trip.travelers_adults || 0} {(trip.travelers_adults || 0) === 1 ? "adult" : "adults"}
+                      {typeof trip.travelers_children === "number" && trip.travelers_children > 0
+                        ? ` • ${trip.travelers_children} ${trip.travelers_children === 1 ? "child" : "children"}`
                         : ""}
                     </span>
                   )}
@@ -252,7 +270,7 @@ export default function TripRequestDetailPage() {
               </div>
 
               <div className="text-right space-y-1">
-                <span className="inline-flex items-center rounded-full bg-[#0c4d47] text-[#E5DFC6] px-3 py-1 text-[10px]">
+                <span className="inline-flex items-center rounded-full bg-[#0c4d47] text-[#E5DFC6] px-3.5 py-1.5 text-[11px] tracking-wide">
                   {trip.status === "open"
                     ? "Open for proposals"
                     : trip.status === "matched"
@@ -262,7 +280,7 @@ export default function TripRequestDetailPage() {
                     : trip.status}
                 </span>
                 {trip.traveler?.display_name && (
-                  <p className="text-[10px] text-[#8D8D8D]">
+                  <p className="text-[12px] text-[#6B7280]">
                     Posted by{" "}
                     <span className="text-[#0a2225] font-semibold">
                       {trip.traveler.display_name}
@@ -273,7 +291,7 @@ export default function TripRequestDetailPage() {
             </div>
 
             {/* Chips row: budget / pace / occasion / roles */}
-            <div className="flex flex-wrap gap-1.5 text-[9px] mb-4">
+            <div className="flex flex-wrap gap-2 text-[12px] mb-4">
               {budgetSummary && (
                 <span className="inline-flex items-center rounded-full bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-1">
                   {budgetSummary}
@@ -313,34 +331,122 @@ export default function TripRequestDetailPage() {
         <section className="mx-auto max-w-5xl px-4 pb-16 md:pb-20">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             {/* Left: details */}
-            <div className="space-y-5 text-[11px]">
-              <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0c4d47]">
-                      <Sparkles className="h-3 w-3 text-[#E5DFC6]" />
+            {/* Editorial re-cut (31 Jul): the launch-day page was white
+                bubble cards set in 9-11px type — off the house baseline
+                (kicker + serif + hairlines, files 270/271/312). Logic,
+                conditions and handlers untouched; skin only. */}
+            <div className="space-y-10 text-[15px]">
+              {(() => {
+                const total = trip.proposals_summary?.total ?? 0;
+                const accepted = trip.proposals_summary?.accepted ?? 0;
+                const stages = [
+                  {
+                    title: preferredCreatorName ? `Sent to ${preferredCreatorName}` : "Posted to the marketplace",
+                    desc: preferredCreatorName
+                      ? "They've been notified directly about your trip."
+                      : "Specialists across the marketplace can see your brief.",
+                    state: "done",
+                  },
+                  {
+                    title: total > 0 ? "Reviewed by specialists" : "Specialists are reviewing",
+                    desc: total > 0
+                      ? "Your brief has been picked up and responded to."
+                      : "Proposals typically arrive within a day or two.",
+                    state: total > 0 ? "done" : "current",
+                  },
+                  {
+                    title: total > 0
+                      ? `${total} proposal${total === 1 ? "" : "s"} delivered`
+                      : "Proposals delivered",
+                    desc: total > 0
+                      ? "Compare them side by side and ask questions in chat."
+                      : "Each arrives with an itinerary, price, and timeline.",
+                    state: total > 0 ? (accepted > 0 ? "done" : "current") : "future",
+                  },
+                  {
+                    title: accepted > 0 ? "Booked" : "You choose & book",
+                    desc: accepted > 0
+                      ? "Payment and details flow into your booking view."
+                      : "Accept the one that fits — payment stays protected on platform.",
+                    state: accepted > 0 ? "done" : "future",
+                  },
+                ];
+                const doneCount = stages.filter((st) => st.state === "done").length;
+                const pct = Math.round((doneCount / stages.length) * 100);
+                const current = stages.find((st) => st.state === "current");
+                return (
+                  <div className="border-y border-[#0a2225]/10 py-8">
+                    <p className="text-center text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
+                      Your request, step by step
+                    </p>
+                    <p className="mt-4 text-center font-secondary text-5xl text-[#0a2225]">{pct}%</p>
+                    <p className="mt-1 text-center text-[11px] uppercase tracking-[0.22em] text-[#6B7280]">
+                      of the way to booked
+                    </p>
+                    <div className="mx-auto mt-5 h-1 w-full max-w-md overflow-hidden rounded-full bg-[#C7A962]/25">
+                      <div className="h-full rounded-full bg-[#C7A962]" style={{ width: `${pct}%` }} />
                     </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                        Trip mood
-                      </p>
-                      <p className="text-[12px] font-semibold">
-                        What they&apos;re hoping for
-                      </p>
+
+                    <div className="mt-9 space-y-7">
+                      {stages.map((st, idx) => (
+                        <div key={st.title} className="flex gap-4">
+                          {st.state === "done" ? (
+                            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0c4d47] text-[#E5DFC6]">
+                              <Check className="h-4 w-4" />
+                            </span>
+                          ) : (
+                            <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-secondary text-[15px] ${
+                              st.state === "current"
+                                ? "border-[#C7A962] text-[#8D6B2F]"
+                                : "border-[#0a2225]/15 text-[#0a2225]/35"
+                            }`}>
+                              {idx + 1}
+                            </span>
+                          )}
+                          <div className={st.state === "future" ? "opacity-45" : ""}>
+                            <p className={`text-[17px] ${st.state === "future" ? "" : "font-medium"} text-[#0a2225]`}>
+                              {st.title}
+                            </p>
+                            <p className="mt-0.5 text-[14px] leading-relaxed text-[#6B7280]">{st.desc}</p>
+                            {st.state === "current" && (
+                              <p className="mt-1.5 text-[11px] uppercase tracking-[0.22em] text-[#8D6B2F]">
+                                You're here
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
+
+                    {current && (
+                      <div className="mt-9 border-l-2 border-[#C7A962] py-1 pl-5">
+                        <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Happening now</p>
+                        <p className="mt-2 font-secondary text-xl text-[#0a2225]">{current.title}.</p>
+                        <p className="mt-1 text-[14px] leading-relaxed text-[#6B7280]">{current.desc}</p>
+                      </div>
+                    )}
                   </div>
+                );
+              })()}
+
+              <div className="border-y border-[#0a2225]/10 py-8 space-y-6">
+                <div>
+                  <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip brief</p>
+                  <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">
+                    What they&apos;re hoping for
+                  </h2>
                 </div>
 
                 {trip.interests && trip.interests.length > 0 && (
                   <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
+                    <p className="text-[12px] uppercase tracking-wide text-[#6B7280] mb-2">
                       What matters most
                     </p>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2">
                       {trip.interests.map((tag) => (
                         <span
                           key={tag}
-                          className="inline-flex rounded-full bg-[#f7f3ea] border border-[#E5DFC6] px-3 py-1 text-[10px]"
+                          className="inline-flex rounded-full bg-[#f7f3ea] border border-[#E5DFC6] px-3.5 py-1.5 text-[13px]"
                         >
                           {tag}
                         </span>
@@ -351,10 +457,10 @@ export default function TripRequestDetailPage() {
 
                 {trip.accommodation_style && (
                   <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
+                    <p className="text-[12px] uppercase tracking-wide text-[#6B7280] mb-1.5">
                       Where they&apos;d like to stay
                     </p>
-                    <p className="text-[11px] text-[#4a4a4a]">
+                    <p className="text-[15px] leading-relaxed text-[#0a2225]/80">
                       {trip.accommodation_style}
                     </p>
                   </div>
@@ -362,10 +468,10 @@ export default function TripRequestDetailPage() {
 
                 {trip.flexibility && (
                   <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
+                    <p className="text-[12px] uppercase tracking-wide text-[#6B7280] mb-1.5">
                       Flexibility
                     </p>
-                    <p className="text-[11px] text-[#4a4a4a] whitespace-pre-line">
+                    <p className="text-[15px] leading-relaxed text-[#0a2225]/80 whitespace-pre-line">
                       {trip.flexibility}
                     </p>
                   </div>
@@ -373,10 +479,10 @@ export default function TripRequestDetailPage() {
 
                 {trip.special_notes && (
                   <div>
-                    <p className="text-[10px] text-[#8D8D8D] mb-1">
+                    <p className="text-[12px] uppercase tracking-wide text-[#6B7280] mb-1.5">
                       Notes for creator / agent
                     </p>
-                    <p className="text-[11px] text-[#4a4a4a] whitespace-pre-line">
+                    <p className="text-[15px] leading-relaxed text-[#0a2225]/80 whitespace-pre-line">
                       {trip.special_notes}
                     </p>
                   </div>
@@ -386,7 +492,7 @@ export default function TripRequestDetailPage() {
                   !trip.flexibility &&
                   !trip.interests?.length &&
                   !trip.accommodation_style && (
-                    <p className="text-[10px] text-[#8D8D8D]">
+                    <p className="text-[14px] text-[#6B7280]">
                       The essentials are here. Partners can use this plus your
                       chat to shape a proposal.
                     </p>
@@ -398,34 +504,26 @@ export default function TripRequestDetailPage() {
             </div>
 
             {/* Right: proposals + actions */}
-            <div className="space-y-5 text-[11px]">
-              <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
-                      Proposals
-                    </p>
-                    <p className="text-[12px] font-semibold">
-                      Who has responded so far
-                    </p>
-                  </div>
+            <div className="space-y-10 text-[15px]">
+              <div className="border-y border-[#0a2225]/10 py-8 space-y-5">
+                <div>
+                  <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals</p>
+                  <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">
+                    {trip.proposals_summary.total > 0
+                      ? `${trip.proposals_summary.total} proposal${
+                          trip.proposals_summary.total === 1 ? "" : "s"
+                        } received`
+                      : "No proposals yet"}
+                  </h2>
+                  <p className="mt-2 text-[14px] leading-relaxed text-[#0a2225]/55">
+                    {trip.proposals_summary.accepted > 0
+                      ? `${trip.proposals_summary.accepted} accepted`
+                      : "You can wait for more, or accept a proposal when you're ready."}
+                  </p>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <p className="text-[11px]">
-                      {trip.proposals_summary.total > 0
-                        ? `${trip.proposals_summary.total} proposal${
-                            trip.proposals_summary.total === 1 ? "" : "s"
-                          } received`
-                        : "No proposals yet"}
-                    </p>
-                    <p className="text-[10px] text-[#8D8D8D]">
-                      {trip.proposals_summary.accepted > 0
-                        ? `${trip.proposals_summary.accepted} accepted`
-                        : "You can wait for more, or accept a proposal when you're ready."}
-                    </p>
-                  </div>
+                  <div />
 
                   {isTraveler && (
                     <button
@@ -433,7 +531,7 @@ export default function TripRequestDetailPage() {
                       onClick={() =>
                         navigate(`/proposals?tripId=${trip.id}`)
                       }
-                      className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:bg-[#073331]"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-2.5 text-sm hover:bg-[#073331] transition-colors"
                     >
                       View proposals
                       <ArrowRight className="h-3 w-3" />
@@ -446,7 +544,7 @@ export default function TripRequestDetailPage() {
                       onClick={() =>
                         navigate(`/proposals/new?tripId=${trip.id}`)
                       }
-                      className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:bg-[#073331]"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-2.5 text-sm hover:bg-[#073331] transition-colors"
                     >
                       Send a proposal
                       <ArrowRight className="h-3 w-3" />
@@ -454,7 +552,7 @@ export default function TripRequestDetailPage() {
                   )}
                 </div>
 
-                <p className="text-[9px] text-[#8D8D8D]">
+                <p className="text-[13px] leading-relaxed text-[#0a2225]/45">
                   Proposals and booking details will flow into your booking
                   view once a proposal is accepted and payment moves into
                   Goldsainte&apos;s protected flow.
@@ -462,11 +560,11 @@ export default function TripRequestDetailPage() {
               </div>
 
               {isTraveler && (
-                <div className="rounded-3xl bg-white/95 border border-[#E5DFC6] p-4 md:p-5 space-y-2">
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8D8D]">
+                <div className="border-b border-[#0a2225]/10 pb-8 space-y-3">
+                  <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">
                     Make a change
                   </p>
-                  <p className="text-[11px] text-[#4a4a4a]">
+                  <p className="text-[14px] leading-relaxed text-[#0a2225]/70">
                     Want to adjust something big — like destination, dates or
                     budget? You can post a new trip if your plans have shifted
                     meaningfully.
@@ -474,7 +572,7 @@ export default function TripRequestDetailPage() {
                   <button
                     type="button"
                     onClick={() => navigate("/post-trip")}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#f7f3ea] text-[#0a2225] border border-[#E5DFC6] px-4 py-1.5 text-[10px] font-semibold hover:border-[#BFAD72]"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/20 px-6 py-2.5 text-sm text-[#0a2225] transition-colors hover:border-[#C7A962]"
                   >
                     Post another trip
                   </button>
