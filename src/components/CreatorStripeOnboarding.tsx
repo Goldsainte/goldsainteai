@@ -130,6 +130,7 @@ export const CreatorStripeOnboarding = ({ returnPath }: CreatorStripeOnboardingP
       });
 
       if (error) throw error;
+      window.dispatchEvent(new Event('gs:stripe-status-updated')); // sync Getting Started checklist (31 Jul)
       setStatus(data);
       return data as StripeStatus;
     } catch (error: any) {
