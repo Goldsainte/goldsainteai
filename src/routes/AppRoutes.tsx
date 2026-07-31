@@ -1,4 +1,10 @@
 import { lazy } from 'react';
+// Static import (31 Jul): as a lazy route with no route-level Suspense
+// boundary in this app, clicking Get Matched suspended the tree for a frame
+// while the chunk loaded — header vanished, layout jolted hard right
+// (scrollbar drop), then the page appeared. The page is tiny; bundling it
+// eagerly removes the intermediate frame entirely.
+import GetMatchedPage from '@/pages/trips/GetMatchedPage';
 import { Route, Routes, Navigate } from 'react-router-dom';
 
 import Auth from '@/pages/Auth';
@@ -74,7 +80,6 @@ const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashbo
 const ContractSignPage = lazy(() => import('@/pages/contracts/ContractSignPage'));
 const MyTripsPage = lazy(() => import('@/pages/trips/MyTripsPage'));
 const PostTripPage = lazy(() => import('@/pages/trips/PostTripPage'));
-const GetMatchedPage = lazy(() => import('@/pages/trips/GetMatchedPage'));
 const TripRequestDetailPageNew = lazy(() => import('@/pages/trips/TripRequestDetailPage'));
 
 const ProposalDetailPage = lazy(() => import('@/pages/proposals/ProposalDetailPage'));
