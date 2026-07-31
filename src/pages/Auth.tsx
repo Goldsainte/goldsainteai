@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from "@/components/ui/password-input";
 
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -881,9 +882,8 @@ const Auth = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -984,7 +984,7 @@ const Auth = () => {
             {(selectedAccountType === 'traveler' || selectedAccountType === 'creator' || selectedAccountType === 'agent') && (
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
-                <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
+                <PasswordInput id="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
                 <div className="text-sm space-y-1" style={{ color: '#9A9384' }}>
                   <p>Password must contain:</p>
                   <ul className="list-disc list-inside pl-2 space-y-0.5">
