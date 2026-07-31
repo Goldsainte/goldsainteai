@@ -135,7 +135,17 @@ export default function GetMatchedPage() {
 
   return (
     <div className="flex-1 bg-[#FDF9F0] text-[#0a2225]">
-      <div className="mx-auto w-full max-w-3xl px-5 pb-24 pt-16 md:pt-20">
+      {/* Entrance (31 Jul): frame-by-frame analysis of the founder's screen
+          recording showed the "hard animation to the right" was actually a
+          single-frame HARD CUT — full-width directory to sparse column in
+          66ms, which the eye reads as violent motion. The fix is a deliberate
+          entrance, not less motion: the site's existing fadeIn (250ms rise)
+          makes the swap read as intent. Applies on both page phases. */}
+      <div
+        key={phase}
+        className="mx-auto w-full max-w-3xl px-5 pb-24 pt-16 md:pt-20"
+        style={{ animation: "fadeIn 0.25s ease-out" }}
+      >
         {phase === "brief" ? (
           <>
             <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Get matched</p>
