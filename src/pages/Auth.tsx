@@ -962,24 +962,11 @@ const Auth = () => {
               <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
             </div>
 
-            <div className="flex items-start space-x-3 pt-1">
-              <Checkbox
-                id="smsOptIn"
-                checked={smsOptIn}
-                onCheckedChange={(checked) => setSmsOptIn(checked === true)}
-                disabled={isLoading}
-                className="mt-0.5 h-4 w-4"
-                style={{ borderColor: '#E8E2D0' }}
-              />
-              <div className="space-y-1">
-                <Label htmlFor="smsOptIn" className="text-sm font-medium leading-none cursor-pointer" style={{ color: '#0a2225' }}>
-                  Text message notifications
-                </Label>
-                <p className="text-sm" style={{ color: '#9A9384' }}>
-                  Receive trip updates, booking confirmations, and travel alerts via SMS. Message and data rates may apply.
-                </p>
-              </div>
-            </div>
+            {/* SMS opt-in checkbox removed 31 Jul: the promise was unbacked —
+                the notification pipeline queues to an sms_queue table that
+                doesn't exist and nothing sends SMS. profiles.sms_notifications
+                still records false; restore the checkbox when texting is
+                actually built (Twilio + queue + dispatcher + A2P compliance). */}
 
             {(selectedAccountType === 'traveler' || selectedAccountType === 'creator' || selectedAccountType === 'agent') && (
               <div className="space-y-2">
