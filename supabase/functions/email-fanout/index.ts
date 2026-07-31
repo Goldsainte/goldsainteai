@@ -108,8 +108,10 @@ Deno.serve(async (req) => {
       // Branded decline — replaces the legacy off-brand "Identity Verification
       // Issue" mail for rejections (e.g. ID/application name mismatch).
       case 'agent_application.declined': {
+        // _keySuffix: allow a fresh decline email after resubmission (30 Jul)
+        const declineSuffix = record._keySuffix ? `-${record._keySuffix}` : ''
         results.push(await send('application-declined-professional', record.email,
-          `app-declined-${record.id}`,
+          `app-declined-${record.id}${declineSuffix}`,
           { recipientName: record.first_name || 'there', adminNotes: record.rejection_reason || '' }))
         break
       }
