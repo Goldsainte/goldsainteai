@@ -93,15 +93,24 @@ Deno.serve(async (req) => {
       await adminClient.from("user_roles").delete().eq("user_id", targetUserId).eq("role", role);
     }
 
-    // 4. Audit log
-    await adminClient.from("application_audit_log").insert({
-      application_id: targetUserId,
-      application_type: "role_change",
-      action: "role_updated",
-      actor_id: adminUserId,
-      actor_type: "admin",
-      details: { accountType, addRoles, removeRoles, changed_at: new Date().toISOString() },
-    });
+    // 4. Audit log (30 Jul rewrite): the original insert targeted
+    // application_audit_log with application_type "role_change" — that table
+    // has CHECK (application_type IN ('agent','brand')), so EVERY call threw
+    // here AFTER the role change had already applied. The function returned
+    // 500, the admin UI said "Update failed" and never refreshed, and admins
+    // saw "nothing happens" while changes silently landed underneath.
+    // Role changes now log to activity_logs, and auditing is non-fatal:
+    // a logging problem must never again misreport a successful mutation.
+    try {
+      await adminClient.from("activity_logs").insert({
+        entity_type: "user",
+        entity_id: targetUserId,
+        action: "roles_updated_by_admin",
+        details: { accountType, addRoles, removeRoles, actor_id: adminUserId },
+      });
+    } catch (auditErr) {
+      console.error("admin-set-user-role: audit log failed (non-fatal)", auditErr);
+    }
 
     return new Response(JSON.stringify({ success: true }), { status: 200, headers });
   } catch (err: any) {
