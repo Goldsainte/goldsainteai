@@ -526,7 +526,7 @@ const Auth = () => {
             variant: "destructive",
             action: (
               <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
-                Sign in
+                {t('auth.signIn')}
               </ToastAction>
             ),
           });
@@ -574,7 +574,7 @@ const Auth = () => {
           variant: "destructive",
           action: (
             <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
-              Sign in
+              {t('auth.signIn')}
             </ToastAction>
           ),
         });
