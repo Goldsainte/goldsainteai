@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -406,7 +407,7 @@ function AgentApplicationFormInner() {
       }
       // Deferred a tick so the toast can never fire before the global
       // <Toaster /> has subscribed (possible when auth resolves synchronously).
-      setTimeout(() => toast({ title: "Draft restored" }), 0);
+      setTimeout(() => toast({ title: t('agentApp.draftRestored') }), 0);
     } catch {
       /* noop */
     }
@@ -455,7 +456,7 @@ function AgentApplicationFormInner() {
       /* noop */
     }
     toast({
-      title: "Draft saved",
+      title: t('agentApp.draftSaved'),
       description: "Your application is saved on this device. Pick up where you left off anytime.",
     });
     navigate("/");
@@ -464,44 +465,44 @@ function AgentApplicationFormInner() {
   // Per-step validation with friendly toasts
   const validateStep = (currentStep: number): boolean => {
     const missing = (label: string) => {
-      toast({ title: `${label} required`, variant: "destructive" });
+      toast({ title: t('agentApp.required', { label }), variant: "destructive" });
       return false;
     };
     if (currentStep === 1) {
-      if (!formData.firstName?.trim()) return missing("First name");
-      if (!formData.lastName?.trim()) return missing("Last name");
-      if (!formData.email?.trim()) return missing("Email");
+      if (!formData.firstName?.trim()) return missing(t('agentApp.mFirstName'));
+      if (!formData.lastName?.trim()) return missing(t('agentApp.mLastName'));
+      if (!formData.email?.trim()) return missing(t('agentApp.mEmail'));
       if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-        toast({ title: "Valid email required", variant: "destructive" });
+        toast({ title: t('agentApp.validEmail'), variant: "destructive" });
         return false;
       }
-      if (!formData.phone?.trim()) return missing("Phone");
+      if (!formData.phone?.trim()) return missing(t('agentApp.mPhone'));
       if (!isValidPhone(formData.phone)) {
         toast({
-          title: "Check your phone number",
-          description: "Use international format, e.g. +1 7045551234. A number starting with 0 needs its country code instead.",
+          title: t('agentApp.phoneTitle'),
+          description: t('agentApp.phoneDesc'),
           variant: "destructive",
         });
         return false;
       }
-      if (!formData.agencyName?.trim()) return missing("Agency name");
-      if (!formData.businessType) return missing("Business type");
+      if (!formData.agencyName?.trim()) return missing(t('agentApp.mAgencyName'));
+      if (!formData.businessType) return missing(t('agentApp.mBusinessType'));
       return true;
     }
     if (currentStep === 2) {
-      if (!formData.accreditationType) return missing("Accreditation");
+      if (!formData.accreditationType) return missing(t('agentApp.mAccreditation'));
       if (ACCREDITATION_NEEDS_NUMBER.includes(formData.accreditationType) && !formData.accreditationNumber?.trim()) {
-        return missing("Accreditation number");
+        return missing(t('agentApp.mAccredNumber'));
       }
       if (formData.accreditationType === "HOST" && !formData.hostAgencyName?.trim()) {
-        return missing("Host agency name");
+        return missing(t('agentApp.mHostAgency'));
       }
       if (formData.certifications.length === 0) {
-        toast({ title: "Select at least one certification", description: "Choose \"None yet\" if you don't hold one.", variant: "destructive" });
+        toast({ title: t('agentApp.certTitle'), description: t('agentApp.certDesc'), variant: "destructive" });
         return false;
       }
       if (formData.specializations.length === 0) {
-        toast({ title: "Select at least one specialization", variant: "destructive" });
+        toast({ title: t('agentApp.specTitle'), variant: "destructive" });
         return false;
       }
       return true;
@@ -543,7 +544,7 @@ function AgentApplicationFormInner() {
   };
 
   const totalSteps = 5;
-  const stepLabels = ["You & Your Business", "Credentials", "Insurance & Legal", "Documents", "Verification"];
+  const stepLabels = [t('agentApp.s1'), t('agentApp.s2'), t('agentApp.s3'), t('agentApp.s4'), t('agentApp.s5')];
 
   const specializationOptions = [
     "Luxury Travel", "Adventure Travel", "Honeymoons & Romance", "Family Travel",
@@ -866,7 +867,7 @@ function AgentApplicationFormInner() {
     <div className="flex justify-between mt-8 pt-4 border-t border-[#E5DFC6]">
       {onBack ? (
         <Button variant="outline" onClick={onBack} className="border-[#E5DFC6] text-[#0a2225] hover:bg-[#E5DFC6]/20 rounded-full px-6">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t('agentApp.back')}
         </Button>
       ) : <div />}
       <button
@@ -877,7 +878,7 @@ function AgentApplicationFormInner() {
         Save &amp; finish later
       </button>
       <Button onClick={onNext} disabled={nextDisabled || isLoading} className="bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full px-8">
-        {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <>{nextLabel || "Next"} <ArrowRight className="ml-2 h-4 w-4" /></>}
+        {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('agentApp.saving')}</> : <>{nextLabel || t('agentApp.next')} <ArrowRight className="ml-2 h-4 w-4" /></>}
       </Button>
     </div>
   );
@@ -887,34 +888,34 @@ function AgentApplicationFormInner() {
       case 1:
         return (
           <div className="space-y-8">
-            <SectionHeader title="You & Your Business" />
+            <SectionHeader title={t('agentApp.s1')} />
             <p className="text-sm text-[#6B7280] -mt-4">Tell us about yourself and your agency.</p>
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">First Name *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('auth.firstName')} *</Label>
                 <Input value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className={luxuryInputClasses} />
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Last Name *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('auth.lastName')} *</Label>
                 <Input value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className={luxuryInputClasses} />
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Email *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.email')} *</Label>
                 <Input type="email" value={formData.email} readOnly className={`${luxuryInputClasses} bg-[#FDF9F0] cursor-not-allowed`} />
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Phone *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.phone')} *</Label>
                 <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={luxuryInputClasses} />
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Agency Name *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.agencyName')} *</Label>
                 <Input value={formData.agencyName} onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })} className={luxuryInputClasses} />
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Country of operation *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.country')} *</Label>
                 <Select value={formData.businessCountry} onValueChange={(value: string) => setFormData({ ...formData, businessCountry: value })}>
                   <SelectTrigger className={luxuryInputClasses}>
-                    <SelectValue placeholder="Select your country" />
+                    <SelectValue placeholder={t('agentApp.selCountry')} />
                   </SelectTrigger>
                   <SelectContent className="max-h-72">
                     {WORLD_COUNTRIES.map((c) => (
@@ -925,25 +926,25 @@ function AgentApplicationFormInner() {
                 <p className="mt-1 text-xs text-[#6B7280]">Where your agency is based and authorized to sell travel. Shown on your public profile and trip listings.</p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Business Type *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.businessType')} *</Label>
                 <Select value={formData.businessType} onValueChange={(value: BusinessType) => setFormData({ ...formData, businessType: value })}>
-                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectTrigger className={luxurySelectClasses}><SelectValue placeholder={t('agentApp.selType')} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="independent">Independent Advisor</SelectItem>
-                    <SelectItem value="agency">Agency</SelectItem>
-                    <SelectItem value="tour_operator">Tour Operator</SelectItem>
-                    <SelectItem value="dmc">DMC / Destination Management</SelectItem>
+                    <SelectItem value="independent">{t('agentApp.btIndependent')}</SelectItem>
+                    <SelectItem value="agency">{t('agentApp.btAgency')}</SelectItem>
+                    <SelectItem value="tour_operator">{t('agentApp.btTourOp')}</SelectItem>
+                    <SelectItem value="dmc">{t('agentApp.btDmc')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Years of Experience</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.years')}</Label>
                 <Select
                   value={formData.yearsExperience}
                   onValueChange={(value) => setFormData({ ...formData, yearsExperience: value })}
                 >
                   <SelectTrigger className={luxurySelectClasses} aria-label="Years of experience">
-                    <SelectValue placeholder="Select years" />
+                    <SelectValue placeholder={t('agentApp.selYears')} />
                   </SelectTrigger>
                   <SelectContent>
                     {YEARS_OPTIONS.map((y) => (
@@ -955,7 +956,7 @@ function AgentApplicationFormInner() {
                 </Select>
               </div>
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">Website</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.website')}</Label>
                 <Input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className={luxuryInputClasses} placeholder="https://" />
               </div>
             </div>
@@ -966,11 +967,11 @@ function AgentApplicationFormInner() {
       case 2:
         return (
           <div className="space-y-8">
-            <SectionHeader title="Credentials & Expertise" />
+            <SectionHeader title={t('agentApp.step2Title')} />
             <p className="text-sm text-[#6B7280] -mt-4">Share your professional credentials and areas of expertise.</p>
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <Label className="text-sm font-medium text-[#0a2225]">How are you accredited to sell travel? *</Label>
+                <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.accredHow')} *</Label>
                 <Select
                   value={formData.accreditationType}
                   onValueChange={(v) => {
@@ -986,7 +987,7 @@ function AgentApplicationFormInner() {
                     });
                   }}
                 >
-                  <SelectTrigger className={luxuryInputClasses}><SelectValue placeholder="Select your accreditation" /></SelectTrigger>
+                  <SelectTrigger className={luxuryInputClasses}><SelectValue placeholder={t('agentApp.selAccred')} /></SelectTrigger>
                   <SelectContent className="max-h-72">
                     {ACCREDITATION_OPTIONS.map((o) => (
                       <SelectItem key={o.value} value={o.value} className="focus:bg-[#FDF9F0]">{o.label}</SelectItem>
@@ -996,7 +997,7 @@ function AgentApplicationFormInner() {
               </div>
               {ACCREDITATION_NEEDS_NUMBER.includes(formData.accreditationType) && (
                 <div>
-                  <Label className="text-sm font-medium text-[#0a2225]">Accreditation number *</Label>
+                  <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.accredNumber')} *</Label>
                   <Input
                     value={formData.accreditationNumber}
                     onChange={(e) => {
@@ -1011,7 +1012,7 @@ function AgentApplicationFormInner() {
                       });
                     }}
                     className={luxuryInputClasses}
-                    placeholder="Your credential number"
+                    placeholder={t('agentApp.credNumberPh')}
                   />
                   {checkAccreditationNumber(formData.accreditationType, formData.accreditationNumber) && (
                     <p className="mt-1.5 text-xs leading-relaxed text-[#8D6B2F]">
@@ -1026,13 +1027,13 @@ function AgentApplicationFormInner() {
                   <Label className="text-sm font-medium text-[#0a2225]">
                     Host agency{formData.accreditationType === "HOST" ? " *" : ""}
                   </Label>
-                  <Input value={formData.hostAgencyName} onChange={(e) => setFormData({ ...formData, hostAgencyName: e.target.value })} className={luxuryInputClasses} placeholder="Agency you book under" />
+                  <Input value={formData.hostAgencyName} onChange={(e) => setFormData({ ...formData, hostAgencyName: e.target.value })} className={luxuryInputClasses} placeholder={t('agentApp.hostAgencyPh')} />
                 </div>
               )}
             </div>
 
             <div>
-              <Label className="text-sm font-medium text-[#0a2225]">Professional certifications *</Label>
+              <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.certifications')} *</Label>
               <p className="text-xs text-[#6B7280] mt-1">
                 Select every credential you hold — or "None yet". Credentials are self-reported and confirmed during review.
               </p>
@@ -1063,7 +1064,7 @@ function AgentApplicationFormInner() {
             </div>
 
             <div>
-              <Label className="text-sm font-medium text-[#0a2225]">Specializations</Label>
+              <Label className="text-sm font-medium text-[#0a2225]">{t('agentApp.specializations')}</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 {specializationOptions.map((spec) => (
                   <div key={spec} className="flex items-center space-x-2">
@@ -1160,7 +1161,7 @@ function AgentApplicationFormInner() {
             <NavButtons
               onBack={() => setStep(2)}
               onNext={() => goToStep(4)}
-              nextLabel="Continue to Documents"
+              nextLabel={t('agentApp.contDocs')}
               nextDisabled={!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor}
             />
           </div>
@@ -1174,7 +1175,7 @@ function AgentApplicationFormInner() {
             <NavButtons
               onBack={() => setStep(3)}
               onNext={saveDraftApplication}
-              nextLabel="Continue to Verification"
+              nextLabel={t('agentApp.contVerif')}
             />
           </div>
         );
@@ -1230,7 +1231,7 @@ function AgentApplicationFormInner() {
       <div className="mx-auto max-w-4xl w-full">
         <div className="mb-10 text-center">
           <h1 className="mb-4 font-secondary text-[26px] md:text-[31px] lg:text-[36px] text-[#0a2225]">
-            Grow Your Luxury Travel Business With <em>Goldsainte</em>
+            {t('agentApp.heroTitle')} <em>Goldsainte</em>
           </h1>
           <p className="text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
             Become part of an exclusive advisor network where you can collaborate with creators, publish signature trips, and connect with travelers who value elevated experiences.
@@ -1295,3 +1296,4 @@ export default function AgentApplicationForm() {
 
   return <AgentApplicationFormInner />;
 }
+  const { t } = useTranslation();
