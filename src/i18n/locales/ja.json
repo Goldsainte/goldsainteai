@@ -679,6 +679,27 @@
     "fileTooLarge": "{{name}}は{{size}}MBです — 上限は50MBです。",
     "fileUnsupported": "未対応のファイル：{{name}}。PDF・JPG・PNG・HEICをご利用ください。",
     "fileNoType": "{{name}}のファイル形式を判別できません。PDF・JPG・PNG・HEICをご利用ください。",
-    "removeFile": "{{name}}を削除"
+    "removeFile": "{{name}}を削除",
+    "finalStep": "最終ステップ",
+    "verifyTitle": "本人確認を行ってください",
+    "verifyIntro": "本人確認はあなたが誰であるかを確認するもので、2〜3分で完了します。その後、チームが資格と保険を審査し、結果をメールでお送りします",
+    "verifyIntroStrong": "1〜2営業日以内に",
+    "haveReady": "ご用意ください",
+    "ready1": "政府発行の顔写真付き身分証 — パスポートまたは運転免許証。",
+    "ready2": "カメラ付きデバイス（簡単なセルフィー照合用）。",
+    "ready3": "約2分のお時間。",
+    "settingUpVerif": "確認を準備中...",
+    "startVerif": "本人確認を開始",
+    "secureNote1": "お客様の情報は安全に暗号化されています。",
+    "secureNote2": "は本人確認にStripe Identityを使用し、身分証を保存しません。",
+    "draftSavedD": "申請はこの端末に保存されています。いつでも続きから再開できます。",
+    "appSaved": "申請を保存しました",
+    "appSavedD": "申請を提出するには本人確認を完了してください。",
+    "submitFailed": "送信に失敗しました",
+    "submitFailedD": "必須項目をすべてご確認のうえ、再度お試しください。",
+    "completePrevSteps": "先にすべてのステップを完了してください",
+    "tryAgain": "もう一度お試しください。",
+    "verifSetupFailed": "確認の準備に失敗しました",
+    "taxIdD": "選択した国の事業者税務番号を入力してください。"
   }
 }
