@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, ArrowRight } from 'lucide-react';
@@ -18,6 +19,7 @@ import logomark from '@/assets/logomark-gold.png';
  */
 const AuthVerify = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,23 +68,23 @@ const AuthVerify = () => {
 
   const isConversation = action === 'ask' || action === 'open';
   const headline =
-    type === 'recovery' ? 'Reset your password'
-    : isConversation ? 'Open your conversation'
-    : 'Confirm your email';
+    type === 'recovery' ? t('auth.vResetHeadline')
+    : isConversation ? t('auth.vOpenConversation')
+    : t('auth.confirmEmail');
   const subline =
-    type === 'recovery' ? 'Click below to set a new password.'
-    : isConversation ? "You'll be signed in automatically — no password needed."
-    : 'One click to confirm and sign in — no password needed.';
+    type === 'recovery' ? t('auth.vResetSub')
+    : isConversation ? t('auth.vConvSub')
+    : t('auth.vConfirmSub');
   const ctaLabel =
-    type === 'recovery' ? 'Reset my password'
-    : isConversation ? 'Open the conversation'
-    : 'Confirm & continue';
+    type === 'recovery' ? t('auth.vCtaReset')
+    : isConversation ? t('auth.vCtaOpen')
+    : t('auth.vCtaConfirm');
 
   const handleContinue = async () => {
     setError(null);
 
     if (!tokenHash) {
-      setError('This link looks incomplete. Please open it again from your email.');
+      setError(t('auth.vIncomplete'));
       return;
     }
 
@@ -91,7 +93,7 @@ const AuthVerify = () => {
 
     if (verifyError) {
       console.error('[AuthVerify] verifyOtp error', verifyError.message);
-      setError('This link has expired or was already used. Please request a new one.');
+      setError(t('auth.vExpired'));
       setVerifying(false);
       return;
     }
@@ -133,12 +135,12 @@ const AuthVerify = () => {
 
             {resendState === 'sent' ? (
               <p className="text-sm text-[#0c4d47]">
-                If an account exists for that address, a fresh link is on its way — check your inbox.
+                {t('auth.vSentSafe')}
               </p>
             ) : (
               <div className="space-y-2 text-left">
                 <label htmlFor="resend-email" className="text-xs font-medium text-[#0a2225]">
-                  Enter your email and we'll send a new link
+                  {t('auth.vResendLabel')}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -156,7 +158,7 @@ const AuthVerify = () => {
                     disabled={resendState === 'sending'}
                     className="h-11 shrink-0 rounded-xl bg-[#0c4d47] px-4 text-sm font-medium text-[#E5DFC6] transition-colors hover:bg-[#073331] disabled:opacity-50"
                   >
-                    {resendState === 'sending' ? 'Sending…' : 'Send new link'}
+                    {resendState === 'sending' ? t('auth.sending') : t('auth.vSendNew')}
                   </button>
                 </div>
               </div>
@@ -180,7 +182,7 @@ const AuthVerify = () => {
             {verifying ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Signing you in…
+                {t('auth.vSigningYouIn')}
               </>
             ) : (
               <>
