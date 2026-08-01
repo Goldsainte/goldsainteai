@@ -679,6 +679,27 @@
     "fileTooLarge": "{{name}} pesa {{size}} MB — il massimo è 50 MB.",
     "fileUnsupported": "File non supportato: {{name}}. Usa PDF, JPG, PNG o HEIC.",
     "fileNoType": "Impossibile rilevare il tipo di {{name}}. Usa PDF, JPG, PNG o HEIC.",
-    "removeFile": "Rimuovi {{name}}"
+    "removeFile": "Rimuovi {{name}}",
+    "finalStep": "Ultimo passaggio",
+    "verifyTitle": "Verifica la tua identità",
+    "verifyIntro": "La verifica dell'identità conferma chi sei — richiede 2–3 minuti. Poi il nostro team esamina credenziali e assicurazione, e ti invieremo una decisione via e-mail",
+    "verifyIntroStrong": "entro uno o due giorni lavorativi",
+    "haveReady": "Tieni a portata",
+    "ready1": "Un documento d'identità con foto — passaporto o patente.",
+    "ready2": "Un dispositivo con fotocamera, per un rapido selfie di riscontro.",
+    "ready3": "Circa due minuti del tuo tempo.",
+    "settingUpVerif": "Preparazione della verifica...",
+    "startVerif": "Avvia la verifica dell'identità",
+    "secureNote1": "Le tue informazioni sono sicure e crittografate.",
+    "secureNote2": "usa Stripe Identity per la verifica e non conserva il tuo documento.",
+    "draftSavedD": "La tua candidatura è salvata su questo dispositivo. Riprendila quando vuoi.",
+    "appSaved": "Candidatura salvata",
+    "appSavedD": "Completa ora la verifica dell'identità per inviare la candidatura.",
+    "submitFailed": "Invio non riuscito",
+    "submitFailedD": "Controlla tutti i campi obbligatori e riprova.",
+    "completePrevSteps": "Completa prima tutti i passaggi precedenti",
+    "tryAgain": "Riprova.",
+    "verifSetupFailed": "Preparazione della verifica non riuscita",
+    "taxIdD": "Inserisci l'identificativo fiscale della tua attività per il paese selezionato."
   }
 }
