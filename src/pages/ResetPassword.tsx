@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,7 @@ const ResetPassword = () => {
   const [hasToken, setHasToken] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -80,8 +82,8 @@ const ResetPassword = () => {
         setIsVerifying(false);
         setHasToken(false);
         toast({
-          title: 'Invalid link',
-          description: 'This password reset link is invalid or has expired.',
+          title: t('auth.rInvalidLink'),
+          description: t('auth.rInvalidLinkD'),
           variant: 'destructive',
         });
         navigate('/auth', { replace: true });
@@ -110,8 +112,8 @@ const ResetPassword = () => {
       setHasToken((prev) => {
         if (!prev) {
           toast({
-            title: "Invalid link",
-            description: "This password reset link is invalid or has expired.",
+            title: t('auth.rInvalidLink'),
+            description: t('auth.rInvalidLinkD'),
             variant: "destructive",
           });
           setIsVerifying(false);
@@ -135,8 +137,8 @@ const ResetPassword = () => {
     // Validate passwords match
     if (password !== confirmPassword) {
       toast({
-        title: "Passwords don't match",
-        description: "Please make sure both passwords are identical.",
+        title: t('auth.rNoMatch'),
+        description: t('auth.rNoMatchD'),
         variant: "destructive",
       });
       setIsLoading(false);
@@ -148,8 +150,8 @@ const ResetPassword = () => {
     if (!passwordValidation.success) {
       const errorMessage = passwordValidation.error.errors[0].message;
       toast({
-        title: "Invalid password",
-        description: errorMessage,
+        title: t('auth.tInvalidPassword'),
+        description: t('auth.tPasswordRulesShort'),
         variant: "destructive",
       });
       setIsLoading(false);
@@ -165,8 +167,8 @@ const ResetPassword = () => {
 
       setIsSuccess(true);
       toast({
-        title: "Password updated!",
-        description: "Your password has been successfully reset.",
+        title: t('auth.rUpdated'),
+        description: t('auth.rUpdatedD'),
       });
 
       // Redirect to auth page after 2 seconds
@@ -175,8 +177,8 @@ const ResetPassword = () => {
       }, 2000);
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to reset password. Please try again.",
+        title: t('auth.tError'),
+        description: error.message || t('auth.rFailed'),
         variant: "destructive",
       });
     }
@@ -207,9 +209,9 @@ const ResetPassword = () => {
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl items-start justify-center px-4 py-8 sm:px-6 sm:py-12">
           <Card className="w-full max-w-xl rounded-xl border border-border/70 bg-card p-10 text-center shadow-xl">
             <CheckCircle2 className="mx-auto mb-5 h-16 w-16 text-primary" />
-            <h1 className="mb-3 font-secondary text-3xl text-foreground">Password updated</h1>
+            <h1 className="mb-3 font-secondary text-3xl text-foreground">{t('auth.rUpdatedTitle')}</h1>
             <p className="mx-auto mb-6 text-muted-foreground">
-            Redirecting you to sign in...
+            {t('auth.rRedirecting')}
           </p>
           </Card>
         </div>
@@ -224,16 +226,16 @@ const ResetPassword = () => {
         <Card className="w-full max-w-xl rounded-xl border border-border/70 bg-card p-8 shadow-xl sm:p-10">
           <div className="mb-10 flex flex-col items-center text-center">
             <img src={logomark} alt="Goldsainte" className="mb-5 h-16 w-16" loading="lazy" />
-            <h1 className="font-secondary text-4xl text-foreground">Reset your password</h1>
-            <p className="mt-3 text-base text-muted-foreground">Enter a new password for your Goldsainte account.</p>
+            <h1 className="font-secondary text-4xl text-foreground">{t('auth.vResetHeadline')}</h1>
+            <p className="mt-3 text-base text-muted-foreground">{t('auth.rSub')}</p>
           </div>
 
           <form onSubmit={handleResetPassword} className="space-y-6">
             <div className="space-y-2.5">
-              <Label htmlFor="password" className="text-sm uppercase tracking-[0.18em] text-muted-foreground">New password</Label>
+              <Label htmlFor="password" className="text-sm uppercase tracking-[0.18em] text-muted-foreground">{t('auth.rNewPassword')}</Label>
               <PasswordInput
                 id="password"
-                placeholder="Enter a new password"
+                placeholder={t('auth.rPlaceholderNew')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -244,10 +246,10 @@ const ResetPassword = () => {
             </div>
 
             <div className="space-y-2.5">
-              <Label htmlFor="confirm-password" className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Confirm new password</Label>
+              <Label htmlFor="confirm-password" className="text-sm uppercase tracking-[0.18em] text-muted-foreground">{t('auth.rConfirmNew')}</Label>
               <PasswordInput
                 id="confirm-password"
-                placeholder="Re-enter your password"
+                placeholder={t('auth.rPlaceholderConfirm')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -258,13 +260,13 @@ const ResetPassword = () => {
             </div>
 
             <div className="rounded-xl border border-border/70 bg-background/60 p-5">
-              <p className="mb-3 text-sm uppercase tracking-[0.18em] text-muted-foreground">Password requirements</p>
+              <p className="mb-3 text-sm uppercase tracking-[0.18em] text-muted-foreground">{t('auth.rReqTitle')}</p>
               <ul className="space-y-2 text-sm text-foreground/80">
-                <li>At least 8 characters</li>
-                <li>One uppercase letter</li>
-                <li>One lowercase letter</li>
-                <li>One number</li>
-                <li>One special character</li>
+                <li>{t('auth.req8')}</li>
+                <li>{t('auth.reqUpper')}</li>
+                <li>{t('auth.reqLower')}</li>
+                <li>{t('auth.reqNumber')}</li>
+                <li>{t('auth.reqSpecial')}</li>
               </ul>
             </div>
 
@@ -272,10 +274,10 @@ const ResetPassword = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating password...
+                  {t('auth.rUpdating')}
                 </>
               ) : (
-                'Save new password'
+                t('auth.rSave')
               )}
             </Button>
           </form>
@@ -288,7 +290,7 @@ const ResetPassword = () => {
               className="mx-auto inline-flex items-center gap-2 rounded-full px-4 text-muted-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to sign in
+              {t('auth.backToSignIn2')}
             </Button>
           </div>
         </Card>
