@@ -457,7 +457,7 @@ function AgentApplicationFormInner() {
     }
     toast({
       title: t('agentApp.draftSaved'),
-      description: "Your application is saved on this device. Pick up where you left off anytime.",
+      description: t('agentApp.draftSavedD'),
     });
     navigate("/");
   };
@@ -520,7 +520,7 @@ function AgentApplicationFormInner() {
       if (!formData.taxIdEIN?.trim()) {
         toast({
           title: t('agentApp.required', { label: taxIdInfoFor(formData.businessCountry).label }),
-          description: "Enter your business tax identifier for the country you selected.",
+          description: t('agentApp.taxIdD'),
           variant: "destructive",
         });
         return false;
@@ -801,14 +801,14 @@ function AgentApplicationFormInner() {
       }
 
       toast({
-        title: "Application saved",
-        description: "Now complete identity verification to submit your application.",
+        title: t('agentApp.appSaved'),
+        description: t('agentApp.appSavedD'),
       });
     } catch (error: any) {
       console.error('Error in saveDraftApplication:', error);
       toast({
-        title: "Submission failed",
-        description: error.message || "Please check all required fields and try again.",
+        title: t('agentApp.submitFailed'),
+        description: error.message || t('agentApp.submitFailedD'),
         variant: "destructive",
       });
     } finally {
@@ -818,7 +818,7 @@ function AgentApplicationFormInner() {
 
   const startStripeVerification = async () => {
     if (!draftApplicationId) {
-      toast({ title: "Error", description: "Please complete all previous steps first", variant: "destructive" });
+      toast({ title: t('auth.tError'), description: t('agentApp.completePrevSteps'), variant: "destructive" });
       return;
     }
     setIsLoading(true);
@@ -840,7 +840,7 @@ function AgentApplicationFormInner() {
       // error.context (a Response). Surface it so the toast says WHAT failed
       // (missing secret, Stripe Identity not enabled, etc.), not just THAT
       // it failed.
-      let description = error?.message || "Please try again.";
+      let description = error?.message || t('agentApp.tryAgain');
       try {
         if (error?.context && typeof error.context.json === "function") {
           const body = await error.context.json();
@@ -850,7 +850,7 @@ function AgentApplicationFormInner() {
           }
         }
       } catch { /* keep the generic message */ }
-      toast({ title: "Verification setup failed", description, variant: "destructive" });
+      toast({ title: t('agentApp.verifSetupFailed'), description, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -1187,21 +1187,20 @@ function AgentApplicationFormInner() {
                 (kicker + serif + gold roman numerals). Restored 30 Jul after
                 a mistaken restyle to the form-card family. */}
             <div>
-              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Final step</p>
-              <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">Verify your identity</h3>
+              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t('agentApp.finalStep')}</p>
+              <h3 className="mt-2 font-secondary text-[30px] leading-snug text-[#0a2225]">{t('agentApp.verifyTitle')}</h3>
               <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
-                Identity verification confirms who you are — it takes 2–3 minutes. Once it's
-                done, our team reviews your credentials and insurance, and we'll email you a
-                decision <strong className="text-[#0a2225]">within one to two business days</strong>.
+                {t('agentApp.verifyIntro')}{" "}
+                <strong className="text-[#0a2225]">{t('agentApp.verifyIntroStrong')}</strong>.
               </p>
             </div>
 
             <div className="border-y border-[#0a2225]/10 py-7">
-              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Have ready</p>
+              <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t('agentApp.haveReady')}</p>
               <div className="mt-4 space-y-3.5 text-[15.5px] leading-relaxed text-[#0a2225]/80">
-                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>A government-issued photo ID — passport or driver's license.</p>
-                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>A device with a camera, for a quick selfie match.</p>
-                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>About two minutes of your time.</p>
+                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>{t('agentApp.ready1')}</p>
+                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>{t('agentApp.ready2')}</p>
+                <p className="flex gap-4"><i className="w-5 shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>{t('agentApp.ready3')}</p>
               </div>
             </div>
 
@@ -1212,11 +1211,11 @@ function AgentApplicationFormInner() {
               className="w-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] rounded-full min-h-[52px] text-base"
               size="lg"
             >
-              {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Setting up verification...</> : <>Start identity verification</>}
+              {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />{t('agentApp.settingUpVerif')}</> : <>{t('agentApp.startVerif')}</>}
             </Button>
 
             <p className="text-center text-xs text-[#9A9079]">
-              Your information is secure and encrypted. <em className="font-secondary">Goldsainte</em> uses Stripe Identity for verification and does not store your government ID.
+              {t('agentApp.secureNote1')} <em className="font-secondary">Goldsainte</em> {t('agentApp.secureNote2')}
             </p>
           </div>
         );
