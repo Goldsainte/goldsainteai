@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ type PersistedAuthFlow = {
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -302,12 +304,12 @@ const Auth = () => {
 
   const handleContinueWithEmail = () => {
     if (!email.trim()) {
-      toast({ title: "Email required", description: "Please enter your email address.", variant: "destructive" });
+      toast({ title: t('auth.tEmailRequired'), description: t('auth.tEmailRequiredD'), variant: "destructive" });
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+      toast({ title: t('auth.tInvalidEmail'), description: t('auth.tInvalidEmailD'), variant: "destructive" });
       return;
     }
     if (isSignUpMode || selectedAccountType) {
@@ -376,9 +378,9 @@ const Auth = () => {
                       },
           });
           if (resendError) {
-            toast({ title: "Email not confirmed", description: "We couldn't resend the confirmation email. Please try again shortly.", variant: "destructive" });
+            toast({ title: t('auth.tNotConfirmed'), description: t('auth.tNotConfirmedD'), variant: "destructive" });
           } else {
-            toast({ title: "Verify your email", description: "We've sent you a new email confirmation link. Please check your inbox." });
+            toast({ title: t('auth.tVerify'), description: t('auth.tVerifyD') });
           }
         } catch (err) {
           console.error("Error resending verification email:", err);
@@ -386,7 +388,7 @@ const Auth = () => {
         setIsLoading(false);
         return;
       }
-      toast({ title: "Sign in failed", description: error.message || "Please check your credentials and try again.", variant: "destructive" });
+      toast({ title: t('auth.tSignInFailed'), description: error.message || t('auth.tSignInFailedD'), variant: "destructive" });
       setIsLoading(false);
     } else {
       const { data: { user } } = await supabase.auth.getUser();
@@ -443,25 +445,25 @@ const Auth = () => {
     const normalizedEmail = normalizeEmail(email);
     
     if (!normalizedEmail) {
-      toast({ title: "Email required", description: "Please enter your email address before creating your account.", variant: "destructive" });
+      toast({ title: t('auth.tEmailRequired'), description: t('auth.tEmailRequired2D'), variant: "destructive" });
       setIsLoading(false);
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(normalizedEmail)) {
-      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+      toast({ title: t('auth.tInvalidEmail'), description: t('auth.tInvalidEmailD'), variant: "destructive" });
       setIsLoading(false);
       return;
     }
     if (!firstName.trim() || !lastName.trim()) {
-      toast({ title: "Missing information", description: "Please enter your first and last name.", variant: "destructive" });
+      toast({ title: t('auth.tMissingInfo'), description: t('auth.tMissingInfoD'), variant: "destructive" });
       setIsLoading(false);
       return;
     }
     // Phone is optional for signup
 
     if (selectedAccountType === 'brand') {
-      toast({ title: "Complete Your Application", description: "You'll be redirected to the brand application form." });
+      toast({ title: t('auth.tCompleteApp'), description: t('auth.tCompleteAppD') });
       navigate('/brand/onboarding', { state: { email: normalizedEmail, firstName, lastName, phone, smsOptIn } });
       setIsLoading(false);
       return;
@@ -472,7 +474,7 @@ const Auth = () => {
       selectedAccountType !== 'creator' &&
       selectedAccountType !== 'agent'
     ) {
-      toast({ title: "Choose an account type", description: "Please tell us how you'll use Goldsainte." });
+      toast({ title: t('auth.tChooseType'), description: t('auth.tChooseTypeD') });
       setStep('account-type');
       setIsLoading(false);
       return;
@@ -480,7 +482,7 @@ const Auth = () => {
 
     const passwordValidation = passwordSchema.safeParse(password);
     if (!passwordValidation.success) {
-      toast({ title: "Invalid password", description: passwordValidation.error.errors[0].message, variant: "destructive" });
+      toast({ title: t('auth.tInvalidPassword'), description: t('auth.tPasswordRulesShort'), variant: "destructive" });
       setIsLoading(false);
       return;
     }
@@ -510,13 +512,13 @@ const Auth = () => {
 
       if (error) {
         console.error("Sign up error:", error);
-        let title = "Could not create your account";
+        let title = t('auth.tCouldNotCreate');
         let description = error.message || "An unexpected error occurred.";
         const msg = error.message?.toLowerCase() || "";
 
         if (isDuplicateEmailError(error)) {
-          title = "Account already exists";
-          description = "An account with this email already exists — sign in instead.";
+          title = t('auth.tExists');
+          description = t('auth.tExistsD');
           toast({
             title,
             description,
@@ -534,7 +536,7 @@ const Auth = () => {
           setIsLoading(false);
           return;
         } else if (msg.includes("failed to fetch") || msg.includes("network")) {
-          title = "Connection issue";
+          title = t('auth.tConnection');
           description = "Unable to reach our servers. Check your internet and try again.";
         } else if (
           msg.includes("rate limit") ||
@@ -542,14 +544,14 @@ const Auth = () => {
           msg.includes("over_email_send_rate_limit") ||
           msg.includes("email rate limit")
         ) {
-          title = "Too many signup attempts for this email";
+          title = t('auth.tTooMany');
           description =
             "We've sent several confirmation emails to this address recently and our provider has paused new sends for about an hour. Please wait ~60 minutes and try again, or use a different email address.";
         } else if (msg.includes("password")) {
-          title = "Password issue";
+          title = t('auth.tPasswordIssue');
           description = error.message;
         } else if (msg.includes("email")) {
-          title = "Email issue";
+          title = t('auth.tEmailIssue');
           description = error.message;
         }
 
@@ -566,8 +568,8 @@ const Auth = () => {
       // an empty `identities` array and no session. Treat it as duplicate.
       if (isDuplicateEmailSignupResponse(data)) {
         toast({
-          title: "Account already exists",
-          description: "An account with this email already exists — sign in instead.",
+          title: t('auth.tExists'),
+          description: t('auth.tExistsD'),
           variant: "destructive",
           action: (
             <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
@@ -598,7 +600,7 @@ const Auth = () => {
       } catch {}
     } catch (error: any) {
       console.error("Unexpected signup error:", error);
-      toast({ title: "Sign up failed", description: error?.message || "An unexpected error occurred.", variant: "destructive" });
+      toast({ title: t('auth.tSignUpFailed'), description: error?.message || t('auth.tUnexpected'), variant: "destructive" });
       Sentry.captureException(error, { tags: { flow: 'signup', phase: 'unexpected' } });
       setIsLoading(false);
     }
@@ -648,7 +650,7 @@ const Auth = () => {
       if (!result.ok) {
         throw new Error(result.error || 'Failed to send reset email.');
       }
-      toast({ title: "Reset email sent", description: "Check your email for a password reset link from Goldsainte." });
+      toast({ title: t('auth.tResetSent'), description: t('auth.tResetSentD') });
       setStep('email');
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to send reset email.";
@@ -713,18 +715,18 @@ const Auth = () => {
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h1 className="text-2xl sm:text-3xl font-secondary tracking-tight" style={{ color: '#0a2225' }}>
-                Welcome to Goldsainte
+                {t('auth.welcomeTitle')}
               </h1>
               <p className="text-sm mt-2 tracking-wide uppercase" style={{ color: '#9A9384', letterSpacing: '0.12em', fontSize: '11px' }}>
-                Select how you want to shape your next adventure
+                {t('auth.selectHow')}
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
               {([
-                { type: 'traveler' as AccountType, label: 'Traveler', desc: 'Book and plan luxury travel experiences' },
-                { type: 'creator' as AccountType, label: 'Creator', desc: 'Share travel content and inspire others' },
-                { type: 'agent' as AccountType, label: 'Travel Agent', desc: 'Professional agents · Application required' },
+                { type: 'traveler' as AccountType, label: t('auth.typeTraveler'), desc: t('auth.typeTravelerDesc') },
+                { type: 'creator' as AccountType, label: t('auth.typeCreator'), desc: t('auth.typeCreatorDesc') },
+                { type: 'agent' as AccountType, label: t('auth.typeAgent'), desc: t('auth.typeAgentDesc') },
               ]).map(({ type, label, desc }) => (
                 <button
                   key={type}
@@ -756,7 +758,7 @@ const Auth = () => {
                 className="text-sm font-medium hover:underline"
                 style={{ color: '#C7A962' }}
               >
-                Already have an account? Sign in
+                {t('auth.alreadySignIn')}
               </button>
             </div>
           </div>
@@ -767,12 +769,12 @@ const Auth = () => {
           <>
             <div className="text-center mb-8">
               <h1 className="text-2xl sm:text-3xl font-secondary tracking-tight" style={{ color: '#0a2225' }}>
-                {isSignUpMode ? 'Create your account' : 'Welcome back'}
+                {isSignUpMode ? t('auth.createYourAccount') : t('auth.welcomeBack')}
               </h1>
               <p className="mt-2 tracking-wide" style={{ color: '#9A9384', letterSpacing: '0.08em', fontSize: '12px' }}>
                 {isSignUpMode 
-                  ? 'Start designing your perfect journey'
-                  : 'Pick up where you left off'}
+                  ? t('auth.subSignup')
+                  : t('auth.subSignin')}
               </p>
             </div>
             <div className="space-y-4">
@@ -804,7 +806,7 @@ const Auth = () => {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  Continue with Google
+                  {t('auth.continueGoogle')}
                 </button>
               </div>
 
@@ -824,7 +826,7 @@ const Auth = () => {
               <div className="space-y-3">
                 <Input
                   type="email"
-                  placeholder="Email address"
+                  placeholder={t('auth.emailAddress')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -853,7 +855,7 @@ const Auth = () => {
                     className="block w-full text-sm font-medium hover:underline"
                     style={{ color: '#C7A962' }}
                   >
-                    Already have an account? Sign in
+                    {t('auth.alreadySignIn')}
                   </button>
                 ) : (
                   <button
@@ -862,7 +864,7 @@ const Auth = () => {
                     className="block w-full text-sm font-medium hover:underline"
                     style={{ color: '#C7A962' }}
                   >
-                    New to Goldsainte? Create an account
+                    {t('auth.newCreate')}
                   </button>
                 )}
               </div>
@@ -881,10 +883,10 @@ const Auth = () => {
               </button>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.password')}</Label>
               <PasswordInput
                 id="password"
-                placeholder="Enter your password"
+                placeholder={t('auth.enterPassword')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -899,19 +901,19 @@ const Auth = () => {
               style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
               disabled={isLoading}
             >
-              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Signing in...</> : 'Sign In'}
+              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('auth.signingIn')}</> : t('auth.signIn')}
             </Button>
             <div className="flex items-center justify-between text-sm">
               <button type="button" onClick={() => setStep('email')} className="transition-colors" style={{ color: '#9A9384' }}>
                 ← Back
               </button>
               <button type="button" onClick={() => setStep('forgot-password')} className="hover:underline" style={{ color: '#C7A962' }}>
-                Forgot password?
+                {t('auth.forgotPassword')}
               </button>
             </div>
             <div className="mt-3 text-center text-sm">
               <button type="button" onClick={() => setStep('signup')} className="hover:underline" style={{ color: '#9A9384' }}>
-                Need an account? Create one instead
+                {t('auth.needAccount')}
               </button>
             </div>
           </form>
@@ -923,25 +925,25 @@ const Auth = () => {
           <form onSubmit={handleSignUp} className="space-y-4">
             <div className="text-center mb-6">
               <h1 className="text-2xl sm:text-3xl font-secondary tracking-tight" style={{ color: '#0a2225' }}>
-                {selectedAccountType === 'agent' && "Apply as Travel Agent"}
-                {selectedAccountType === 'brand' && "Apply as Brand"}
-                {selectedAccountType === 'traveler' && "Create Traveler Account"}
-                {selectedAccountType === 'creator' && "Create Creator Account"}
+                {selectedAccountType === 'agent' && t('auth.applyAgent')}
+                {selectedAccountType === 'brand' && t('auth.applyBrand')}
+                {selectedAccountType === 'traveler' && t('auth.createTraveler')}
+                {selectedAccountType === 'creator' && t('auth.createCreator')}
               </h1>
               <p className="text-sm mt-2" style={{ color: '#9A9384' }}>
                 {(selectedAccountType === 'agent' || selectedAccountType === 'brand') 
-                  ? "We'll redirect you to complete your application"
-                  : "Enter your details to get started"
+                  ? t('auth.redirectApp')
+                  : t('auth.enterDetails')
                 }
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email address</Label>
+              <Label htmlFor="signupEmail" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.emailAddress')}</Label>
               {selectedAccountType === 'agent' && (
                 <p className="text-xs text-[#6B7280] mb-3 flex items-start gap-1.5">
                   <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-[#9A9384]" />
-                  <span>Travel agents sign up with email for business correspondence and verification.</span>
+                  <span>{t('auth.agentEmailNote')}</span>
                 </p>
               )}
               <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
@@ -949,16 +951,16 @@ const Auth = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm font-medium" style={{ color: '#0a2225' }}>First Name</Label>
-                <Input id="firstName" type="text" placeholder="John" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+                <Label htmlFor="firstName" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.firstName')}</Label>
+                <Input id="firstName" type="text" placeholder={t('auth.firstNameSample')} value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm font-medium" style={{ color: '#0a2225' }}>Last Name</Label>
-                <Input id="lastName" type="text" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+                <Label htmlFor="lastName" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.lastName')}</Label>
+                <Input id="lastName" type="text" placeholder={t('auth.lastNameSample')} value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#0a2225' }}>Phone Number <span style={{ color: '#9A9384' }}>(optional)</span></Label>
+              <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.phoneNumber')} <span style={{ color: '#9A9384' }}>{t('auth.optional')}</span></Label>
               <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
             </div>
 
@@ -970,16 +972,16 @@ const Auth = () => {
 
             {(selectedAccountType === 'traveler' || selectedAccountType === 'creator' || selectedAccountType === 'agent') && (
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>Password</Label>
-                <PasswordInput id="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
+                <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.password')}</Label>
+                <PasswordInput id="password" placeholder={t('auth.createPassword')} value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} minLength={8} />
                 <div className="text-sm space-y-1" style={{ color: '#9A9384' }}>
-                  <p>Password must contain:</p>
+                  <p>{t('auth.mustContain')}</p>
                   <ul className="list-disc list-inside pl-2 space-y-0.5">
-                    <li>At least 8 characters</li>
-                    <li>One uppercase letter</li>
-                    <li>One lowercase letter</li>
-                    <li>One number</li>
-                    <li>One special character</li>
+                    <li>{t('auth.req8')}</li>
+                    <li>{t('auth.reqUpper')}</li>
+                    <li>{t('auth.reqLower')}</li>
+                    <li>{t('auth.reqNumber')}</li>
+                    <li>{t('auth.reqSpecial')}</li>
                   </ul>
                 </div>
               </div>
@@ -1003,11 +1005,11 @@ const Auth = () => {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('auth.processing')}</>
                 ) : (selectedAccountType === 'agent' || selectedAccountType === 'brand') ? (
-                  'Continue to Application'
+                  t('auth.continueApplication')
                 ) : (
-                  'Create Account'
+                  t('auth.createAccount')
                 )}
               </Button>
             </div>
@@ -1018,11 +1020,11 @@ const Auth = () => {
                   type="button"
                   onClick={() => {
                     setSelectedAccountType('traveler');
-                    toast({ title: "Switched to Traveler", description: "You can always apply as an agent or brand later from your profile." });
+                    toast({ title: t('auth.tSwitched'), description: t('auth.tSwitchedD') });
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
                 >
-                  Skip for now
+                  {t('auth.skipForNow')}
                 </button>
               </div>
             )}
@@ -1034,14 +1036,14 @@ const Auth = () => {
           <div className="space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-2xl font-secondary tracking-tight" style={{ color: '#0a2225' }}>
-                Confirm your email
+                {t('auth.confirmEmail')}
               </h2>
               <p className="text-sm max-w-sm mx-auto" style={{ color: '#9A9384' }}>
-                We've sent a confirmation link to{' '}
+                {t('auth.sentLinkTo')}{' '}
                 <span className="font-medium" style={{ color: '#0a2225' }}>{email}</span>
               </p>
               <p className="text-sm max-w-md mx-auto mt-2" style={{ color: '#9A9384' }}>
-                Please click the link in that email to verify your address and activate your Goldsainte account. Check your spam folder if you don't see it.
+                {t('auth.clickLink')}
               </p>
             </div>
             <div className="space-y-3 pt-4">
@@ -1067,19 +1069,19 @@ const Auth = () => {
                       },
                     });
                     if (error) {
-                      toast({ title: "Could not resend email", description: error.message, variant: "destructive" });
+                      toast({ title: t('auth.tCouldNotResend'), description: error.message, variant: "destructive" });
                     } else {
-                      toast({ title: "Email sent", description: "We've resent the confirmation email to your inbox." });
+                      toast({ title: t('auth.tEmailSent'), description: t('auth.tEmailSentD') });
                     }
                   } catch (err: any) {
-                    toast({ title: "Error", description: err?.message || "Failed to resend email", variant: "destructive" });
+                    toast({ title: t('auth.tError'), description: err?.message || t('auth.tResendGeneric'), variant: "destructive" });
                   } finally {
                     setIsLoading(false);
                   }
                 }}
                 disabled={isLoading}
               >
-                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending...</> : 'Resend confirmation email'}
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('auth.sending')}</> : t('auth.resendConfirmation')}
               </Button>
               <button type="button" onClick={() => setStep("email")} className="block w-full text-sm transition-colors" style={{ color: '#9A9384' }}>
                 Use a different email
@@ -1116,8 +1118,8 @@ const Auth = () => {
                   }
                   {
                     toast({
-                      title: "Not verified yet",
-                      description: "We don't see a confirmation yet. Click the link in your email, then try again.",
+                      title: t('auth.tNotVerifiedYet'),
+                      description: t('auth.tNotVerifiedYetD'),
                       variant: "destructive",
                     });
                   }
@@ -1125,7 +1127,7 @@ const Auth = () => {
                 className="mt-3 text-sm font-medium hover:underline transition-colors"
                 style={{ color: '#0c4d47' }}
               >
-                Already verified? Continue →
+                {t('auth.alreadyVerified')}
               </button>
             </div>
           </div>
@@ -1151,7 +1153,7 @@ const Auth = () => {
             </Button>
             <div className="text-center">
               <button type="button" onClick={() => setStep('signin')} className="text-sm transition-colors" style={{ color: '#9A9384' }}>
-                ← Back to sign in
+                {t('auth.backToSignIn')}
               </button>
             </div>
           </form>
@@ -1179,7 +1181,7 @@ const Auth = () => {
         {/* Bottom editorial text */}
         <div className="absolute bottom-12 left-10 right-10">
           <p className="font-secondary text-3xl leading-snug" style={{ color: '#FFFFFF', textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-            Design the journey<br />before you live it.
+            {t('auth.tagline1')}<br />{t('auth.tagline2')}
           </p>
           <p className="mt-3 text-sm tracking-wide" style={{ color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em' }}>
             GOLDSAINTE
