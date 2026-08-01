@@ -371,8 +371,6 @@
     "modernSlaveryStatement": "Déclaration sur l'Esclavage Moderne",
     "humanRightsStatement": "Déclaration des Droits de l'Homme",
     "partners": "Partenaires",
-    "becomeAgent": "Devenir Agent de Voyage",
-    "influencerProgram": "Programme d'Influenceurs",
     "listYourCompany": "Référencer Votre Entreprise",
     "about": "À propos",
     "aboutGoldsainte": "À propos de Goldsainte",
@@ -447,9 +445,7 @@
     "sections": {
       "whatIs": {
         "title": "Qu'est-ce que Goldsainte ?",
-        "p1": "Goldsainte AI est un marché de voyage activé par la voix et alimenté par l'IA qui fusionne l'automatisation avec l'expertise humaine vérifiée pour offrir une planification et une réservation de voyage de bout en bout entièrement personnalisées. Avec le mot d'activation \"Hey, Goldsainte\", les utilisateurs peuvent engager un concierge conversationnel pour rechercher, planifier et réserver des vols, des hôtels, des restaurants, des événements et des transports, complètement mains libres et en temps réel.",
-        "p2": "Au cœur de la plateforme se trouve un marché d'agents de voyage où les utilisateurs peuvent publier des itinéraires complexes, recevoir des offres compétitives d'agents certifiés et payer en toute sécurité via des transactions basées sur des jalons. Le système prend en charge les réservations de groupe, les paiements partagés, la gestion complète des itinéraires et la messagerie en temps réel, facilitant la coordination même des voyages les plus complexes.",
-        "p3": "Goldsainte alimente également une économie de créateurs unique : les créateurs de contenu collaborent avec des agents pour co-créer et promouvoir des expériences de voyage sélectionnées, tandis que les fournisseurs de transport peuvent s'intégrer, promouvoir leurs services et être inclus dans des forfaits dirigés par des créateurs ou des agents. Cet écosystème à trois voies (IA + Agents + Créateurs) fait de Goldsainte la première plateforme à unifier l'inspiration, la planification et la réservation au sein d'un environnement de commerce social intelligent."
+        "p1": "Goldsainte AI est un marché de voyage activé par la voix et alimenté par l'IA qui fusionne l'automatisation avec l'expertise humaine vérifiée pour offrir une planification et une réservation de voyage de bout en bout entièrement personnalisées. Avec le mot d'activation \"Hey, Goldsainte\", les utilisateurs peuvent engager un concierge conversationnel pour rechercher, planifier et réserver des vols, des hôtels, des restaurants, des événements et des transports, complètement mains libres et en temps réel."
       },
       "features": {
         "title": "Ce Que Nous Offrons"
