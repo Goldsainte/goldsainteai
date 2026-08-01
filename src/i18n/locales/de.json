@@ -679,6 +679,27 @@
     "fileTooLarge": "{{name}} ist {{size}} MB groß — maximal 50 MB.",
     "fileUnsupported": "Nicht unterstützte Datei: {{name}}. Bitte PDF, JPG, PNG oder HEIC verwenden.",
     "fileNoType": "Dateityp von {{name}} nicht erkennbar. Bitte PDF, JPG, PNG oder HEIC verwenden.",
-    "removeFile": "{{name}} entfernen"
+    "removeFile": "{{name}} entfernen",
+    "finalStep": "Letzter Schritt",
+    "verifyTitle": "Verifizieren Sie Ihre Identität",
+    "verifyIntro": "Die Identitätsprüfung bestätigt, wer Sie sind — sie dauert 2–3 Minuten. Danach prüft unser Team Ihre Qualifikationen und Versicherung, und Sie erhalten unsere Entscheidung per E-Mail",
+    "verifyIntroStrong": "innerhalb von ein bis zwei Werktagen",
+    "haveReady": "Bereithalten",
+    "ready1": "Ein amtliches Ausweisdokument mit Foto — Reisepass oder Führerschein.",
+    "ready2": "Ein Gerät mit Kamera für einen kurzen Selfie-Abgleich.",
+    "ready3": "Etwa zwei Minuten Ihrer Zeit.",
+    "settingUpVerif": "Verifizierung wird vorbereitet...",
+    "startVerif": "Identitätsprüfung starten",
+    "secureNote1": "Ihre Daten sind sicher und verschlüsselt.",
+    "secureNote2": "nutzt Stripe Identity zur Verifizierung und speichert Ihren Ausweis nicht.",
+    "draftSavedD": "Ihre Bewerbung ist auf diesem Gerät gespeichert. Machen Sie jederzeit weiter.",
+    "appSaved": "Bewerbung gespeichert",
+    "appSavedD": "Schließen Sie jetzt die Identitätsprüfung ab, um Ihre Bewerbung einzureichen.",
+    "submitFailed": "Einreichen fehlgeschlagen",
+    "submitFailedD": "Bitte prüfen Sie alle Pflichtfelder und versuchen Sie es erneut.",
+    "completePrevSteps": "Bitte schließen Sie zuerst alle vorherigen Schritte ab",
+    "tryAgain": "Bitte versuchen Sie es erneut.",
+    "verifSetupFailed": "Vorbereitung der Verifizierung fehlgeschlagen",
+    "taxIdD": "Geben Sie die Steuer-ID Ihres Unternehmens für das gewählte Land ein."
   }
 }
