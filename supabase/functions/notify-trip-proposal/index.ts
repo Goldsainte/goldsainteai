@@ -107,7 +107,7 @@ serve(async (req) => {
         body: `${proposerName} (${roleLabel}) sent a proposal for "${tripRequest.title || tripRequest.destination}"${priceText}. ${proposal.headline ? `"${proposal.headline}"` : "View the full pitch in your Trip Requests."}`,
         type: "milestone",
         priority: "high",
-        actionUrl: `/trip-request/${tripRequestId}`,
+        actionUrl: `/trip-requests/${tripRequestId}`, // owner's journey page directly — was a 2-redirect chain via the legacy route (31 Jul audit),
         data: {
           tripRequestId,
           proposalHeadline: proposal.headline,
