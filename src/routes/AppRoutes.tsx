@@ -392,14 +392,9 @@ export const AppRoutes = () => (
       <Route path="/application/status" element={<ApplicationStatusCheck />} />
       <Route path="/apply/agent" element={<AgentApplicationForm />} />
       <Route path="/agent-onboarding" element={<Navigate to="/apply/agent" replace />} />
-      <Route
-        path="/trips"
-        element={(
-          <RequireAuth>
-            <TripInboxPage />
-          </RequireAuth>
-        )}
-      />
+      {/* Consolidated (31 Jul audit): two traveler request lists existed;
+          /my-trip-requests is canonical. TripInboxPage retired from routing. */}
+      <Route path="/trips" element={<Navigate to="/my-trip-requests" replace />} />
       {/* Stale-path healer: old links used the path form instead of ?tab= */}
       <Route path="/marketplace/trip-requests" element={<Navigate to="/marketplace?tab=trip-requests" replace />} />
       <Route path="/my-trips" element={<Navigate to="/my-bookings" replace />} />
