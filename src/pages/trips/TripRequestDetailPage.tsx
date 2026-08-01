@@ -214,18 +214,23 @@ export default function TripRequestDetailPage() {
           </Link>
 
           {canDelete && (
+            <div className="flex items-center gap-2.5">
+              {/* Close lives BESIDE the delete dialog, never inside its
+                  asChild trigger — Radix Slot demands exactly one child;
+                  v1 of this port put a second element in the trigger and
+                  crashed the page for owners (React.Children.only). */}
+              {trip?.status === "open" && (
+                <button
+                  type="button"
+                  onClick={handleCloseRequest}
+                  disabled={closing}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#0a2225]/15 bg-white px-3 py-1.5 text-[12px] text-[#0a2225]/70 transition-colors hover:border-[#C7A962] disabled:opacity-50"
+                >
+                  {closing ? "Closing…" : "Close request"}
+                </button>
+              )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                {trip?.status === "open" && (
-                  <button
-                    type="button"
-                    onClick={handleCloseRequest}
-                    disabled={closing}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#0a2225]/15 bg-white px-3 py-1.5 text-[12px] text-[#0a2225]/70 transition-colors hover:border-[#C7A962] disabled:opacity-50"
-                  >
-                    {closing ? "Closing…" : "Close request"}
-                  </button>
-                )}
                 <button
                   type="button"
                   disabled={deleting}
@@ -253,6 +258,7 @@ export default function TripRequestDetailPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            </div>
           )}
         </div>
 
