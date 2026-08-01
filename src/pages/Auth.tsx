@@ -877,10 +877,10 @@ const Auth = () => {
         {step === 'signin' && (
           <form onSubmit={handleSignIn} className="space-y-4">
             <div className="text-sm mb-4" style={{ color: '#9A9384' }}>
-              Signing in as <span className="font-medium" style={{ color: '#0a2225' }}>{email}</span>
+              {t('auth.signingInAs')} <span className="font-medium" style={{ color: '#0a2225' }}>{email}</span>
               {' '}
               <button type="button" onClick={() => setStep('email')} className="hover:underline" style={{ color: '#C7A962' }}>
-                Change
+                {t('auth.change')}
               </button>
             </div>
             <div className="space-y-2">
@@ -906,7 +906,7 @@ const Auth = () => {
             </Button>
             <div className="flex items-center justify-between text-sm">
               <button type="button" onClick={() => setStep('email')} className="transition-colors" style={{ color: '#9A9384' }}>
-                ← Back
+                ← {t('auth.plainBack')}
               </button>
               <button type="button" onClick={() => setStep('forgot-password')} className="hover:underline" style={{ color: '#C7A962' }}>
                 {t('auth.forgotPassword')}
