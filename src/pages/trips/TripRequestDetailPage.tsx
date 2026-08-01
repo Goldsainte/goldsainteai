@@ -122,8 +122,18 @@ export default function TripRequestDetailPage() {
         // trip, one face per role, whatever door anyone walks through.
         // (In the loader, not mid-render — the rules-of-hooks lesson.)
         if (user && tripData && user.id !== tripData.user_id) {
-          navigate(`/marketplace/request/${tripRequestId}`, { replace: true });
-          return;
+          // Admins are the exception (31 Jul): support work needs the
+          // traveler's view of the trip, so they stay on the journey.
+          const { data: adminRow } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("role", "admin")
+            .maybeSingle();
+          if (!adminRow) {
+            navigate(`/marketplace/request/${tripRequestId}`, { replace: true });
+            return;
+          }
         }
 
         if (user) {
