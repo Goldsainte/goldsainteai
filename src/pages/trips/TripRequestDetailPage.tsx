@@ -551,14 +551,14 @@ export default function TripRequestDetailPage() {
                 <div>
                   <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals</p>
                   <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">
-                    {trip.proposals_summary.total > 0
+                    {(trip.proposals_summary?.total ?? 0) > 0
                       ? `${trip.proposals_summary.total} proposal${
                           trip.proposals_summary.total === 1 ? "" : "s"
                         } received`
                       : "No proposals yet"}
                   </h2>
                   <p className="mt-2 text-[14px] leading-relaxed text-[#0a2225]/55">
-                    {trip.proposals_summary.accepted > 0
+                    {(trip.proposals_summary?.accepted ?? 0) > 0
                       ? `${trip.proposals_summary.accepted} accepted`
                       : "You can wait for more, or accept a proposal when you're ready."}
                   </p>
