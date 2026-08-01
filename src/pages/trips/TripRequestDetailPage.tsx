@@ -112,6 +112,20 @@ export default function TripRequestDetailPage() {
         if (cancelled) return;
 
         const user = authData.user;
+
+        // Canonical page per role, BOTH directions (31 Jul 11:33PM,
+        // founder report: recipient creator saw the traveler's journey —
+        // "YOUR request… YOU'RE HERE" — on this page, while the bell/email
+        // correctly sent him to the marketplace brief. The morning fix (333)
+        // redirected owners OUT of the marketplace view; this is the missing
+        // mirror: non-owners get redirected OUT of the journey view. One
+        // trip, one face per role, whatever door anyone walks through.
+        // (In the loader, not mid-render — the rules-of-hooks lesson.)
+        if (user && tripData && user.id !== tripData.user_id) {
+          navigate(`/marketplace/request/${tripRequestId}`, { replace: true });
+          return;
+        }
+
         if (user) {
           setCurrentUserId(user.id);
           const { data: profile } = await supabase
