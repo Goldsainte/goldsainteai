@@ -679,6 +679,27 @@
     "fileTooLarge": "{{name}} 大小为 {{size}}MB — 上限为 50MB。",
     "fileUnsupported": "不支持的文件：{{name}}。请使用 PDF、JPG、PNG 或 HEIC。",
     "fileNoType": "无法识别 {{name}} 的文件类型。请使用 PDF、JPG、PNG 或 HEIC。",
-    "removeFile": "移除 {{name}}"
+    "removeFile": "移除 {{name}}",
+    "finalStep": "最后一步",
+    "verifyTitle": "验证您的身份",
+    "verifyIntro": "身份验证用于确认您的身份 — 约需 2–3 分钟。完成后，我们的团队将审核您的资质与保险，并通过邮件发送审核结果",
+    "verifyIntroStrong": "1–2 个工作日内",
+    "haveReady": "请准备",
+    "ready1": "政府签发的带照片证件 — 护照或驾照。",
+    "ready2": "带摄像头的设备，用于快速自拍比对。",
+    "ready3": "大约两分钟时间。",
+    "settingUpVerif": "正在准备验证...",
+    "startVerif": "开始身份验证",
+    "secureNote1": "您的信息安全且已加密。",
+    "secureNote2": "使用 Stripe Identity 进行验证，不会存储您的证件。",
+    "draftSavedD": "您的申请已保存在此设备上，随时可继续填写。",
+    "appSaved": "申请已保存",
+    "appSavedD": "请完成身份验证以提交申请。",
+    "submitFailed": "提交失败",
+    "submitFailedD": "请检查所有必填项后重试。",
+    "completePrevSteps": "请先完成之前的所有步骤",
+    "tryAgain": "请重试。",
+    "verifSetupFailed": "验证准备失败",
+    "taxIdD": "请输入所选国家/地区的企业税务识别号。"
   }
 }
