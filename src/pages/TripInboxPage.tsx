@@ -108,7 +108,7 @@ export default function TripInboxPage() {
                   )}
                 </div>
                 <Button asChild variant="ghost" className="rounded-full text-xs">
-                  <Link to={`/trip/${trip.id}`}>Open trip</Link>
+                  <Link to={`/trip-requests/${trip.id}`}>Open trip</Link>{/* journey page — /trip/:id is the CREATOR trip route, wrong entity (31 Jul audit) */}
                 </Button>
               </CardContent>
             </Card>
@@ -144,4 +144,3 @@ export default function TripInboxPage() {
     </div>
   );
 }
-
