@@ -679,6 +679,27 @@
     "fileTooLarge": "{{name}} is {{size}}MB — max is 50MB.",
     "fileUnsupported": "Unsupported file: {{name}}. Please use PDF, JPG, PNG, or HEIC.",
     "fileNoType": "Could not detect file type for {{name}}. Please use PDF, JPG, PNG, or HEIC.",
-    "removeFile": "Remove {{name}}"
+    "removeFile": "Remove {{name}}",
+    "finalStep": "Final step",
+    "verifyTitle": "Verify your identity",
+    "verifyIntro": "Identity verification confirms who you are — it takes 2–3 minutes. Once it's done, our team reviews your credentials and insurance, and we'll email you a decision",
+    "verifyIntroStrong": "within one to two business days",
+    "haveReady": "Have ready",
+    "ready1": "A government-issued photo ID — passport or driver's license.",
+    "ready2": "A device with a camera, for a quick selfie match.",
+    "ready3": "About two minutes of your time.",
+    "settingUpVerif": "Setting up verification...",
+    "startVerif": "Start identity verification",
+    "secureNote1": "Your information is secure and encrypted.",
+    "secureNote2": "uses Stripe Identity for verification and does not store your government ID.",
+    "draftSavedD": "Your application is saved on this device. Pick up where you left off anytime.",
+    "appSaved": "Application saved",
+    "appSavedD": "Now complete identity verification to submit your application.",
+    "submitFailed": "Submission failed",
+    "submitFailedD": "Please check all required fields and try again.",
+    "completePrevSteps": "Please complete all previous steps first",
+    "tryAgain": "Please try again.",
+    "verifSetupFailed": "Verification setup failed",
+    "taxIdD": "Enter your business tax identifier for the country you selected."
   }
 }
