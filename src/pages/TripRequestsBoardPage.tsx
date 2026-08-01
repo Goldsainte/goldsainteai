@@ -21,6 +21,10 @@ type TripRequest = {
 
 export default function TripRequestsBoardPage() {
   const { user } = useAuth();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id ?? null));
+  }, []);
   const [requests, setRequests] = useState<TripRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +41,7 @@ export default function TripRequestsBoardPage() {
       const { data, error } = await supabase
         .from("trip_requests")
         .select(
-          "id, title, destination, start_date, end_date, budget_min, budget_max, travelers_adults, travelers_children, trip_style, created_at"
+          "id, user_id, title, destination, start_date, end_date, budget_min, budget_max, travelers_adults, travelers_children, trip_style, created_at"
         )
         .eq("status", "open")
         // Privacy filters (31 Jul audit): this second board was missing the
@@ -148,7 +152,9 @@ function TripRequestCard({ req }: { req: TripRequest }) {
 
   return (
     <Link
-      to={`/marketplace/request/${req.id}`}
+      // Role-aware at the SOURCE (31 Jul audit): an owner's own card goes
+      // straight to their journey — no redirect hop; partners get the brief.
+      to={req.user_id === currentUserId ? `/trip-requests/${req.id}` : `/marketplace/request/${req.id}`}
       className="flex flex-col rounded-3xl bg-[#f6f3ea]/95 p-4 shadow-sm ring-1 ring-[#E5DFC6] hover:ring-[#BFAD72] transition-all"
     >
       <div className="flex items-center justify-between gap-2 text-[10px] text-[#8D8D8D]">
