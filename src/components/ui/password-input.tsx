@@ -14,6 +14,7 @@
  *    (backlog 5.2, third bite was the admin search on 30 Jul); without the
  *    sm: pin, typed text would slide under the eye icon on desktop. */
 import { forwardRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ type PasswordInputProps = Omit<React.ComponentProps<typeof Input>, "type">;
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, ...props }, ref) => {
     const [visible, setVisible] = useState(false);
+  const { t } = useTranslation();
     return (
       <div className="relative">
         <Input
@@ -34,7 +36,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         <button
           type="button"
           tabIndex={0}
-          aria-label={visible ? "Hide password" : "Show password"}
+          aria-label={visible ? t('auth.pwHide') : t('auth.pwShow')}
           aria-pressed={visible}
           onClick={() => setVisible((v) => !v)}
           disabled={props.disabled}
