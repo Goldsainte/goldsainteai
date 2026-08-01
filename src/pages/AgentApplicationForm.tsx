@@ -519,14 +519,14 @@ function AgentApplicationFormInner() {
     if (currentStep === 3) {
       if (!formData.taxIdEIN?.trim()) {
         toast({
-          title: `${taxIdInfoFor(formData.businessCountry).label} required`,
+          title: t('agentApp.required', { label: taxIdInfoFor(formData.businessCountry).label }),
           description: "Enter your business tax identifier for the country you selected.",
           variant: "destructive",
         });
         return false;
       }
       if (!formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedVendor) {
-        toast({ title: "Please accept all legal agreements", variant: "destructive" });
+        toast({ title: t('agentApp.acceptAllLegal'), variant: "destructive" });
         return false;
       }
       return true;
@@ -630,13 +630,13 @@ function AgentApplicationFormInner() {
       // keep the user on the Documents step with a clear message rather than
       // producing an application with null document paths.
       const requiredDocs: Array<{ file: File | null | undefined; field: string; label: string }> = [
-        { file: formData.businessLicenseFile, field: 'business_license', label: 'Business License' },
-        { file: formData.insuranceCertificateFile, field: 'insurance_certificate', label: 'Insurance Certificate' },
+        { file: formData.businessLicenseFile, field: 'business_license', label: t('agentApp.docBusinessLicense') },
+        { file: formData.insuranceCertificateFile, field: 'insurance_certificate', label: t('agentApp.docInsuranceCert') },
       ];
       const missing = requiredDocs.find((d) => !d.file);
       if (missing) {
         setStep(4);
-        throw new Error(`${missing.label} is required. Please upload it before continuing.`);
+        throw new Error(t('agentApp.docRequired', { label: missing.label }));
       }
 
       let businessLicensePath: string;
@@ -990,7 +990,7 @@ function AgentApplicationFormInner() {
                   <SelectTrigger className={luxuryInputClasses}><SelectValue placeholder={t('agentApp.selAccred')} /></SelectTrigger>
                   <SelectContent className="max-h-72">
                     {ACCREDITATION_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value} className="focus:bg-[#FDF9F0]">{o.label}</SelectItem>
+                      <SelectItem key={o.value} value={o.value} className="focus:bg-[#FDF9F0]">{o.value === "OTHER" ? t('agentApp.accOther') : o.value === "HOST" ? t('agentApp.accHost') : o.value === "NONE" ? t('agentApp.accNone') : o.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -1105,16 +1105,16 @@ function AgentApplicationFormInner() {
                   onCheckedChange={(checked) => setFormData({ ...formData, errorsOmissionsInsurance: checked as boolean })}
                   className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47]"
                 />
-                <Label className="text-sm text-[#0a2225] cursor-pointer">I carry Errors & Omissions (E&O) Insurance</Label>
+                <Label className="text-sm text-[#0a2225] cursor-pointer">{t('agentApp.eoInsurance')}</Label>
               </div>
               {formData.errorsOmissionsInsurance && (
                 <div className="grid gap-4 md:grid-cols-3 pl-7">
                   <div>
-                    <Label className="text-sm text-[#0a2225]">Insurance Provider</Label>
+                    <Label className="text-sm text-[#0a2225]">{t('agentApp.insuranceProvider')}</Label>
                     <Input value={formData.insuranceProvider} onChange={(e) => setFormData({ ...formData, insuranceProvider: e.target.value })} className={luxuryInputClasses} />
                   </div>
                   <div>
-                    <Label className="text-sm text-[#0a2225]">Coverage Amount ($)</Label>
+                    <Label className="text-sm text-[#0a2225]">{t('agentApp.coverageAmount')}</Label>
                     <Input type="number" value={formData.insuranceCoverage} onChange={(e) => setFormData({ ...formData, insuranceCoverage: e.target.value })} className={luxuryInputClasses} />
                   </div>
                 </div>
@@ -1139,11 +1139,11 @@ function AgentApplicationFormInner() {
 
             {/* Legal Acceptance */}
             <div className="space-y-4 border-t border-[#E5DFC6] pt-6">
-              <h4 className="font-medium text-[#0a2225]">Legal Agreements</h4>
+              <h4 className="font-medium text-[#0a2225]">{t('agentApp.legalAgreements')}</h4>
               {[
-                { key: "acceptedTerms" as const, label: "Terms of Service", link: "/terms" },
-                { key: "acceptedPrivacy" as const, label: "Privacy Policy", link: "/privacy-cookies" },
-                { key: "acceptedVendor" as const, label: "Agent Partnership Agreement", link: "/legal/agent-agreement" },
+                { key: "acceptedTerms" as const, label: t('agentApp.legalTerms'), link: "/terms" },
+                { key: "acceptedPrivacy" as const, label: t('agentApp.legalPrivacy'), link: "/privacy-cookies" },
+                { key: "acceptedVendor" as const, label: t('agentApp.legalVendor'), link: "/legal/agent-agreement" },
               ].map(({ key, label, link }) => (
                 <div key={key} className="flex items-start space-x-3">
                   <Checkbox
@@ -1152,7 +1152,7 @@ function AgentApplicationFormInner() {
                     className="data-[state=checked]:bg-[#0c4d47] data-[state=checked]:border-[#0c4d47] mt-0.5"
                   />
                   <label className="text-sm text-[#0a2225]">
-                    I accept the <a href={link} target="_blank" rel="noopener noreferrer" className="text-[#C7A962] hover:underline">{label}</a> *
+                    {t('agentApp.iAccept')} <a href={link} target="_blank" rel="noopener noreferrer" className="text-[#C7A962] hover:underline">{label}</a> *
                   </label>
                 </div>
               ))}
