@@ -1,4 +1,5 @@
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Upload, AlertCircle, X, FilePlus } from "lucide-react";
 import { useState } from "react";
@@ -13,22 +14,23 @@ const luxuryInputClasses = "mt-1.5 min-h-[48px] border-[#E5DFC6] bg-white focus:
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'image/heif'];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
-function validateFile(file: File): string | null {
+function validateFile(file: File, t: (k: string, o?: Record<string, unknown>) => string): string | null {
   if (file.size > MAX_FILE_SIZE) {
-    return `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB — max is 50MB.`;
+    return t('agentApp.fileTooLarge', { name: file.name, size: (file.size / 1024 / 1024).toFixed(1) });
   }
   const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
   const extOk = ['pdf', 'jpg', 'jpeg', 'png', 'heic', 'heif'].includes(ext);
   if (file.type && !ALLOWED_TYPES.includes(file.type) && !extOk) {
-    return `Unsupported file: ${file.name}. Please use PDF, JPG, PNG, or HEIC.`;
+    return t('agentApp.fileUnsupported', { name: file.name });
   }
   if (!file.type && !extOk) {
-    return `Could not detect file type for ${file.name}. Please use PDF, JPG, PNG, or HEIC.`;
+    return t('agentApp.fileNoType', { name: file.name });
   }
   return null;
 }
 
 export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
+  const { t } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const MAX_SUPPORTING_DOCS = 5;
@@ -45,7 +47,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
     }
     const accepted: File[] = [];
     for (const file of picked.slice(0, room)) {
-      const err = validateFile(file);
+      const err = validateFile(file, t);
       if (err) {
         setErrors((prev) => ({ ...prev, supportingDocumentFiles: err }));
         continue;
@@ -66,7 +68,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
   const handlePick = (fieldKey: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const err = validateFile(file);
+    const err = validateFile(file, t);
     if (err) {
       setErrors((prev) => ({ ...prev, [fieldKey]: err }));
       // clear the input so user can re-pick
@@ -89,7 +91,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
         <div className="rounded-xl border border-red-300 bg-red-50 p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-red-800">
-            <p className="font-medium mb-1">We couldn't upload your documents</p>
+            <p className="font-medium mb-1">{t('agentApp.uploadFailTitle')}</p>
             <p>{submitError}</p>
           </div>
         </div>
@@ -97,14 +99,14 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="h-8 w-1 bg-[#C7A962] rounded-full" />
-          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">Document Uploads</h3>
+          <h3 className="font-secondary text-xl md:text-2xl text-[#0a2225]">{t('agentApp.docsHeader')}</h3>
         </div>
         <p className="mb-6 text-sm text-[#6B7280] ml-4">
-          Please upload your business license and proof of insurance. Accepted formats: PDF, JPG, PNG, or HEIC (iPhone photos). Max 50MB each. Your identity will be verified separately through Stripe Identity in the final step — no government ID or headshot needed here.
+          {t('agentApp.docsIntro')}
         </p>
         <div className="space-y-5">
           <div>
-            <Label htmlFor="businessLicenseFile" className="text-sm font-medium text-[#0a2225]">Business License *</Label>
+            <Label htmlFor="businessLicenseFile" className="text-sm font-medium text-[#0a2225]">{t('agentApp.docBusinessLicense')} *</Label>
             <div className="mt-1.5 border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] bg-[#FDF9F0]/50 rounded-xl p-4 transition-colors cursor-pointer">
               <Input
                 id="businessLicenseFile"
@@ -122,7 +124,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
             </div>
           </div>
           <div>
-            <Label htmlFor="insuranceCertificateFile" className="text-sm font-medium text-[#0a2225]">E&O Insurance Certificate</Label>
+            <Label htmlFor="insuranceCertificateFile" className="text-sm font-medium text-[#0a2225]">{t('agentApp.docEOCert')}</Label>
             <div className="mt-1.5 border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] bg-[#FDF9F0]/50 rounded-xl p-4 transition-colors cursor-pointer">
               <Input
                 id="insuranceCertificateFile"
@@ -141,7 +143,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
           </div>
           <div>
             <Label htmlFor="supportingDocumentFiles" className="text-sm font-medium text-[#0a2225]">
-              Additional Documents <span className="font-normal text-[#6B7280]">(optional — accreditations, references, bonding, up to 5)</span>
+              {t('agentApp.docAdditional')} <span className="font-normal text-[#6B7280]">{t('agentApp.docAdditionalHint')}</span>
             </Label>
             <div className="mt-1.5 border-2 border-dashed border-[#E5DFC6] hover:border-[#C7A962] bg-[#FDF9F0]/50 rounded-xl p-4 transition-colors cursor-pointer">
               <Input
@@ -159,7 +161,7 @@ export const Step10Documents = ({ formData, setFormData }: Step10Props) => {
                       <span className="truncate">✓ {f.name}</span>
                       <button
                         type="button"
-                        aria-label={`Remove ${f.name}`}
+                        aria-label={t('agentApp.removeFile', { name: f.name })}
                         onClick={() => removeSupportingDoc(i)}
                         className="ml-3 shrink-0 rounded p-0.5 text-[#6B7280] hover:bg-[#FDF9F0] hover:text-[#0a2225]"
                       >
