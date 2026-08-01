@@ -40,6 +40,14 @@ export default function TripRequestsBoardPage() {
           "id, title, destination, start_date, end_date, budget_min, budget_max, travelers_adults, travelers_children, trip_style, created_at"
         )
         .eq("status", "open")
+        // Privacy filters (31 Jul audit): this second board was missing the
+        // Jul 26 fix from the marketplace tab — direct requests addressed to
+        // ONE named creator/agent, and on-trip hires, were listed publicly
+        // here for anyone signed in. Same rule everywhere a board exists:
+        // addressed briefs never appear on open boards.
+        .filter("source_metadata->>hire_on_trip", "is", null)
+        .is("preferred_creator_id", null)
+        .is("preferred_agent_id", null)
         .order("created_at", { ascending: false });
 
       if (!isMounted) return;
