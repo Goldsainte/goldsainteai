@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -1190,7 +1191,14 @@ const Auth = () => {
       </div>
 
       {/* Right: Auth card */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-10">
+      <div className="relative w-full md:w-1/2 flex items-center justify-center p-6 sm:p-10">
+        {/* Language switcher (1 Aug): the auth layout has no global header,
+            so batch-1 translations shipped with no way to switch languages
+            on this page — founder catch. Same selector as the header, styled
+            for the light panel. */}
+        <div className="absolute right-4 top-4 sm:right-6 sm:top-6 z-10">
+          <LanguageSelector className="gap-2 text-[#8D6B2F] hover:text-[#0a2225] transition-colors" />
+        </div>
         {authCard}
       </div>
     </div>
