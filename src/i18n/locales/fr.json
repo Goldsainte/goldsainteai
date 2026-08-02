@@ -35,7 +35,18 @@
     "navCreators": "Créateurs",
     "navSpecialists": "Spécialistes",
     "navPartner": "Partenaire",
-    "getStarted": "Commencer"
+    "getStarted": "Commencer",
+    "menuMarketplace": "Marketplace",
+    "menuMarketplaceD": "Parcourir les voyages sélectionnés",
+    "menuTours": "Tours",
+    "menuToursD": "Tours et expériences réservables",
+    "menuGuides": "Guides d'itinéraires",
+    "menuGuidesD": "Guides jour par jour à télécharger",
+    "menuPostTrip": "Publier une demande de voyage",
+    "menuPostTripD": "Recevez des propositions sur mesure de spécialistes",
+    "menuAgent": "Devenir agent",
+    "menuAgentD": "Concevez et vendez des voyages en tant que vendeur officiel",
+    "agentPromoD": "Mettez votre expertise à profit et gagnez sur chaque voyage que vous réalisez."
   },
   "common": {
     "loading": "Chargement...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "La marketplace sociale du voyage",
       "sub": "Découvrez, planifiez et réservez vos voyages auprès de créateurs et de spécialistes — chacun avec sa vitrine, son expertise et sa messagerie directe. Paiements sécurisés par Stripe.",
-      "h": "Des voyages conçus par ceux qui y sont allés.",
       "postDream": "Publiez le voyage de vos rêves →",
       "twoDoorsQ": "Créateur voyage ou agent ?",
       "openStorefront": "Ouvrez votre boutique →",
       "popularTrips": "Voyages populaires",
-      "viewAll": "Tout voir →"
+      "viewAll": "Tout voir →",
+      "h1a": "Des voyages conçus par ceux",
+      "h1b": "qui y sont allés."
     },
     "dreamTrip": {
       "eyebrow": "Pour les voyageurs",
@@ -1128,5 +1140,45 @@
     "petsSub": "Vous voyagez avec un animal d'assistance ?",
     "openSearch": "Ouvrir la recherche",
     "setTravelers": "Définir le nombre de voyageurs"
+  },
+  "directory": {
+    "agentTitle": "Nos spécialistes du voyage",
+    "agentSub": "Trouvez un spécialiste du voyage qui vous comprend et concevez ensemble le voyage de vos rêves — en réservant en toute sécurité via Goldsainte.",
+    "creatorTitle": "Nos créateurs voyage",
+    "creatorSub": "Suivez des créateurs dont les voyages vous inspirent — puis transformez leurs contenus en votre prochain voyage, réservé en toute sécurité via Goldsainte.",
+    "moreN": "+{{count}} autres",
+    "searchAgents": "Rechercher spécialistes, destinations…",
+    "searchCreators": "Rechercher créateurs, univers, lieux…",
+    "clear": "Effacer",
+    "agentsSoon": "Spécialistes bientôt disponibles",
+    "creatorsSoon": "Créateurs bientôt disponibles",
+    "postToMatch": "Publiez votre voyage et nous vous mettrons en relation.",
+    "noMatches": "Aucun résultat",
+    "clearAll": "Effacer les filtres et tout afficher",
+    "getMatched": "Être mis en relation"
+  },
+  "specialistsPage": {
+    "kicker": "Spécialistes",
+    "h1": "Choisis, pas listés.",
+    "sub": "Chaque spécialiste rejoint Goldsainte sur candidature — identité vérifiée, références et assurance examinées par notre équipe avant la vente du moindre voyage. La cohorte fondatrice se constitue en ce moment.",
+    "doesKicker": "Ce que fait un spécialiste Goldsainte",
+    "w1s": "Il répond à de vraies demandes.",
+    "w1r": "Les voyageurs publient les voyages qu'ils veulent ; les spécialistes répondent par des propositions sur mesure — itinéraire, prix et calendrier.",
+    "w2s": "Il publie ses propres voyages.",
+    "w2r": "Mettez en forme les voyages que vous connaissez par cœur et proposez-les à votre nom, à votre prix, réservables directement.",
+    "w3s": "Il est payé directement.",
+    "w3r": "Chaque paiement est encaissé sur votre propre compte Stripe — vous êtes le vendeur officiel.",
+    "howKicker": "Comment la cohorte fondatrice est choisie",
+    "h1r": "Une candidature de dix minutes — votre activité, vos références, votre assurance et votre expertise.",
+    "h2r": "Vérification d'identité via Stripe, en deux minutes environ.",
+    "h3r": "Examen humain, avec une décision envoyée par e-mail sous un à deux jours ouvrés.",
+    "feePara": "Vous fixez votre prix — vos coûts et votre marge vous appartiennent. La commission de Goldsainte est de 3,5 % fixes, prélevés à la réservation ; le reste arrive sur votre propre compte Stripe, car vous êtes le vendeur officiel de chaque voyage que vous vendez.",
+    "feeCaption": "La commission fixe de Goldsainte",
+    "closing": "Les voyageurs arrivent. La cohorte est volontairement restreinte. Si vous vendez du voyage avec une vraie expertise, c'est le moment d'être parmi les premiers.",
+    "applyCta": "Candidater",
+    "browseCta": "Parcourir les voyages que les voyageurs réservent →",
+    "alreadyApplied": "Déjà candidat ?",
+    "checkStatus": "Connectez-vous à tout moment pour suivre votre candidature.",
+    "questions": "Des questions sur le métier de spécialiste —"
   }
 }
