@@ -35,7 +35,18 @@
     "navCreators": "Creator",
     "navSpecialists": "Specialisti",
     "navPartner": "Partner",
-    "getStarted": "Inizia"
+    "getStarted": "Inizia",
+    "menuMarketplace": "Marketplace",
+    "menuMarketplaceD": "Sfoglia i viaggi selezionati",
+    "menuTours": "Tour",
+    "menuToursD": "Tour ed esperienze prenotabili",
+    "menuGuides": "Guide di itinerario",
+    "menuGuidesD": "Guide giorno per giorno scaricabili",
+    "menuPostTrip": "Pubblica una richiesta di viaggio",
+    "menuPostTripD": "Ricevi proposte su misura dagli specialisti",
+    "menuAgent": "Diventa agente",
+    "menuAgentD": "Progetta e vendi viaggi come venditore ufficiale",
+    "agentPromoD": "Metti in campo la tua esperienza e guadagna su ogni viaggio che realizzi."
   },
   "common": {
     "loading": "Caricamento...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "Il marketplace sociale del viaggio",
       "sub": "Scopri, pianifica e prenota viaggi con creator e specialisti — ognuno con la propria vetrina, competenza e messaggistica diretta. Pagamenti protetti da Stripe.",
-      "h": "Viaggi creati da chi c'è già stato.",
       "postDream": "Pubblica il viaggio dei tuoi sogni →",
       "twoDoorsQ": "Creator di viaggio o agente?",
       "openStorefront": "Apri la tua vetrina →",
       "popularTrips": "Viaggi più richiesti",
-      "viewAll": "Vedi tutti →"
+      "viewAll": "Vedi tutti →",
+      "h1a": "Viaggi creati da chi",
+      "h1b": "c'è già stato."
     },
     "dreamTrip": {
       "eyebrow": "Per i viaggiatori",
@@ -1128,5 +1140,45 @@
     "petsSub": "Viaggi con un animale di assistenza?",
     "openSearch": "Apri la ricerca",
     "setTravelers": "Imposta il numero di viaggiatori"
+  },
+  "directory": {
+    "agentTitle": "I nostri specialisti di viaggio",
+    "agentSub": "Trova uno specialista di viaggio in sintonia con te e progettate insieme il viaggio dei tuoi sogni — prenotando in sicurezza tramite Goldsainte.",
+    "creatorTitle": "I nostri creator di viaggio",
+    "creatorSub": "Segui i creator i cui viaggi ti ispirano — poi trasforma i loro contenuti nel tuo prossimo viaggio, prenotato in sicurezza tramite Goldsainte.",
+    "moreN": "+{{count}} altri",
+    "searchAgents": "Cerca specialisti, destinazioni…",
+    "searchCreators": "Cerca creator, nicchie, luoghi…",
+    "clear": "Cancella",
+    "agentsSoon": "Specialisti in arrivo",
+    "creatorsSoon": "Creator in arrivo",
+    "postToMatch": "Pubblica il tuo viaggio e ti metteremo in contatto.",
+    "noMatches": "Nessun risultato",
+    "clearAll": "Cancella i filtri e mostra tutti",
+    "getMatched": "Trova il tuo match"
+  },
+  "specialistsPage": {
+    "kicker": "Specialisti",
+    "h1": "Scelti, non elencati.",
+    "sub": "Ogni specialista entra in Goldsainte su candidatura — identità verificata, credenziali e assicurazione esaminate dal nostro team prima che venga venduto un solo viaggio. La coorte fondatrice si sta formando ora.",
+    "doesKicker": "Cosa fa uno specialista Goldsainte",
+    "w1s": "Risponde a richieste vere.",
+    "w1r": "I viaggiatori pubblicano i viaggi che desiderano; gli specialisti rispondono con proposte su misura — itinerario, prezzo e tempi.",
+    "w2s": "Pubblica i propri viaggi.",
+    "w2r": "Confeziona i viaggi che conosci a memoria e proponili a tuo nome, al tuo prezzo, prenotabili direttamente.",
+    "w3s": "Viene pagato direttamente.",
+    "w3r": "Ogni pagamento viene addebitato sul tuo conto Stripe — sei tu il venditore ufficiale.",
+    "howKicker": "Come viene scelta la coorte fondatrice",
+    "h1r": "Una candidatura di dieci minuti — la tua attività, le credenziali, l'assicurazione e l'esperienza.",
+    "h2r": "Verifica dell'identità tramite Stripe, in circa due minuti.",
+    "h3r": "Revisione umana, con decisione via email entro uno o due giorni lavorativi.",
+    "feePara": "Il prezzo lo fai tu — costi e margine sono tuoi da costruire. La commissione di Goldsainte è un 3,5% fisso, addebitato alla prenotazione; il resto arriva sul tuo conto Stripe, perché sei il venditore ufficiale di ogni viaggio che vendi.",
+    "feeCaption": "La commissione fissa di Goldsainte",
+    "closing": "I viaggiatori stanno arrivando. La coorte è piccola di proposito. Se vendi viaggi con vera competenza, questo è il momento di arrivare per primi.",
+    "applyCta": "Candidati",
+    "browseCta": "Sfoglia i viaggi che i viaggiatori stanno prenotando →",
+    "alreadyApplied": "Hai già fatto domanda?",
+    "checkStatus": "Accedi in qualsiasi momento per verificare lo stato della candidatura.",
+    "questions": "Domande su come diventare specialista —"
   }
 }
