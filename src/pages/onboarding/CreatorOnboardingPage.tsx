@@ -663,7 +663,7 @@ export default function CreatorOnboardingPage() {
             {currentStep === 0 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">About You</h2>
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">{t('creatorApp.stAbout')}</h2>
                   <p className="text-[#6B7280]">How travelers will discover you</p>
                 </div>
 
@@ -689,21 +689,21 @@ export default function CreatorOnboardingPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-[#0a2225] font-medium">Display Name *</Label>
+                    <Label className="text-[#0a2225] font-medium">{t('creatorApp.displayName')} *</Label>
                     <Input
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Your creative name or brand"
+                      placeholder={t('creatorApp.phCreative')}
                       className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
                   </div>
 
                   <div>
-                    <Label className="text-[#0a2225] font-medium">Bio / Tagline *</Label>
+                    <Label className="text-[#0a2225] font-medium">{t('creatorApp.bioTagline')} *</Label>
                     <Textarea
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
-                      placeholder="What makes your content unique?"
+                      placeholder={t('creatorApp.phUnique')}
                       className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl min-h-[100px]"
                     />
                     <div className="mt-2 flex justify-end">
@@ -717,11 +717,11 @@ export default function CreatorOnboardingPage() {
                   </div>
 
                   <div>
-                    <Label className="text-[#0a2225] font-medium">Home Base *</Label>
+                    <Label className="text-[#0a2225] font-medium">{t('creatorApp.homeBase')} *</Label>
                     <GoogleCityAutocomplete
                       value={homeBase}
                       onChange={setHomeBase}
-                      placeholder="City, Country"
+                      placeholder={t('creatorApp.phCity')}
                       className="mt-2"
                       inputClassName="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl"
                     />
@@ -735,28 +735,28 @@ export default function CreatorOnboardingPage() {
                     </p>
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-[#0a2225] font-medium">Countries visited</Label>
-                        <Input value={aboutDetails.countries_visited || ""} onChange={(e) => setAbout("countries_visited", e.target.value)} placeholder="e.g. 27" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                        <Label className="text-[#0a2225] font-medium">{t('creatorApp.countriesVisited')}</Label>
+                        <Input value={aboutDetails.countries_visited || ""} onChange={(e) => setAbout("countries_visited", e.target.value)} placeholder={t('creatorApp.phCount')} className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                       <div>
-                        <Label className="text-[#0a2225] font-medium">Your travel style in three words</Label>
-                        <Input value={aboutDetails.three_words || ""} onChange={(e) => setAbout("three_words", e.target.value)} placeholder="Slow, spontaneous, delicious" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                        <Label className="text-[#0a2225] font-medium">{t('creatorApp.threeWords')}</Label>
+                        <Input value={aboutDetails.three_words || ""} onChange={(e) => setAbout("three_words", e.target.value)} placeholder={t('creatorApp.phThreeWords')} className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                       <div>
-                        <Label className="text-[#0a2225] font-medium">Window or aisle?</Label>
-                        <Input value={aboutDetails.window_or_aisle || ""} onChange={(e) => setAbout("window_or_aisle", e.target.value)} placeholder="Window, always" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                        <Label className="text-[#0a2225] font-medium">{t('creatorApp.windowAisle')}</Label>
+                        <Input value={aboutDetails.window_or_aisle || ""} onChange={(e) => setAbout("window_or_aisle", e.target.value)} placeholder={t('creatorApp.phWindow')} className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                       <div className="sm:col-span-2">
-                        <Label className="text-[#0a2225] font-medium">Most unforgettable trip</Label>
-                        <Input value={aboutDetails.favorite_trip || ""} onChange={(e) => setAbout("favorite_trip", e.target.value)} placeholder="Sunrise over Bagan in a hot-air balloon" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                        <Label className="text-[#0a2225] font-medium">{t('creatorApp.favoriteTrip')}</Label>
+                        <Input value={aboutDetails.favorite_trip || ""} onChange={(e) => setAbout("favorite_trip", e.target.value)} placeholder={t('creatorApp.phFav')} className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                       <div className="sm:col-span-2">
-                        <Label className="text-[#0a2225] font-medium">Still on the dream list</Label>
-                        <Input value={aboutDetails.dream_destination || ""} onChange={(e) => setAbout("dream_destination", e.target.value)} placeholder="Antarctica by expedition ship" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                        <Label className="text-[#0a2225] font-medium">{t('creatorApp.dreamList')}</Label>
+                        <Input value={aboutDetails.dream_destination || ""} onChange={(e) => setAbout("dream_destination", e.target.value)} placeholder={t('creatorApp.phDream')} className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                       <div className="sm:col-span-2">
-                        <Label className="text-[#0a2225] font-medium">A travel tip you swear by</Label>
-                        <Input value={aboutDetails.travel_tip || ""} onChange={(e) => setAbout("travel_tip", e.target.value)} placeholder="Book the first morning slot at major sights" className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
+                        <Label className="text-[#0a2225] font-medium">{t('creatorApp.travelTip')}</Label>
+                        <Input value={aboutDetails.travel_tip || ""} onChange={(e) => setAbout("travel_tip", e.target.value)} placeholder={t('creatorApp.phTip')} className="mt-2 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
                       </div>
                     </div>
                   </div>
@@ -768,13 +768,13 @@ export default function CreatorOnboardingPage() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Social Profile</h2>
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">{t('creatorApp.stSocial')}</h2>
                   <p className="text-[#6B7280]">Where travelers can find your work</p>
                 </div>
 
                 {/* Primary Platform */}
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Primary Platform *</Label>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.primaryPlatform')} *</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {PLATFORMS.map((platform) => (
                       <LuxurySelectionCard
@@ -853,7 +853,7 @@ export default function CreatorOnboardingPage() {
             {currentStep === 2 && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Niche</h2>
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">{t('creatorApp.stNiche')}</h2>
                   <p className="text-[#6B7280]">Help us match you with the right travelers</p>
                 </div>
 
@@ -875,7 +875,7 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Content Style</Label>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.contentStyle')}</Label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {CONTENT_STYLES.map((style) => (
                       <LuxurySelectionCard
@@ -890,7 +890,7 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Budget Levels You Feature</Label>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.budgetLevels')}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {BUDGET_LEVELS.map((budget) => (
                       <LuxurySelectionCard
@@ -918,7 +918,7 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225]">Languages you speak</Label>
+                  <Label className="text-[#0a2225]">{t('creatorApp.languagesSpoken')}</Label>
                   <Input
                     value={languagesInput}
                     onChange={(e) => setLanguagesInput(e.target.value)}
@@ -929,8 +929,8 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225]">Light up your map</Label>
-                  <p className="mt-0.5 text-xs text-[#9CA3AF]">Tap at least 3 countries you know firsthand — travelers see this map on your profile.</p>
+                  <Label className="text-[#0a2225]">{t('creatorApp.lightMap')}</Label>
+                  <p className="mt-0.5 text-xs text-[#9CA3AF]">{t('creatorApp.lightMapHelp')}</p>
                   <Input
                     value={countrySearch}
                     onChange={(e) => setCountrySearch(e.target.value)}
@@ -985,14 +985,14 @@ export default function CreatorOnboardingPage() {
             {SHOW_PORTFOLIO_STEP && currentStep === PORTFOLIO_STEP_INDEX && (
               <div className="space-y-8">
                 <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Your Portfolio</h2>
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">{t('creatorApp.hYourPortfolio')}</h2>
                   <p className="text-[#6B7280]">Showcase your work — everything here is optional</p>
                 </div>
 
                 {/* Cover Image */}
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Cover / Hero Image</Label>
-                  <p className="text-xs text-[#6B7280] mb-3">This appears as the banner at the top of your public profile.</p>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.coverImage')}</Label>
+                  <p className="text-xs text-[#6B7280] mb-3">{t('creatorApp.coverHelp')}</p>
                   {coverImageUrl ? (
                     <div className="relative rounded-xl overflow-hidden border border-[#E5DFC6] aspect-[3/1]">
                       <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" loading="lazy"/>
@@ -1034,7 +1034,7 @@ export default function CreatorOnboardingPage() {
 
                 {/* Featured Photos */}
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Featured Photos</Label>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.featuredPhotos')}</Label>
                   <FeaturedPhotosUploader
                     userId={user?.id || ""}
                     photos={featuredPhotos}
@@ -1048,8 +1048,8 @@ export default function CreatorOnboardingPage() {
 
                 {/* Media Gallery — videos, reels, social links */}
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-1 block">Content Gallery</Label>
-                  <p className="text-xs text-[#6B7280] mb-3">Upload videos, reels, or paste Instagram / TikTok links to showcase your content.</p>
+                  <Label className="text-[#0a2225] font-medium mb-1 block">{t('creatorApp.contentGallery')}</Label>
+                  <p className="text-xs text-[#6B7280] mb-3">{t('creatorApp.galleryHelp')}</p>
                   <CreatorMediaUploader
                     userId={user?.id || ""}
                     media={creatorMedia}
@@ -1060,7 +1060,7 @@ export default function CreatorOnboardingPage() {
 
                 {/* Brand Alignment */}
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Brand Alignment</Label>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.brandAlignment')}</Label>
                   <BrandAlignmentSelector
                     selectedTiers={preferredBrandTiers}
                     onTiersChange={setPreferredBrandTiers}
@@ -1073,7 +1073,7 @@ export default function CreatorOnboardingPage() {
 
                 {/* Pricing Model */}
                 <div>
-                  <Label className="text-[#0a2225] font-medium mb-3 block">Pricing Model</Label>
+                  <Label className="text-[#0a2225] font-medium mb-3 block">{t('creatorApp.pricingModel')}</Label>
                   <div className="space-y-3">
                     {PRICING_MODELS.map((model) => (
                       <LuxurySelectionCard
@@ -1120,14 +1120,14 @@ export default function CreatorOnboardingPage() {
             {currentStep === GET_HIRED_STEP_INDEX && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-secondary text-2xl text-[#0a2225]">Get hired onto trips</h2>
+                  <h2 className="font-secondary text-2xl text-[#0a2225]">{t('creatorApp.hGetHired')}</h2>
                   <p className="mt-1.5 text-sm leading-relaxed text-[#0a2225]/70">
                     Travelers can hire you to join their own trip — you host the days, they cover it at your rate, paid straight to your Stripe account. Set your rate now and you're hireable the moment you finish.
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225]">Offer title</Label>
+                  <Label className="text-[#0a2225]">{t('creatorApp.offerTitle')}</Label>
                   <Input value={hostTitle} onChange={(e) => setHostTitle(e.target.value)}
                     placeholder="Travel With Me"
                     className="mt-1.5 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962] rounded-xl" />
@@ -1135,7 +1135,7 @@ export default function CreatorOnboardingPage() {
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label className="text-[#0a2225]">What it's like to travel with you <span className="text-[#9CA3AF]">(optional)</span></Label>
+                    <Label className="text-[#0a2225]">{t('creatorApp.travelWithYou')} <span className="text-[#9CA3AF]">(optional)</span></Label>
                     <AIRewriteButton value={hostDesc} onRewrite={setHostDesc} fieldLabel="Hosted-trip description" />
                   </div>
                   <Textarea value={hostDesc} onChange={(e) => setHostDesc(e.target.value)} rows={3}
@@ -1144,8 +1144,8 @@ export default function CreatorOnboardingPage() {
                 </div>
 
                 <div>
-                  <Label className="text-[#0a2225]">What can travelers hire you for?</Label>
-                  <p className="mt-0.5 text-xs text-[#9CA3AF]">Travelers pick from exactly this list when they hire you.</p>
+                  <Label className="text-[#0a2225]">{t('creatorApp.hireFor')}</Label>
+                  <p className="mt-0.5 text-xs text-[#9CA3AF]">{t('creatorApp.hireForHelp')}</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {ON_TRIP_CAPABILITIES.map((c) => (
                       <button key={c.id} type="button" title={c.hint}
@@ -1206,7 +1206,7 @@ export default function CreatorOnboardingPage() {
             {currentStep === STANDARDS_STEP_INDEX && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">Standards & Legal</h2>
+                  <h2 className="font-secondary text-2xl text-[#0a2225] mb-2">{t('creatorApp.hStandards')}</h2>
                   <p className="text-[#6B7280]">Our partnership commitments</p>
                 </div>
 
