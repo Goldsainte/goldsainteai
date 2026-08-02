@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import logomark from "@/assets/logomark-gold.webp";
 
 // ============================================================================
@@ -22,20 +23,26 @@ const GRADS = {
 const SIDES = [
   {
     key: "creators",
+    nameKey: "home.equation.creatorsName",
     name: "Creators",
     dot: "#C7A962",
+    bodyKey: "home.equation.creatorsBody",
     body: "A storefront under your own name — travel guides, on-trip services, and tips from the travelers you inspire. Paid directly.",
   },
   {
     key: "travelers",
+    nameKey: "home.equation.travelersName",
     name: "Travelers",
     dot: "#4a7c76",
+    bodyKey: "home.equation.travelersBody",
     body: "Trips designed by real experts who compete for your brief — with someone to message from first idea to home again.",
   },
   {
     key: "agents",
+    nameKey: "home.equation.agentsName",
     name: "Travel agents",
     dot: "#8D6B2F",
+    bodyKey: "home.equation.agentsBody",
     body: "Matched trip requests, winning proposals, and clients for life. You are the seller of record, paid directly.",
   },
 ] as const;
@@ -53,6 +60,7 @@ function SideCard({
   className?: string;
   style?: React.CSSProperties;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       onMouseEnter={onSelect}
@@ -64,10 +72,10 @@ function SideCard({
     >
       <h4 className="flex items-center gap-2.5 font-secondary text-[17px] text-[#0a2225]">
         <span className="h-2.5 w-2.5 flex-shrink-0 rounded-[3px]" style={{ backgroundColor: side.dot }} />
-        {side.name}
+        {t(side.nameKey, side.name)}
       </h4>
       <p className="mt-1.5 text-sm leading-relaxed text-[#4a4a4a]">
-        {side.body}
+        {t(side.bodyKey, side.body)}
       </p>
     </div>
   );
@@ -83,6 +91,7 @@ const CIRCLE = (bg: string, size = 340): React.CSSProperties => ({
 });
 
 export function GoldsainteEquation() {
+  const { t } = useTranslation();
   // Fora-style focus: one side is active — its circle rises to the top at
   // full strength while the other two circles and cards dim. Click any card
   // (or circle) to bring that side forward.
@@ -105,12 +114,13 @@ export function GoldsainteEquation() {
       >
         <div className="absolute left-[7%] top-1/2 max-w-[430px] -translate-y-[58%]">
           <h2 className="font-secondary text-[44px] font-medium leading-[1.15] text-[#0a2225]">
-            Where travel comes together
+            {t("home.equation.h2", "Where travel comes together")}
           </h2>
           <p className="mt-5 max-w-[400px] text-sm leading-relaxed text-[#4a4a4a] md:text-base">
-            Travelers get trips only people could plan. Creators turn expertise
-            into income. Agents build businesses that last. Everyone is paid
-            directly.
+            {t(
+              "home.equation.sub",
+              "Travelers get trips only people could plan. Creators turn expertise into income. Agents build businesses that last. Everyone is paid directly."
+            )}
           </p>
         </div>
 
@@ -177,12 +187,13 @@ export function GoldsainteEquation() {
           mobile arrangement). ── */}
       <div className="lg:hidden">
         <h2 className="font-secondary text-[30px] font-medium leading-[1.15] text-[#0a2225]">
-          Where travel comes together
+          {t("home.equation.h2", "Where travel comes together")}
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-[#4a4a4a] md:text-base">
-          Travelers get trips only people could plan. Creators turn expertise
-          into income. Agents build businesses that last. Everyone is paid
-          directly.
+          {t(
+            "home.equation.sub",
+            "Travelers get trips only people could plan. Creators turn expertise into income. Agents build businesses that last. Everyone is paid directly."
+          )}
         </p>
 
         <div
