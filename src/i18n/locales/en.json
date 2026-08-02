@@ -64,32 +64,6 @@
     "profile": "Profile"
   },
   "home": {
-    "hero": {
-      "title": "Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs",
-      "subtitle": "Plan smarter with AI. Get certified travel agents bidding to save you more — or book CoCurated™ trips, created by experts, promoted by creators, and crafted for extraordinary value.",
-      "whatCanDo": "What Goldsainte.Ai can do",
-      "terms": "Terms",
-      "privacy": "Privacy Policy",
-      "agreement": "By using Goldsainte.Ai, you agree to our",
-      "mainHeadline": "<em>Plan, Discover & Book — The Smarter Travel Marketplace</em>",
-      "mainDescription": "Browse trips planned by certified travel specialists and explorers in over 50 countries.",
-      "mainDescriptionSub": "Or let our technology build your perfect itinerary in minutes.",
-      "subHeading": "Turn your trips into income—or book your next one in minutes.",
-      "postDreamTrip": "Start Exploring",
-      "seeHowItWorks": "See How It Works",
-      "browseCreators": "Browse creators",
-      "browseAgents": "Browse agents",
-      "marketplace": "The Collections Marketplace",
-      "marketplaceDisclaimer": "All actions happen inside the Goldsainte marketplace — we connect travelers, creators and agents, but do not operate the trips ourselves.",
-      "gentleAssist": "Prefer a gentle assist?",
-      "askAI": "Ask Goldsainte AI to shape your brief.",
-      "trustPromise": "All messaging and payments stay on-platform. No phone numbers, no side deals — just beautifully organized, protected bookings.",
-      "storyboardCaption": "Every journey begins with a vision.",
-      "storyboardDescription": "From inspiration to itinerary in minutes.\nUpload photos, generate a trip, and share or sell it instantly.",
-      "infinityPool": "Infinity pool and skyline",
-      "treehouseHammock": "Treehouse hammock",
-      "friendsHiking": "Friends hiking"
-    },
     "builtForEverySide": {
       "badge": "Travelers — Creators — Agents — Brands",
       "title": "Built for every side of luxury travel",
@@ -327,6 +301,71 @@
       "eyebrow": "The Social Marketplace for Travel",
       "sub": "Discover, plan and book travel through creators and travel specialists — each with their own storefront, expertise and direct messaging. Payments secured by Stripe.",
       "h": "Trips built by people who've been there."
+    },
+    "dreamTrip": {
+      "eyebrow": "For travelers",
+      "h2a": "Have a trip in mind that",
+      "h2b": "doesn't exist yet?",
+      "h2c": "Post it.",
+      "sub": "Stop scrolling through the same packages everyone else books. Describe the trip you actually want, and certified specialists design it for you — start to finish.",
+      "cta": "Post your dream trip",
+      "ctaNote": "Free to post · No obligation to book",
+      "why1k": "Designed",
+      "why1v": "not generated",
+      "why2k": "Personal",
+      "why2v": "not packaged",
+      "why3k": "Protected",
+      "why3v": "not prepaid",
+      "step1Title": "You describe it",
+      "step1Body": "Tell us the trip you wish existed — in your own words.",
+      "step2Title": "Proposals come to you",
+      "step2Body": "Certified experts design it and reply — you don't chase anyone.",
+      "step3Title": "Book with confidence",
+      "step3Body": "Choose the one you love. Pay your specialist directly, secured by Stripe.",
+      "mockBrief": "\"Two weeks in Japan in October — food-focused, mid-luxury, off the tourist trail.\"",
+      "chipJapan": "Japan",
+      "chipOct": "Oct",
+      "chipCulinary": "Culinary",
+      "chipBudget": "$8k",
+      "escrow1": "Secure Stripe checkout, direct to your specialist",
+      "escrow2": "Support from booking to boarding"
+    },
+    "equation": {
+      "h2": "Where travel comes together",
+      "sub": "Travelers get trips only people could plan. Creators turn expertise into income. Agents build businesses that last. Everyone is paid directly.",
+      "creatorsName": "Creators",
+      "creatorsBody": "A storefront under your own name — travel guides, on-trip services, and tips from the travelers you inspire. Paid directly.",
+      "travelersName": "Travelers",
+      "travelersBody": "Trips designed by real experts who compete for your brief — with someone to message from first idea to home again.",
+      "agentsName": "Travel agents",
+      "agentsBody": "Matched trip requests, winning proposals, and clients for life. You are the seller of record, paid directly."
+    },
+    "oneConv": {
+      "eyebrow": "Why Goldsainte",
+      "h2": "One thread. The whole trip.",
+      "sub": "Ask, negotiate, sign, and pay — without ever leaving your messages.",
+      "p1Title": "Discover with confidence.",
+      "p1Body": "Browse journeys designed from real destination experience — by specialists and travelers who've actually been there.",
+      "p2Title": "Choose what fits.",
+      "p2Body": "Book instantly with transparent pricing, or compare tailored proposals built around your vision and pick the one you love.",
+      "p3Title": "Plan in one place.",
+      "p3Body": "Keep your messages, itinerary, documents, and updates together — from first idea to the day you land.",
+      "p4Title": "Travel with support.",
+      "p4Body": "Stay connected to your specialist before, during, and after your journey — a message away the whole way.",
+      "closer": "No other travel platform takes you from first message to fully booked — without leaving the chat."
+    },
+    "stats": {
+      "v1": "45+ countries",
+      "l1": "Specialists can join & get paid",
+      "v2": "Book direct",
+      "l2": "Your payment goes to your specialist",
+      "v3": "Secured by Stripe",
+      "l3": "Payments & payouts",
+      "v4": "Team-reviewed",
+      "l4": "Every listing, before it goes live"
+    },
+    "asFeaturedIn": {
+      "eyebrow": "As featured in"
     }
   },
   "navigation": {
@@ -467,7 +506,8 @@
         "p2": "For any questions regarding Goldsainte, the Service, or the Website, or to send or serve documents, notices, correspondence, or other communications, including press inquiries, please contact Goldsainte Inc. directly at its registered office in Delaware.",
         "p3": "Goldsainte Inc. does not maintain a legal domicile at any other location or office, including the offices of its Support Companies. The Support Companies are not authorized to act as process agent or service agent for Goldsainte Inc., and no reservations can be made through the Support Companies."
       }
-    }
+    },
+    "heroSubtitle": "Goldsainte is the social marketplace for travel — creators inspire the trip, certified specialists design it by hand, and you book directly, payments secured by Stripe."
   },
   "auth": {
     "welcomeTitle": "Welcome to Goldsainte",
