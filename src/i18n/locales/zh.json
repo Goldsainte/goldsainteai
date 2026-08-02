@@ -30,7 +30,12 @@
     "preferencesEnabled": "偏好已启用",
     "preferencesDisabled": "偏好已禁用",
     "preferencesEnabledDesc": "搜索结果将匹配您保存的偏好",
-    "preferencesDisabledDesc": "搜索结果将显示所有可用选项"
+    "preferencesDisabledDesc": "搜索结果将显示所有可用选项",
+    "navTravel": "旅行",
+    "navCreators": "创作者",
+    "navSpecialists": "专家",
+    "navPartner": "合作",
+    "getStarted": "开始使用"
   },
   "common": {
     "loading": "加载中...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "旅行的社交市场",
       "sub": "通过创作者与旅行专家发现、规划并预订旅行 — 每个人都有自己的主页、专长与私信。支付由 Stripe 保护。",
-      "h": "由去过的人打造的旅程。"
+      "h": "由去过的人打造的旅程。",
+      "postDream": "发布你的梦想旅程 →",
+      "twoDoorsQ": "旅行创作者或代理？",
+      "openStorefront": "开设你的店铺 →",
+      "popularTrips": "热门旅程",
+      "viewAll": "查看全部 →"
     },
     "dreamTrip": {
       "eyebrow": "致旅行者",
@@ -464,6 +474,38 @@
       "c2Body": "真实旅行者从世界各地发布梦想旅程；无论你身在何处，都可以用量身定制的提案来回应。预订即收款——客户付款的那一刻，订金和尾款就进入你自己的 Stripe 账户。不用开票，不用催款。",
       "c2Cta": "以专家身份加入",
       "c2Alt": "金色时刻的精致高级餐桌"
+    },
+    "trustPlaque": {
+      "eyebrow": "信任与安全",
+      "h2": "值得托付你的旅程",
+      "sub": "每一笔预订背后的四项承诺——经过审核、通过认证、受到保障、全程支持。",
+      "c1e": "审核",
+      "c1t": "上线前逐一审核",
+      "c1b": "每一个行程、指南和主页在进入市集前都由 Goldsainte 团队审核。没有任何内容未经查看就上线。",
+      "c2e": "身份",
+      "c2t": "每个账号都经认证",
+      "c2b": "每位创作者和旅行代理在上架或接单前都要完成 Stripe Identity 身份认证。你始终清楚与谁打交道。",
+      "c3e": "支付",
+      "c3t": "由 Stripe 保障",
+      "c3b": "结账通过 Stripe 完成，款项直接支付给你的旅行代理——代理是你的正式卖方。银行卡信息绝不经过我们的服务器。",
+      "c4e": "支持",
+      "c4t": "陪你直到登机",
+      "c4b": "从预订到登机，与你的专家保持同一个对话——每一趟旅程背后都有 Goldsainte 的支持。",
+      "footPre": "完整标准请见我们的",
+      "footLink": "信任与安全页面"
+    },
+    "finalCta": {
+      "h2a": "你的下一段旅程",
+      "h2b": "从这里启程。",
+      "sub": "找到由真正去过的人打造的旅程——或者用你去过的每一个地方开始赚钱。",
+      "cta1": "探索旅程",
+      "cta2": "开始赚钱"
+    },
+    "founderNote": {
+      "eyebrow": "我们为什么创办 Goldsainte",
+      "quote": "「旅行的发现早已发生在社交平台上——缺失的是灵感之后的一切。我们创办 Goldsainte，是为了让激发你旅程的那个人，真正能去设计它、带领它、并以此为生；也为了让你托付旅程的那个人，正是你付钱的那个人——在一个为每位专家背书的市集上。」",
+      "role": "创始人兼 CEO，Goldsainte",
+      "alt": "Goldsainte 创始人兼 CEO Andre Powell"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "description": "旅行的社交市场 — 通过个人主页、私信与可预订旅行的全球市场，连接旅行者与创作者及独立旅行专家。",
     "copyright": "版权所有 © 2025 Goldsainte.Ai™。保留所有权利。",
     "creatorMarketplace": "创作者市场",
-    "creatorStudio": "创作者控制台"
+    "creatorStudio": "创作者控制台",
+    "colExplore": "探索",
+    "colJoin": "加入 GOLDSAINTE",
+    "colCompany": "公司",
+    "colStarted": "新手指南",
+    "colSupport": "支持",
+    "browseTrips": "浏览旅程",
+    "browseCreators": "浏览创作者",
+    "postTrip": "发布旅程",
+    "findSpecialist": "寻找专家",
+    "signupTraveler": "注册为旅行者",
+    "joinCreator": "加入成为创作者",
+    "applyAgent": "申请成为旅行代理",
+    "aboutGs": "关于 Goldsainte",
+    "newsroomL": "新闻中心",
+    "pressL": "媒体",
+    "contactUs": "联系我们",
+    "forTravelers": "旅行者指南",
+    "forCreators": "创作者指南",
+    "forAgents": "代理指南",
+    "whereAvailable": "服务地区",
+    "paymentsFees": "支付与费用",
+    "safetyTrust": "安全与信任",
+    "cancellationPolicy": "取消政策",
+    "privacyPolicy": "隐私政策",
+    "creatorAgreement": "创作者协议",
+    "agentAgreement": "代理协议",
+    "disputeRes": "争议解决",
+    "installApp": "安装应用"
   },
   "welcomeModal": {
     "title": "Goldsainte.Ai能为您做什么",
@@ -1034,5 +1104,29 @@
     "moneyB": "在 Goldsainte 预订的旅行由独立专业人士销售并直接收款。Goldsainte 只收取单一固定平台费 — 绝不在结账时加价，没有佣金迷宫。",
     "closing": "社交发现遇见旅行交易 — 身份、内容、对话、提案与交易，尽在一个平台。",
     "cta": "加入 Goldsainte"
+  },
+  "search": {
+    "where": "目的地",
+    "when": "日期",
+    "who": "人数",
+    "searchDest": "搜索目的地",
+    "addDates": "添加日期",
+    "addGuests": "添加人数",
+    "guestsN": "{{count}} 位旅客",
+    "whereTo": "去哪儿？",
+    "anywhere": "任何地方",
+    "anyDates": "日期不限",
+    "whereGoing": "你要去哪里？",
+    "checkInOut": "入住 – 退房",
+    "adults": "成人",
+    "adultsSub": "13岁及以上",
+    "children": "儿童",
+    "childrenSub": "2–12岁",
+    "infants": "婴幼儿",
+    "infantsSub": "2岁以下",
+    "pets": "宠物",
+    "petsSub": "携带服务动物出行？",
+    "openSearch": "打开搜索",
+    "setTravelers": "设置旅客人数"
   }
 }
