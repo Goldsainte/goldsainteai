@@ -1,4 +1,5 @@
 // src/pages/trips/PostTripPage.tsx
+import { useTranslation } from "react-i18next";
 import {
   DestinationVignette,
   TravelersVignette,
@@ -24,14 +25,15 @@ type WantsRole = "creator" | "agent" | "both";
 const TOTAL_STEPS = 5;
 
 const stepMeta = [
-  { title: "Where are you dreaming of?", subtitle: "Start with the destination and dates — we'll handle the rest." },
-  { title: "Who's coming along?", subtitle: "A few details help us match you with the right planners." },
-  { title: "Set the mood", subtitle: "What kind of experience are you after?" },
-  { title: "Anything else?", subtitle: "The little things that make a trip yours." },
-  { title: "Review & post", subtitle: "Take a final look before we share your brief." },
+  { title: "trip.pt1", subtitle: "trip.pt1S" },
+  { title: "trip.pt2", subtitle: "trip.pt2S" },
+  { title: "trip.pt3", subtitle: "trip.pt3S" },
+  { title: "trip.pt4", subtitle: "trip.pt4S" },
+  { title: "trip.pt5", subtitle: "trip.pt5S" },
 ];
 
 export default function PostTripPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -213,11 +215,11 @@ export default function PostTripPage() {
   async function handleHireSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!destination || !startsOn || !endsOn) {
-      setError("Destination and dates are required.");
+      setError(t('trip.ptErrDates'));
       return;
     }
     if (hireDays <= 0) {
-      setError("The end date must be after the start date.");
+      setError(t('trip.ptErrOrder'));
       return;
     }
     if (serviceCaps.length > 0 && chosenCaps.length === 0) {
@@ -530,12 +532,12 @@ export default function PostTripPage() {
       sessionStorage.removeItem("goldsainte:agentId");
 
       toast.success(notifyUserId
-        ? `Your trip has been sent directly to ${preferredName || "the selected planner"}.`
-        : "Your trip has been posted. Creators and agents will respond here.");
+        ? t('trip.ptSentDirect', { name: preferredName || t('trip.ptPlanner') })
+        : t('trip.ptPosted'));
       navigate("/my-trip-requests");
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Something went wrong posting your trip.");
+      setError(err.message || t('trip.ptWrong'));
     } finally {
       setSubmitting(false);
     }
@@ -732,7 +734,7 @@ export default function PostTripPage() {
     return (
       <div className="min-h-screen bg-[#FDF9F0] px-4 py-10 md:py-16">
         <form onSubmit={handleHireSubmit} className="mx-auto max-w-xl rounded-3xl border border-[#E5DFC6] bg-white p-6 md:p-8">
-          <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
+          <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">{t('trip.ptKicker')}</p>
           <h1 className="mt-2 font-secondary text-2xl leading-tight text-[#0a2225] md:text-3xl">
             Hire {preferredName || "your host"}
           </h1>
@@ -746,26 +748,26 @@ export default function PostTripPage() {
 
           <div className="mt-6 space-y-4">
             <div>
-              <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Where is your trip? *</label>
-              <input className={F} value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="e.g. Rome & the Amalfi Coast" />
+              <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">{t('trip.ptWhere')} *</label>
+              <input className={F} value={destination} onChange={(e) => setDestination(e.target.value)} placeholder={t('trip.ptPhWhere')} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Starts *</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">{t('trip.ptStarts')} *</label>
                 <input type="date" className={F} value={startsOn} onChange={(e) => setStartsOn(e.target.value)} />
               </div>
               <div>
-                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Ends *</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">{t('trip.ptEnds')} *</label>
                 <input type="date" className={F} value={endsOn} onChange={(e) => setEndsOn(e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Adults</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">{t('trip.ptAdults')}</label>
                 <input type="number" min="1" className={F} value={adults} onChange={(e) => setAdults(e.target.value)} />
               </div>
               <div>
-                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">Children</label>
+                <label className="mb-1.5 block text-[14px] font-medium text-[#3d4a4c]">{t('trip.ptChildren')}</label>
                 <input type="number" min="0" className={F} value={children} onChange={(e) => setChildren(e.target.value)} />
               </div>
             </div>
@@ -792,7 +794,7 @@ export default function PostTripPage() {
                 Anything {hireFirstName} should know? <span className="text-[#9CA3AF]">(optional)</span>
               </label>
               <textarea rows={3} className={F} value={specialNotes} onChange={(e) => setSpecialNotes(e.target.value)}
-                placeholder="Occasion, pace, must-sees, who's coming…" />
+                placeholder={t('trip.ptPhBrief')} />
             </div>
           </div>
 
@@ -853,7 +855,7 @@ export default function PostTripPage() {
               <div className="flex items-start gap-3">
                 <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-[#0a2225]">Direct Request</p>
+                  <p className="text-sm font-medium text-[#0a2225]">{t('trip.ptDirect')}</p>
                   <p className="text-[14px] text-[#4a4a4a] mt-0.5">
                     This trip will be sent directly to <span className="font-semibold">{preferredName}</span>
                   </p>
@@ -866,7 +868,7 @@ export default function PostTripPage() {
               <div className="flex items-start gap-3">
                 <Sparkles className="h-5 w-5 text-[#C7A962] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-[#0a2225]">Pre-filled from AI Collection</p>
+                  <p className="text-sm font-medium text-[#0a2225]">{t('trip.ptPrefilled')}</p>
                   <p className="text-[14px] text-[#4a4a4a] mt-0.5">
                     <span className="font-semibold">{itineraryPrefill.title}</span> — {itineraryPrefill.nights} nights in {itineraryPrefill.destination}
                   </p>
@@ -881,9 +883,9 @@ export default function PostTripPage() {
         {/* Step header */}
         <div className="mb-8 md:mb-12">
           <h1 className="font-secondary text-2xl md:text-3xl text-[#0a2225] leading-tight">
-            {stepMeta[currentStep].title}
+            {t(stepMeta[currentStep].title)}
           </h1>
-          <p className="text-sm text-[#6B7280] mt-2">{stepMeta[currentStep].subtitle}</p>
+          <p className="text-sm text-[#6B7280] mt-2">{t(stepMeta[currentStep].subtitle)}</p>
         </div>
 
         {/* Step content with fade */}
@@ -896,14 +898,14 @@ export default function PostTripPage() {
                   Destination <span className="text-red-500">*</span>
                 </label>
                 <input type="text" value={destination} onChange={e => setDestination(e.target.value)}
-                  className={inputCls} placeholder="Amalfi Coast, Paris & Provence, Bali..." />
+                  className={inputCls} placeholder={t('trip.ptPhDest')} />
               </div>
               <div>
                 <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">
                   Departing from <span className="text-red-500">*</span>
                 </label>
                 <input type="text" value={departureCity} onChange={e => setDepartureCity(e.target.value)}
-                  className={inputCls} placeholder="New York, London, Los Angeles..." />
+                  className={inputCls} placeholder={t('trip.ptPhFrom')} />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -920,9 +922,9 @@ export default function PostTripPage() {
                 </div>
               </div>
               <div>
-                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Trip nickname <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptNickname')} <span className="text-red-500">*</span></label>
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-                  className={inputCls} placeholder="Example: Amalfi anniversary escape" />
+                  className={inputCls} placeholder={t('trip.ptPhNick')} />
               </div>
             </>
           )}
@@ -932,33 +934,33 @@ export default function PostTripPage() {
             <>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Adults</label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptAdults')}</label>
                   <input type="number" min={1} value={adults} onChange={e => setAdults(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Children</label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptChildren')}</label>
                   <input type="number" min={0} value={children} onChange={e => setChildren(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Occasion <span className="text-red-500">*</span></label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptOccasion')} <span className="text-red-500">*</span></label>
                   <input type="text" value={occasion} onChange={e => setOccasion(e.target.value)}
-                    className={inputCls} placeholder="Honeymoon, birthday..." />
+                    className={inputCls} placeholder={t('trip.ptPhOcc')} />
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Budget from (total) <span className="text-red-500">*</span></label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptBudgetFrom')} <span className="text-red-500">*</span></label>
                   <input type="number" min={0} value={budgetMin} onChange={e => setBudgetMin(e.target.value)}
                     className={inputCls} placeholder="e.g. 7000" />
                 </div>
                 <div>
-                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Budget to (total) <span className="text-red-500">*</span></label>
+                  <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptBudgetTo')} <span className="text-red-500">*</span></label>
                   <input type="number" min={0} value={budgetMax} onChange={e => setBudgetMax(e.target.value)}
                     className={inputCls} placeholder="e.g. 12000" />
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">Budget style</label>
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptBudgetStyle')}</label>
                 <div className="flex flex-wrap gap-2">
                   {budgetLabels.map(([value, label]) => (
                     <Pill key={value} selected={budgetLevel === value} onClick={() => setBudgetLevel(value)}>{label}</Pill>
@@ -972,12 +974,12 @@ export default function PostTripPage() {
           {currentStep === 2 && (
             <>
               <div>
-                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Accommodation style <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptAccom')} <span className="text-red-500">*</span></label>
                 <input type="text" value={accommodationStyle} onChange={e => setAccommodationStyle(e.target.value)}
-                  className={inputCls} placeholder="Design hotels, villas, all-inclusive..." />
+                  className={inputCls} placeholder={t('trip.ptPhAccom')} />
               </div>
               <div>
-                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">Trip pace</label>
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptPace')}</label>
                 <div className="flex flex-wrap gap-2">
                   {paceLabels.map(([value, label]) => (
                     <Pill key={value} selected={pace === value} onClick={() => setPace(value)}>{label}</Pill>
@@ -985,7 +987,7 @@ export default function PostTripPage() {
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">What matters most? <span className="text-red-500">*</span></label>
+                <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptMatters')} <span className="text-red-500">*</span></label>
                 <div className="flex flex-wrap gap-2">
                   {interestOptions.map(label => (
                     <Pill key={label} selected={interests.includes(label)} onClick={() => toggleInterest(label)}>{label}</Pill>
@@ -994,7 +996,7 @@ export default function PostTripPage() {
               </div>
               {aestheticTags.length > 0 && (
                 <div>
-                  <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">Aesthetic tags</label>
+                  <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptAesthetic')}</label>
                   <div className="flex flex-wrap gap-2">
                     {aestheticTags.map(tag => (
                       <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#BFAD72] bg-[#FDFBF5] text-xs text-[#0a2225]">
@@ -1014,16 +1016,16 @@ export default function PostTripPage() {
           {currentStep === 3 && (
             <>
               <div>
-                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">How flexible are you? <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptFlexible')} <span className="text-red-500">*</span></label>
                 <textarea value={flexibility} onChange={e => setFlexibility(e.target.value)}
                   className={cn(inputCls, "min-h-[100px] resize-none")}
-                  placeholder="Dates can move, happy to consider nearby towns..." />
+                  placeholder={t('trip.ptPhFlex')} />
               </div>
               <div>
-                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">Special notes <span className="text-red-500">*</span></label>
+                <label className="block mb-1.5 text-[14px] text-[#3d4a4c] font-medium">{t('trip.ptNotes')} <span className="text-red-500">*</span></label>
                 <textarea value={specialNotes} onChange={e => setSpecialNotes(e.target.value)}
                   className={cn(inputCls, "min-h-[120px] resize-none")}
-                  placeholder="Allergies, accessibility needs, non-negotiables..." />
+                  placeholder={t('trip.ptPhNotes')} />
               </div>
               <div>
                 <label className="block mb-2 text-[14px] text-[#3d4a4c] font-medium">
@@ -1140,7 +1142,7 @@ export default function PostTripPage() {
           ) : (
             <button key="step-submit" type="button" onClick={handleSubmit} disabled={submitting}
               className="inline-flex items-center gap-2 rounded-full bg-[#0c4d47] text-[#E5DFC6] px-6 py-2.5 text-sm font-semibold hover:bg-[#073331] disabled:opacity-60 transition-colors">
-              {submitting ? "Posting..." : "Post this trip"}
+              {submitting ? t('trip.gmPosting') : t('trip.ptPostThis')}
               <ArrowRight className="h-4 w-4" />
             </button>
           )}
