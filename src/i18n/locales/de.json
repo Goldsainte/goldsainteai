@@ -30,7 +30,12 @@
     "preferencesEnabled": "Präferenzen aktiviert",
     "preferencesDisabled": "Präferenzen deaktiviert",
     "preferencesEnabledDesc": "Suchergebnisse werden an deine gespeicherten Präferenzen angepasst",
-    "preferencesDisabledDesc": "Suchergebnisse zeigen alle verfügbaren Optionen"
+    "preferencesDisabledDesc": "Suchergebnisse zeigen alle verfügbaren Optionen",
+    "navTravel": "Reisen",
+    "navCreators": "Creator",
+    "navSpecialists": "Spezialisten",
+    "navPartner": "Partner",
+    "getStarted": "Loslegen"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "Der soziale Marktplatz fürs Reisen",
       "sub": "Entdecken, planen und buchen Sie Reisen über Creator und Spezialisten — jeder mit eigener Storefront, Expertise und Direktnachrichten. Zahlungen über Stripe gesichert.",
-      "h": "Reisen, gestaltet von Menschen, die dort waren."
+      "h": "Reisen, gestaltet von Menschen, die dort waren.",
+      "postDream": "Traumreise ausschreiben →",
+      "twoDoorsQ": "Travel-Creator oder Reiseexperte?",
+      "openStorefront": "Eigenes Schaufenster eröffnen →",
+      "popularTrips": "Beliebte Reisen",
+      "viewAll": "Alle ansehen →"
     },
     "dreamTrip": {
       "eyebrow": "Für Reisende",
@@ -464,6 +474,38 @@
       "c2Body": "Echte Reisende posten Traumreisen aus aller Welt; Sie antworten mit maßgeschneiderten Angeboten — egal, wo Sie sitzen. Bezahlt bei Buchung: Anzahlungen und Restbeträge landen auf Ihrem eigenen Stripe-Konto, sobald Ihr Kunde zahlt. Keine Rechnungen, kein Nachfassen.",
       "c2Cta": "Als Spezialist beitreten",
       "c2Alt": "Edles Fine-Dining-Ambiente zur goldenen Stunde"
+    },
+    "trustPlaque": {
+      "eyebrow": "Vertrauen und Sicherheit",
+      "h2": "Gebaut, um Ihre Reise verdient zu bekommen",
+      "sub": "Vier Zusagen hinter jeder Buchung — geprüft, verifiziert, abgesichert und begleitet, von Anfang bis Ende.",
+      "c1e": "Kuratierung",
+      "c1t": "Geprüft vor Veröffentlichung",
+      "c1b": "Jede Reise, jeder Guide und jedes Profil wird vom Goldsainte-Team geprüft, bevor es auf den Marktplatz kommt. Nichts geht ungesehen online.",
+      "c2e": "Identität",
+      "c2t": "Jedes Konto verifiziert",
+      "c2b": "Jeder Creator und Reiseexperte durchläuft die Stripe-Identity-Verifizierung, bevor er anbieten oder Buchungen annehmen kann. Sie wissen immer, mit wem Sie es zu tun haben.",
+      "c3e": "Zahlungen",
+      "c3t": "Abgesichert durch Stripe",
+      "c3b": "Der Checkout läuft über Stripe und bezahlt Ihren Reiseexperten direkt — er ist Ihr Verkäufer. Kartendaten berühren nie unsere Server.",
+      "c4e": "Betreuung",
+      "c4t": "Bis zum Boarding an Ihrer Seite",
+      "c4b": "Ein Verlauf mit Ihrem Spezialisten von der Buchung bis zum Boarding — und der Goldsainte-Support hinter jeder Reise.",
+      "footPre": "Alle Standards finden Sie auf unserer",
+      "footLink": "Seite Vertrauen und Sicherheit"
+    },
+    "finalCta": {
+      "h2a": "Ihre nächste Reise",
+      "h2b": "beginnt hier.",
+      "sub": "Finden Sie eine Reise von jemandem, der dort war — oder verdienen Sie an all den Orten, an denen Sie schon waren.",
+      "cta1": "Reisen entdecken",
+      "cta2": "Jetzt verdienen"
+    },
+    "founderNote": {
+      "eyebrow": "Warum wir Goldsainte gebaut haben",
+      "quote": "„Reisen werden längst auf Social Media entdeckt — was fehlte, war alles nach der Inspiration. Wir haben Goldsainte gebaut, damit die Person, die Ihre Reise inspiriert hat, sie auch wirklich gestalten, führen und davon leben kann — und damit die Person, der Sie Ihre Reise anvertrauen, genau die ist, die Sie bezahlen, auf einem Marktplatz, der für jeden Spezialisten einsteht.“",
+      "role": "Gründer und CEO, Goldsainte",
+      "alt": "Andre Powell, Gründer und CEO von Goldsainte"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "description": "Der soziale Marktplatz fürs Reisen — verbindet Reisende mit Creators und unabhängigen Spezialisten über persönliche Storefronts, Direktnachrichten und einen globalen Marktplatz buchbarer Reisen.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Alle Rechte vorbehalten.",
     "creatorMarketplace": "Creator-Marktplatz",
-    "creatorStudio": "Creator-Dashboard"
+    "creatorStudio": "Creator-Dashboard",
+    "colExplore": "ENTDECKEN",
+    "colJoin": "GOLDSAINTE BEITRETEN",
+    "colCompany": "UNTERNEHMEN",
+    "colStarted": "ERSTE SCHRITTE",
+    "colSupport": "HILFE",
+    "browseTrips": "Reisen durchstöbern",
+    "browseCreators": "Creator entdecken",
+    "postTrip": "Reise ausschreiben",
+    "findSpecialist": "Spezialisten finden",
+    "signupTraveler": "Als Reisender registrieren",
+    "joinCreator": "Als Creator beitreten",
+    "applyAgent": "Als Reiseexperte bewerben",
+    "aboutGs": "Über Goldsainte",
+    "newsroomL": "Newsroom",
+    "pressL": "Presse",
+    "contactUs": "Kontakt",
+    "forTravelers": "Für Reisende",
+    "forCreators": "Für Creator",
+    "forAgents": "Für Reiseexperten",
+    "whereAvailable": "Wo wir verfügbar sind",
+    "paymentsFees": "Zahlungen und Gebühren",
+    "safetyTrust": "Sicherheit und Vertrauen",
+    "cancellationPolicy": "Stornierungsrichtlinie",
+    "privacyPolicy": "Datenschutzerklärung",
+    "creatorAgreement": "Creator-Vereinbarung",
+    "agentAgreement": "Agenten-Vereinbarung",
+    "disputeRes": "Streitbeilegung",
+    "installApp": "App installieren"
   },
   "welcomeModal": {
     "title": "Was Goldsainte.Ai für Sie tun kann",
@@ -1034,5 +1104,29 @@
     "moneyB": "Auf Goldsainte gebuchte Reisen verkaufen unabhängige Profis, die direkt bezahlt werden. Goldsainte berechnet eine einzige feste Plattformgebühr — nie beim Checkout aufgeschlagen, nie ein Provisionslabyrinth.",
     "closing": "Soziale Entdeckung trifft Reise-Commerce — Identität, Inhalt, Gespräch, Angebot und Transaktion auf einer Plattform.",
     "cta": "Goldsainte beitreten"
+  },
+  "search": {
+    "where": "Wohin",
+    "when": "Wann",
+    "who": "Wer",
+    "searchDest": "Reiseziele suchen",
+    "addDates": "Daten wählen",
+    "addGuests": "Gäste angeben",
+    "guestsN": "{{count}} Gäste",
+    "whereTo": "Wohin geht's?",
+    "anywhere": "Überallhin",
+    "anyDates": "Beliebige Daten",
+    "whereGoing": "Wohin reisen Sie?",
+    "checkInOut": "Check-in – Check-out",
+    "adults": "Erwachsene",
+    "adultsSub": "Ab 13 Jahren",
+    "children": "Kinder",
+    "childrenSub": "2 bis 12 Jahre",
+    "infants": "Kleinkinder",
+    "infantsSub": "Unter 2 Jahren",
+    "pets": "Haustiere",
+    "petsSub": "Reisen Sie mit einem Assistenztier?",
+    "openSearch": "Suche öffnen",
+    "setTravelers": "Anzahl der Reisenden festlegen"
   }
 }
