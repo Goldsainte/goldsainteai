@@ -2,6 +2,7 @@
 // investor materials. Grayscale logos on cream, subtle color-on-hover, responsive
 // wrap. Native section (not the flat deck banner) so it's accessible + sharp on
 // every viewport. Logos live in src/assets/press/ (uploaded via GitHub).
+import { useTranslation } from "react-i18next";
 import forbes from "@/assets/press/forbes.png";
 import yahooFinance from "@/assets/press/yahoo-finance.png";
 import axios from "@/assets/press/axios.png";
@@ -29,6 +30,7 @@ const OUTLETS: { src: string; alt: string; h: number }[] = [
 ];
 
 export function AsFeaturedIn() {
+  const { t } = useTranslation();
   return (
     <section className="border-t border-[#E5DFC6] bg-[#f7f3ea] py-14 md:py-16">
       <div className="mx-auto max-w-6xl px-4 text-center md:px-6">
@@ -36,7 +38,7 @@ export function AsFeaturedIn() {
           className="text-[12px] font-medium uppercase tracking-[0.24em] text-[#8a7136]"
           style={inter}
         >
-          As featured in
+          {t("home.asFeaturedIn.eyebrow", "As featured in")}
         </span>
         <span aria-hidden="true" className="mx-auto mt-3.5 block h-px w-12 bg-[#C7A962]" />
 
