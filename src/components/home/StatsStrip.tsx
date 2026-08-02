@@ -1,12 +1,15 @@
 // Trust-facts strip. Replaces the pre-launch stats ("50+ Countries /
 // Launching Summer 2026") with claims Goldsainte can stand behind from
 // day one. Layout and rhythm intentionally identical to the old strip.
+import { useTranslation } from "react-i18next";
+
 export function StatsStrip() {
+  const { t } = useTranslation();
   const facts = [
-    { value: "45+ countries", label: "Specialists can join & get paid" },
-    { value: "Book direct", label: "Your payment goes to your specialist" },
-    { value: "Secured by Stripe", label: "Payments & payouts" },
-    { value: "Team-reviewed", label: "Every listing, before it goes live" },
+    { value: t("home.stats.v1", "45+ countries"), label: t("home.stats.l1", "Specialists can join & get paid") },
+    { value: t("home.stats.v2", "Book direct"), label: t("home.stats.l2", "Your payment goes to your specialist") },
+    { value: t("home.stats.v3", "Secured by Stripe"), label: t("home.stats.l3", "Payments & payouts") },
+    { value: t("home.stats.v4", "Team-reviewed"), label: t("home.stats.l4", "Every listing, before it goes live") },
   ];
 
   return (
