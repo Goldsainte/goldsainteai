@@ -30,7 +30,12 @@
     "preferencesEnabled": "Préférences activées",
     "preferencesDisabled": "Préférences désactivées",
     "preferencesEnabledDesc": "Les résultats de recherche correspondront à vos préférences enregistrées",
-    "preferencesDisabledDesc": "Les résultats de recherche afficheront toutes les options disponibles"
+    "preferencesDisabledDesc": "Les résultats de recherche afficheront toutes les options disponibles",
+    "navTravel": "Voyager",
+    "navCreators": "Créateurs",
+    "navSpecialists": "Spécialistes",
+    "navPartner": "Partenaire",
+    "getStarted": "Commencer"
   },
   "common": {
     "loading": "Chargement...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "La marketplace sociale du voyage",
       "sub": "Découvrez, planifiez et réservez vos voyages auprès de créateurs et de spécialistes — chacun avec sa vitrine, son expertise et sa messagerie directe. Paiements sécurisés par Stripe.",
-      "h": "Des voyages conçus par ceux qui y sont allés."
+      "h": "Des voyages conçus par ceux qui y sont allés.",
+      "postDream": "Publiez le voyage de vos rêves →",
+      "twoDoorsQ": "Créateur voyage ou agent ?",
+      "openStorefront": "Ouvrez votre boutique →",
+      "popularTrips": "Voyages populaires",
+      "viewAll": "Tout voir →"
     },
     "dreamTrip": {
       "eyebrow": "Pour les voyageurs",
@@ -464,6 +474,38 @@
       "c2Body": "De vrais voyageurs publient leurs voyages de rêve depuis le monde entier ; vous répondez par des propositions sur mesure — où que vous soyez. Payé à la réservation : acomptes et soldes arrivent sur votre propre compte Stripe dès que votre client paie. Sans facturation, sans relances.",
       "c2Cta": "Rejoindre comme spécialiste",
       "c2Alt": "Table gastronomique raffinée à l'heure dorée"
+    },
+    "trustPlaque": {
+      "eyebrow": "Confiance et sécurité",
+      "h2": "Conçu pour mériter la confiance de votre voyage",
+      "sub": "Quatre engagements derrière chaque réservation — vérifiée, contrôlée, sécurisée et accompagnée, du début à la fin.",
+      "c1e": "Sélection",
+      "c1t": "Vérifié avant mise en ligne",
+      "c1b": "Chaque voyage, guide et profil est vérifié par l'équipe Goldsainte avant d'arriver sur le marketplace. Rien n'est publié sans avoir été vu.",
+      "c2e": "Identité",
+      "c2t": "Chaque compte vérifié",
+      "c2b": "Chaque créateur et agent de voyage passe la vérification Stripe Identity avant de pouvoir publier ou accepter une réservation. Vous savez toujours avec qui vous travaillez.",
+      "c3e": "Paiements",
+      "c3t": "Sécurisé par Stripe",
+      "c3b": "Le paiement passe par Stripe et rémunère directement votre agent de voyage — c'est lui le vendeur officiel. Vos données de carte ne touchent jamais nos serveurs.",
+      "c4e": "Assistance",
+      "c4t": "À vos côtés jusqu'à l'embarquement",
+      "c4b": "Un seul fil avec votre spécialiste de la réservation à l'embarquement — et l'assistance Goldsainte derrière chaque voyage.",
+      "footPre": "Retrouvez toutes nos normes sur notre",
+      "footLink": "page Confiance et sécurité"
+    },
+    "finalCta": {
+      "h2a": "Votre prochain voyage",
+      "h2b": "commence ici.",
+      "sub": "Trouvez un voyage conçu par quelqu'un qui y est allé — ou commencez à gagner grâce à tous les endroits où vous êtes allé.",
+      "cta1": "Explorer les voyages",
+      "cta2": "Commencer à gagner"
+    },
+    "founderNote": {
+      "eyebrow": "Pourquoi nous avons créé Goldsainte",
+      "quote": "« La découverte du voyage se fait déjà sur les réseaux — ce qui manquait, c'est tout ce qui vient après l'inspiration. Nous avons créé Goldsainte pour que la personne qui a inspiré votre voyage puisse réellement le concevoir, le mener et en vivre — et pour que la personne à qui vous confiez votre voyage soit exactement celle que vous payez, sur une place de marché qui répond de chacun de ses spécialistes. »",
+      "role": "Fondateur et CEO, Goldsainte",
+      "alt": "Andre Powell, fondateur et CEO de Goldsainte"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "description": "La marketplace sociale du voyage — reliant les voyageurs aux créateurs et spécialistes indépendants via des vitrines personnelles, la messagerie directe et une marketplace mondiale de voyages réservables.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Tous droits réservés.",
     "creatorMarketplace": "Marché des Créateurs",
-    "creatorStudio": "Tableau de Bord Créateur"
+    "creatorStudio": "Tableau de Bord Créateur",
+    "colExplore": "EXPLORER",
+    "colJoin": "REJOINDRE GOLDSAINTE",
+    "colCompany": "ENTREPRISE",
+    "colStarted": "PREMIERS PAS",
+    "colSupport": "ASSISTANCE",
+    "browseTrips": "Parcourir les voyages",
+    "browseCreators": "Parcourir les créateurs",
+    "postTrip": "Publier un voyage",
+    "findSpecialist": "Trouver un spécialiste",
+    "signupTraveler": "S'inscrire comme voyageur",
+    "joinCreator": "Devenir créateur",
+    "applyAgent": "Candidater comme agent de voyage",
+    "aboutGs": "À propos de Goldsainte",
+    "newsroomL": "Salle de presse",
+    "pressL": "Presse",
+    "contactUs": "Nous contacter",
+    "forTravelers": "Pour les voyageurs",
+    "forCreators": "Pour les créateurs",
+    "forAgents": "Pour les agents",
+    "whereAvailable": "Où nous sommes disponibles",
+    "paymentsFees": "Paiements et frais",
+    "safetyTrust": "Sécurité et confiance",
+    "cancellationPolicy": "Politique d'annulation",
+    "privacyPolicy": "Politique de confidentialité",
+    "creatorAgreement": "Contrat créateur",
+    "agentAgreement": "Contrat agent",
+    "disputeRes": "Résolution des litiges",
+    "installApp": "Installer l'app"
   },
   "welcomeModal": {
     "title": "Ce que Goldsainte.Ai peut faire pour vous",
@@ -1034,5 +1104,29 @@
     "moneyB": "Les voyages réservés sur Goldsainte sont vendus par des professionnels indépendants, payés directement. Goldsainte prélève une commission de plateforme unique et fixe — jamais ajoutée au paiement, jamais un labyrinthe de commissions.",
     "closing": "La découverte sociale rencontre le commerce du voyage — identité, contenu, conversation, proposition et transaction, sur une seule plateforme.",
     "cta": "Rejoindre Goldsainte"
+  },
+  "search": {
+    "where": "Où",
+    "when": "Quand",
+    "who": "Qui",
+    "searchDest": "Rechercher une destination",
+    "addDates": "Ajouter des dates",
+    "addGuests": "Ajouter des voyageurs",
+    "guestsN": "{{count}} voyageurs",
+    "whereTo": "Où allez-vous ?",
+    "anywhere": "N'importe où",
+    "anyDates": "Toutes dates",
+    "whereGoing": "Où allez-vous ?",
+    "checkInOut": "Arrivée – Départ",
+    "adults": "Adultes",
+    "adultsSub": "13 ans et plus",
+    "children": "Enfants",
+    "childrenSub": "De 2 à 12 ans",
+    "infants": "Bébés",
+    "infantsSub": "Moins de 2 ans",
+    "pets": "Animaux",
+    "petsSub": "Vous voyagez avec un animal d'assistance ?",
+    "openSearch": "Ouvrir la recherche",
+    "setTravelers": "Définir le nombre de voyageurs"
   }
 }
