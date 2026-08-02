@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef } from "react";
 import { User, Hotel, Plane, Ticket, Briefcase, Video, Bell, TrendingUp, ArrowLeft, Plus, ShoppingCart, Link2, LayoutDashboard, Settings, Info, Sparkles, PlaneTakeoff, Car, MessageCircle, BarChart3, Luggage, BookOpen, Newspaper, ChevronDown, Users, HelpCircle, FileText, Compass, Globe, Send } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -35,6 +36,7 @@ const GsAgentPromoArt = () => (
 );
 
 export const Header = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
@@ -545,7 +547,7 @@ export const Header = () => {
                       className="group flex flex-col items-center pt-1 focus:outline-none"
                     >
                       <span className="flex items-center pb-1.5">
-                        <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${travelActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Travel</span>
+                        <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${travelActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>{t("header.navTravel", "Travel")}</span>
                       </span>
                       <span className={`h-[2.5px] w-full rounded-full transition-colors ${travelActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25 group-data-[state=open]:bg-[#fdfaf2]/40'}`} />
                     </button>
@@ -584,7 +586,7 @@ export const Header = () => {
                   className="group flex flex-col items-center pt-1 focus:outline-none"
                 >
                   <span className="flex items-center pb-1.5">
-                    <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${creatorsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Creators</span>
+                    <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${creatorsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>{t("header.navCreators", "Creators")}</span>
                   </span>
                   <span className={`h-[2.5px] w-full rounded-full transition-colors ${creatorsActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25'}`} />
                 </button>
@@ -595,7 +597,7 @@ export const Header = () => {
                   className="group flex flex-col items-center pt-1 focus:outline-none"
                 >
                   <span className="flex items-center pb-1.5">
-                    <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${specialistsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Specialists</span>
+                    <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${specialistsActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>{t("header.navSpecialists", "Specialists")}</span>
                   </span>
                   <span className={`h-[2.5px] w-full rounded-full transition-colors ${specialistsActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25'}`} />
                 </button>
@@ -607,7 +609,7 @@ export const Header = () => {
                       className="group flex flex-col items-center pt-1 focus:outline-none"
                     >
                       <span className="flex items-center pb-1.5">
-                        <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${partnerActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>Partner</span>
+                        <span className={`text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${partnerActive ? 'text-[#fdfaf2]' : 'text-[#E5DFC6]/85 group-hover:text-[#fdfaf2]'}`}>{t("header.navPartner", "Partner")}</span>
                       </span>
                       <span className={`h-[2.5px] w-full rounded-full transition-colors ${partnerActive ? 'bg-[#C7A962]' : 'bg-transparent group-hover:bg-[#fdfaf2]/25 group-data-[state=open]:bg-[#fdfaf2]/40'}`} />
                     </button>
@@ -635,7 +637,7 @@ export const Header = () => {
                     onClick={() => navigate('/auth?mode=signup')}
                     className="rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] h-10 px-5 text-sm font-semibold mr-1"
                   >
-                    Get Started
+                    {t("header.getStarted", "Get Started")}
                   </Button>
                 )}
 
