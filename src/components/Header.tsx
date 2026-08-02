@@ -425,8 +425,8 @@ export const Header = () => {
                                 >
                                   <div className="flex w-full items-center gap-4">
                                     <div className="flex-1">
-                                      <p className="text-[15px] font-semibold text-[#0a2225]">Become an Agent</p>
-                                      <p className="mt-0.5 text-[13px] leading-snug text-[#6B7280]">Plug in your expertise and earn on every journey you deliver.</p>
+                                      <p className="text-[15px] font-semibold text-[#0a2225]">{t("header.menuAgent", "Become an Agent")}</p>
+                                      <p className="mt-0.5 text-[13px] leading-snug text-[#6B7280]">{t("header.agentPromoD", "Plug in your expertise and earn on every journey you deliver.")}</p>
                                     </div>
                                     <GsAgentPromoArt />
                                   </div>
@@ -555,26 +555,26 @@ export const Header = () => {
                   <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-secondary">
                     <DropdownMenuItem onClick={() => navigate('/marketplace')} className="cursor-pointer px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-[#0a2225]">Marketplace</p>
-                        <p className="text-xs text-[#6B7280]">Browse curated trips</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{t("header.menuMarketplace", "Marketplace")}</p>
+                        <p className="text-xs text-[#6B7280]">{t("header.menuMarketplaceD", "Browse curated trips")}</p>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/marketplace?tab=tours')} className="cursor-pointer px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-[#0a2225]">Tours</p>
-                        <p className="text-xs text-[#6B7280]">Bookable tours &amp; experiences</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{t("header.menuTours", "Tours")}</p>
+                        <p className="text-xs text-[#6B7280]">{t("header.menuToursD", "Bookable tours & experiences")}</p>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/marketplace?tab=itinerary-guides')} className="cursor-pointer px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-[#0a2225]">Itinerary Guides</p>
-                        <p className="text-xs text-[#6B7280]">Downloadable day-by-day guides</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{t("header.menuGuides", "Itinerary Guides")}</p>
+                        <p className="text-xs text-[#6B7280]">{t("header.menuGuidesD", "Downloadable day-by-day guides")}</p>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/post-trip')} className="cursor-pointer px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-[#0a2225]">Post a Trip Request</p>
-                        <p className="text-xs text-[#6B7280]">Get tailored proposals from specialists</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{t("header.menuPostTrip", "Post a Trip Request")}</p>
+                        <p className="text-xs text-[#6B7280]">{t("header.menuPostTripD", "Get tailored proposals from specialists")}</p>
                       </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -617,8 +617,8 @@ export const Header = () => {
                   <DropdownMenuContent align="start" className="w-64 bg-white border-[#E5DFC6] font-secondary">
                     <DropdownMenuItem onClick={() => navigate('/apply/agent')} className="cursor-pointer px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-[#0a2225]">Become an Agent</p>
-                        <p className="text-xs text-[#6B7280]">Design and sell trips as the seller of record</p>
+                        <p className="text-sm font-medium text-[#0a2225]">{t("header.menuAgent", "Become an Agent")}</p>
+                        <p className="text-xs text-[#6B7280]">{t("header.menuAgentD", "Design and sell trips as the seller of record")}</p>
                       </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -822,8 +822,8 @@ export const Header = () => {
                               >
                                 <div className="flex w-full items-center gap-4">
                                   <div className="flex-1">
-                                    <p className="text-[15px] font-semibold text-[#0a2225]">Become an Agent</p>
-                                    <p className="mt-0.5 text-[13px] leading-snug text-[#6B7280]">Plug in your expertise and earn on every journey you deliver.</p>
+                                    <p className="text-[15px] font-semibold text-[#0a2225]">{t("header.menuAgent", "Become an Agent")}</p>
+                                    <p className="mt-0.5 text-[13px] leading-snug text-[#6B7280]">{t("header.agentPromoD", "Plug in your expertise and earn on every journey you deliver.")}</p>
                                   </div>
                                   <GsAgentPromoArt />
                                 </div>
