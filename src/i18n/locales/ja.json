@@ -30,7 +30,12 @@
     "preferencesEnabled": "設定が有効",
     "preferencesDisabled": "設定が無効",
     "preferencesEnabledDesc": "検索結果は保存された設定に一致します",
-    "preferencesDisabledDesc": "検索結果は利用可能なすべてのオプションを表示します"
+    "preferencesDisabledDesc": "検索結果は利用可能なすべてのオプションを表示します",
+    "navTravel": "旅する",
+    "navCreators": "クリエイター",
+    "navSpecialists": "スペシャリスト",
+    "navPartner": "パートナー",
+    "getStarted": "はじめる"
   },
   "common": {
     "loading": "読み込み中...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "旅のソーシャルマーケットプレイス",
       "sub": "クリエイターとトラベルスペシャリストから旅を発見・計画・予約 — それぞれが自分のストアフロント、専門性、ダイレクトメッセージを持っています。決済はStripeで保護。",
-      "h": "その場所を知る人がつくる旅。"
+      "h": "その場所を知る人がつくる旅。",
+      "postDream": "夢の旅を投稿する →",
+      "twoDoorsQ": "旅のクリエイター、それともエージェント？",
+      "openStorefront": "ストアフロントを開く →",
+      "popularTrips": "人気の旅",
+      "viewAll": "すべて見る →"
     },
     "dreamTrip": {
       "eyebrow": "旅行者の方へ",
@@ -464,6 +474,38 @@
       "c2Body": "本物の旅行者が世界中から夢の旅を投稿します。あなたはどこにいても、オーダーメイドの提案で応えるだけ。予約と同時に入金 — 依頼主が支払った瞬間、手付金も残金もあなた自身の Stripe 口座へ。請求書も催促も要りません。",
       "c2Cta": "スペシャリストとして参加",
       "c2Alt": "黄金色の光に包まれた上質なダイニング"
+    },
+    "trustPlaque": {
+      "eyebrow": "信頼と安全",
+      "h2": "旅を任せられる場所であるために",
+      "sub": "すべての予約を支える4つの約束 — 審査され、認証され、保護され、最後まで支えられます。",
+      "c1e": "審査",
+      "c1t": "公開前にすべて審査",
+      "c1b": "すべての旅、ガイド、プロフィールは、マーケットプレイスに載る前に Goldsainte チームが審査します。見られずに公開されるものはありません。",
+      "c2e": "本人確認",
+      "c2t": "すべてのアカウントを認証",
+      "c2b": "すべてのクリエイターと旅行エージェントは、出品や予約受付の前に Stripe Identity の本人確認を完了します。相手が誰か、常に分かります。",
+      "c3e": "決済",
+      "c3t": "Stripe による保護",
+      "c3b": "決済は Stripe 上で行われ、旅行エージェントに直接支払われます — 販売主体は担当エージェントです。カード情報が当社のサーバーに触れることはありません。",
+      "c4e": "サポート",
+      "c4t": "搭乗までずっと一緒に",
+      "c4b": "予約から搭乗まで、スペシャリストとひとつのスレッドで — そしてすべての旅の後ろに Goldsainte のサポートがあります。",
+      "footPre": "基準の全文はこちら：",
+      "footLink": "信頼と安全のページ"
+    },
+    "finalCta": {
+      "h2a": "次の旅は、",
+      "h2b": "ここから始まる。",
+      "sub": "実際に行った人がつくった旅を見つけるか — これまで訪れたすべての場所から収入を生み出すか。",
+      "cta1": "旅を探す",
+      "cta2": "収益を始める"
+    },
+    "founderNote": {
+      "eyebrow": "Goldsainte をつくった理由",
+      "quote": "「旅の発見はすでにSNSで起きています。足りなかったのは、インスピレーションのその先のすべてでした。私たちは Goldsainte をつくりました。あなたの旅のきっかけをくれた人が、その旅を実際に設計し、案内し、収入にできるように。そして、旅を託す相手こそが、あなたがお金を払う相手そのものであるように — すべてのスペシャリストの後ろに立つマーケットプレイスの上で。」",
+      "role": "創業者 兼 CEO、Goldsainte",
+      "alt": "Goldsainte 創業者 兼 CEO、アンドレ・パウエル"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "description": "旅のソーシャルマーケットプレイス — 個人ストアフロント、ダイレクトメッセージ、予約可能な旅のグローバルマーケットで、旅行者とクリエイター・独立スペシャリストをつなぎます。",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. 全著作権所有。",
     "creatorMarketplace": "クリエイターマーケットプレイス",
-    "creatorStudio": "クリエイターダッシュボード"
+    "creatorStudio": "クリエイターダッシュボード",
+    "colExplore": "探す",
+    "colJoin": "GOLDSAINTE に参加",
+    "colCompany": "会社情報",
+    "colStarted": "はじめに",
+    "colSupport": "サポート",
+    "browseTrips": "旅を探す",
+    "browseCreators": "クリエイターを探す",
+    "postTrip": "旅をリクエスト",
+    "findSpecialist": "スペシャリストを探す",
+    "signupTraveler": "旅行者として登録",
+    "joinCreator": "クリエイターとして参加",
+    "applyAgent": "旅行エージェントに応募",
+    "aboutGs": "Goldsainte について",
+    "newsroomL": "ニュースルーム",
+    "pressL": "プレス",
+    "contactUs": "お問い合わせ",
+    "forTravelers": "旅行者の方へ",
+    "forCreators": "クリエイターの方へ",
+    "forAgents": "エージェントの方へ",
+    "whereAvailable": "利用可能な地域",
+    "paymentsFees": "支払いと手数料",
+    "safetyTrust": "安全と信頼",
+    "cancellationPolicy": "キャンセルポリシー",
+    "privacyPolicy": "プライバシーポリシー",
+    "creatorAgreement": "クリエイター規約",
+    "agentAgreement": "エージェント規約",
+    "disputeRes": "紛争解決",
+    "installApp": "アプリをインストール"
   },
   "welcomeModal": {
     "title": "Goldsainte.Aiができること",
@@ -1034,5 +1104,29 @@
     "moneyB": "Goldsainteで予約された旅は独立したプロが販売し、直接支払いを受け取ります。Goldsainteは単一の固定プラットフォーム手数料のみ — 決済時の上乗せも、複雑な手数料の迷宮もありません。",
     "closing": "ソーシャルな発見と旅のコマースが出会う — アイデンティティ、コンテンツ、会話、提案、取引をひとつのプラットフォームで。",
     "cta": "Goldsainteに参加"
+  },
+  "search": {
+    "where": "行き先",
+    "when": "日程",
+    "who": "人数",
+    "searchDest": "目的地を検索",
+    "addDates": "日付を追加",
+    "addGuests": "人数を追加",
+    "guestsN": "ゲスト{{count}}名",
+    "whereTo": "どちらへ？",
+    "anywhere": "どこでも",
+    "anyDates": "日付未定",
+    "whereGoing": "どちらへ行きますか？",
+    "checkInOut": "チェックイン – チェックアウト",
+    "adults": "大人",
+    "adultsSub": "13歳以上",
+    "children": "子ども",
+    "childrenSub": "2〜12歳",
+    "infants": "乳幼児",
+    "infantsSub": "2歳未満",
+    "pets": "ペット",
+    "petsSub": "介助動物をお連れですか？",
+    "openSearch": "検索を開く",
+    "setTravelers": "旅行者数を設定"
   }
 }
