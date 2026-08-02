@@ -97,21 +97,21 @@ const PLATFORMS = [
   { value: "tiktok", label: "TikTok", icon: Video },
   { value: "instagram", label: "Instagram", icon: Instagram },
   { value: "youtube", label: "YouTube", icon: Youtube },
-  { value: "multi", label: "Multi-Platform", icon: Globe },
+  { value: "multi", label: "creatorApp.platMulti", icon: Globe },
 ];
 
 const PRICING_MODELS = [
-  { value: "commission_only", label: "Commission Only", description: "I earn when travelers book through my content.", icon: TrendingUp },
-  { value: "planning_fees", label: "Planning Fees", description: "I charge for custom trip planning plus commissions.", icon: FileText },
-  { value: "custom_itineraries", label: "Custom Itineraries", description: "I sell detailed, bookable itineraries as products.", icon: MapPin },
-  { value: "premium_content", label: "Premium Content", description: "I offer exclusive destination guides and resources.", icon: Star },
+  { value: "commission_only", label: "creatorApp.priceCommission", description: "creatorApp.priceCommissionD", icon: TrendingUp },
+  { value: "planning_fees", label: "creatorApp.pricePlanning", description: "creatorApp.pricePlanningD", icon: FileText },
+  { value: "custom_itineraries", label: "creatorApp.priceItineraries", description: "creatorApp.priceItinerariesD", icon: MapPin },
+  { value: "premium_content", label: "creatorApp.pricePremium", description: "creatorApp.pricePremiumD", icon: Star },
 ];
 
 const RESPONSE_TIMES = [
-  { value: 4, label: "Within 4 hours", description: "Lightning fast" },
-  { value: 12, label: "Within 12 hours", description: "Same-day" },
-  { value: 24, label: "Within 24 hours", description: "Next-day" },
-  { value: 48, label: "Within 48 hours", description: "Flexible" },
+  { value: 4, label: "creatorApp.rt4", description: "creatorApp.rt4D" },
+  { value: 12, label: "creatorApp.rt12", description: "creatorApp.rt12D" },
+  { value: 24, label: "creatorApp.rt24", description: "creatorApp.rt24D" },
+  { value: 48, label: "creatorApp.rt48", description: "creatorApp.rt48D" },
 ];
 
 export default function CreatorOnboardingPage() {
@@ -251,14 +251,14 @@ export default function CreatorOnboardingPage() {
         .from("profiles")
         .update(updateData)
         .eq("id", user.id);
-      toast.success("Progress saved! You can finish onboarding anytime from your dashboard.");
+      toast.success(t('creatorApp.tProgressSaved'));
       // Skip = leave onboarding for now. /creator-dashboard is guarded only by
       // RequireAuth (no onboarding-completion gate); it shows a "complete your
       // profile" banner + Getting Started checklist so they can finish later.
       navigate("/creator-handbook");
     } catch (error) {
       console.error("Error saving partial progress:", error);
-      toast.error("Failed to save progress.");
+      toast.error(t('creatorApp.tSaveFailed'));
     }
   };
 
@@ -348,7 +348,7 @@ export default function CreatorOnboardingPage() {
       const planningCents = toCents(planningFee);
       const itineraryCents = toCents(itineraryFee);
       if (planningCents === "invalid" || itineraryCents === "invalid") {
-        toast.error("Enter a valid non-negative fee (e.g. 150.50).");
+        toast.error(t('creatorApp.tBadFee'));
         setIsSubmitting(false);
         return;
       }
@@ -509,8 +509,8 @@ export default function CreatorOnboardingPage() {
         }
       }
       toast.success(hiredLive
-        ? `You're live \u2014 hireable at $${hostRateNum}/day`
-        : "You're live \u2014 welcome to Goldsainte");
+        ? t('creatorApp.tLiveHireable', { rate: hostRateNum })
+        : t('creatorApp.tLiveWelcome'));
 
       // Save creator media items
       if (creatorMedia.length > 0) {
@@ -779,7 +779,7 @@ export default function CreatorOnboardingPage() {
                     {PLATFORMS.map((platform) => (
                       <LuxurySelectionCard
                         key={platform.value}
-                        label={platform.label}
+                        label={platform.value === "multi" ? t(platform.label) : platform.label}
                         icon={platform.icon}
                         selected={primaryPlatform === platform.value}
                         onSelect={() => setPrimaryPlatform(platform.value)}
@@ -1013,15 +1013,15 @@ export default function CreatorOnboardingPage() {
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file || !user) return;
-                          if (file.size > 50 * 1024 * 1024) { toast.error("Max 50MB"); return; }
+                          if (file.size > 50 * 1024 * 1024) { toast.error(t('creatorApp.tMax50')); return; }
                           const ext = file.name.split(".").pop();
                           // Path MUST start with `${user.id}/...` — avatars RLS scopes by (storage.foldername(name))[1].
                           const path = `${user.id}/cover/${Date.now()}.${ext}`;
                           const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-                          if (error) { toast.error("Upload failed"); return; }
+                          if (error) { toast.error(t('creatorApp.tUploadFailed')); return; }
                           const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
                           setCoverImageUrl(publicUrl);
-                          toast.success("Cover image uploaded!");
+                          toast.success(t('creatorApp.tCoverUploaded'));
                         }}
                       />
                       <div className="text-center">
@@ -1078,8 +1078,8 @@ export default function CreatorOnboardingPage() {
                     {PRICING_MODELS.map((model) => (
                       <LuxurySelectionCard
                         key={model.value}
-                        label={model.label}
-                        description={model.description}
+                        label={t(model.label)}
+                        description={t(model.description)}
                         icon={model.icon}
                         selected={pricingModel === model.value}
                         onSelect={() => setPricingModel(model.value)}
@@ -1220,8 +1220,8 @@ export default function CreatorOnboardingPage() {
                     {RESPONSE_TIMES.map((time) => (
                       <LuxurySelectionCard
                         key={time.value}
-                        label={time.label}
-                        description={time.description}
+                        label={t(time.label)}
+                        description={t(time.description)}
                         selected={responseTime === time.value}
                         onSelect={() => setResponseTime(time.value)}
                         variant="single"
