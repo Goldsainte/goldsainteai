@@ -324,10 +324,9 @@
       }
     },
     "heroV2": {
-      "eyebrow": "O marketplace de viagens inteligente",
-      "h1a": "Viagens criadas por pessoas",
-      "h1b": "que já estiveram lá.",
-      "sub": "Seja qual for o destino dos seus sonhos, aqui há alguém que o conhece. Os criadores trazem a inspiração; os especialistas certificados desenham a sua viagem à mão. Publique a viagem dos seus sonhos, compare as propostas e reserve diretamente — pagamentos protegidos pela Stripe."
+      "eyebrow": "O marketplace social de viagens",
+      "sub": "Descubra, planeie e reserve viagens com criadores e especialistas — cada um com a sua loja, experiência e mensagens diretas. Pagamentos protegidos pela Stripe.",
+      "h": "Viagens criadas por quem já lá esteve."
     }
   },
   "navigation": {
@@ -380,7 +379,7 @@
     "investorRelations": "Relações com Investidores",
     "corporateContact": "Contato Corporativo",
     "followUs": "Siga-nos:",
-    "description": "Goldsainte AI faz parte da Goldsainte Inc., líder mundial em viagens de luxo alimentadas por IA e experiências curadas. Descubra. Crie. Compartilhe. Viaje com Goldsainte.",
+    "description": "O marketplace social de viagens — liga viajantes a criadores e especialistas independentes através de lojas pessoais, mensagens diretas e um marketplace global de viagens reserváveis.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Todos os direitos reservados.",
     "creatorMarketplace": "Marketplace de Criadores",
     "creatorStudio": "Painel do Criador"
@@ -881,5 +880,21 @@
     "ptPosted": "A sua viagem foi publicada. Criadores e agentes responderão aqui.",
     "ptWrong": "Algo correu mal ao publicar a viagem.",
     "ptPostThis": "Publicar esta viagem"
+  },
+  "wd": {
+    "metaTitle": "O que fazemos — Goldsainte",
+    "kicker": "O que fazemos",
+    "title": "O marketplace social de viagens.",
+    "intro": "A Goldsainte liga viajantes a criadores e especialistas independentes através de lojas pessoais, mensagens diretas e um marketplace global de viagens, itinerários e propostas à medida.",
+    "creatorsT": "Os criadores inspiram",
+    "creatorsB": "Os criadores partilham lugares que conhecem em primeira mão — com lojas, guias e viagens anfitriãs realmente reserváveis.",
+    "specialistsT": "Os especialistas concretizam",
+    "specialistsB": "Agentes e planeadores certificados desenham viagens à mão, respondem a briefs com propostas à medida e são o vendedor oficial de cada reserva.",
+    "travelersT": "Os viajantes ficam num só lugar",
+    "travelersB": "Publique uma viagem, compare propostas, fale diretamente e reserve — com pagamentos protegidos pela Stripe do depósito à partida.",
+    "moneyK": "Como funciona o dinheiro",
+    "moneyB": "As viagens reservadas na Goldsainte são vendidas por profissionais independentes, pagos diretamente. A Goldsainte cobra uma única taxa fixa de plataforma — nunca somada no pagamento, nunca um labirinto de comissões.",
+    "closing": "A descoberta social encontra o comércio de viagens — identidade, conteúdo, conversa, proposta e transação, numa só plataforma.",
+    "cta": "Junte-se à Goldsainte"
   }
 }
