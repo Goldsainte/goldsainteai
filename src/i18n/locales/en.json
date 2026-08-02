@@ -35,7 +35,18 @@
     "navCreators": "Creators",
     "navSpecialists": "Specialists",
     "navPartner": "Partner",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "menuMarketplace": "Marketplace",
+    "menuMarketplaceD": "Browse curated trips",
+    "menuTours": "Tours",
+    "menuToursD": "Bookable tours & experiences",
+    "menuGuides": "Itinerary Guides",
+    "menuGuidesD": "Downloadable day-by-day guides",
+    "menuPostTrip": "Post a Trip Request",
+    "menuPostTripD": "Get tailored proposals from specialists",
+    "menuAgent": "Become an Agent",
+    "menuAgentD": "Design and sell trips as the seller of record",
+    "agentPromoD": "Plug in your expertise and earn on every journey you deliver."
   },
   "common": {
     "loading": "Loading...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "The Social Marketplace for Travel",
       "sub": "Discover, plan and book travel through creators and travel specialists — each with their own storefront, expertise and direct messaging. Payments secured by Stripe.",
-      "h": "Trips built by people who've been there.",
       "postDream": "Post your dream trip →",
       "twoDoorsQ": "Travel creator or agent?",
       "openStorefront": "Open your storefront →",
       "popularTrips": "Popular Trips",
-      "viewAll": "View all →"
+      "viewAll": "View all →",
+      "h1a": "Trips built by people",
+      "h1b": "who've been there."
     },
     "dreamTrip": {
       "eyebrow": "For travelers",
@@ -1128,5 +1140,45 @@
     "petsSub": "Bringing a service animal?",
     "openSearch": "Open search",
     "setTravelers": "Set number of travelers"
+  },
+  "directory": {
+    "agentTitle": "Our Travel Specialists",
+    "agentSub": "Find a travel specialist who gets your vibe, and design your dream trip together — all while booking securely through Goldsainte.",
+    "creatorTitle": "Our Travel Creators",
+    "creatorSub": "Follow creators whose journeys inspire yours — then turn their content into your next trip, booked securely through Goldsainte.",
+    "moreN": "+{{count}} more",
+    "searchAgents": "Search specialists, destinations…",
+    "searchCreators": "Search creators, niches, places…",
+    "clear": "Clear",
+    "agentsSoon": "Specialists coming soon",
+    "creatorsSoon": "Creators coming soon",
+    "postToMatch": "Post your trip and we'll match you.",
+    "noMatches": "No matches",
+    "clearAll": "Clear filters and show everyone",
+    "getMatched": "Get matched"
+  },
+  "specialistsPage": {
+    "kicker": "Specialists",
+    "h1": "Chosen, not listed.",
+    "sub": "Every specialist on Goldsainte joins by application — identity verified, credentials and insurance reviewed by our team before a single trip is sold. The founding cohort is being assembled now.",
+    "doesKicker": "What a Goldsainte specialist does",
+    "w1s": "Answers real briefs.",
+    "w1r": "Travelers post the journeys they want; specialists reply with tailored proposals — itinerary, price, and timeline.",
+    "w2s": "Publishes their own trips.",
+    "w2r": "Package the journeys you know by heart and list them under your name, at your price, bookable directly.",
+    "w3s": "Gets paid directly.",
+    "w3r": "Every payment is charged on your own Stripe account — you are the merchant of record.",
+    "howKicker": "How the founding cohort is chosen",
+    "h1r": "A ten-minute application — your business, credentials, insurance, and expertise.",
+    "h2r": "Identity verification through Stripe, in about two minutes.",
+    "h3r": "Human review, with a decision emailed within one to two business days.",
+    "feePara": "You set your price — your costs and your margin are yours to build in. Goldsainte's platform fee is a flat 3.5%, charged at booking; the rest lands in your own Stripe account, because you're the merchant of record on every trip you sell.",
+    "feeCaption": "Goldsainte's flat platform fee",
+    "closing": "The travelers are arriving. The cohort is small on purpose. If you sell travel with real expertise, this is the moment to be early.",
+    "applyCta": "Apply to join",
+    "browseCta": "Browse the trips travelers are booking →",
+    "alreadyApplied": "Already applied?",
+    "checkStatus": "Sign in any time to check your application status.",
+    "questions": "Questions about becoming a specialist —"
   }
 }
