@@ -64,32 +64,6 @@
     "profile": "Perfil"
   },
   "home": {
-    "hero": {
-      "title": "Descubra. Reserve. Crie. Ganhe — Viagens Reinventadas com IA, Lances de Agentes e Colaborações de Criadores",
-      "subtitle": "Use IA para planejar rápido, obtenha lances de agentes para economizar mais, ou reserve viagens CoCuradas.",
-      "whatCanDo": "O que Goldsainte.Ai pode fazer",
-      "terms": "Termos",
-      "privacy": "Privacidade",
-      "agreement": "Ao usar Goldsainte.Ai, você concorda com nossos",
-      "mainHeadline": "<em>Planeje, Descubra e Reserve — O Marketplace de Viagens Mais Inteligente</em>",
-      "mainDescription": "Explore viagens planejadas por especialistas certificados e exploradores em mais de 50 países.",
-      "mainDescriptionSub": "Ou deixe nossa tecnologia construir seu itinerário perfeito em minutos.",
-      "subHeading": "Transforme suas viagens em renda — ou reserve a próxima em minutos.",
-      "postDreamTrip": "Começar a Explorar",
-      "seeHowItWorks": "Veja Como Funciona",
-      "browseCreators": "Explorar criadores",
-      "browseAgents": "Explorar agentes",
-      "marketplace": "O Marketplace de Coleções",
-      "marketplaceDisclaimer": "Todas as ações acontecem dentro do marketplace Goldsainte — conectamos viajantes, criadores e agentes, mas não operamos as viagens diretamente.",
-      "gentleAssist": "Prefere uma ajuda discreta?",
-      "askAI": "Peça à Goldsainte AI para moldar sua solicitação.",
-      "trustPromise": "Toda mensagem e pagamento permanece na plataforma. Sem números de telefone, sem acordos paralelos — apenas reservas lindamente organizadas e protegidas.",
-      "storyboardCaption": "Toda jornada começa com uma visão.",
-      "storyboardDescription": "Da inspiração ao itinerário em minutos.\nFaça upload de fotos, gere uma viagem e compartilhe ou venda instantaneamente.",
-      "infinityPool": "Piscina infinita e horizonte",
-      "treehouseHammock": "Rede em casa na árvore",
-      "friendsHiking": "Amigos em trilha"
-    },
     "rotatingPlaceholders": {
       "hotels": "Para onde ir a seguir? Descubra hotéis selecionados sob medida para o seu gosto.",
       "flights": "Reserve voos mais inteligentes com IA que conhece suas preferências.",
@@ -327,6 +301,71 @@
       "eyebrow": "O marketplace social de viagens",
       "sub": "Descubra, planeie e reserve viagens com criadores e especialistas — cada um com a sua loja, experiência e mensagens diretas. Pagamentos protegidos pela Stripe.",
       "h": "Viagens criadas por quem já lá esteve."
+    },
+    "dreamTrip": {
+      "eyebrow": "Para viajantes",
+      "h2a": "Tem uma viagem em mente",
+      "h2b": "que ainda não existe?",
+      "h2c": "Publique-a.",
+      "sub": "Pare de percorrer os mesmos pacotes que todo mundo reserva. Descreva a viagem que você realmente quer e especialistas certificados a criam para você, do início ao fim.",
+      "cta": "Publique a viagem dos seus sonhos",
+      "ctaNote": "Publicar é grátis · Sem compromisso de reserva",
+      "why1k": "Projetada",
+      "why1v": "não gerada",
+      "why2k": "Pessoal",
+      "why2v": "não padronizada",
+      "why3k": "Protegida",
+      "why3v": "não pré-paga",
+      "step1Title": "Você descreve",
+      "step1Body": "Conte-nos a viagem que você gostaria que existisse — com as suas palavras.",
+      "step2Title": "As propostas chegam até você",
+      "step2Body": "Especialistas certificados criam a viagem e respondem — você não corre atrás de ninguém.",
+      "step3Title": "Reserve com confiança",
+      "step3Body": "Escolha a proposta que você amar. Pague o seu especialista diretamente, com a segurança da Stripe.",
+      "mockBrief": "\"Duas semanas no Japão em outubro — foco em gastronomia, luxo intermediário, longe das rotas turísticas.\"",
+      "chipJapan": "Japão",
+      "chipOct": "out",
+      "chipCulinary": "Gastronomia",
+      "chipBudget": "US$ 8 mil",
+      "escrow1": "Checkout seguro da Stripe, direto para o seu especialista",
+      "escrow2": "Suporte da reserva ao embarque"
+    },
+    "equation": {
+      "h2": "Onde a viagem se encontra",
+      "sub": "Os viajantes ganham viagens que só pessoas poderiam planejar. Os criadores transformam experiência em renda. Os agentes constroem negócios que duram. Todos recebem diretamente.",
+      "creatorsName": "Criadores",
+      "creatorsBody": "Uma vitrine com o seu próprio nome — guias de viagem, serviços durante a viagem e gorjetas dos viajantes que você inspira. Pagamento direto.",
+      "travelersName": "Viajantes",
+      "travelersBody": "Viagens criadas por especialistas de verdade que disputam o seu pedido — com alguém para conversar da primeira ideia até a volta para casa.",
+      "agentsName": "Agentes de viagem",
+      "agentsBody": "Pedidos de viagem compatíveis, propostas vencedoras e clientes para a vida toda. Você é o vendedor oficial e recebe diretamente."
+    },
+    "oneConv": {
+      "eyebrow": "Por que Goldsainte",
+      "h2": "Uma conversa. A viagem inteira.",
+      "sub": "Pergunte, negocie, assine e pague — sem nunca sair das suas mensagens.",
+      "p1Title": "Descubra com confiança.",
+      "p1Body": "Explore viagens criadas a partir de vivência real do destino — por especialistas e viajantes que estiveram lá de verdade.",
+      "p2Title": "Escolha o que combina.",
+      "p2Body": "Reserve na hora com preços transparentes, ou compare propostas sob medida feitas em torno da sua ideia e fique com a que você amar.",
+      "p3Title": "Organize tudo em um só lugar.",
+      "p3Body": "Mensagens, roteiro, documentos e novidades juntos — da primeira ideia ao dia em que você pousa.",
+      "p4Title": "Viaje com apoio.",
+      "p4Body": "Continue em contato com o seu especialista antes, durante e depois da viagem — a uma mensagem de distância o tempo todo.",
+      "closer": "Nenhuma outra plataforma de viagem leva você da primeira mensagem à reserva completa — sem sair do chat."
+    },
+    "stats": {
+      "v1": "Mais de 45 países",
+      "l1": "Especialistas podem entrar e receber",
+      "v2": "Reserva direta",
+      "l2": "O seu pagamento vai para o seu especialista",
+      "v3": "Protegido pela Stripe",
+      "l3": "Pagamentos e repasses",
+      "v4": "Revisado pela equipe",
+      "l4": "Cada anúncio, antes de entrar no ar"
+    },
+    "asFeaturedIn": {
+      "eyebrow": "Já falaram de nós"
     }
   },
   "navigation": {
@@ -467,7 +506,8 @@
         "p2": "Para quaisquer perguntas sobre Goldsainte, o Serviço ou o Site, ou para enviar ou entregar quaisquer documentos, avisos, correspondência ou outras comunicações, incluindo consultas de imprensa, entre em contato com Goldsainte Inc. diretamente em seu escritório registrado em Delaware.",
         "p3": "Goldsainte Inc. não mantém um domicílio legal em nenhum outro local ou escritório, incluindo os escritórios de suas Empresas de Suporte. As Empresas de Suporte não estão autorizadas a atuar como agente de processo ou agente de serviço para Goldsainte Inc., e nenhuma reserva pode ser feita através das Empresas de Suporte."
       }
-    }
+    },
+    "heroSubtitle": "A Goldsainte é o marketplace social de viagens — os criadores inspiram a viagem, especialistas certificados a desenham à mão e você reserva diretamente, com pagamentos protegidos pela Stripe."
   },
   "auth": {
     "welcomeTitle": "Bem-vindo à Goldsainte",
