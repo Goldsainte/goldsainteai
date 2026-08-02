@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -71,7 +72,7 @@ export const WeatherForecast = ({ tripId }: WeatherForecastProps) => {
   };
 
   const formatDate = (date: { year: number; month: number; day: number }) => {
-    return new Date(date.year, date.month - 1, date.day).toLocaleDateString('en-US', {
+    return new Date(date.year, date.month - 1, date.day).toLocaleDateString(gsIntlLocale(), {
       weekday: 'short',
       month: 'short',
       day: 'numeric'
