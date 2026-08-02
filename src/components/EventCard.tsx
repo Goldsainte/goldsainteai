@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,7 @@ export const EventCard = ({ event }: EventCardProps) => {
   const currencySymbol = currencyInfo.symbol;
   
   const date = new Date(event.dates?.start?.dateTime || event.dates?.start?.localDate);
-  const formattedDate = date.toLocaleDateString('en-US', { 
+  const formattedDate = date.toLocaleDateString(gsIntlLocale(), { 
     weekday: 'short', 
     year: 'numeric', 
     month: 'short', 
