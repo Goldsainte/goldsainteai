@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,14 +68,14 @@ export const PriceCalendar = ({ basePrice, currency, checkIn, checkOut }: PriceC
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
   };
 
-  const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const monthName = currentMonth.toLocaleDateString(gsIntlLocale(), { month: 'long', year: 'numeric' });
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const cheapestDays = useMemo(() => {
     return calendarDays
       .filter((d): d is NonNullable<typeof d> => d !== null && d.isDeal && !d.isPast)
       .slice(0, 3)
-      .map(d => d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      .map(d => d.date.toLocaleDateString(gsIntlLocale(), { month: 'short', day: 'numeric' }));
   }, [calendarDays]);
 
   return (
