@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CountryTile } from "./CountryTile";
@@ -24,15 +25,19 @@ interface DirectoryCard {
   homeBase: string | null;
 }
 
-const COPY: Record<DirectoryKind, { title: string; subtitle: string; link: (id: string) => string }> = {
+const COPY: Record<DirectoryKind, { titleKey: string; title: string; subKey: string; subtitle: string; link: (id: string) => string }> = {
   agent: {
+    titleKey: "directory.agentTitle",
     title: "Our Travel Specialists",
+    subKey: "directory.agentSub",
     subtitle:
       "Find a travel specialist who gets your vibe, and design your dream trip together — all while booking securely through Goldsainte.",
     link: (id) => `/agents/${id}`,
   },
   creator: {
+    titleKey: "directory.creatorTitle",
     title: "Our Travel Creators",
+    subKey: "directory.creatorSub",
     subtitle:
       "Follow creators whose journeys inspire yours — then turn their content into your next trip, booked securely through Goldsainte.",
     link: (id) => `/creators/${id}`,
@@ -112,6 +117,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   // ── Filtering (Jul 25) — the directory will hold thousands of profiles;
   // search + specialty chips keep it navigable. Client-side over the ranked
   // set; server-side pagination is the boarded v2 once volume demands it.
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [activeCountries, setActiveCountries] = useState<string[]>([]);
@@ -224,19 +230,19 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
     if (tags.length === 0) return null;
     const shown = tags.slice(0, 2).join(", ");
     const extra = tags.length - 2;
-    return extra > 0 ? `${shown}, +${extra} more` : shown;
+    return extra > 0 ? `${shown}, ` + t("directory.moreN", { count: extra, defaultValue: "+{{count}} more" }) : shown;
   };
 
   return (
     <div className="min-h-screen bg-[#FDF9F0] pb-28">
       <Helmet>
-        <title>{copy.title + " · Goldsainte"}</title>
-        <meta name="description" content={copy.subtitle} />
+        <title>{t(copy.titleKey, copy.title) + " · Goldsainte"}</title>
+        <meta name="description" content={t(copy.subKey, copy.subtitle)} />
       </Helmet>
 
       <div className="mx-auto max-w-4xl px-4 pt-10 text-center md:pt-16">
-        <h1 className="font-secondary text-3xl leading-tight text-[#0a2225] sm:text-5xl md:text-6xl">{copy.title}</h1>
-        <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-[#0a2225]/70 md:mt-6 md:text-[18px]">{copy.subtitle}</p>
+        <h1 className="font-secondary text-3xl leading-tight text-[#0a2225] sm:text-5xl md:text-6xl">{t(copy.titleKey, copy.title)}</h1>
+        <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-[#0a2225]/70 md:mt-6 md:text-[18px]">{t(copy.subKey, copy.subtitle)}</p>
       </div>
 
       {/* Filter bar */}
@@ -248,7 +254,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={kind === "agent" ? "Search specialists, destinations…" : "Search creators, niches, places…"}
+                placeholder={kind === "agent" ? t("directory.searchAgents", "Search specialists, destinations…") : t("directory.searchCreators", "Search creators, niches, places…")}
                 className="w-full rounded-full border border-[#E5DFC6] bg-white py-3 pl-11 pr-4 text-[14.5px] text-[#0a2225] outline-none placeholder:text-[#9CA3AF] focus:border-[#C7A962]"
               />
             </div>
@@ -258,7 +264,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                 onClick={clearFilters}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-[13.5px] text-[#0a2225]/70 hover:text-[#0a2225]"
               >
-                <X className="h-3.5 w-3.5" /> Clear
+                <X className="h-3.5 w-3.5" /> {t("directory.clear", "Clear")}
               </button>
             )}
             {/* Roster size removed Jul 26 (founder call): the marketplace's
@@ -294,15 +300,15 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
         ) : cards.length === 0 ? (
           <div className="rounded-3xl border border-[#E5DFC6] bg-white/60 p-12 text-center">
             <p className="font-secondary text-xl text-[#0a2225]">
-              {kind === "agent" ? "Specialists coming soon" : "Creators coming soon"}
+              {kind === "agent" ? t("directory.agentsSoon", "Specialists coming soon") : t("directory.creatorsSoon", "Creators coming soon")}
             </p>
-            <p className="mt-2 text-sm text-[#6B7280]">Post your trip and we'll match you.</p>
+            <p className="mt-2 text-sm text-[#6B7280]">{t("directory.postToMatch", "Post your trip and we'll match you.")}</p>
           </div>
         ) : visibleCards.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-            <p className="font-secondary text-xl text-[#0a2225]">No matches</p>
+            <p className="font-secondary text-xl text-[#0a2225]">{t("directory.noMatches", "No matches")}</p>
             <button type="button" onClick={clearFilters} className="mt-3 text-sm text-[#0c4d47] underline underline-offset-4">
-              Clear filters and show everyone
+              {t("directory.clearAll", "Clear filters and show everyone")}
             </button>
           </div>
         ) : (
@@ -344,7 +350,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
         onClick={() => navigate("/get-matched")} // AI front door (31 Jul); wizard remains at /post-trip
         className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#0c4d47] px-8 py-4 text-[15px] font-medium text-[#f7f3ea] shadow-[0_10px_30px_rgba(10,34,37,0.30)] transition-colors hover:bg-[#0a2225]"
       >
-        Get matched <ArrowRight className="h-4 w-4" />
+        {t("directory.getMatched", "Get matched")} <ArrowRight className="h-4 w-4" />
       </button>
     </div>
   );
