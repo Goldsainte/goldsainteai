@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface MarketplaceSearchProps {
 }
 
 export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded = false }: MarketplaceSearchProps) {
+  const { t } = useTranslation();
   const [destination, setDestination] = useState(filters.destination || "");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
     if (filters.startDate || filters.endDate) {
@@ -289,13 +291,13 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           {/* Where */}
           <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-6">
             <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
-              Where
+              {t("search.where", "Where")}
             </label>
             <div className="relative flex h-[18px] min-w-0 items-center">
               <Input
                 ref={inputRef}
                 className="h-[18px] w-full truncate border-0 bg-transparent text-sm leading-[18px] text-[#0a2225] placeholder:text-[#6B7280] focus-visible:ring-0 focus-visible:ring-offset-0" style={{ fontFamily: "Inter, sans-serif", padding: 0 }}
-                placeholder="Search destinations"
+                placeholder={t("search.searchDest", "Search destinations")}
                 value={destination}
                 onChange={(e) => {
                   setDestination(e.target.value);
@@ -335,14 +337,14 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           {/* Dates — using MobileDatePicker in range mode */}
           <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-6">
             <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
-              When
+              {t("search.when", "When")}
             </label>
             <div className="flex h-[18px] min-w-0 items-center [&>*]:min-w-0 [&_button]:truncate [&_svg]:hidden" style={{ fontFamily: "Inter, sans-serif" }}>
               <MobileDatePicker
                 mode="range"
                 dateRange={dateRange}
                 onDateRangeChange={handleDateRangeChange}
-                placeholder="Add dates"
+                placeholder={t("search.addDates", "Add dates")}
                 className={`border-0 bg-transparent p-0 pl-0 text-sm ${dateRange?.from ? "text-[#0a2225]" : "text-[#6B7280]"} focus-visible:ring-0 focus-visible:ring-offset-0 min-h-0 h-auto rounded-none shadow-none hover:bg-transparent`}
               />
             </div>
@@ -353,22 +355,22 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           {true ? (
             <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-6">
               <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
-                Who
+                {t("search.who", "Who")}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
                     className={`flex h-[18px] min-h-0 items-center text-sm leading-[18px] whitespace-nowrap ${travelers > 1 ? "text-[#0a2225]" : "text-[#6B7280]"}`} style={{ fontFamily: "Inter, sans-serif" }}
-                    aria-label="Set number of travelers"
+                    aria-label={t("search.setTravelers", "Set number of travelers")}
                   >
-                    <span>{travelers > 1 ? `${travelers} guests` : "Add guests"}</span>
+                    <span>{travelers > 1 ? t("search.guestsN", { count: travelers, defaultValue: "{{count}} guests" }) : t("search.addGuests", "Add guests")}</span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent align="end" sideOffset={10} className="w-[340px] rounded-2xl border-[#E5DFC6] bg-white p-5 shadow-lg">
                   <GuestRow
-                    title="Adults"
-                    subtitle="Ages 13 or above"
+                    title={t("search.adults", "Adults")}
+                    subtitle={t("search.adultsSub", "Ages 13 or above")}
                     value={adults}
                     onDecrement={() => setGuests(Math.max(1, adults - 1), children)}
                     onIncrement={() => setGuests(adults + 1, children)}
@@ -376,8 +378,8 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                     incrementDisabled={adults + children >= 20}
                   />
                   <GuestRow
-                    title="Children"
-                    subtitle="Ages 2 – 12"
+                    title={t("search.children", "Children")}
+                    subtitle={t("search.childrenSub", "Ages 2 – 12")}
                     value={children}
                     onDecrement={() => setGuests(adults, Math.max(0, children - 1))}
                     onIncrement={() => setGuests(adults, children + 1)}
@@ -385,8 +387,8 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                     incrementDisabled={adults + children >= 20}
                   />
                   <GuestRow
-                    title="Infants"
-                    subtitle="Under 2"
+                    title={t("search.infants", "Infants")}
+                    subtitle={t("search.infantsSub", "Under 2")}
                     value={infants}
                     onDecrement={() => setInfants(Math.max(0, infants - 1))}
                     onIncrement={() => setInfants(Math.min(5, infants + 1))}
@@ -394,8 +396,8 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
                     incrementDisabled={infants >= 5}
                   />
                   <GuestRow
-                    title="Pets"
-                    subtitle="Bringing a service animal?"
+                    title={t("search.pets", "Pets")}
+                    subtitle={t("search.petsSub", "Bringing a service animal?")}
                     subtitleUnderlined
                     value={pets}
                     onDecrement={() => setPets(Math.max(0, pets - 1))}
@@ -410,7 +412,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
           ) : (
             <div className="flex flex-1 flex-col justify-center gap-0.5 px-5">
               <label className="block text-[13px] font-semibold leading-[16px] text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
-                Who
+                {t("search.who", "Who")}
               </label>
               <div className="flex h-9 items-center gap-2">
                 <Users className="h-4 w-4 text-[#8D8D8D]" />
@@ -439,22 +441,22 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              aria-label="Open search"
+              aria-label={t("search.openSearch", "Open search")}
               className="flex w-full items-center gap-3 rounded-full border border-[#E5DFC6] bg-white px-4 py-2.5 text-left shadow-[0_3px_12px_rgba(10,34,37,0.08)]"
               style={{ fontFamily: "Inter, sans-serif" }}
             >
               <Search className="h-4 w-4 flex-none text-[#0a2225]" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[14px] font-semibold text-[#0a2225]">
-                  {destination.trim() || "Where to?"}
+                  {destination.trim() || t("search.whereTo", "Where to?")}
                 </span>
                 <span className="block truncate text-[12px] text-[#6B7280]">
                   {[
-                    destination.trim() ? null : "Anywhere",
+                    destination.trim() ? null : t("search.anywhere", "Anywhere"),
                     dateRange?.from
                       ? `${format(dateRange.from, "MMM d")}${dateRange.to ? ` – ${format(dateRange.to, "MMM d")}` : ""}`
-                      : "Any dates",
-                    travelers > 1 ? `${travelers} guests` : "Add guests",
+                      : t("search.anyDates", "Any dates"),
+                    travelers > 1 ? t("search.guestsN", { count: travelers, defaultValue: "{{count}} guests" }) : t("search.addGuests", "Add guests"),
                   ].filter(Boolean).join(" · ")}
                 </span>
               </span>
@@ -478,14 +480,14 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               {/* Where */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                  Where
+                  {t("search.where", "Where")}
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D8D]" />
                   <Input
                     ref={mobileInputRef}
                     className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] pl-10 sm:pl-10 text-sm text-[#0a2225] placeholder:text-[#8D8D8D] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
-                    placeholder="Where are you going?"
+                    placeholder={t("search.whereGoing", "Where are you going?")}
                     value={destination}
                     onChange={(e) => {
                       setDestination(e.target.value);
@@ -526,13 +528,13 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               {/* Dates */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                  When
+                  {t("search.when", "When")}
                 </label>
                 <MobileDatePicker
                   mode="range"
                   dateRange={dateRange}
                   onDateRangeChange={handleDateRangeChange}
-                  placeholder="Check-in – Check-out"
+                  placeholder={t("search.checkInOut", "Check-in – Check-out")}
                   className="w-full rounded-xl border-[#E5DFC6] bg-[#FBF9F0] text-sm text-[#0a2225] focus:border-[#BFAD72] focus:ring-[#BFAD72]"
                 />
               </div>
@@ -540,7 +542,7 @@ export function MarketplaceSearch({ onSearch, filters, onClearFilters, embedded 
               {/* Travelers */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-[#8D8D8D]">
-                  Who
+                  {t("search.who", "Who")}
                 </label>
                 <div className="flex items-center gap-3 rounded-xl border border-[#E5DFC6] bg-[#FBF9F0] px-4 py-2.5">
                   <Users className="h-4 w-4 text-[#8D8D8D]" />
