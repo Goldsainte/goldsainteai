@@ -7,6 +7,7 @@
  * Every claim on this page is true per product law: application-gated,
  * Stripe-Identity-verified, human-reviewed, agent as merchant of record at a
  * flat 3.5% platform fee. Approved from DRAFT_specialists_page.html. */
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import horizontalLogo from "@/assets/primary-horizontal-logo-green.svg";
 
@@ -22,45 +23,44 @@ const NumRow = ({ n, children }: { n: string; children: React.ReactNode }) => (
 );
 
 export default function SpecialistsFoundingPage() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 bg-[#FDF9F0] text-[#0a2225]">
       <div className="mx-auto w-full max-w-6xl px-5 pb-28 pt-20 md:pt-24">
-        <Kicker>Specialists</Kicker>
+        <Kicker>{t("specialistsPage.kicker", "Specialists")}</Kicker>
         <h1 className="mt-4 font-secondary text-[44px] leading-[1.05] md:text-[62px]">
-          Chosen, not listed.
+          {t("specialistsPage.h1", "Chosen, not listed.")}
         </h1>
         <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-[#0a2225]/55">
-          Every specialist on Goldsainte joins by application — identity verified,
-          credentials and insurance reviewed by our team before a single trip is
-          sold. The founding cohort is being assembled now.
+          {t(
+            "specialistsPage.sub",
+            "Every specialist on Goldsainte joins by application — identity verified, credentials and insurance reviewed by our team before a single trip is sold. The founding cohort is being assembled now."
+          )}
         </p>
 
         <hr className="my-16 border-0 border-t border-[#0a2225]/10" />
 
         <div className="grid grid-cols-1 gap-x-20 gap-y-16 md:grid-cols-2">
           <div>
-            <Kicker>What a Goldsainte specialist does</Kicker>
+            <Kicker>{t("specialistsPage.doesKicker", "What a Goldsainte specialist does")}</Kicker>
             <NumRow n="i.">
-              <strong className="font-medium text-[#0a2225]">Answers real briefs.</strong>{" "}
-              Travelers post the journeys they want; specialists reply with tailored
-              proposals — itinerary, price, and timeline.
+              <strong className="font-medium text-[#0a2225]">{t("specialistsPage.w1s", "Answers real briefs.")}</strong>{" "}
+              {t("specialistsPage.w1r", "Travelers post the journeys they want; specialists reply with tailored proposals — itinerary, price, and timeline.")}
             </NumRow>
             <NumRow n="ii.">
-              <strong className="font-medium text-[#0a2225]">Publishes their own trips.</strong>{" "}
-              Package the journeys you know by heart and list them under your name,
-              at your price, bookable directly.
+              <strong className="font-medium text-[#0a2225]">{t("specialistsPage.w2s", "Publishes their own trips.")}</strong>{" "}
+              {t("specialistsPage.w2r", "Package the journeys you know by heart and list them under your name, at your price, bookable directly.")}
             </NumRow>
             <NumRow n="iii.">
-              <strong className="font-medium text-[#0a2225]">Gets paid directly.</strong>{" "}
-              Every payment is charged on your own Stripe account — you are the
-              merchant of record.
+              <strong className="font-medium text-[#0a2225]">{t("specialistsPage.w3s", "Gets paid directly.")}</strong>{" "}
+              {t("specialistsPage.w3r", "Every payment is charged on your own Stripe account — you are the merchant of record.")}
             </NumRow>
           </div>
           <div>
-            <Kicker>How the founding cohort is chosen</Kicker>
-            <NumRow n="i.">A ten-minute application — your business, credentials, insurance, and expertise.</NumRow>
-            <NumRow n="ii.">Identity verification through Stripe, in about two minutes.</NumRow>
-            <NumRow n="iii.">Human review, with a decision emailed within one to two business days.</NumRow>
+            <Kicker>{t("specialistsPage.howKicker", "How the founding cohort is chosen")}</Kicker>
+            <NumRow n="i.">{t("specialistsPage.h1r", "A ten-minute application — your business, credentials, insurance, and expertise.")}</NumRow>
+            <NumRow n="ii.">{t("specialistsPage.h2r", "Identity verification through Stripe, in about two minutes.")}</NumRow>
+            <NumRow n="iii.">{t("specialistsPage.h3r", "Human review, with a decision emailed within one to two business days.")}</NumRow>
           </div>
         </div>
 
@@ -70,10 +70,10 @@ export default function SpecialistsFoundingPage() {
         <hr className="my-16 border-0 border-t border-[#0a2225]/10" />
         <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[1fr_auto]">
           <p className="max-w-xl text-[16px] leading-relaxed text-[#0a2225]/80">
-            You set your price — your costs and your margin are yours to build
-            in. Goldsainte's platform fee is a flat 3.5%, charged at booking;
-            the rest lands in your own Stripe account, because you're the
-            merchant of record on every trip you sell.
+            {t(
+              "specialistsPage.feePara",
+              "You set your price — your costs and your margin are yours to build in. Goldsainte's platform fee is a flat 3.5%, charged at booking; the rest lands in your own Stripe account, because you're the merchant of record on every trip you sell."
+            )}
           </p>
           {/* Accent, not billboard (31 Jul): sized to the hero's weight class,
               and captioned truthfully — 3.5% is GOLDSAINTE'S only fee; the
@@ -81,37 +81,39 @@ export default function SpecialistsFoundingPage() {
               processing. "Your only fee" overclaimed and is gone. */}
           <div className="md:text-right">
             <p className="font-secondary text-[44px] leading-none text-[#0a2225] md:text-[56px]">3.5%</p>
-            <p className="mt-2 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">Goldsainte's flat platform fee</p>
+            <p className="mt-2 text-[11px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("specialistsPage.feeCaption", "Goldsainte's flat platform fee")}</p>
           </div>
         </div>
 
         <div className="mt-20">
           <p className="max-w-2xl font-secondary text-[24px] leading-snug md:text-[26px]">
-            The travelers are arriving. The cohort is small on purpose. If you
-            sell travel with real expertise, this is the moment to be early.
+            {t(
+              "specialistsPage.closing",
+              "The travelers are arriving. The cohort is small on purpose. If you sell travel with real expertise, this is the moment to be early."
+            )}
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link
               to="/apply/agent"
               className="rounded-full bg-[#0c4d47] px-9 py-3.5 text-[15px] text-[#E5DFC6] transition-colors hover:bg-[#073331]"
             >
-              Apply to join
+              {t("specialistsPage.applyCta", "Apply to join")}
             </Link>
             <Link
               to="/marketplace"
               className="text-[15px] text-[#0c4d47] underline underline-offset-4"
             >
-              Browse the trips travelers are booking →
+              {t("specialistsPage.browseCta", "Browse the trips travelers are booking →")}
             </Link>
           </div>
         </div>
 
         <p className="mt-16 max-w-xl text-[13px] leading-relaxed text-[#0a2225]/45">
-          Already applied?{" "}
+          {t("specialistsPage.alreadyApplied", "Already applied?")}{" "}
           <Link to="/application/status" className="underline underline-offset-2">
-            Sign in any time to check your application status.
+            {t("specialistsPage.checkStatus", "Sign in any time to check your application status.")}
           </Link>{" "}
-          Questions about becoming a specialist —{" "}
+          {t("specialistsPage.questions", "Questions about becoming a specialist —")}{" "}
           <a href="mailto:support@goldsainte.com" className="underline underline-offset-2">
             support@goldsainte.com
           </a>.
