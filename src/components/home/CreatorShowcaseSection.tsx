@@ -5,6 +5,7 @@
 // video feel, zero video weight). Honest stat strip: we flex terms, not
 // fabricated volume. Scene labels sit in solid dark pills so photos can
 // never wash them out (founder note from the preview review).
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import positano from "@/assets/home/storyboard-positano.webp";
@@ -21,45 +22,55 @@ const ROTATE_MS = 5000;
 
 const TABS = [
   {
+    titleKey: "home.creatorShow.tab1Title",
     title: "Get hired for trips",
+    bodyKey: "home.creatorShow.tab1Body",
     body:
       "Travelers hire you to guide, host, or shoot their trip. Requests land in your pipeline — you send the proposal, they accept, it's booked.",
   },
   {
+    titleKey: "home.creatorShow.tab2Title",
     title: "Paid at booking",
+    bodyKey: "home.creatorShow.tab2Body",
     body:
       "Deposits and balances land in your own Stripe account the moment your client pays — never chased over Venmo.",
   },
   {
+    titleKey: "home.creatorShow.tab3Title",
     title: "A flat 3.5% fee",
+    bodyKey: "home.creatorShow.tab3Body",
     body:
       "7% platform fee total, split evenly with your traveler. Standard card processing applies. No tiers. No surprises.",
   },
   {
+    titleKey: "home.creatorShow.tab4Title",
     title: "Sell guides & services",
+    bodyKey: "home.creatorShow.tab4Body",
     body:
       "Your itineraries, presets, planning calls, and day rates — a storefront under your own name.",
   },
   {
+    titleKey: "home.creatorShow.tab5Title",
     title: "Get hired on location",
+    bodyKey: "home.creatorShow.tab5Body",
     body:
       "Post where you're headed. Travelers hire you while you're already there — your highest-margin bookings.",
   },
 ];
 
 const SHELF = [
-  { t: "Lisbon in 5 days", p: "$29", k: "Guide", img: positano },
-  { t: "Photo day rate", p: "$450", k: "Service", img: desert },
-  { t: "Preset pack", p: "$19", k: "Digital", img: jungle },
-  { t: "Planning call", p: "$95", k: "1:1", img: seoul },
-  { t: "Tulum guide", p: "$24", k: "Guide", img: beach },
-  { t: "Full trip plan", p: "$350", k: "Service", img: maldives },
+  { tKey: "home.creatorShow.shelf1t", t: "Lisbon in 5 days", p: "$29", kKey: "home.creatorShow.shelf1k", k: "Guide", img: positano },
+  { tKey: "home.creatorShow.shelf2t", t: "Photo day rate", p: "$450", kKey: "home.creatorShow.shelf2k", k: "Service", img: desert },
+  { tKey: "home.creatorShow.shelf3t", t: "Preset pack", p: "$19", kKey: "home.creatorShow.shelf3k", k: "Digital", img: jungle },
+  { tKey: "home.creatorShow.shelf4t", t: "Planning call", p: "$95", kKey: "home.creatorShow.shelf4k", k: "1:1", img: seoul },
+  { tKey: "home.creatorShow.shelf5t", t: "Tulum guide", p: "$24", kKey: "home.creatorShow.shelf5k", k: "Guide", img: beach },
+  { tKey: "home.creatorShow.shelf6t", t: "Full trip plan", p: "$350", kKey: "home.creatorShow.shelf6k", k: "Service", img: maldives },
 ];
 
 const CAL = [
-  { d: "Portugal", w: "December 2026" },
-  { d: "Patagonia", w: "January 2027" },
-  { d: "Morocco", w: "March 2027" },
+  { dKey: "home.creatorShow.cal1d", d: "Portugal", wKey: "home.creatorShow.cal1w", w: "December 2026" },
+  { dKey: "home.creatorShow.cal2d", d: "Patagonia", wKey: "home.creatorShow.cal2w", w: "January 2027" },
+  { dKey: "home.creatorShow.cal3d", d: "Morocco", wKey: "home.creatorShow.cal3w", w: "March 2027" },
 ];
 
 const SCENE_IMG = [positano, overwater, amalfi, bali, desert];
@@ -104,6 +115,7 @@ function SceneFg({
 }
 
 export function CreatorShowcaseSection() {
+  const { t } = useTranslation();
   const [active, setActive] = useState(0);
   const [earned, setEarned] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -174,34 +186,35 @@ export function CreatorShowcaseSection() {
 
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <p className="text-[12px] font-semibold uppercase tracking-[0.28em] text-[#8D6B2F]">
-          Built for creators
+          {t("home.creatorShow.eyebrow", "Built for creators")}
         </p>
         <h2 className="mt-3 font-secondary text-3xl leading-[1.15] text-[#0a2225] md:text-[40px]">
-          Your audience already asks.
+          {t("home.creatorShow.h2a", "Your audience already asks.")}
           <br />
-          Now the answer pays you.
+          {t("home.creatorShow.h2b", "Now the answer pays you.")}
         </h2>
         <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/75">
-          Everything a travel creator needs to run a real business — hire
-          requests, direct Stripe payments, a storefront for your guides and
-          services, and a client pipeline — in one place, on your terms.
+          {t(
+            "home.creatorShow.sub",
+            "Everything a travel creator needs to run a real business — hire requests, direct Stripe payments, a storefront for your guides and services, and a client pipeline — in one place, on your terms."
+          )}
         </p>
 
         {/* Honest stat strip: pre-launch we flex TERMS, not volume. */}
         <div className="mt-11 grid grid-cols-2 border-t border-[#0a2225]/15 md:grid-cols-4">
           {[
-            ["7%", "Flat fee. Ever."],
-            ["3.5%", "Your flat platform fee"],
-            ["$0", "To start"],
-            ["100%", "Paid direct to your Stripe"],
-          ].map(([n, l], i) => (
+            ["7%", "home.creatorShow.stat1", "Flat fee. Ever."],
+            ["3.5%", "home.creatorShow.stat2", "Your flat platform fee"],
+            ["$0", "home.creatorShow.stat3", "To start"],
+            ["100%", "home.creatorShow.stat4", "Paid direct to your Stripe"],
+          ].map(([n, sk, l], i) => (
             <div
               key={l}
               className={`pt-5 ${i > 0 ? "md:border-l md:border-[#0a2225]/10 md:pl-5" : ""} ${i % 2 === 1 ? "border-l border-[#0a2225]/10 pl-5 md:border-l" : ""}`}
             >
               <p className="font-secondary text-[30px] text-[#0a2225] md:text-[34px]">{n}</p>
               <p className="mt-1 text-[12.5px] uppercase tracking-[0.1em] text-[#0a2225]/55">
-                {l}
+                {t(sk, l)}
               </p>
             </div>
           ))}
@@ -212,11 +225,11 @@ export function CreatorShowcaseSection() {
               space INSIDE this box instead of resizing the section (which
               shoved the whole page on every rotation). */}
           <div className="flex flex-col md:min-h-[430px] md:justify-center">
-            {TABS.map((t, i) => {
+            {TABS.map((tab, i) => {
               const on = i === active;
               return (
                 <button
-                  key={t.title}
+                  key={tab.title}
                   type="button"
                   onClick={() => restart(i)}
                   className="relative border-t border-[#0a2225]/12 px-1 py-4 text-left"
@@ -233,7 +246,7 @@ export function CreatorShowcaseSection() {
                   <span
                     className={`block text-[17px] font-medium transition-colors ${on ? "text-[#0a2225]" : "text-[#0a2225]/45"}`}
                   >
-                    {t.title}
+                    {t(tab.titleKey, tab.title)}
                   </span>
                   {/* Description expansion animates HEIGHT, which on mobile
                       (tabs stacked above the stage) shifted the whole page on
@@ -243,7 +256,7 @@ export function CreatorShowcaseSection() {
                   <span
                     className={`hidden md:block overflow-hidden text-[14px] leading-relaxed text-[#0a2225]/70 transition-all duration-500 ${on ? "md:mt-1.5 md:max-h-24 md:opacity-100" : "md:max-h-0 md:opacity-0"}`}
                   >
-                    {t.body}
+                    {t(tab.bodyKey, tab.body)}
                   </span>
                 </button>
               );
@@ -277,7 +290,7 @@ export function CreatorShowcaseSection() {
             <div className="absolute inset-0">
               <SceneFg i={0} active={active} run={acts.current[0]}>
                 <>
-                  <SceneChip>Hire requests</SceneChip>
+                  <SceneChip>{t("home.creatorShow.chip1", "Hire requests")}</SceneChip>
                   <div
                     className="max-w-[390px] rounded-2xl bg-[#fdfaf2] p-5 opacity-0 shadow-[0_16px_40px_-18px_rgba(0,0,0,0.45)]"
                     style={{ animation: "gsCsSlideIn .8s cubic-bezier(.2,.9,.3,1) .25s forwards" }}
@@ -288,24 +301,24 @@ export function CreatorShowcaseSection() {
                       </span>
                       <span>
                         <span className="block text-[15px] font-medium text-[#0a2225]">
-                          Maya T. wants to hire you
+                          {t("home.creatorShow.hireTitle", "Maya T. wants to hire you")}
                         </span>
                         <span className="block text-[12.5px] text-[#0a2225]/55">
-                          Lisbon · Oct 12–17 · Photography
+                          {t("home.creatorShow.hireMeta", "Lisbon · Oct 12–17 · Photography")}
                         </span>
                       </span>
                     </div>
                     <p className="mt-3 font-secondary text-[30px] text-[#0a2225]">$2,250</p>
-                    <p className="text-[13px] text-[#0a2225]/60">5 on-trip days · your day rate</p>
+                    <p className="text-[13px] text-[#0a2225]/60">{t("home.creatorShow.hireRate", "5 on-trip days · your day rate")}</p>
                     <div className="mt-4 flex gap-2.5">
                       <span
                         className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-[12px] uppercase tracking-[0.1em] text-[#E5DFC6]"
                         style={{ animation: "gsCsPulse 2.2s 1.4s infinite" }}
                       >
-                        Send proposal
+                        {t("home.creatorShow.sendProposal", "Send proposal")}
                       </span>
                       <span className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[12px] uppercase tracking-[0.1em] text-[#0a2225]">
-                        View request
+                        {t("home.creatorShow.viewRequest", "View request")}
                       </span>
                     </div>
                   </div>
@@ -313,31 +326,31 @@ export function CreatorShowcaseSection() {
                     className="mt-3.5 max-w-[390px] rounded-xl border border-[#E5DFC6]/25 bg-[#E5DFC6]/10 px-4 py-2.5 text-[13.5px] text-[#E5DFC6] opacity-0"
                     style={{ animation: "gsCsSlideIn .7s 1.7s forwards" }}
                   >
-                    Proposal accepted — deposit paid to your account.
+                    {t("home.creatorShow.accepted", "Proposal accepted — deposit paid to your account.")}
                   </div>
                 </>
               </SceneFg>
 
               <SceneFg i={1} active={active} run={acts.current[1]}>
                 <>
-                  <SceneChip>Paid direct, start to finish</SceneChip>
+                  <SceneChip>{t("home.creatorShow.chip2", "Paid direct, start to finish")}</SceneChip>
                   <div className="max-w-[400px]">
                     {[
-                      "Traveler pays the deposit",
-                      "Paid straight to your Stripe account",
-                      "Balance paid before departure",
-                      "Trip happens",
-                      "Your business, your revenue",
-                    ].map((step, i) => (
+                      ["home.creatorShow.pay1", "Traveler pays the deposit"],
+                      ["home.creatorShow.pay2", "Paid straight to your Stripe account"],
+                      ["home.creatorShow.pay3", "Balance paid before departure"],
+                      ["home.creatorShow.pay4", "Trip happens"],
+                      ["home.creatorShow.pay5", "Your business, your revenue"],
+                    ].map(([pk, step], i) => (
                       <div
-                        key={step}
+                        key={pk}
                         className="flex items-center gap-3.5 py-[9px] text-[15px] text-[#E5DFC6] opacity-0"
                         style={{ animation: `gsCsLightUp .5s ${i * 0.45}s forwards` }}
                       >
                         <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#C7A962] text-[12px] text-[#0a2225]">
                           ✓
                         </span>
-                        {step}
+                        {t(pk, step)}
                       </div>
                     ))}
                     <div className="mt-4 h-[9px] overflow-hidden rounded-full bg-[#E5DFC6]/15">
@@ -350,7 +363,7 @@ export function CreatorShowcaseSection() {
                       className="mt-3 text-[14px] text-[#E5DFC6] opacity-0"
                       style={{ animation: "gsCsLightUp .5s 2.6s forwards" }}
                     >
-                      Payout on a $2,250 trip:{" "}
+                      {t("home.creatorShow.payoutLabel", "Payout on a $2,250 trip:")}{" "}
                       <span className="font-secondary text-[21px] text-[#C7A962]">$2,171.25</span>
                     </p>
                   </div>
@@ -359,7 +372,7 @@ export function CreatorShowcaseSection() {
 
               <SceneFg i={2} active={active} run={acts.current[2]}>
                 <>
-                  <SceneChip>Your earnings</SceneChip>
+                  <SceneChip>{t("home.creatorShow.chip3", "Your earnings")}</SceneChip>
                   <p className="font-secondary text-[58px] leading-none text-[#fdfaf2] md:text-[68px]">
                     $
                     {earned.toLocaleString("en-US", {
@@ -369,16 +382,16 @@ export function CreatorShowcaseSection() {
                   </p>
                   <div className="mt-5 max-w-[380px]">
                     {[
-                      ["Guide sales", "$1,940.00"],
-                      ["Trip bookings", "$186.50"],
-                      ["Tips", "$44.75"],
-                    ].map(([k, v], i) => (
+                      ["home.creatorShow.earn1", "Guide sales", "$1,940.00"],
+                      ["home.creatorShow.earn2", "Trip bookings", "$186.50"],
+                      ["home.creatorShow.earn3", "Tips", "$44.75"],
+                    ].map(([ek, k, v], i) => (
                       <div
                         key={k}
                         className="flex justify-between border-t border-[#E5DFC6]/15 py-2.5 text-[15px] text-[#E5DFC6] opacity-0"
                         style={{ animation: `gsCsLightUp .5s ${0.2 + i * 0.35}s forwards` }}
                       >
-                        <span>{k}</span>
+                        <span>{t(ek, k)}</span>
                         <span>{v}</span>
                       </div>
                     ))}
@@ -388,7 +401,7 @@ export function CreatorShowcaseSection() {
 
               <SceneFg i={3} active={active} run={acts.current[3]} pad="px-6 pb-5 pt-14 md:px-8">
                 <>
-                  <SceneChip>Your storefront</SceneChip>
+                  <SceneChip>{t("home.creatorShow.chip4", "Your storefront")}</SceneChip>
                   <div className="grid max-w-[500px] grid-cols-3 gap-2.5">
                     {SHELF.map((it, i) => (
                       <div
@@ -402,9 +415,9 @@ export function CreatorShowcaseSection() {
                           loading="lazy"
                           className="mb-1.5 h-[40px] w-full rounded-lg object-cover md:h-[44px]"
                         />
-                        <p className="text-[12.5px] font-medium leading-tight text-[#0a2225]">{it.t}</p>
+                        <p className="text-[12.5px] font-medium leading-tight text-[#0a2225]">{t(it.tKey, it.t)}</p>
                         <p className="mt-0.5 font-secondary text-[15px] text-[#0a2225]">{it.p}</p>
-                        <p className="text-[12px] uppercase tracking-[0.12em] text-[#8D6B2F]">{it.k}</p>
+                        <p className="text-[12px] uppercase tracking-[0.12em] text-[#8D6B2F]">{t(it.kKey, it.k)}</p>
                       </div>
                     ))}
                   </div>
@@ -413,7 +426,7 @@ export function CreatorShowcaseSection() {
 
               <SceneFg i={4} active={active} run={acts.current[4]}>
                 <>
-                  <SceneChip>On location</SceneChip>
+                  <SceneChip>{t("home.creatorShow.chip5", "On location")}</SceneChip>
                   <div className="max-w-[500px]">
                     {CAL.map((c, i) => (
                       <div
@@ -422,16 +435,16 @@ export function CreatorShowcaseSection() {
                         style={{ animation: `gsCsCalIn .55s ${i * 0.28}s cubic-bezier(.2,.9,.3,1) forwards` }}
                       >
                         <span>
-                          <span className="block font-secondary text-[18px] text-[#0a2225]">{c.d}</span>
+                          <span className="block font-secondary text-[18px] text-[#0a2225]">{t(c.dKey, c.d)}</span>
                           <span className="block text-[12px] uppercase tracking-[0.14em] text-[#0a2225]/55">
-                            {c.w}
+                            {t(c.wKey, c.w)}
                           </span>
                         </span>
                         <span
                           className="rounded-full bg-[#0c4d47] px-4 py-2 text-[12px] uppercase tracking-[0.1em] text-[#E5DFC6]"
                           style={i === 1 ? { animation: "gsCsPulse 2.2s 1.2s infinite" } : undefined}
                         >
-                          Hire me here
+                          {t("home.creatorShow.hireMeHere", "Hire me here")}
                         </span>
                       </div>
                     ))}
@@ -439,7 +452,7 @@ export function CreatorShowcaseSection() {
                       className="mt-3.5 rounded-xl border border-[#E5DFC6]/25 bg-[#E5DFC6]/10 px-4 py-2.5 text-[13.5px] text-[#E5DFC6] opacity-0"
                       style={{ animation: "gsCsLightUp .5s 1.5s forwards" }}
                     >
-                      You're already going — travel's covered, the day rate is all margin.
+                      {t("home.creatorShow.marginNote", "You're already going — travel's covered, the day rate is all margin.")}
                     </div>
                   </div>
                 </>
@@ -454,13 +467,13 @@ export function CreatorShowcaseSection() {
             to="/auth?mode=signup&role=creator"
             className="rounded-full bg-[#0c4d47] px-8 py-3.5 text-[13px] font-medium uppercase tracking-[0.14em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
           >
-            Become a creator
+            {t("home.creatorShow.ctaPrimary", "Become a creator")}
           </Link>
           <Link
             to="/creators"
             className="text-[14px] font-medium text-[#0c4d47] underline-offset-4 hover:underline"
           >
-            See how creators use Goldsainte →
+            {t("home.creatorShow.ctaSecondary", "See how creators use Goldsainte →")}
           </Link>
         </div>
       </div>
