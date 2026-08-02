@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import TravelMap from "@/components/partner/TravelMap";
@@ -15,14 +16,15 @@ const DEMO_COUNTRIES = [
 ];
 
 const FEATURES = [
-  ["AI guide writer", "Destination guides in your voice, drafted in seconds"],
-  ["Your travel map", "Every country you've been lights up gold"],
-  ["Guide analytics", "Live view counts and milestone alerts"],
-  ["Direct payouts", "Every booking paid straight to your Stripe account"],
-  ["Brand collab hub", "Media kit, formats, and inbound partnerships"],
+  ["home.platformDemo.f1t", "AI guide writer", "home.platformDemo.f1d", "Destination guides in your voice, drafted in seconds"],
+  ["home.platformDemo.f2t", "Your travel map", "home.platformDemo.f2d", "Every country you've been lights up gold"],
+  ["home.platformDemo.f3t", "Guide analytics", "home.platformDemo.f3d", "Live view counts and milestone alerts"],
+  ["home.platformDemo.f4t", "Direct payouts", "home.platformDemo.f4d", "Every booking paid straight to your Stripe account"],
+  ["home.platformDemo.f5t", "Brand collab hub", "home.platformDemo.f5d", "Media kit, formats, and inbound partnerships"],
 ];
 
 export function PlatformDemoSection() {
+  const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [count, setCount] = useState(0);
@@ -69,16 +71,16 @@ export function PlatformDemoSection() {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0c4d47] font-secondary text-[15px] text-[#E5DFC6]">
-                    You
+                    {t("home.platformDemo.you", "You")}
                   </span>
                   <div>
-                    <p className="font-secondary text-[17px] leading-tight text-[#0a2225]">Your profile</p>
-                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#8D6B2F]">Goldsainte Creator</p>
+                    <p className="font-secondary text-[17px] leading-tight text-[#0a2225]">{t("home.platformDemo.yourProfile", "Your profile")}</p>
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-[#8D6B2F]">{t("home.platformDemo.creatorBadge", "Goldsainte Creator")}</p>
                   </div>
                 </div>
                 <div className="rounded-xl bg-white px-4 py-2 text-center shadow-sm">
                   <p className="font-secondary text-xl leading-none text-[#0a2225]">{count}</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[#0a2225]/60">Countries</p>
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[#0a2225]/60">{t("home.platformDemo.countries", "Countries")}</p>
                 </div>
               </div>
               <div className="mt-4">
@@ -94,23 +96,23 @@ export function PlatformDemoSection() {
           {/* The pitch + feature rail */}
           <div>
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#C7A962]">
-              The platform
+              {t("home.platformDemo.eyebrow", "The platform")}
             </span>
             <h2 className="mt-4 font-secondary text-[30px] leading-tight text-[#f7f3ea] md:text-[38px]">
-              Your travel business, in one storefront
+              {t("home.platformDemo.h2", "Your travel business, in one storefront")}
             </h2>
             <ul className="mt-8 space-y-4">
-              {FEATURES.map(([t, d]) => (
-                <li key={t} className="border-l-2 border-[#C7A962]/40 pl-4">
-                  <p className="text-[15px] font-medium text-[#f7f3ea]">{t}</p>
-                  <p className="mt-0.5 text-[13px] leading-relaxed text-[#f7f3ea]/60">{d}</p>
+              {FEATURES.map(([ftk, ft, fdk, fd]) => (
+                <li key={ftk} className="border-l-2 border-[#C7A962]/40 pl-4">
+                  <p className="text-[15px] font-medium text-[#f7f3ea]">{t(ftk, ft)}</p>
+                  <p className="mt-0.5 text-[13px] leading-relaxed text-[#f7f3ea]/60">{t(fdk, fd)}</p>
                 </li>
               ))}
             </ul>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link to="/apply/agent"
                 className="rounded-full border border-[#f7f3ea]/30 px-7 py-3.5 text-[14px] font-medium text-[#f7f3ea] transition-colors hover:bg-white/10">
-                Join as a specialist
+                {t("home.platformDemo.cta", "Join as a specialist")}
               </Link>
             </div>
           </div>
