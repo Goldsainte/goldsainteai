@@ -1,5 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { setDefaultOptions, type Locale } from 'date-fns';
+import { enUS, fr as frFR, es as esES, de as deDE, it as itIT, pt as ptPT, ja as jaJP, zhCN, ko as koKR, ar as arAR } from 'date-fns/locale';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -41,6 +43,17 @@ const getSavedLanguage = () => {
   }
 };
 
+const DATE_FNS_LOCALES: Record<string, Locale> = {
+  en: enUS, fr: frFR, es: esES, de: deDE, it: itIT,
+  pt: ptPT, ja: jaJP, zh: zhCN, ko: koKR, ar: arAR,
+};
+
+// One switch localizes every date-fns format()/formatDistanceToNow() call in
+// the app — no call-site changes needed (H5 formatting layer).
+const applyDateLocale = (lang: string) => {
+  setDefaultOptions({ locale: DATE_FNS_LOCALES[lang.split('-')[0]] ?? enUS });
+};
+
 const applyDirection = (lang: string) => {
   if (typeof document === 'undefined') return;
   document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -49,6 +62,7 @@ const applyDirection = (lang: string) => {
 
 const initialLang = getSavedLanguage();
 applyDirection(initialLang);
+applyDateLocale(initialLang);
 
 i18n
   .use(initReactI18next)
@@ -66,6 +80,7 @@ i18n
 
 i18n.on('languageChanged', (newLang) => {
   applyDirection(newLang);
+  applyDateLocale(newLang);
 });
 
 export default i18n;
