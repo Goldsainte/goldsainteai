@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -162,7 +163,7 @@ const perPerson = useMemo(() => {
 const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency].some(c => c && c !== currencyInfo.code), [flightCurrency, hotelCurrency, carCurrency, currencyInfo.code]);
   
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', { 
+    return new Date(date).toLocaleDateString(gsIntlLocale(), { 
       month: 'short', 
       day: 'numeric',
       year: 'numeric'
@@ -247,7 +248,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-semibold">{segment.departure?.iataCode}</span>
                               <span className="text-sm text-muted-foreground">
-                                {new Date(segment.departure?.at).toLocaleTimeString('en-US', { 
+                                {new Date(segment.departure?.at).toLocaleTimeString(gsIntlLocale(), { 
                                   hour: 'numeric', 
                                   minute: '2-digit',
                                   hour12: true 
@@ -255,7 +256,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              {new Date(segment.departure?.at).toLocaleDateString('en-US', { 
+                              {new Date(segment.departure?.at).toLocaleDateString(gsIntlLocale(), { 
                                 month: 'short', 
                                 day: 'numeric' 
                               })}
@@ -282,7 +283,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                           <div className="flex-1 text-right">
                             <div className="flex items-center justify-end gap-2 mb-1">
                               <span className="text-sm text-muted-foreground">
-                                {new Date(segment.arrival?.at).toLocaleTimeString('en-US', { 
+                                {new Date(segment.arrival?.at).toLocaleTimeString(gsIntlLocale(), { 
                                   hour: 'numeric', 
                                   minute: '2-digit',
                                   hour12: true 
@@ -291,7 +292,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                               <span className="font-semibold">{segment.arrival?.iataCode}</span>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              {new Date(segment.arrival?.at).toLocaleDateString('en-US', { 
+                              {new Date(segment.arrival?.at).toLocaleDateString(gsIntlLocale(), { 
                                 month: 'short', 
                                 day: 'numeric' 
                               })}
@@ -339,7 +340,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="font-semibold">{segment.departure?.iataCode}</span>
                                 <span className="text-sm text-muted-foreground">
-                                  {new Date(segment.departure?.at).toLocaleTimeString('en-US', { 
+                                  {new Date(segment.departure?.at).toLocaleTimeString(gsIntlLocale(), { 
                                     hour: 'numeric', 
                                     minute: '2-digit',
                                     hour12: true 
@@ -347,7 +348,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                                 </span>
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                {new Date(segment.departure?.at).toLocaleDateString('en-US', { 
+                                {new Date(segment.departure?.at).toLocaleDateString(gsIntlLocale(), { 
                                   month: 'short', 
                                   day: 'numeric' 
                                 })}
@@ -374,7 +375,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                             <div className="flex-1 text-right">
                               <div className="flex items-center justify-end gap-2 mb-1">
                                 <span className="text-sm text-muted-foreground">
-                                  {new Date(segment.arrival?.at).toLocaleTimeString('en-US', { 
+                                  {new Date(segment.arrival?.at).toLocaleTimeString(gsIntlLocale(), { 
                                     hour: 'numeric', 
                                     minute: '2-digit',
                                     hour12: true 
@@ -383,7 +384,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                                 <span className="font-semibold">{segment.arrival?.iataCode}</span>
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                {new Date(segment.arrival?.at).toLocaleDateString('en-US', { 
+                                {new Date(segment.arrival?.at).toLocaleDateString(gsIntlLocale(), { 
                                   month: 'short', 
                                   day: 'numeric' 
                                 })}
