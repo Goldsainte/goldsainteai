@@ -30,7 +30,12 @@
     "preferencesEnabled": "Preferences enabled",
     "preferencesDisabled": "Preferences disabled",
     "preferencesEnabledDesc": "Search results will match your saved preferences",
-    "preferencesDisabledDesc": "Search results will show all available options"
+    "preferencesDisabledDesc": "Search results will show all available options",
+    "navTravel": "Travel",
+    "navCreators": "Creators",
+    "navSpecialists": "Specialists",
+    "navPartner": "Partner",
+    "getStarted": "Get Started"
   },
   "common": {
     "loading": "Loading...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "The Social Marketplace for Travel",
       "sub": "Discover, plan and book travel through creators and travel specialists — each with their own storefront, expertise and direct messaging. Payments secured by Stripe.",
-      "h": "Trips built by people who've been there."
+      "h": "Trips built by people who've been there.",
+      "postDream": "Post your dream trip →",
+      "twoDoorsQ": "Travel creator or agent?",
+      "openStorefront": "Open your storefront →",
+      "popularTrips": "Popular Trips",
+      "viewAll": "View all →"
     },
     "dreamTrip": {
       "eyebrow": "For travelers",
@@ -464,6 +474,38 @@
       "c2Body": "Real travelers post dream trips from around the world; you answer with bespoke proposals — wherever you're based. Get paid at booking — deposits and balances land in your own Stripe account the moment your client pays. No invoicing, no chasing.",
       "c2Cta": "Join as a specialist",
       "c2Alt": "Refined fine dining setting at golden hour"
+    },
+    "trustPlaque": {
+      "eyebrow": "Trust & safety",
+      "h2": "Built to be trusted with your trip",
+      "sub": "Four commitments behind every booking — reviewed, verified, secured, and supported, start to finish.",
+      "c1e": "Curation",
+      "c1t": "Reviewed before it goes live",
+      "c1b": "Every trip, guide, and profile is reviewed by the Goldsainte team before it reaches the marketplace. Nothing goes live unseen.",
+      "c2e": "Identity",
+      "c2t": "Verified, every account",
+      "c2b": "Every creator and travel agent completes Stripe Identity verification before they can list or take a booking. You always know who you’re working with.",
+      "c3e": "Payments",
+      "c3t": "Secured by Stripe",
+      "c3b": "Checkout runs on Stripe and pays your travel agent directly — they’re your seller of record. Card details never touch our servers.",
+      "c4e": "Support",
+      "c4t": "With you to boarding",
+      "c4b": "One thread with your specialist from booking to boarding — and Goldsainte support behind every trip.",
+      "footPre": "Read the full standards on our",
+      "footLink": "Trust & Safety page"
+    },
+    "finalCta": {
+      "h2a": "Your next journey",
+      "h2b": "starts here.",
+      "sub": "Find a trip built by someone who's been there — or start earning from everywhere you've been.",
+      "cta1": "Explore trips",
+      "cta2": "Start earning"
+    },
+    "founderNote": {
+      "eyebrow": "Why we built Goldsainte",
+      "quote": "“Travel discovery already happens on social — what’s been missing is everything after the inspiration. We built Goldsainte so the person who inspired your trip can actually design it, lead it, and earn from it — and so the person you trust with your journey is exactly who you pay, on a marketplace that stands behind every specialist.”",
+      "role": "Founder & CEO, Goldsainte",
+      "alt": "Andre Powell, Founder & CEO of Goldsainte"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "corporateContact": "Corporate Contact",
     "followUs": "Follow us:",
     "description": "The social marketplace for travel — connecting travelers with creators and independent travel specialists through personal storefronts, direct messaging and a global marketplace of bookable trips.",
-    "copyright": "© 2026 Goldsainte AI Inc. All rights reserved."
+    "copyright": "© 2026 Goldsainte AI Inc. All rights reserved.",
+    "colExplore": "EXPLORE",
+    "colJoin": "JOIN GOLDSAINTE",
+    "colCompany": "COMPANY",
+    "colStarted": "GETTING STARTED",
+    "colSupport": "SUPPORT",
+    "browseTrips": "Browse Trips",
+    "browseCreators": "Browse Creators",
+    "postTrip": "Post a Trip",
+    "findSpecialist": "Find a Specialist",
+    "signupTraveler": "Sign Up as a Traveler",
+    "joinCreator": "Join as a Creator",
+    "applyAgent": "Apply as a Travel Agent",
+    "aboutGs": "About Goldsainte",
+    "newsroomL": "Newsroom",
+    "pressL": "Press",
+    "contactUs": "Contact Us",
+    "forTravelers": "For Travelers",
+    "forCreators": "For Creators",
+    "forAgents": "For Agents",
+    "whereAvailable": "Where we're available",
+    "paymentsFees": "Payments and fees",
+    "safetyTrust": "Safety & Trust",
+    "cancellationPolicy": "Cancellation Policy",
+    "privacyPolicy": "Privacy Policy",
+    "creatorAgreement": "Creator Agreement",
+    "agentAgreement": "Agent Agreement",
+    "disputeRes": "Dispute Resolution",
+    "installApp": "Install App"
   },
   "welcomeModal": {
     "title": "What Goldsainte.Ai can do for you",
@@ -1034,5 +1104,29 @@
     "moneyB": "Travel booked on Goldsainte is sold by independent travel professionals, who are paid directly for your trip. Goldsainte charges a single flat platform fee — never added at checkout, never a commission maze.",
     "closing": "Social discovery meets travel commerce — identity, content, conversation, proposal and transaction, on one platform.",
     "cta": "Join Goldsainte"
+  },
+  "search": {
+    "where": "Where",
+    "when": "When",
+    "who": "Who",
+    "searchDest": "Search destinations",
+    "addDates": "Add dates",
+    "addGuests": "Add guests",
+    "guestsN": "{{count}} guests",
+    "whereTo": "Where to?",
+    "anywhere": "Anywhere",
+    "anyDates": "Any dates",
+    "whereGoing": "Where are you going?",
+    "checkInOut": "Check-in – Check-out",
+    "adults": "Adults",
+    "adultsSub": "Ages 13 or above",
+    "children": "Children",
+    "childrenSub": "Ages 2 – 12",
+    "infants": "Infants",
+    "infantsSub": "Under 2",
+    "pets": "Pets",
+    "petsSub": "Bringing a service animal?",
+    "openSearch": "Open search",
+    "setTravelers": "Set number of travelers"
   }
 }
