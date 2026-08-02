@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,7 +57,7 @@ export const TravelPackageCard = ({
   } = packageData;
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', { 
+    return new Date(date).toLocaleDateString(gsIntlLocale(), { 
       month: 'short', 
       day: 'numeric' 
     });
