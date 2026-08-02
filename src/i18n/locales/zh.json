@@ -35,7 +35,18 @@
     "navCreators": "创作者",
     "navSpecialists": "专家",
     "navPartner": "合作",
-    "getStarted": "开始使用"
+    "getStarted": "开始使用",
+    "menuMarketplace": "市集",
+    "menuMarketplaceD": "浏览精选旅程",
+    "menuTours": "跟团游",
+    "menuToursD": "可预订的跟团游与体验",
+    "menuGuides": "行程指南",
+    "menuGuidesD": "可下载的逐日指南",
+    "menuPostTrip": "发布旅行需求",
+    "menuPostTripD": "获取专家量身定制的提案",
+    "menuAgent": "成为代理",
+    "menuAgentD": "以正式卖方身份设计并销售旅程",
+    "agentPromoD": "发挥你的专长，从每一趟经手的旅程中获得收入。"
   },
   "common": {
     "loading": "加载中...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "旅行的社交市场",
       "sub": "通过创作者与旅行专家发现、规划并预订旅行 — 每个人都有自己的主页、专长与私信。支付由 Stripe 保护。",
-      "h": "由去过的人打造的旅程。",
       "postDream": "发布你的梦想旅程 →",
       "twoDoorsQ": "旅行创作者或代理？",
       "openStorefront": "开设你的店铺 →",
       "popularTrips": "热门旅程",
-      "viewAll": "查看全部 →"
+      "viewAll": "查看全部 →",
+      "h1a": "由去过的人",
+      "h1b": "打造的旅程。"
     },
     "dreamTrip": {
       "eyebrow": "致旅行者",
@@ -1128,5 +1140,45 @@
     "petsSub": "携带服务动物出行？",
     "openSearch": "打开搜索",
     "setTravelers": "设置旅客人数"
+  },
+  "directory": {
+    "agentTitle": "我们的旅行专家",
+    "agentSub": "找到懂你品味的旅行专家，一起设计你的梦想旅程——并通过 Goldsainte 安全预订。",
+    "creatorTitle": "我们的旅行创作者",
+    "creatorSub": "关注那些旅程能启发你的创作者——再把他们的内容变成你的下一趟旅行，通过 Goldsainte 安全预订。",
+    "moreN": "及另外 {{count}} 项",
+    "searchAgents": "搜索专家、目的地…",
+    "searchCreators": "搜索创作者、领域、地点…",
+    "clear": "清除",
+    "agentsSoon": "专家即将上线",
+    "creatorsSoon": "创作者即将上线",
+    "postToMatch": "发布你的旅程，我们来为你匹配。",
+    "noMatches": "没有匹配结果",
+    "clearAll": "清除筛选并显示全部",
+    "getMatched": "获取匹配"
+  },
+  "specialistsPage": {
+    "kicker": "专家",
+    "h1": "入选，而非上架。",
+    "sub": "Goldsainte 的每位专家都经申请加入——身份经过认证，资质与保险由我们的团队审核，之后才能售出第一趟旅程。创始阵容正在组建中。",
+    "doesKicker": "Goldsainte 专家做什么",
+    "w1s": "回应真实的需求。",
+    "w1r": "旅行者发布想要的旅程；专家以量身定制的提案回应——行程、价格与时间表。",
+    "w2s": "发布自己的旅程。",
+    "w2r": "把你烂熟于心的旅程打包成品，以你的名义、按你的价格上架，可直接预订。",
+    "w3s": "直接收款。",
+    "w3r": "每笔付款都记入你自己的 Stripe 账户——你就是正式卖方。",
+    "howKicker": "创始阵容如何选出",
+    "h1r": "十分钟的申请——你的业务、资质、保险与专长。",
+    "h2r": "通过 Stripe 完成身份认证，约两分钟。",
+    "h3r": "人工审核，一至两个工作日内以邮件告知结果。",
+    "feePara": "价格由你来定——成本与利润空间都由你掌握。Goldsainte 的平台费固定为 3.5%，在预订时收取；其余款项进入你自己的 Stripe 账户，因为你售出的每趟旅程，正式卖方都是你。",
+    "feeCaption": "Goldsainte 的固定平台费",
+    "closing": "旅行者正在到来。阵容刻意保持精简。如果你凭真本事卖旅行，现在正是抢先入场的时刻。",
+    "applyCta": "申请加入",
+    "browseCta": "看看旅行者正在预订的旅程 →",
+    "alreadyApplied": "已经申请过？",
+    "checkStatus": "随时登录查看申请进度。",
+    "questions": "关于成为专家的疑问 —"
   }
 }
