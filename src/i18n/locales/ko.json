@@ -35,7 +35,18 @@
     "navCreators": "크리에이터",
     "navSpecialists": "전문가",
     "navPartner": "파트너",
-    "getStarted": "시작하기"
+    "getStarted": "시작하기",
+    "menuMarketplace": "마켓플레이스",
+    "menuMarketplaceD": "엄선된 여행 둘러보기",
+    "menuTours": "투어",
+    "menuToursD": "예약 가능한 투어와 체험",
+    "menuGuides": "일정 가이드",
+    "menuGuidesD": "다운로드 가능한 일자별 가이드",
+    "menuPostTrip": "여행 요청 올리기",
+    "menuPostTripD": "전문가의 맞춤 제안을 받아보세요",
+    "menuAgent": "에이전트 되기",
+    "menuAgentD": "공식 판매자로서 여행을 설계하고 판매하세요",
+    "agentPromoD": "당신의 전문성으로, 성사시키는 모든 여행에서 수익을."
   },
   "common": {
     "loading": "로딩 중...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "여행의 소셜 마켓플레이스",
       "sub": "크리에이터와 여행 전문가를 통해 여행을 발견하고 계획하고 예약하세요 — 각자 자신만의 스토어프런트, 전문성, 다이렉트 메시지를 갖추고 있습니다. 결제는 Stripe로 보호됩니다.",
-      "h": "그곳을 아는 사람들이 만드는 여행.",
       "postDream": "꿈의 여행 올리기 →",
       "twoDoorsQ": "여행 크리에이터 또는 에이전트이신가요?",
       "openStorefront": "스토어 열기 →",
       "popularTrips": "인기 여행",
-      "viewAll": "전체 보기 →"
+      "viewAll": "전체 보기 →",
+      "h1a": "그곳을 아는 사람들이",
+      "h1b": "만드는 여행."
     },
     "dreamTrip": {
       "eyebrow": "여행자를 위해",
@@ -1128,5 +1140,45 @@
     "petsSub": "보조동물과 함께 여행하시나요?",
     "openSearch": "검색 열기",
     "setTravelers": "여행자 수 설정"
+  },
+  "directory": {
+    "agentTitle": "우리의 여행 전문가",
+    "agentSub": "당신의 취향을 이해하는 전문가를 찾아 함께 꿈의 여행을 설계하세요 — 예약은 Goldsainte에서 안전하게.",
+    "creatorTitle": "우리의 여행 크리에이터",
+    "creatorSub": "여정이 영감을 주는 크리에이터를 팔로우하고, 그 콘텐츠를 다음 여행으로 — 예약은 Goldsainte에서 안전하게.",
+    "moreN": "외 {{count}}개",
+    "searchAgents": "전문가, 여행지 검색…",
+    "searchCreators": "크리에이터, 분야, 장소 검색…",
+    "clear": "지우기",
+    "agentsSoon": "전문가 공개 예정",
+    "creatorsSoon": "크리에이터 공개 예정",
+    "postToMatch": "여행을 올리면 맞는 상대를 연결해 드립니다.",
+    "noMatches": "검색 결과 없음",
+    "clearAll": "필터를 지우고 전체 보기",
+    "getMatched": "매칭 받기"
+  },
+  "specialistsPage": {
+    "kicker": "전문가",
+    "h1": "선택되는 곳. 나열되지 않는 곳.",
+    "sub": "Goldsainte의 모든 전문가는 지원을 거쳐 합류합니다 — 신원을 인증하고, 자격과 보험을 저희 팀이 검토한 뒤에야 단 한 건의 여행도 판매할 수 있습니다. 창립 멤버를 지금 모으고 있습니다.",
+    "doesKicker": "Goldsainte 전문가가 하는 일",
+    "w1s": "진짜 요청에 답합니다.",
+    "w1r": "여행자가 원하는 여정을 올리면, 전문가가 일정·가격·타임라인을 갖춘 맞춤 제안으로 답합니다.",
+    "w2s": "자신의 여행을 판매합니다.",
+    "w2r": "속속들이 아는 여정을 상품으로 만들어 당신의 이름으로, 당신의 가격에, 바로 예약 가능하게 올리세요.",
+    "w3s": "직접 정산받습니다.",
+    "w3r": "모든 결제는 당신의 Stripe 계정으로 청구됩니다 — 공식 판매자는 당신입니다.",
+    "howKicker": "창립 멤버는 이렇게 선발합니다",
+    "h1r": "10분 지원서 — 사업, 자격, 보험, 전문 분야.",
+    "h2r": "Stripe 신원 인증, 약 2분.",
+    "h3r": "사람이 직접 검토하고, 1~2영업일 안에 이메일로 결과를 알려드립니다.",
+    "feePara": "가격은 당신이 정합니다 — 비용과 마진 설계도 당신 몫입니다. Goldsainte의 플랫폼 수수료는 고정 3.5%로 예약 시 청구되며, 나머지는 당신의 Stripe 계정으로 들어갑니다. 판매하는 모든 여행의 공식 판매자가 당신이기 때문입니다.",
+    "feeCaption": "Goldsainte 고정 수수료",
+    "closing": "여행자들이 모이고 있습니다. 멤버는 일부러 소수로 유지합니다. 진짜 전문성으로 여행을 판다면, 지금이 먼저 자리 잡을 순간입니다.",
+    "applyCta": "가입 지원하기",
+    "browseCta": "여행자들이 예약 중인 여행 보기 →",
+    "alreadyApplied": "이미 지원하셨나요?",
+    "checkStatus": "언제든 로그인해 지원 현황을 확인하세요.",
+    "questions": "전문가 합류에 대한 문의 —"
   }
 }
