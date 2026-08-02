@@ -108,7 +108,10 @@ const About = () => {
             Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents &mdash; combining bookable travel inspiration with a custom-trip proposal marketplace.
           </p>
           <p className="text-base md:text-lg text-[#0a2225]/70 leading-relaxed max-w-2xl">
-            {t('home.hero.subtitle')}
+            {t(
+              "about.heroSubtitle",
+              "Goldsainte is the social marketplace for travel — creators inspire the trip, certified specialists design it by hand, and you book directly, payments secured by Stripe."
+            )}
           </p>
         </header>
 
