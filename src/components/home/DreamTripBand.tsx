@@ -4,6 +4,7 @@
 // the page (no posted trip = no marketplace), so it now leads the value
 // sections, ahead of the creator showcase. Sub-headline + differentiator strip
 // approved from the HTML preview.
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import maldives from "@/assets/home/storyboard-maldives.webp";
 import bali from "@/assets/home/storyboard-bali.webp";
@@ -15,30 +16,36 @@ const STEPS = [
   {
     n: "1",
     img: maldives,
+    titleKey: "home.dreamTrip.step1Title",
     title: "You describe it",
+    bodyKey: "home.dreamTrip.step1Body",
     body: "Tell us the trip you wish existed — in your own words.",
     kind: "mock" as const,
   },
   {
     n: "2",
     img: bali,
+    titleKey: "home.dreamTrip.step2Title",
     title: "Proposals come to you",
+    bodyKey: "home.dreamTrip.step2Body",
     body: "Certified experts design it and reply — you don't chase anyone.",
     kind: "proposals" as const,
   },
   {
     n: "3",
     img: overwater,
+    titleKey: "home.dreamTrip.step3Title",
     title: "Book with confidence",
+    bodyKey: "home.dreamTrip.step3Body",
     body: "Choose the one you love. Pay your specialist directly, secured by Stripe.",
     kind: "escrow" as const,
   },
 ];
 
 const WHY = [
-  ["Designed", "not generated"],
-  ["Personal", "not packaged"],
-  ["Protected", "not prepaid"],
+  { kKey: "home.dreamTrip.why1k", k: "Designed", vKey: "home.dreamTrip.why1v", v: "not generated" },
+  { kKey: "home.dreamTrip.why2k", k: "Personal", vKey: "home.dreamTrip.why2v", v: "not packaged" },
+  { kKey: "home.dreamTrip.why3k", k: "Protected", vKey: "home.dreamTrip.why3v", v: "not prepaid" },
 ];
 
 const PROPOSALS = [
@@ -48,6 +55,7 @@ const PROPOSALS = [
 ];
 
 export function DreamTripBand() {
+  const { t } = useTranslation();
   return (
     <section className="relative overflow-hidden bg-[#0c4d47] py-16 text-[#FDF9F0] md:py-[84px]">
       <style>{`
@@ -61,17 +69,19 @@ export function DreamTripBand() {
       />
       <div className="relative mx-auto max-w-6xl px-4 md:px-6">
         <span className="text-[12px] font-semibold uppercase tracking-[0.28em] text-[#C7A962]" style={inter}>
-          For travelers
+          {t("home.dreamTrip.eyebrow", "For travelers")}
         </span>
         <h2 className="mt-4 font-secondary text-[30px] leading-[1.12] text-[#FDF9F0] md:text-[42px]">
-          Have a trip in mind that
+          {t("home.dreamTrip.h2a", "Have a trip in mind that")}
           <br />
-          doesn't exist yet? <em className="italic text-[#C7A962]">Post it.</em>
+          {t("home.dreamTrip.h2b", "doesn't exist yet?")}{" "}
+          <em className="italic text-[#C7A962]">{t("home.dreamTrip.h2c", "Post it.")}</em>
         </h2>
         <p className="mt-4 max-w-[560px] text-[16px] leading-relaxed text-[#FDF9F0]/85 md:text-[17.5px]">
-          Stop scrolling through the same packages everyone else books. Describe
-          the trip you actually want, and certified specialists design it
-          for you — start to finish.
+          {t(
+            "home.dreamTrip.sub",
+            "Stop scrolling through the same packages everyone else books. Describe the trip you actually want, and certified specialists design it for you — start to finish."
+          )}
         </p>
 
         <div className="mt-7 flex flex-wrap items-center gap-4">
@@ -80,20 +90,20 @@ export function DreamTripBand() {
             className="inline-flex items-center justify-center rounded-full bg-[#C7A962] px-8 py-3.5 text-[14px] font-semibold text-[#073331] transition-colors hover:bg-[#b3954f]"
             style={inter}
           >
-            Post your dream trip
+            {t("home.dreamTrip.cta", "Post your dream trip")}
           </Link>
           <span className="text-[13px] text-[#FDF9F0]/70" style={inter}>
-            Free to post · No obligation to book
+            {t("home.dreamTrip.ctaNote", "Free to post · No obligation to book")}
           </span>
         </div>
 
         {/* Differentiator strip — the "why us vs. algorithms/agents" answer */}
         <div className="mt-7 flex flex-wrap gap-x-9 gap-y-4 border-t border-[#E5DFC6]/20 pt-6">
-          {WHY.map(([k, v]) => (
-            <div key={k} className="flex flex-col">
-              <span className="font-secondary text-[18px] text-[#FDF9F0]">{k}</span>
+          {WHY.map((w) => (
+            <div key={w.k} className="flex flex-col">
+              <span className="font-secondary text-[18px] text-[#FDF9F0]">{t(w.kKey, w.k)}</span>
               <span className="mt-0.5 text-[12.5px] uppercase tracking-[0.06em] text-[#C7A962]/90" style={inter}>
-                {v}
+                {t(w.vKey, w.v)}
               </span>
             </div>
           ))}
@@ -116,24 +126,32 @@ export function DreamTripBand() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#061a18]/55 to-transparent" />
               </div>
               <div className="px-5 pb-6 pt-[18px]">
-                <p className="font-secondary text-[18px] text-[#FDF9F0]">{step.title}</p>
+                <p className="font-secondary text-[18px] text-[#FDF9F0]">{t(step.titleKey, step.title)}</p>
                 <p className="mt-1.5 text-[14px] leading-relaxed text-[#FDF9F0]/72" style={inter}>
-                  {step.body}
+                  {t(step.bodyKey, step.body)}
                 </p>
 
                 {step.kind === "mock" && (
                   <div className="mt-3.5 rounded-xl bg-[#fdfaf2] px-3.5 py-3 text-[#0a2225]">
                     <p className="text-[13px] leading-relaxed" style={inter}>
-                      "Two weeks in Japan in October — food-focused, mid-luxury, off the tourist trail."
+                      {t(
+                        "home.dreamTrip.mockBrief",
+                        "\"Two weeks in Japan in October — food-focused, mid-luxury, off the tourist trail.\""
+                      )}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {["Japan", "Oct", "Culinary", "$8k"].map((t) => (
+                      {[
+                        ["home.dreamTrip.chipJapan", "Japan"],
+                        ["home.dreamTrip.chipOct", "Oct"],
+                        ["home.dreamTrip.chipCulinary", "Culinary"],
+                        ["home.dreamTrip.chipBudget", "$8k"],
+                      ].map(([ck, cv]) => (
                         <span
-                          key={t}
+                          key={ck}
                           className="rounded-full bg-[#F0EADA] px-2.5 py-[3px] text-[12.5px] text-[#8D6B2F]"
                           style={inter}
                         >
-                          {t}
+                          {t(ck, cv)}
                         </span>
                       ))}
                     </div>
@@ -157,12 +175,15 @@ export function DreamTripBand() {
 
                 {step.kind === "escrow" && (
                   <div className="mt-3">
-                    {["Secure Stripe checkout, direct to your specialist", "Support from booking to boarding"].map((line) => (
-                      <div key={line} className="flex items-center gap-2.5 py-[5px] text-[13px] text-[#FDF9F0]/85" style={inter}>
+                    {[
+                      ["home.dreamTrip.escrow1", "Secure Stripe checkout, direct to your specialist"],
+                      ["home.dreamTrip.escrow2", "Support from booking to boarding"],
+                    ].map(([lk, line]) => (
+                      <div key={lk} className="flex items-center gap-2.5 py-[5px] text-[13px] text-[#FDF9F0]/85" style={inter}>
                         <span className="flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-[#C7A962] text-[12.5px] text-[#0a2225]">
                           ✓
                         </span>
-                        {line}
+                        {t(lk, line)}
                       </div>
                     ))}
                     <div className="mt-2.5 h-[7px] overflow-hidden rounded-full bg-[#E5DFC6]/15">
