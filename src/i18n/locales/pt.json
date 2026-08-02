@@ -35,7 +35,18 @@
     "navCreators": "Criadores",
     "navSpecialists": "Especialistas",
     "navPartner": "Parcerias",
-    "getStarted": "Começar"
+    "getStarted": "Começar",
+    "menuMarketplace": "Marketplace",
+    "menuMarketplaceD": "Explore viagens selecionadas",
+    "menuTours": "Tours",
+    "menuToursD": "Tours e experiências reserváveis",
+    "menuGuides": "Guias de roteiro",
+    "menuGuidesD": "Guias dia a dia para baixar",
+    "menuPostTrip": "Publicar um pedido de viagem",
+    "menuPostTripD": "Receba propostas sob medida de especialistas",
+    "menuAgent": "Torne-se agente",
+    "menuAgentD": "Crie e venda viagens como vendedor oficial",
+    "agentPromoD": "Use a sua experiência e ganhe em cada viagem que realizar."
   },
   "common": {
     "loading": "Carregando...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "O marketplace social de viagens",
       "sub": "Descubra, planeie e reserve viagens com criadores e especialistas — cada um com a sua loja, experiência e mensagens diretas. Pagamentos protegidos pela Stripe.",
-      "h": "Viagens criadas por quem já lá esteve.",
       "postDream": "Publique a viagem dos seus sonhos →",
       "twoDoorsQ": "Criador de viagens ou agente?",
       "openStorefront": "Abra a sua vitrine →",
       "popularTrips": "Viagens populares",
-      "viewAll": "Ver tudo →"
+      "viewAll": "Ver tudo →",
+      "h1a": "Viagens criadas por quem",
+      "h1b": "já lá esteve."
     },
     "dreamTrip": {
       "eyebrow": "Para viajantes",
@@ -1128,5 +1140,45 @@
     "petsSub": "Levando um animal de serviço?",
     "openSearch": "Abrir busca",
     "setTravelers": "Definir número de viajantes"
+  },
+  "directory": {
+    "agentTitle": "Nossos especialistas em viagens",
+    "agentSub": "Encontre um especialista que combine com você e desenhem juntos a viagem dos seus sonhos — reservando com segurança pela Goldsainte.",
+    "creatorTitle": "Nossos criadores de viagem",
+    "creatorSub": "Siga criadores cujas jornadas inspiram as suas — e transforme o conteúdo deles na sua próxima viagem, reservada com segurança pela Goldsainte.",
+    "moreN": "+{{count}} mais",
+    "searchAgents": "Buscar especialistas, destinos…",
+    "searchCreators": "Buscar criadores, nichos, lugares…",
+    "clear": "Limpar",
+    "agentsSoon": "Especialistas em breve",
+    "creatorsSoon": "Criadores em breve",
+    "postToMatch": "Publique a sua viagem e nós fazemos o match.",
+    "noMatches": "Nenhum resultado",
+    "clearAll": "Limpar filtros e mostrar todos",
+    "getMatched": "Fazer match"
+  },
+  "specialistsPage": {
+    "kicker": "Especialistas",
+    "h1": "Escolhidos, não listados.",
+    "sub": "Todo especialista entra na Goldsainte por candidatura — identidade verificada, credenciais e seguro revisados pela nossa equipe antes de uma única viagem ser vendida. A turma fundadora está sendo formada agora.",
+    "doesKicker": "O que faz um especialista Goldsainte",
+    "w1s": "Responde a pedidos reais.",
+    "w1r": "Viajantes publicam as jornadas que querem; especialistas respondem com propostas sob medida — roteiro, preço e prazo.",
+    "w2s": "Publica as próprias viagens.",
+    "w2r": "Empacote as jornadas que você conhece de cor e ofereça com o seu nome, pelo seu preço, com reserva direta.",
+    "w3s": "Recebe diretamente.",
+    "w3r": "Cada pagamento é cobrado na sua própria conta Stripe — você é o vendedor oficial.",
+    "howKicker": "Como a turma fundadora é escolhida",
+    "h1r": "Uma candidatura de dez minutos — seu negócio, credenciais, seguro e experiência.",
+    "h2r": "Verificação de identidade pela Stripe, em cerca de dois minutos.",
+    "h3r": "Revisão humana, com decisão enviada por e-mail em um a dois dias úteis.",
+    "feePara": "Você define o seu preço — custos e margem são seus. A taxa da Goldsainte é fixa em 3,5%, cobrada na reserva; o restante cai na sua própria conta Stripe, porque você é o vendedor oficial de cada viagem que vende.",
+    "feeCaption": "A taxa fixa da Goldsainte",
+    "closing": "Os viajantes estão chegando. A turma é pequena de propósito. Se você vende viagens com experiência de verdade, este é o momento de chegar cedo.",
+    "applyCta": "Candidatar-se",
+    "browseCta": "Veja as viagens que os viajantes estão reservando →",
+    "alreadyApplied": "Já se candidatou?",
+    "checkStatus": "Entre a qualquer momento para acompanhar o status da candidatura.",
+    "questions": "Dúvidas sobre como se tornar especialista —"
   }
 }
