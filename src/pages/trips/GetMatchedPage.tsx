@@ -8,6 +8,7 @@
  * PostTripPage sends). Posting to everyone remains a deliberate secondary
  * choice, not the hidden default. Route: /get-matched (RequireAuth). */
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +33,7 @@ const EXAMPLES = [
 ];
 
 export default function GetMatchedPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [brief, setBrief] = useState("");
@@ -43,7 +45,7 @@ export default function GetMatchedPage() {
 
   const runMatch = async () => {
     if (brief.trim().length < 15) {
-      toast.error("Tell us a little more about the trip first.");
+      toast.error(t('trip.gmTellMore'));
       return;
     }
     setWorking(true);
@@ -57,7 +59,7 @@ export default function GetMatchedPage() {
       setMatches(data.matches ?? []);
       setPhase("results");
     } catch (e: any) {
-      toast.error(e.message || "Something went wrong — please try again.");
+      toast.error(e.message || t('trip.gmWrong'));
     } finally {
       setWorking(false);
     }
@@ -123,8 +125,8 @@ export default function GetMatchedPage() {
 
       const to = matches.find((m) => m.id === preferredCreatorId);
       toast.success(
-        preferredCreatorId ? `Your trip is on its way to ${to?.name ?? "them"}` : "Posted to all specialists",
-        { description: "Proposals will land right on your trip page." },
+        preferredCreatorId ? t('trip.gmOnItsWay', { name: to?.name ?? t('trip.gmThem') }) : t('trip.gmPostedAll'),
+        { description: t('trip.gmProposalsLand') },
       );
       navigate(`/trip-requests/${inserted.id}`, { replace: true });
     } catch (e: any) {
@@ -148,13 +150,12 @@ export default function GetMatchedPage() {
       >
         {phase === "brief" ? (
           <>
-            <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Get matched</p>
+            <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t('trip.gmKicker')}</p>
             <h1 className="mt-4 font-secondary text-[40px] leading-[1.08] md:text-[52px]">
-              Tell us about the trip.
+              {t('trip.gmTitle')}
             </h1>
             <p className="mt-5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/55">
-              In your own words — where you're dreaming of, who's coming, when,
-              and what matters most. Our AI reads it and shows you the creators
+              {t('trip.gmIntro')}
               who fit, instantly.
             </p>
 
@@ -180,12 +181,12 @@ export default function GetMatchedPage() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" /> Match me
+                    <Sparkles className="h-4 w-4" /> {t('trip.gmMatchMe')}
                   </>
                 )}
               </button>
               <Link to="/post-trip" className="text-[14px] text-[#0c4d47] underline underline-offset-4">
-                Prefer step-by-step? Use the guided form
+                {t('trip.gmGuided')}
               </Link>
             </div>
           </>
@@ -199,14 +200,14 @@ export default function GetMatchedPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Edit my trip
             </button>
 
-            <p className="mt-6 text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your matches</p>
+            <p className="mt-6 text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t('trip.gmYourMatches')}</p>
             <h1 className="mt-3 font-secondary text-[34px] leading-tight md:text-[44px]">
               {matches.length > 0
-                ? `${matches.length} creator${matches.length === 1 ? "" : "s"} fit${matches.length === 1 ? "s" : ""} this trip.`
-                : "No strong fits — yet."}
+                ? t('trip.gmFitCount', { count: matches.length })
+                : t('trip.gmNoFits')}
             </h1>
             <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/55">
-              {fields?.title ? `${fields.title}` : "Your trip"}
+              {fields?.title ? `${fields.title}` : t('trip.gmYourTrip')}
               {fields?.destination ? ` · ${fields.destination}` : ""}
               {fields?.occasion ? ` · ${fields.occasion}` : ""}
             </p>
@@ -242,7 +243,7 @@ export default function GetMatchedPage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-4">
                       <Link to={`/creators/${m.id}`} className="text-[13px] text-[#0c4d47] underline underline-offset-4">
-                        View profile
+                        {t('trip.gmViewProfile')}
                       </Link>
                       <button
                         type="button"
@@ -250,7 +251,7 @@ export default function GetMatchedPage() {
                         disabled={sendingTo !== null}
                         className="rounded-full bg-[#0c4d47] px-6 py-2.5 text-sm text-[#E5DFC6] transition-colors hover:bg-[#073331] disabled:opacity-50"
                       >
-                        {sendingTo === m.id ? "Sending…" : "Send them this trip"}
+                        {sendingTo === m.id ? t('trip.gmSending') : t('trip.gmSendThem')}
                       </button>
                     </div>
                   </div>
@@ -276,10 +277,10 @@ export default function GetMatchedPage() {
                 }
               >
                 {sendingTo === "__all__"
-                  ? "Posting…"
+                  ? t('trip.gmPosting')
                   : matches.length > 0
-                  ? "Or post to all specialists instead →"
-                  : "Post to all specialists"}
+                  ? t('trip.gmPostAllInstead')
+                  : t('trip.gmPostAll')}
               </button>
             </div>
           </>
