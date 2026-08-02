@@ -1,12 +1,14 @@
 // Founder statement — authentic "why we exist" from the founder (no customer
 // reviews yet). Layout mirrors Fora's advisor-quote block: left-aligned large
 // serif quote, then a horizontal row of round photo + name/title beneath.
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import founderPhoto from "@/assets/founder.webp";
 
 const inter = { fontFamily: "Inter, sans-serif" } as const;
 
 export function FounderNote() {
+  const { t } = useTranslation();
   const [imgOk, setImgOk] = useState(true);
 
   return (
@@ -16,17 +18,15 @@ export function FounderNote() {
           className="text-[12px] font-medium uppercase tracking-[0.24em] text-[#8a7136]"
           style={inter}
         >
-          Why we built Goldsainte
+          {t("home.founderNote.eyebrow", "Why we built Goldsainte")}
         </span>
 
         <blockquote className="mt-6">
           <p className="font-secondary text-[22px] leading-[1.5] text-[#0a2225] md:text-[28px] md:leading-[1.5]">
-            &ldquo;Travel discovery already happens on social — what&rsquo;s been
-            missing is everything after the inspiration. We built Goldsainte so
-            the person who inspired your trip can actually design it, lead it, and
-            earn from it — and so the person you trust with your journey is
-            exactly who you pay, on a marketplace that stands behind every
-            specialist.&rdquo;
+            {t(
+              "home.founderNote.quote",
+              "\u201cTravel discovery already happens on social \u2014 what\u2019s been missing is everything after the inspiration. We built Goldsainte so the person who inspired your trip can actually design it, lead it, and earn from it \u2014 and so the person you trust with your journey is exactly who you pay, on a marketplace that stands behind every specialist.\u201d"
+            )}
           </p>
         </blockquote>
 
@@ -34,7 +34,7 @@ export function FounderNote() {
           {imgOk ? (
             <img
               src={founderPhoto}
-              alt="Andre Powell, Founder & CEO of Goldsainte"
+              alt={t("home.founderNote.alt", "Andre Powell, Founder & CEO of Goldsainte")}
               loading="lazy"
               onError={() => setImgOk(false)}
               className="h-14 w-14 flex-none rounded-full object-cover"
@@ -50,7 +50,7 @@ export function FounderNote() {
               Andre Powell
             </p>
             <p className="text-[15px] text-[#0a2225]/55" style={inter}>
-              Founder &amp; CEO, Goldsainte
+              {t("home.founderNote.role", "Founder & CEO, Goldsainte")}
             </p>
           </div>
         </div>
