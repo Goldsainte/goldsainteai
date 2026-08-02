@@ -21,63 +21,68 @@ export const Footer = () => {
 
   const columns = [
     {
+      headingKey: "footer.colExplore",
       heading: "EXPLORE",
       links: [
-        { to: "/marketplace", label: "Browse Trips" },
-        { to: "/creators", label: "Browse Creators" },
-        { to: "/post-trip", label: "Post a Trip" },
-        { to: "/agents", label: "Find a Specialist" },
+        { to: "/marketplace", labelKey: "footer.browseTrips", label: "Browse Trips" },
+        { to: "/creators", labelKey: "footer.browseCreators", label: "Browse Creators" },
+        { to: "/post-trip", labelKey: "footer.postTrip", label: "Post a Trip" },
+        { to: "/agents", labelKey: "footer.findSpecialist", label: "Find a Specialist" },
       ],
     },
     {
+      headingKey: "footer.colJoin",
       heading: "JOIN GOLDSAINTE",
       links: [
-        { to: "/auth?mode=signup&role=traveler", label: "Sign Up as a Traveler" },
+        { to: "/auth?mode=signup&role=traveler", labelKey: "footer.signupTraveler", label: "Sign Up as a Traveler" },
         // Restored Jul 26. Creator is one of the three live signup roles
         // (SIGNUP_ROLES in Auth.tsx) and has a card in the picker, but the
         // footer link went missing during the tour-operator cleanup — leaving
         // creators with no footer entry point at all.
-        { to: "/auth?mode=signup&role=creator", label: "Join as a Creator" },
-        { to: "/auth?mode=signup&role=agent", label: "Apply as a Travel Agent" },
+        { to: "/auth?mode=signup&role=creator", labelKey: "footer.joinCreator", label: "Join as a Creator" },
+        { to: "/auth?mode=signup&role=agent", labelKey: "footer.applyAgent", label: "Apply as a Travel Agent" },
       ],
     },
     {
+      headingKey: "footer.colCompany",
       heading: "COMPANY",
       links: [
-        { to: "/about", label: "About Goldsainte" },
-        { to: "/newsroom", label: "Newsroom" },
-        { to: "/newsroom/press-contact", label: "Press" },
-        { to: "/corporate-contact", label: "Contact Us" },
+        { to: "/about", labelKey: "footer.aboutGs", label: "About Goldsainte" },
+        { to: "/newsroom", labelKey: "footer.newsroomL", label: "Newsroom" },
+        { to: "/newsroom/press-contact", labelKey: "footer.pressL", label: "Press" },
+        { to: "/corporate-contact", labelKey: "footer.contactUs", label: "Contact Us" },
       ],
     },
     {
+      headingKey: "footer.colStarted",
       heading: "GETTING STARTED",
       links: [
-        { to: "/how-it-works/traveler", label: "For Travelers" },
-        { to: "/how-it-works/creator", label: "For Creators" },
-        { to: "/how-it-works/agent", label: "For Agents" },
-        { to: "/help/supported-countries", label: "Where we're available" },
-        { to: "/help/payments-and-fees", label: "Payments and fees" },
+        { to: "/how-it-works/traveler", labelKey: "footer.forTravelers", label: "For Travelers" },
+        { to: "/how-it-works/creator", labelKey: "footer.forCreators", label: "For Creators" },
+        { to: "/how-it-works/agent", labelKey: "footer.forAgents", label: "For Agents" },
+        { to: "/help/supported-countries", labelKey: "footer.whereAvailable", label: "Where we're available" },
+        { to: "/help/payments-and-fees", labelKey: "footer.paymentsFees", label: "Payments and fees" },
       ],
     },
     {
+      headingKey: "footer.colSupport",
       heading: "SUPPORT",
       links: [
-        { to: "/help", label: "Help Center" },
-        { to: "/trust-safety", label: "Safety & Trust" },
-        { to: "/cancellation-refund-policy", label: "Cancellation Policy" },
-        { to: "/community-guidelines", label: "Community Guidelines" },
-        { to: "/privacy-cookies", label: "Privacy Policy" },
+        { to: "/help", labelKey: "footer.helpCenter", label: "Help Center" },
+        { to: "/trust-safety", labelKey: "footer.safetyTrust", label: "Safety & Trust" },
+        { to: "/cancellation-refund-policy", labelKey: "footer.cancellationPolicy", label: "Cancellation Policy" },
+        { to: "/community-guidelines", labelKey: "footer.communityGuidelines", label: "Community Guidelines" },
+        { to: "/privacy-cookies", labelKey: "footer.privacyPolicy", label: "Privacy Policy" },
       ],
     },
   ];
 
   const legalLinks = [
-    { to: "/privacy-cookies", label: "Privacy Policy" },
-    { to: "/terms", label: "Terms of Service" },
-    { to: "/legal/creator-agreement", label: "Creator Agreement" },
-    { to: "/legal/agent-agreement", label: "Agent Agreement" },
-    { to: "/dispute-resolution", label: "Dispute Resolution" },
+    { to: "/privacy-cookies", labelKey: "footer.privacyPolicy", label: "Privacy Policy" },
+    { to: "/terms", labelKey: "footer.termsOfService", label: "Terms of Service" },
+    { to: "/legal/creator-agreement", labelKey: "footer.creatorAgreement", label: "Creator Agreement" },
+    { to: "/legal/agent-agreement", labelKey: "footer.agentAgreement", label: "Agent Agreement" },
+    { to: "/dispute-resolution", labelKey: "footer.disputeRes", label: "Dispute Resolution" },
   ];
 
   return (
@@ -92,12 +97,12 @@ export const Footer = () => {
               value={col.heading}
               className={i === columns.length - 1 ? "border-b-0" : "border-[#E5DFC6]"}
             >
-              <AccordionTrigger className={headingClasses}>{col.heading}</AccordionTrigger>
+              <AccordionTrigger className={headingClasses}>{t(col.headingKey, col.heading)}</AccordionTrigger>
               <AccordionContent>
                 <ul className="space-y-3 text-sm">
                   {col.links.map((l) => (
                     <li key={l.label}>
-                      <Link to={l.to} className={linkClasses}>{l.label}</Link>
+                      <Link to={l.to} className={linkClasses}>{t(l.labelKey, l.label)}</Link>
                     </li>
                   ))}
                 </ul>
@@ -110,11 +115,11 @@ export const Footer = () => {
         <div className="hidden md:grid grid-cols-5 gap-8 mb-12">
           {columns.map((col) => (
             <div key={col.heading}>
-              <h4 className={headingClasses}>{col.heading}</h4>
+              <h4 className={headingClasses}>{t(col.headingKey, col.heading)}</h4>
               <ul className="space-y-3 text-sm">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link to={l.to} className={linkClasses}>{l.label}</Link>
+                    <Link to={l.to} className={linkClasses}>{t(l.labelKey, l.label)}</Link>
                   </li>
                 ))}
               </ul>
@@ -176,18 +181,18 @@ export const Footer = () => {
         <div className="pt-2">
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5 text-center">
             {legalLinks.map((l) => (
-              <Link key={l.label} to={l.to} className={legalLinkClasses}>{l.label}</Link>
+              <Link key={l.label} to={l.to} className={legalLinkClasses}>{t(l.labelKey, l.label)}</Link>
             ))}
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent("show-install-prompt"))}
               className={legalLinkClasses}
             >
-              Install App
+              {t("footer.installApp", "Install App")}
             </button>
           </div>
           <div className="mt-4 flex flex-col items-center gap-2">
-            <span className="text-xs text-[#9A9079]">© 2026 Goldsainte AI Inc. All rights reserved.</span>
+            <span className="text-xs text-[#9A9079]">{t("footer.copyright", "© 2026 Goldsainte AI Inc. All rights reserved.")}</span>
             <LanguageSelector className="gap-2 text-[#9A9079] hover:text-[#E5DFC6] transition-colors" />
           </div>
         </div>
