@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,12 +52,12 @@ import {
 // stay intact behind this flag (nothing was deleted).
 const SHOW_PORTFOLIO_STEP = false;
 const STEPS = [
-  { title: "About You", icon: User },
-  { title: "Social Profile", icon: Globe },
-  { title: "Your Niche", icon: Sparkles },
-  ...(SHOW_PORTFOLIO_STEP ? [{ title: "Portfolio", icon: Image }] : []),
-  { title: "Get Hired", icon: Plane },
-  { title: "Standards", icon: Shield },
+  { title: "creatorApp.stAbout", icon: User },
+  { title: "creatorApp.stSocial", icon: Globe },
+  { title: "creatorApp.stNiche", icon: Sparkles },
+  ...(SHOW_PORTFOLIO_STEP ? [{ title: "creatorApp.stPortfolio", icon: Image }] : []),
+  { title: "creatorApp.stHired", icon: Plane },
+  { title: "creatorApp.stStandards", icon: Shield },
 ];
 // Step indices shift when Portfolio is hidden, so derive them from the flag.
 const PORTFOLIO_STEP_INDEX = 3;
@@ -64,32 +65,32 @@ const GET_HIRED_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 4 : 3;
 const STANDARDS_STEP_INDEX = SHOW_PORTFOLIO_STEP ? 5 : 4;
 
 const TRAVEL_NICHES = [
-  { value: "luxury", label: "Luxury & Ultra-Luxury", description: "5-star resorts, private villas, exclusive experiences" },
-  { value: "adventure", label: "Adventure & Outdoors", description: "Hiking, diving, safaris, extreme sports" },
-  { value: "wellness", label: "Wellness & Spa", description: "Retreats, yoga, meditation, healing journeys" },
-  { value: "culinary", label: "Food & Culinary", description: "Fine dining, cooking classes, food tours" },
-  { value: "cultural", label: "Culture & History", description: "Museums, architecture, local traditions" },
-  { value: "romantic", label: "Romantic & Honeymoons", description: "Couples getaways, proposals, anniversaries" },
-  { value: "family", label: "Family Travel", description: "Kid-friendly destinations, multi-gen trips" },
-  { value: "solo", label: "Solo Travel", description: "Independent journeys, self-discovery" },
-  { value: "design", label: "Design Hotels", description: "Boutique, architectural gems, aesthetic stays" },
-  { value: "sustainable", label: "Sustainable Travel", description: "Eco-lodges, conservation, responsible tourism" },
+  { value: "luxury", label: "creatorApp.nicheLuxury", description: "creatorApp.nicheLuxuryD" },
+  { value: "adventure", label: "creatorApp.nicheAdventure", description: "creatorApp.nicheAdventureD" },
+  { value: "wellness", label: "creatorApp.nicheWellness", description: "creatorApp.nicheWellnessD" },
+  { value: "culinary", label: "creatorApp.nicheCulinary", description: "creatorApp.nicheCulinaryD" },
+  { value: "cultural", label: "creatorApp.nicheCultural", description: "creatorApp.nicheCulturalD" },
+  { value: "romantic", label: "creatorApp.nicheRomantic", description: "creatorApp.nicheRomanticD" },
+  { value: "family", label: "creatorApp.nicheFamily", description: "creatorApp.nicheFamilyD" },
+  { value: "solo", label: "creatorApp.nicheSolo", description: "creatorApp.nicheSoloD" },
+  { value: "design", label: "creatorApp.nicheDesign", description: "creatorApp.nicheDesignD" },
+  { value: "sustainable", label: "creatorApp.nicheSustainable", description: "creatorApp.nicheSustainableD" },
 ];
 
 const CONTENT_STYLES = [
-  { value: "cinematic", label: "Cinematic", description: "High-production, movie-like visuals" },
-  { value: "documentary", label: "Documentary", description: "Storytelling, in-depth exploration" },
-  { value: "vlog", label: "Vlog-style", description: "Personal, day-in-the-life content" },
-  { value: "photo", label: "Photo-focused", description: "Stunning photography, visual inspiration" },
-  { value: "guides", label: "Guides & Tips", description: "Practical advice, how-tos, itineraries" },
-  { value: "aesthetic", label: "Aesthetic & Mood", description: "Vibes, atmosphere, sensory content" },
+  { value: "cinematic", label: "creatorApp.styleCinematic", description: "creatorApp.styleCinematicD" },
+  { value: "documentary", label: "creatorApp.styleDocumentary", description: "creatorApp.styleDocumentaryD" },
+  { value: "vlog", label: "creatorApp.styleVlog", description: "creatorApp.styleVlogD" },
+  { value: "photo", label: "creatorApp.stylePhoto", description: "creatorApp.stylePhotoD" },
+  { value: "guides", label: "creatorApp.styleGuides", description: "creatorApp.styleGuidesD" },
+  { value: "aesthetic", label: "creatorApp.styleAesthetic", description: "creatorApp.styleAestheticD" },
 ];
 
 const BUDGET_LEVELS = [
-  { value: "budget", label: "Budget-Friendly", description: "Under $100/day experiences" },
-  { value: "mid", label: "Mid-Range", description: "$100-300/day sweet spot" },
-  { value: "luxury", label: "Luxury", description: "$300-1000/day experiences" },
-  { value: "ultra", label: "Ultra-Luxury", description: "$1000+/day exclusive" },
+  { value: "budget", label: "creatorApp.budgetBudget", description: "creatorApp.budgetBudgetD" },
+  { value: "mid", label: "creatorApp.budgetMid", description: "creatorApp.budgetMidD" },
+  { value: "luxury", label: "creatorApp.budgetLuxury", description: "creatorApp.budgetLuxuryD" },
+  { value: "ultra", label: "creatorApp.budgetUltra", description: "creatorApp.budgetUltraD" },
 ];
 
 const PLATFORMS = [
@@ -114,6 +115,7 @@ const RESPONSE_TIMES = [
 ];
 
 export default function CreatorOnboardingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
@@ -649,7 +651,7 @@ export default function CreatorOnboardingPage() {
         </div>
 
         <div className="mb-8">
-          <LuxuryStepIndicator steps={STEPS} currentStep={currentStep} onStepClick={setCurrentStep} />
+          <LuxuryStepIndicator steps={STEPS.map((st) => ({ ...st, title: t(st.title) }))} currentStep={currentStep} onStepClick={setCurrentStep} />
         </div>
 
         <div className="relative">
@@ -863,8 +865,8 @@ export default function CreatorOnboardingPage() {
                     {TRAVEL_NICHES.map((niche) => (
                       <LuxurySelectionCard
                         key={niche.value}
-                        label={niche.label}
-                        description={niche.description}
+                        label={t(niche.label)}
+                        description={t(niche.description)}
                         selected={selectedNiches.includes(niche.value)}
                         onSelect={() => toggleSelection(setSelectedNiches, niche.value)}
                       />
@@ -878,8 +880,8 @@ export default function CreatorOnboardingPage() {
                     {CONTENT_STYLES.map((style) => (
                       <LuxurySelectionCard
                         key={style.value}
-                        label={style.label}
-                        description={style.description}
+                        label={t(style.label)}
+                        description={t(style.description)}
                         selected={selectedStyles.includes(style.value)}
                         onSelect={() => toggleSelection(setSelectedStyles, style.value)}
                       />
@@ -893,8 +895,8 @@ export default function CreatorOnboardingPage() {
                     {BUDGET_LEVELS.map((budget) => (
                       <LuxurySelectionCard
                         key={budget.value}
-                        label={budget.label}
-                        description={budget.description}
+                        label={t(budget.label)}
+                        description={t(budget.description)}
                         selected={selectedBudgets.includes(budget.value)}
                         onSelect={() => toggleSelection(setSelectedBudgets, budget.value)}
                       />
