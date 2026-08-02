@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,14 +51,14 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
   const currencySymbol = currencyInfo.symbol;
 
   const formatTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleTimeString('en-US', { 
+    return new Date(dateTime).toLocaleTimeString(gsIntlLocale(), { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
   };
 
   const formatDate = (dateTime: string) => {
-    return new Date(dateTime).toLocaleDateString('en-US', { 
+    return new Date(dateTime).toLocaleDateString(gsIntlLocale(), { 
       month: 'short', 
       day: 'numeric' 
     });
