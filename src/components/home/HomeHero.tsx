@@ -98,7 +98,7 @@ export function HomeHero() {
               className="mt-7 text-center md:text-left text-[12.5px] md:text-[13px] font-semibold uppercase tracking-[0.26em] text-[#8a7136]"
               style={inter}
             >
-              {t("home.heroV2.eyebrow", "The Smarter Travel Marketplace")}
+              {t("home.heroV2.eyebrow", "The Social Marketplace for Travel")}
             </p>
             <span aria-hidden="true" className="mx-auto md:mx-0 mt-2.5 block h-px w-11 bg-[#C7A962]" />
 
@@ -112,7 +112,7 @@ export function HomeHero() {
             <p className="mt-4 text-center md:text-left max-w-xl mx-auto md:mx-0 text-[15px] md:text-[17px] leading-relaxed text-[#3f4a4b]">
               {t(
                 "home.heroV2.sub",
-                "Wherever you're dreaming of, someone who knows it is here. Creators bring you the inspiration; certified specialists design your trip by hand. Post your dream trip, compare their proposals, and book yours directly — payments secured by Stripe."
+                "Discover, plan and book travel through creators and travel specialists — each with their own storefront, expertise and direct messaging. Payments secured by Stripe."
               )}
             </p>
 
