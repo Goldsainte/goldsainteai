@@ -35,7 +35,18 @@
     "navCreators": "Creator",
     "navSpecialists": "Spezialisten",
     "navPartner": "Partner",
-    "getStarted": "Loslegen"
+    "getStarted": "Loslegen",
+    "menuMarketplace": "Marktplatz",
+    "menuMarketplaceD": "Kuratierte Reisen entdecken",
+    "menuTours": "Touren",
+    "menuToursD": "Buchbare Touren und Erlebnisse",
+    "menuGuides": "Reiseguides",
+    "menuGuidesD": "Tag-für-Tag-Guides zum Herunterladen",
+    "menuPostTrip": "Reiseanfrage ausschreiben",
+    "menuPostTripD": "Maßgeschneiderte Angebote von Spezialisten erhalten",
+    "menuAgent": "Agent werden",
+    "menuAgentD": "Reisen gestalten und als offizieller Verkäufer verkaufen",
+    "agentPromoD": "Bringen Sie Ihr Wissen ein und verdienen Sie an jeder Reise, die Sie umsetzen."
   },
   "common": {
     "loading": "Wird geladen...",
@@ -305,12 +316,13 @@
     "heroV2": {
       "eyebrow": "Der soziale Marktplatz fürs Reisen",
       "sub": "Entdecken, planen und buchen Sie Reisen über Creator und Spezialisten — jeder mit eigener Storefront, Expertise und Direktnachrichten. Zahlungen über Stripe gesichert.",
-      "h": "Reisen, gestaltet von Menschen, die dort waren.",
       "postDream": "Traumreise ausschreiben →",
       "twoDoorsQ": "Travel-Creator oder Reiseexperte?",
       "openStorefront": "Eigenes Schaufenster eröffnen →",
       "popularTrips": "Beliebte Reisen",
-      "viewAll": "Alle ansehen →"
+      "viewAll": "Alle ansehen →",
+      "h1a": "Reisen, gestaltet von Menschen,",
+      "h1b": "die dort waren."
     },
     "dreamTrip": {
       "eyebrow": "Für Reisende",
@@ -1128,5 +1140,45 @@
     "petsSub": "Reisen Sie mit einem Assistenztier?",
     "openSearch": "Suche öffnen",
     "setTravelers": "Anzahl der Reisenden festlegen"
+  },
+  "directory": {
+    "agentTitle": "Unsere Reisespezialisten",
+    "agentSub": "Finden Sie einen Reisespezialisten, der Sie versteht, und gestalten Sie gemeinsam Ihre Traumreise — sicher gebucht über Goldsainte.",
+    "creatorTitle": "Unsere Travel-Creator",
+    "creatorSub": "Folgen Sie Creators, deren Reisen Sie inspirieren — und machen Sie aus ihren Inhalten Ihre nächste Reise, sicher gebucht über Goldsainte.",
+    "moreN": "+{{count}} weitere",
+    "searchAgents": "Spezialisten, Reiseziele suchen …",
+    "searchCreators": "Creator, Nischen, Orte suchen …",
+    "clear": "Löschen",
+    "agentsSoon": "Spezialisten bald verfügbar",
+    "creatorsSoon": "Creator bald verfügbar",
+    "postToMatch": "Schreiben Sie Ihre Reise aus — wir vermitteln Sie.",
+    "noMatches": "Keine Treffer",
+    "clearAll": "Filter löschen und alle anzeigen",
+    "getMatched": "Vermitteln lassen"
+  },
+  "specialistsPage": {
+    "kicker": "Spezialisten",
+    "h1": "Ausgewählt, nicht gelistet.",
+    "sub": "Jeder Spezialist kommt per Bewerbung zu Goldsainte — Identität verifiziert, Referenzen und Versicherung von unserem Team geprüft, bevor eine einzige Reise verkauft wird. Die Gründungskohorte wird gerade zusammengestellt.",
+    "doesKicker": "Was ein Goldsainte-Spezialist tut",
+    "w1s": "Beantwortet echte Anfragen.",
+    "w1r": "Reisende posten die Reisen, die sie sich wünschen; Spezialisten antworten mit maßgeschneiderten Angeboten — Reiseplan, Preis und Zeitrahmen.",
+    "w2s": "Veröffentlicht eigene Reisen.",
+    "w2r": "Schnüren Sie die Reisen, die Sie auswendig kennen, und bieten Sie sie unter Ihrem Namen an, zu Ihrem Preis, direkt buchbar.",
+    "w3s": "Wird direkt bezahlt.",
+    "w3r": "Jede Zahlung läuft über Ihr eigenes Stripe-Konto — Sie sind der offizielle Verkäufer.",
+    "howKicker": "Wie die Gründungskohorte ausgewählt wird",
+    "h1r": "Eine Bewerbung in zehn Minuten — Ihr Geschäft, Ihre Referenzen, Versicherung und Expertise.",
+    "h2r": "Identitätsprüfung über Stripe, in etwa zwei Minuten.",
+    "h3r": "Menschliche Prüfung, mit Entscheidung per E-Mail innerhalb von ein bis zwei Werktagen.",
+    "feePara": "Sie bestimmen Ihren Preis — Kosten und Marge gehören Ihnen. Goldsaintes Plattformgebühr beträgt pauschal 3,5 %, fällig bei Buchung; der Rest landet auf Ihrem eigenen Stripe-Konto, denn Sie sind bei jeder verkauften Reise der offizielle Verkäufer.",
+    "feeCaption": "Goldsaintes feste Plattformgebühr",
+    "closing": "Die Reisenden kommen. Die Kohorte ist bewusst klein. Wenn Sie Reisen mit echter Expertise verkaufen, ist jetzt der Moment, früh dabei zu sein.",
+    "applyCta": "Jetzt bewerben",
+    "browseCta": "Die Reisen ansehen, die Reisende gerade buchen →",
+    "alreadyApplied": "Schon beworben?",
+    "checkStatus": "Melden Sie sich jederzeit an, um Ihren Bewerbungsstatus einzusehen.",
+    "questions": "Fragen zum Weg zum Spezialisten —"
   }
 }
