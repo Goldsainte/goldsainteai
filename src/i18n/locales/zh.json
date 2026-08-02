@@ -324,10 +324,9 @@
       }
     },
     "heroV2": {
-      "eyebrow": "更聪明的旅行市场",
-      "h1a": "由真正去过的人",
-      "h1b": "为你打造的旅程。",
-      "sub": "无论你梦想去哪里，这里都有真正了解那里的人。创作者带来灵感，认证专家为你亲手设计行程。发布你的梦想之旅，比较他们的方案，并直接预订——付款由 Stripe 安全保障。"
+      "eyebrow": "旅行的社交市场",
+      "sub": "通过创作者与旅行专家发现、规划并预订旅行 — 每个人都有自己的主页、专长与私信。支付由 Stripe 保护。",
+      "h": "由去过的人打造的旅程。"
     }
   },
   "navigation": {
@@ -380,7 +379,7 @@
     "investorRelations": "投资者关系",
     "corporateContact": "企业联系",
     "followUs": "关注我们：",
-    "description": "Goldsainte AI是Goldsainte Inc.的一部分，是AI驱动的豪华旅行和精选体验的全球领导者。发现。创作。分享。与Goldsainte一起旅行。",
+    "description": "旅行的社交市场 — 通过个人主页、私信与可预订旅行的全球市场，连接旅行者与创作者及独立旅行专家。",
     "copyright": "版权所有 © 2025 Goldsainte.Ai™。保留所有权利。",
     "creatorMarketplace": "创作者市场",
     "creatorStudio": "创作者控制台"
@@ -881,5 +880,21 @@
     "ptPosted": "旅行已发布。创作者和代理将在此回应。",
     "ptWrong": "发布旅行时出了问题。",
     "ptPostThis": "发布这次旅行"
+  },
+  "wd": {
+    "metaTitle": "我们做什么 — Goldsainte",
+    "kicker": "我们做什么",
+    "title": "旅行的社交市场。",
+    "intro": "Goldsainte 通过个人主页、私信以及可预订旅行、行程与定制提案的全球市场，连接旅行者与创作者及独立旅行专家。",
+    "creatorsT": "创作者带来灵感",
+    "creatorsB": "创作者分享他们亲身了解的地方 — 拥有主页、攻略与真正可预订的带队旅行。",
+    "specialistsT": "专家负责实现",
+    "specialistsB": "认证代理与规划师亲手设计旅程，以定制提案回应需求，并作为每笔预订的销售方。",
+    "travelersT": "旅行者一站搞定",
+    "travelersB": "发布旅行、比较提案、直接沟通并预订 — 从定金到出发，支付全程由 Stripe 保护。",
+    "moneyK": "资金如何运转",
+    "moneyB": "在 Goldsainte 预订的旅行由独立专业人士销售并直接收款。Goldsainte 只收取单一固定平台费 — 绝不在结账时加价，没有佣金迷宫。",
+    "closing": "社交发现遇见旅行交易 — 身份、内容、对话、提案与交易，尽在一个平台。",
+    "cta": "加入 Goldsainte"
   }
 }
