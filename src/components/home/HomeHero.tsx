@@ -133,13 +133,13 @@ export function HomeHero() {
                 anchors that become flex items, so we keep these inline). */}
             <p className="mt-5 text-center md:text-left text-[13.5px] leading-6 text-[#6B7280]" style={inter}>
               <Link to="/post-trip" className="whitespace-nowrap font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
-                Post your dream trip →
+                {t("home.heroV2.postDream", "Post your dream trip →")}
               </Link>
               <span aria-hidden="true" className="mx-3 hidden text-[#C7A962] md:inline">·</span>
               <span className="mt-1.5 block md:mt-0 md:inline md:whitespace-nowrap">
-                Travel creator or agent?{" "}
+                {t("home.heroV2.twoDoorsQ", "Travel creator or agent?")}{" "}
                 <a href="#storefronts" className="font-semibold text-[#0c4d47] underline decoration-[#C7A962] underline-offset-4 hover:decoration-[#8a7136]">
-                  Open your storefront →
+                  {t("home.heroV2.openStorefront", "Open your storefront →")}
                 </a>
               </span>
             </p>
@@ -149,13 +149,13 @@ export function HomeHero() {
               <div className="mt-8">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-[12px] font-medium uppercase tracking-[0.18em] text-[#0a2225]/60" style={inter}>
-                    Popular Trips
+                    {t("home.heroV2.popularTrips", "Popular Trips")}
                   </span>
                   <span className="h-px flex-1 bg-[#E5DFC6]" />
                   {/* Featured Trips section (and its view-all) was cut — the
                       marketplace door now lives here so inventory stays one tap away. */}
                   <Link to="/marketplace" className="whitespace-nowrap text-[13px] font-medium text-[#0c4d47] hover:underline" style={inter}>
-                    View all →
+                    {t("home.heroV2.viewAll", "View all →")}
                   </Link>
                 </div>
                 <div className="grid grid-cols-3 gap-2 md:gap-3">
