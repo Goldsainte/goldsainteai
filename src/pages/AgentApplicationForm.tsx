@@ -252,6 +252,7 @@ const luxuryInputClasses = "min-h-[48px] w-full max-w-full border-[#E5DFC6] bg-w
 const luxurySelectClasses = "min-h-[48px] border-[#E5DFC6] bg-white focus:border-[#C7A962] focus:ring-2 focus:ring-[#C7A962]/20 rounded-lg";
 
 function AgentApplicationFormInner() {
+  const { t } = useTranslation();
   const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
   const prefillData = location.state as {
@@ -1295,4 +1296,3 @@ export default function AgentApplicationForm() {
 
   return <AgentApplicationFormInner />;
 }
-  const { t } = useTranslation();
