@@ -30,7 +30,12 @@
     "preferencesEnabled": "환경설정 활성화됨",
     "preferencesDisabled": "환경설정 비활성화됨",
     "preferencesEnabledDesc": "검색 결과가 저장된 환경설정과 일치합니다",
-    "preferencesDisabledDesc": "검색 결과는 모든 사용 가능한 옵션을 표시합니다"
+    "preferencesDisabledDesc": "검색 결과는 모든 사용 가능한 옵션을 표시합니다",
+    "navTravel": "여행",
+    "navCreators": "크리에이터",
+    "navSpecialists": "전문가",
+    "navPartner": "파트너",
+    "getStarted": "시작하기"
   },
   "common": {
     "loading": "로딩 중...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "여행의 소셜 마켓플레이스",
       "sub": "크리에이터와 여행 전문가를 통해 여행을 발견하고 계획하고 예약하세요 — 각자 자신만의 스토어프런트, 전문성, 다이렉트 메시지를 갖추고 있습니다. 결제는 Stripe로 보호됩니다.",
-      "h": "그곳을 아는 사람들이 만드는 여행."
+      "h": "그곳을 아는 사람들이 만드는 여행.",
+      "postDream": "꿈의 여행 올리기 →",
+      "twoDoorsQ": "여행 크리에이터 또는 에이전트이신가요?",
+      "openStorefront": "스토어 열기 →",
+      "popularTrips": "인기 여행",
+      "viewAll": "전체 보기 →"
     },
     "dreamTrip": {
       "eyebrow": "여행자를 위해",
@@ -464,6 +474,38 @@
       "c2Body": "진짜 여행자들이 전 세계에서 꿈의 여행을 올립니다. 당신은 어디에 있든 맞춤 제안으로 답하면 됩니다. 예약과 동시에 정산 — 고객이 결제하는 순간 계약금과 잔금이 당신의 Stripe 계좌로 들어옵니다. 청구서도, 독촉도 없습니다.",
       "c2Cta": "전문가로 합류하기",
       "c2Alt": "황금빛 시간의 고급 다이닝 테이블"
+    },
+    "trustPlaque": {
+      "eyebrow": "신뢰와 안전",
+      "h2": "여행을 믿고 맡길 수 있도록 만들었습니다",
+      "sub": "모든 예약 뒤에 있는 네 가지 약속 — 검수되고, 인증되고, 보호되고, 끝까지 지원됩니다.",
+      "c1e": "검수",
+      "c1t": "공개 전에 모두 검수",
+      "c1b": "모든 여행, 가이드, 프로필은 마켓플레이스에 오르기 전에 Goldsainte 팀이 검수합니다. 검토 없이 공개되는 것은 없습니다.",
+      "c2e": "신원",
+      "c2t": "모든 계정 인증",
+      "c2b": "모든 크리에이터와 여행 에이전트는 상품을 올리거나 예약을 받기 전에 Stripe Identity 신원 인증을 완료합니다. 누구와 거래하는지 항상 알 수 있습니다.",
+      "c3e": "결제",
+      "c3t": "Stripe 보안 적용",
+      "c3b": "결제는 Stripe에서 처리되어 여행 에이전트에게 직접 지급됩니다 — 에이전트가 공식 판매자입니다. 카드 정보는 저희 서버에 닿지 않습니다.",
+      "c4e": "지원",
+      "c4t": "탑승까지 함께",
+      "c4b": "예약부터 탑승까지 전문가와 하나의 대화로 — 그리고 모든 여행 뒤에 Goldsainte 지원팀이 있습니다.",
+      "footPre": "전체 기준은 여기에서 확인하세요:",
+      "footLink": "신뢰와 안전 페이지"
+    },
+    "finalCta": {
+      "h2a": "다음 여행은",
+      "h2b": "여기서 시작됩니다.",
+      "sub": "실제로 다녀온 사람이 만든 여행을 찾아보세요 — 아니면 지금까지 다녀온 모든 곳으로 수익을 시작하세요.",
+      "cta1": "여행 둘러보기",
+      "cta2": "수익 시작하기"
+    },
+    "founderNote": {
+      "eyebrow": "Goldsainte를 만든 이유",
+      "quote": "“여행의 발견은 이미 소셜에서 일어나고 있습니다. 부족했던 건 영감 그 이후의 모든 것이었죠. 당신의 여행에 영감을 준 사람이 그 여행을 직접 설계하고, 이끌고, 수익으로 만들 수 있도록 — 그리고 여행을 맡긴 그 사람이 바로 당신이 돈을 지불하는 사람이 되도록, 모든 전문가를 책임지는 마켓플레이스 위에 Goldsainte를 만들었습니다.”",
+      "role": "창업자 겸 CEO, Goldsainte",
+      "alt": "Goldsainte 창업자 겸 CEO 안드레 파월"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "description": "여행의 소셜 마켓플레이스 — 개인 스토어프런트, 다이렉트 메시지, 예약 가능한 여행의 글로벌 마켓으로 여행자와 크리에이터·독립 전문가를 연결합니다.",
     "copyright": "저작권 © 2025 Goldsainte.Ai™. 모든 권리 보유.",
     "creatorMarketplace": "크리에이터 마켓플레이스",
-    "creatorStudio": "크리에이터 대시보드"
+    "creatorStudio": "크리에이터 대시보드",
+    "colExplore": "둘러보기",
+    "colJoin": "GOLDSAINTE 함께하기",
+    "colCompany": "회사",
+    "colStarted": "시작하기",
+    "colSupport": "지원",
+    "browseTrips": "여행 둘러보기",
+    "browseCreators": "크리에이터 둘러보기",
+    "postTrip": "여행 요청 올리기",
+    "findSpecialist": "전문가 찾기",
+    "signupTraveler": "여행자로 가입",
+    "joinCreator": "크리에이터로 참여",
+    "applyAgent": "여행 에이전트 지원",
+    "aboutGs": "Goldsainte 소개",
+    "newsroomL": "뉴스룸",
+    "pressL": "보도자료",
+    "contactUs": "문의하기",
+    "forTravelers": "여행자 안내",
+    "forCreators": "크리에이터 안내",
+    "forAgents": "에이전트 안내",
+    "whereAvailable": "이용 가능 지역",
+    "paymentsFees": "결제와 수수료",
+    "safetyTrust": "안전과 신뢰",
+    "cancellationPolicy": "취소 정책",
+    "privacyPolicy": "개인정보 처리방침",
+    "creatorAgreement": "크리에이터 약관",
+    "agentAgreement": "에이전트 약관",
+    "disputeRes": "분쟁 해결",
+    "installApp": "앱 설치"
   },
   "welcomeModal": {
     "title": "Goldsainte.Ai가 당신을 위해 할 수 있는 것",
@@ -1034,5 +1104,29 @@
     "moneyB": "Goldsainte에서 예약된 여행은 독립 전문가가 판매하며 직접 정산받습니다. Goldsainte는 단일 고정 플랫폼 수수료만 — 결제 시 추가되지 않으며, 복잡한 커미션 미로도 없습니다.",
     "closing": "소셜 발견이 여행 커머스를 만나다 — 정체성, 콘텐츠, 대화, 제안, 거래를 하나의 플랫폼에서.",
     "cta": "Goldsainte 가입하기"
+  },
+  "search": {
+    "where": "어디로",
+    "when": "언제",
+    "who": "누구와",
+    "searchDest": "여행지 검색",
+    "addDates": "날짜 추가",
+    "addGuests": "인원 추가",
+    "guestsN": "게스트 {{count}}명",
+    "whereTo": "어디로 떠나세요?",
+    "anywhere": "어디든지",
+    "anyDates": "날짜 미정",
+    "whereGoing": "어디로 가시나요?",
+    "checkInOut": "체크인 – 체크아웃",
+    "adults": "성인",
+    "adultsSub": "13세 이상",
+    "children": "어린이",
+    "childrenSub": "2–12세",
+    "infants": "유아",
+    "infantsSub": "2세 미만",
+    "pets": "반려동물",
+    "petsSub": "보조동물과 함께 여행하시나요?",
+    "openSearch": "검색 열기",
+    "setTravelers": "여행자 수 설정"
   }
 }
