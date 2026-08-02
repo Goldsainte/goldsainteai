@@ -30,7 +30,12 @@
     "preferencesEnabled": "Preferências ativadas",
     "preferencesDisabled": "Preferências desativadas",
     "preferencesEnabledDesc": "Os resultados da busca corresponderão às suas preferências salvas",
-    "preferencesDisabledDesc": "Os resultados da busca mostrarão todas as opções disponíveis"
+    "preferencesDisabledDesc": "Os resultados da busca mostrarão todas as opções disponíveis",
+    "navTravel": "Viajar",
+    "navCreators": "Criadores",
+    "navSpecialists": "Especialistas",
+    "navPartner": "Parcerias",
+    "getStarted": "Começar"
   },
   "common": {
     "loading": "Carregando...",
@@ -300,7 +305,12 @@
     "heroV2": {
       "eyebrow": "O marketplace social de viagens",
       "sub": "Descubra, planeie e reserve viagens com criadores e especialistas — cada um com a sua loja, experiência e mensagens diretas. Pagamentos protegidos pela Stripe.",
-      "h": "Viagens criadas por quem já lá esteve."
+      "h": "Viagens criadas por quem já lá esteve.",
+      "postDream": "Publique a viagem dos seus sonhos →",
+      "twoDoorsQ": "Criador de viagens ou agente?",
+      "openStorefront": "Abra a sua vitrine →",
+      "popularTrips": "Viagens populares",
+      "viewAll": "Ver tudo →"
     },
     "dreamTrip": {
       "eyebrow": "Para viajantes",
@@ -464,6 +474,38 @@
       "c2Body": "Viajantes de verdade publicam viagens dos sonhos do mundo inteiro; você responde com propostas sob medida — de onde estiver. Receba na reserva: depósitos e saldos caem na sua própria conta Stripe no momento em que o cliente paga. Sem fatura, sem cobrança.",
       "c2Cta": "Entrar como especialista",
       "c2Alt": "Mesa requintada de alta gastronomia na hora dourada"
+    },
+    "trustPlaque": {
+      "eyebrow": "Confiança e segurança",
+      "h2": "Feito para merecer a sua viagem",
+      "sub": "Quatro compromissos por trás de cada reserva — revisada, verificada, protegida e acompanhada, do início ao fim.",
+      "c1e": "Curadoria",
+      "c1t": "Revisado antes de ir ao ar",
+      "c1b": "Cada viagem, guia e perfil é revisado pela equipe da Goldsainte antes de chegar ao marketplace. Nada entra no ar sem ser visto.",
+      "c2e": "Identidade",
+      "c2t": "Cada conta, verificada",
+      "c2b": "Cada criador e agente de viagens completa a verificação Stripe Identity antes de poder anunciar ou aceitar uma reserva. Você sempre sabe com quem está lidando.",
+      "c3e": "Pagamentos",
+      "c3t": "Protegido pela Stripe",
+      "c3b": "O checkout roda na Stripe e paga o seu agente de viagens diretamente — ele é o seu vendedor oficial. Os dados do cartão nunca tocam os nossos servidores.",
+      "c4e": "Suporte",
+      "c4t": "Com você até o embarque",
+      "c4b": "Uma só conversa com o seu especialista da reserva ao embarque — e o suporte da Goldsainte por trás de cada viagem.",
+      "footPre": "Leia todos os padrões na nossa",
+      "footLink": "página de Confiança e segurança"
+    },
+    "finalCta": {
+      "h2a": "Sua próxima viagem",
+      "h2b": "começa aqui.",
+      "sub": "Encontre uma viagem criada por quem já esteve lá — ou comece a ganhar com todos os lugares por onde você passou.",
+      "cta1": "Explorar viagens",
+      "cta2": "Começar a ganhar"
+    },
+    "founderNote": {
+      "eyebrow": "Por que criamos a Goldsainte",
+      "quote": "“A descoberta de viagens já acontece nas redes — o que faltava era tudo o que vem depois da inspiração. Criamos a Goldsainte para que a pessoa que inspirou a sua viagem possa de fato desenhá-la, conduzi-la e viver disso — e para que a pessoa a quem você confia a sua viagem seja exatamente quem você paga, em um marketplace que responde por cada especialista.”",
+      "role": "Fundador e CEO, Goldsainte",
+      "alt": "Andre Powell, fundador e CEO da Goldsainte"
     }
   },
   "navigation": {
@@ -519,7 +561,35 @@
     "description": "O marketplace social de viagens — liga viajantes a criadores e especialistas independentes através de lojas pessoais, mensagens diretas e um marketplace global de viagens reserváveis.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Todos os direitos reservados.",
     "creatorMarketplace": "Marketplace de Criadores",
-    "creatorStudio": "Painel do Criador"
+    "creatorStudio": "Painel do Criador",
+    "colExplore": "EXPLORAR",
+    "colJoin": "ENTRE NA GOLDSAINTE",
+    "colCompany": "EMPRESA",
+    "colStarted": "PRIMEIROS PASSOS",
+    "colSupport": "SUPORTE",
+    "browseTrips": "Explorar viagens",
+    "browseCreators": "Explorar criadores",
+    "postTrip": "Publicar uma viagem",
+    "findSpecialist": "Encontrar um especialista",
+    "signupTraveler": "Cadastre-se como viajante",
+    "joinCreator": "Entre como criador",
+    "applyAgent": "Candidate-se como agente de viagens",
+    "aboutGs": "Sobre a Goldsainte",
+    "newsroomL": "Sala de imprensa",
+    "pressL": "Imprensa",
+    "contactUs": "Fale conosco",
+    "forTravelers": "Para viajantes",
+    "forCreators": "Para criadores",
+    "forAgents": "Para agentes",
+    "whereAvailable": "Onde estamos disponíveis",
+    "paymentsFees": "Pagamentos e taxas",
+    "safetyTrust": "Segurança e confiança",
+    "cancellationPolicy": "Política de cancelamento",
+    "privacyPolicy": "Política de privacidade",
+    "creatorAgreement": "Contrato do criador",
+    "agentAgreement": "Contrato do agente",
+    "disputeRes": "Resolução de disputas",
+    "installApp": "Instalar o app"
   },
   "welcomeModal": {
     "title": "O que Goldsainte.Ai pode fazer por você",
@@ -1034,5 +1104,29 @@
     "moneyB": "As viagens reservadas na Goldsainte são vendidas por profissionais independentes, pagos diretamente. A Goldsainte cobra uma única taxa fixa de plataforma — nunca somada no pagamento, nunca um labirinto de comissões.",
     "closing": "A descoberta social encontra o comércio de viagens — identidade, conteúdo, conversa, proposta e transação, numa só plataforma.",
     "cta": "Junte-se à Goldsainte"
+  },
+  "search": {
+    "where": "Onde",
+    "when": "Quando",
+    "who": "Quem",
+    "searchDest": "Buscar destinos",
+    "addDates": "Adicionar datas",
+    "addGuests": "Adicionar hóspedes",
+    "guestsN": "{{count}} hóspedes",
+    "whereTo": "Para onde?",
+    "anywhere": "Qualquer lugar",
+    "anyDates": "Qualquer data",
+    "whereGoing": "Para onde você vai?",
+    "checkInOut": "Check-in – Check-out",
+    "adults": "Adultos",
+    "adultsSub": "13 anos ou mais",
+    "children": "Crianças",
+    "childrenSub": "De 2 a 12 anos",
+    "infants": "Bebês",
+    "infantsSub": "Menores de 2 anos",
+    "pets": "Pets",
+    "petsSub": "Levando um animal de serviço?",
+    "openSearch": "Abrir busca",
+    "setTravelers": "Definir número de viajantes"
   }
 }
