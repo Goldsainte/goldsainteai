@@ -1673,7 +1673,16 @@
     "upcoming": "예정",
     "viewBreakdown": "내역 보기",
     "yourSpecialist": "나의 전문가",
-    "youreHere": "현재 위치"
+    "youreHere": "현재 위치",
+    "checkoutFailed": "결제를 시작하지 못했습니다. 다시 시도해 주세요. 계속되면 지원팀에 문의하세요.",
+    "customTrip": "나만의 맞춤 여행",
+    "due": "결제 예정",
+    "goldsainteTrip": "Goldsainte 여행",
+    "notFound": "예약을 찾을 수 없습니다.",
+    "payBalanceFee": "잔금 결제 — {{amount}} + 수수료 3.5%",
+    "payDepositFee": "계약금 결제 — {{amount}} + 수수료 3.5%",
+    "selectState": "위 결제 섹션에서 거주 주를 선택한 뒤 다시 시도해 주세요.",
+    "stateUnavailable": "캘리포니아, 플로리다, 하와이, 아이오와, 워싱턴 거주자는 아직 여행 예약을 이용할 수 없습니다."
   },
   "hire": {
     "acceptNote": "상대가 수락하고 계약금을 결제합니다 — 당신의 Stripe 계정으로 바로 입금됩니다.",
@@ -1948,5 +1957,38 @@
       "14-29": "출발 14–29일 전",
       "<14": "출발 14일 미만"
     }
+  },
+  "msg": {
+    "acceptFailed": "요청을 수락하지 못했습니다",
+    "convArchived": "대화를 보관했습니다",
+    "convDeleted": "대화를 삭제했습니다",
+    "convDeletedPerm": "대화를 영구 삭제했습니다",
+    "deleteFailed": "메시지를 삭제하지 못했습니다",
+    "error": "오류",
+    "fileTooLarge": "파일이 너무 큽니다",
+    "fileTooLargeD": "{{name}}이(가) 10MB를 초과합니다.",
+    "messageDeleted": "메시지를 삭제했습니다",
+    "openAttachFailed": "첨부 파일을 열지 못했습니다",
+    "requestAccepted": "요청을 수락했습니다",
+    "requestAcceptedD": "이제 서로 메시지를 보낼 수 있습니다.",
+    "requestDeclined": "요청을 거절했습니다",
+    "tryAgain": "다시 시도해 주세요.",
+    "uploadFailed": "업로드 실패",
+    "userBlocked": "사용자를 차단했습니다"
+  },
+  "sett": {
+    "checkoutOpened": "새 탭에서 결제가 열렸습니다",
+    "clearCacheFailed": "검색 캐시를 지우지 못했습니다",
+    "imageTooLarge": "이미지는 5MB 미만이어야 합니다",
+    "loadProfileFailed": "프로필을 불러오지 못했습니다",
+    "openingCheckout": "결제 여는 중…",
+    "paySuccess": "결제 완료! 인증 상태를 확인 중…",
+    "photoFailed": "사진을 업로드하지 못했습니다",
+    "photoUpdated": "프로필 사진이 업데이트되었습니다!",
+    "profileUpdated": "프로필이 업데이트되었습니다!",
+    "selectImage": "이미지 파일을 선택해 주세요",
+    "updateProfileFailed": "프로필을 업데이트하지 못했습니다",
+    "verifCancelled": "인증이 취소되었습니다",
+    "verifStartFailed": "인증을 시작하지 못했습니다"
   }
 }
