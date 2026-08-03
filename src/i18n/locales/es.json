@@ -1291,5 +1291,49 @@
       "quietAdventureK": "Soledad merecida"
     },
     "disclaimer": "Goldsainte es un marketplace de viajes. Todos los viajes son diseñados y realizados por especialistas, agentes y proveedores independientes. Las propuestas a solicitudes de viaje reflejan sus propias condiciones de cancelación, reembolso y depósito."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "Tu pipeline",
+      "h1": "Mis propuestas",
+      "desc": "Cada propuesta que has enviado — y en qué punto está cada una."
+    },
+    "card": {
+      "proposer": "Autor de la propuesta",
+      "unnamed": "Creador/agente sin nombre",
+      "roleAgent": "Agente de viajes",
+      "roleCreator": "Creador",
+      "estTotal": "Total estimado",
+      "itinerary": "Resumen del itinerario",
+      "noItinerary": "No se proporcionó itinerario.",
+      "included": "Qué incluye",
+      "notIncluded": "No incluido / extras opcionales",
+      "terms": "Condiciones de cancelación y pago"
+    },
+    "status": {
+      "awaiting": "Pendiente de revisión",
+      "underReview": "En revisión",
+      "accepted": "Aceptada",
+      "declined": "Rechazada",
+      "withdrawn": "Retirada",
+      "expired": "Expirada"
+    },
+    "list": {
+      "tripNotFound": "Viaje no encontrado.",
+      "loadFailed": "No se pudieron cargar las propuestas.",
+      "tripFallback": "Viaje",
+      "back": "Volver a los viajes",
+      "eyebrow": "Propuestas recibidas",
+      "optionsFor": "Opciones para «{{title}}»",
+      "compareSub": "Compara propuestas de creadores y agentes de viajes lado a lado. Abre cualquiera para ver todos los detalles y pasar al flujo de reserva protegido de Goldsainte.",
+      "destination": "Destino",
+      "budget": "Presupuesto",
+      "noBudget": "Sin presupuesto definido",
+      "datesFlexible": "Fechas flexibles",
+      "emptyTitle": "Aún no hay propuestas",
+      "emptyDesc": "A medida que creadores y agentes respondan, aparecerán aquí para que puedas compararlas antes de decidir.",
+      "proposalOne": "propuesta",
+      "proposalMany": "propuestas"
+    }
   }
 }
