@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { UserCircle } from "lucide-react";
 import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
 
@@ -32,6 +33,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
     ? `Complexity ${adminComplexityScore}/10` 
     : null;
 
+  const { t } = useTranslation();
   return (
     <div className="rounded-2xl border border-border bg-background p-5 shadow-sm">
       {/* Header */}
@@ -40,7 +42,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
           {proposal?.proposer?.avatar_url ? (
             <img
               src={proposal.proposer.avatar_url}
-              alt={proposal.proposer.full_name || "Proposer"}
+              alt={proposal.proposer.full_name || t("prop.card.proposer", "Proposer")}
               className="h-10 w-10 rounded-full object-cover"
             loading="lazy"/>
           ) : (
@@ -49,10 +51,10 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
 
           <div className="space-y-[2px]">
             <p className="text-sm font-semibold text-foreground">
-              {proposal?.proposer?.full_name || "Unnamed Creator/Agent"}
+              {proposal?.proposer?.full_name || t("prop.card.unnamed", "Unnamed Creator/Agent")}
             </p>
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              {proposal?.proposer_role === "agent" ? "Travel Agent" : "Creator"}
+              {proposal?.proposer_role === "agent" ? t("prop.card.roleAgent", "Travel Agent") : t("prop.card.roleCreator", "Creator")}
             </p>
             
             {/* Admin-only triage pills */}
@@ -78,7 +80,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
           <p className="text-base font-semibold text-foreground">
             {proposal.price_from != null ? `$${proposal.price_from.toLocaleString()}` : "—"}
           </p>
-          <p className="text-[11px] text-muted-foreground">Estimated total</p>
+          <p className="text-[11px] text-muted-foreground">{t("prop.card.estTotal", "Estimated total")}</p>
         </div>
       </div>
 
@@ -87,10 +89,10 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
       {/* Itinerary Overview */}
       <div className="mt-4 space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          Itinerary Overview
+          {t("prop.card.itinerary", "Itinerary Overview")}
         </p>
         <p className="text-xs leading-relaxed text-foreground">
-          {proposal.message || "No itinerary provided."}
+          {proposal.message || t("prop.card.noItinerary", "No itinerary provided.")}
         </p>
       </div>
 
@@ -98,7 +100,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
       {proposal.inclusions && (
         <div className="mt-4 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            What&apos;s Included
+            {t("prop.card.included", "What's Included")}
           </p>
           <p className="text-xs leading-relaxed whitespace-pre-line text-foreground">
             {proposal.inclusions}
@@ -110,7 +112,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
       {proposal.exclusions && (
         <div className="mt-4 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Not Included / Optional Add-ons
+            {t("prop.card.notIncluded", "Not Included / Optional Add-ons")}
           </p>
           <p className="text-xs leading-relaxed whitespace-pre-line text-foreground">
             {proposal.exclusions}
@@ -145,7 +147,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
       {/* Cancellation & Deposit Terms */}
       {(cancellationPolicyId || depositPercentage != null || customCancellationTerms) && (
         <div className="mt-4 rounded-lg border border-border bg-muted/30 px-3 py-2">
-          <p className="text-xs font-medium text-foreground">Cancellation & Payment Terms</p>
+          <p className="text-xs font-medium text-foreground">{t("prop.card.terms", "Cancellation & Payment Terms")}</p>
           {cancellationPolicyId && (
             <p className="text-[11px] text-muted-foreground mt-1">
               Standard cancellation policy applied
