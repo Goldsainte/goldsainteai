@@ -1673,7 +1673,16 @@
     "upcoming": "これから",
     "viewBreakdown": "内訳を見る",
     "yourSpecialist": "あなたのスペシャリスト",
-    "youreHere": "いまここ"
+    "youreHere": "いまここ",
+    "checkoutFailed": "決済を開始できませんでした。もう一度お試しください。続く場合はサポートへ。",
+    "customTrip": "あなたのカスタム旅",
+    "due": "支払い",
+    "goldsainteTrip": "Goldsainte の旅",
+    "notFound": "予約が見つかりません。",
+    "payBalanceFee": "残金を支払う — {{amount}} + 手数料3.5%",
+    "payDepositFee": "デポジットを支払う — {{amount}} + 手数料3.5%",
+    "selectState": "上の支払いセクションで居住州を選択してから、もう一度お試しください。",
+    "stateUnavailable": "カリフォルニア、フロリダ、ハワイ、アイオワ、ワシントン各州の居住者は、まだ旅の予約をご利用いただけません。"
   },
   "hire": {
     "acceptNote": "相手が承諾しデポジットを支払います — あなたの Stripe アカウントに直接入金。",
@@ -1948,5 +1957,38 @@
       "14-29": "出発14–29日前",
       "<14": "出発14日未満"
     }
+  },
+  "msg": {
+    "acceptFailed": "リクエストを承認できませんでした",
+    "convArchived": "会話をアーカイブしました",
+    "convDeleted": "会話を削除しました",
+    "convDeletedPerm": "会話を完全に削除しました",
+    "deleteFailed": "メッセージを削除できませんでした",
+    "error": "エラー",
+    "fileTooLarge": "ファイルが大きすぎます",
+    "fileTooLargeD": "{{name}}は10MBを超えています。",
+    "messageDeleted": "メッセージを削除しました",
+    "openAttachFailed": "添付を開けませんでした",
+    "requestAccepted": "リクエストを承認しました",
+    "requestAcceptedD": "メッセージを送り合えるようになりました。",
+    "requestDeclined": "リクエストを辞退しました",
+    "tryAgain": "もう一度お試しください。",
+    "uploadFailed": "アップロードに失敗しました",
+    "userBlocked": "ユーザーをブロックしました"
+  },
+  "sett": {
+    "checkoutOpened": "新しいタブで決済を開きました",
+    "clearCacheFailed": "検索キャッシュを削除できませんでした",
+    "imageTooLarge": "画像は5MB未満にしてください",
+    "loadProfileFailed": "プロフィールを読み込めませんでした",
+    "openingCheckout": "決済を開いています…",
+    "paySuccess": "お支払い完了！認証状況を確認しています…",
+    "photoFailed": "写真をアップロードできませんでした",
+    "photoUpdated": "プロフィール写真を更新しました！",
+    "profileUpdated": "プロフィールを更新しました！",
+    "selectImage": "画像ファイルを選択してください",
+    "updateProfileFailed": "プロフィールを更新できませんでした",
+    "verifCancelled": "認証をキャンセルしました",
+    "verifStartFailed": "認証を開始できませんでした"
   }
 }
