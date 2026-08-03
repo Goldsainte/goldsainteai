@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { HireProposalComposer } from "@/components/proposals/HireProposalComposer";
 import { capLabel } from "@/lib/onTripCapabilities";
@@ -49,6 +50,7 @@ const STEPS = [
   "Attachments",
   "Review & Submit",
 ];
+const STEP_KEYS = ["np.stepPitch","np.stepScope","np.stepPricing","np.stepCancel","np.stepDeliv","np.stepAttach","np.stepReview"];
 
 const labelClasses = "text-sm font-medium text-[#0a2225]";
 const inputClasses = "rounded-xl h-11 text-sm border-[#E5DFC6] bg-white focus:ring-2 focus:ring-[#C7A962]/20 focus:border-[#C7A962] transition-all";
@@ -71,6 +73,7 @@ const CANCELLATION_LABELS: Record<string, string> = {
 };
 
 export default function NewProposalPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const tripId = searchParams.get("tripId") || "";
   const editId = searchParams.get("edit");
@@ -207,7 +210,7 @@ export default function NewProposalPage() {
         .eq("id", editId)
         .maybeSingle();
       if (error || !p) {
-        toast.error("Couldn't load this proposal for editing.");
+        toast.error(t("np.tLoadEdit", "Couldn't load this proposal for editing."));
         return;
       }
       prefilledRef.current = true;
@@ -336,7 +339,7 @@ export default function NewProposalPage() {
 
   const handleAiPolish = async () => {
     if (message.trim().length < 10) {
-      toast.error("Jot down a few rough notes first — the AI refines what you give it.");
+      toast.error(t("np.tJotNotes", "Jot down a few rough notes first — the AI refines what you give it."));
       return;
     }
     setAiPolishing(true);
@@ -361,10 +364,10 @@ export default function NewProposalPage() {
       if (data?.error) throw new Error(data.error);
       if (data?.pitch) setMessage(data.pitch);
       if (data?.headline) setHeadline(data.headline);
-      toast.success("Refined — review it and make it yours.");
+      toast.success(t("np.tRefined", "Refined — review it and make it yours."));
     } catch (err: any) {
       console.error("ai-proposal-polish failed", err);
-      toast.error("Couldn't refine right now — your notes are untouched.");
+      toast.error(t("np.tRefineFail", "Couldn't refine right now — your notes are untouched."));
     } finally {
       setAiPolishing(false);
     }
@@ -410,10 +413,10 @@ export default function NewProposalPage() {
       setDelBookingMgmt(Boolean(data.booking_management));
       setDelOnTripSupport(Boolean(data.on_trip_support));
       setAttempted(false);
-      toast.success("Full proposal drafted — walk each step and make it yours.");
+      toast.success(t("np.tDrafted", "Full proposal drafted — walk each step and make it yours."));
     } catch (err) {
       console.error("ai full draft failed", err);
-      toast.error("Couldn't draft right now — nothing was changed.");
+      toast.error(t("np.tDraftFail", "Couldn't draft right now — nothing was changed."));
     } finally {
       setAiDrafting(false);
     }
@@ -421,7 +424,7 @@ export default function NewProposalPage() {
 
   const handleAiScope = async () => {
     if (inclusionsText.trim().length < 5) {
-      toast.error("Add a few rough inclusion lines first.");
+      toast.error(t("np.tAddLines", "Add a few rough inclusion lines first."));
       return;
     }
     setAiScoping(true);
@@ -438,10 +441,10 @@ export default function NewProposalPage() {
       if (data?.error) throw new Error(data.error);
       if (Array.isArray(data.inclusions) && data.inclusions.length > 0) setInclusionsText(data.inclusions.join("\n"));
       if (Array.isArray(data.exclusions)) setExclusionsText(data.exclusions.join("\n"));
-      toast.success("Lists tidied — review each line.");
+      toast.success(t("np.tTidied", "Lists tidied — review each line."));
     } catch (err) {
       console.error("ai scope polish failed", err);
-      toast.error("Couldn't tidy right now — your lists are untouched.");
+      toast.error(t("np.tTidyFail", "Couldn't tidy right now — your lists are untouched."));
     } finally {
       setAiScoping(false);
     }
@@ -449,7 +452,7 @@ export default function NewProposalPage() {
 
   const handleAiRefineTerms = async () => {
     if (customCancellationTerms.trim().length < 10) {
-      toast.error("Jot rough terms first — the AI refines what you give it.");
+      toast.error(t("np.tJotTerms", "Jot rough terms first — the AI refines what you give it."));
       return;
     }
     setAiRefiningTerms(true);
@@ -460,10 +463,10 @@ export default function NewProposalPage() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data.cancellation_terms) setCustomCancellationTerms(data.cancellation_terms);
-      toast.success("Terms refined — make sure they're exactly your policy.");
+      toast.success(t("np.tTermsRefined", "Terms refined — make sure they're exactly your policy."));
     } catch (err) {
       console.error("ai terms polish failed", err);
-      toast.error("Couldn't refine right now — your terms are untouched.");
+      toast.error(t("np.tTermsFail", "Couldn't refine right now — your terms are untouched."));
     } finally {
       setAiRefiningTerms(false);
     }
@@ -473,7 +476,7 @@ export default function NewProposalPage() {
     if (!e.target.files || !user) return;
     const files = Array.from(e.target.files);
     if (uploadedFiles.length + files.length > 5) {
-      toast.error("Maximum 5 files allowed");
+      toast.error(t("np.tMaxFiles", "Maximum 5 files allowed"));
       return;
     }
     setUploading(true);
@@ -514,7 +517,7 @@ export default function NewProposalPage() {
     const exclusions = exclusionsText.split("\n").map((s) => s.trim()).filter(Boolean);
 
     // Build deliverables into inclusions
-    if (delItinerary) inclusions.push("Full Itinerary PDF: Day-by-day PDF with booking confirmations, maps, and contacts");
+    if (delItinerary) inclusions.push(t("np.incItin", "Full Itinerary PDF: Day-by-day PDF with booking confirmations, maps, and contacts"));
     if (delBookingMgmt) inclusions.push(`Booking Management: ${bookingMgmtLevel === "full_service" ? "Full-service (I book everything)" : bookingMgmtLevel === "advisory" ? "Advisory only (recommendations)" : "Hybrid (I book key components)"}`);
     if (delOnTripSupport) inclusions.push(`On-Trip Support: ${onTripSupportLevel === "24_7" ? "24/7 emergency line" : onTripSupportLevel === "business_hours" ? "Business hours phone support" : "Email only"}`);
     if (delConcierge && conciergeDetails) inclusions.push(`Concierge Services: ${conciergeDetails}`);
@@ -626,7 +629,7 @@ export default function NewProposalPage() {
 
     if (error || !insertedData) {
       console.error("Proposal submit error", error);
-      toast.error("Failed to submit proposal. Please try again.");
+      toast.error(t("np.tSubmitFail", "Failed to submit proposal. Please try again."));
       setSubmitting(false);
       return;
     }
@@ -653,11 +656,11 @@ export default function NewProposalPage() {
       }).catch((err) => console.error("Notification error:", err));
     }
 
-    toast.success("Proposal submitted successfully!");
+    toast.success(t("np.tSubmitted", "Proposal submitted successfully!"));
     navigate(`/proposals/${insertedData.id}`);
     } catch (err) {
       console.error("Proposal submission failed:", err);
-      toast.error("An unexpected error occurred while submitting your proposal. Please try again.");
+      toast.error(t("np.tUnexpected", "An unexpected error occurred while submitting your proposal. Please try again."));
     } finally {
       setSubmitting(false);
     }
@@ -674,8 +677,8 @@ export default function NewProposalPage() {
   if (!tripData) {
     return (
       <div className="min-h-screen bg-[#f7f3ea] flex flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">Trip request not found.</p>
-        <Button variant="outline" onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')}>Go Back</Button>
+        <p className="text-muted-foreground">{t("np.notFound", "Trip request not found.")}</p>
+        <Button variant="outline" onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')}>{t("np.goBack", "Go Back")}</Button>
       </div>
     );
   }
@@ -712,14 +715,14 @@ export default function NewProposalPage() {
           <div className="mx-auto flex h-[72px] max-w-5xl items-center gap-4 px-4 md:px-6">
             <button
               onClick={() => navigate(tripId ? `/marketplace/request/${tripId}` : '/marketplace')}
-              aria-label="Back"
+              aria-label={t("np.backAria", "Back")}
               className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#E5DFC6]/28 text-[#E5DFC6] transition-colors hover:bg-white/10"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <div className="min-w-0 flex-1">
-              <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">Submit a Proposal</p>
-              <p className="truncate font-secondary text-[23px] leading-tight text-white">{tripData.title || "Trip Request"}</p>
+              <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">{t("np.submitProposal", "Submit a Proposal")}</p>
+              <p className="truncate font-secondary text-[23px] leading-tight text-white">{tripData.title || t("np.tripRequest", "Trip Request")}</p>
             </div>
             <div className="hidden shrink-0 items-center gap-4 text-[13px] text-[#f7f3ea] md:flex">
               {tripData.destination && (
@@ -767,11 +770,11 @@ export default function NewProposalPage() {
                       : "cursor-default text-[#E5DFC6]/35"
                   }`}
                 >
-                  {i + 1}.&nbsp;{s}
+                  {i + 1}.&nbsp;{t(STEP_KEYS[i], s)}
                 </button>
               ))}
               <span className="ml-auto hidden shrink-0 pl-3 text-[12.5px] text-[#E5DFC6]/60 sm:inline">
-                Step {step + 1} of {STEPS.length}
+                {t("np.stepOf", { n: step + 1, total: STEPS.length, defaultValue: "Step {{n}} of {{total}}" })}
               </span>
             </div>
           </div>
@@ -787,7 +790,7 @@ export default function NewProposalPage() {
             {/* STEP 0: Pitch */}
             {isHire && (
               <div className="mb-5 rounded-2xl border border-[#C7A962]/50 bg-[#FDF9F0] p-5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">On-trip hire</p>
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.onTripHire", "On-trip hire")}</p>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]">
                   You're being hired to join this trip — {tripData?.destination}
                   {hireDays > 0 ? `, ${hireDays} days` : ""}
@@ -803,15 +806,15 @@ export default function NewProposalPage() {
                     ))}
                   </div>
                 )}
-                <p className="mt-1.5 text-[12.5px] text-[#0a2225]/60">No itinerary needed — confirm your price and terms; the trip is theirs, the days are yours to host.</p>
+                <p className="mt-1.5 text-[12.5px] text-[#0a2225]/60">{t("np.hireHint", "No itinerary needed — confirm your price and terms; the trip is theirs, the days are yours to host.")}</p>
               </div>
             )}
             {step === 0 && (
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step One</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Your Pitch</h2>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepOne", "Step One")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.yourPitch", "Your Pitch")}</h2>
                     <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{isHire ? "Confirm you're available and set your terms \u2014 no itinerary needed." : "Describe your proposed itinerary and why you're the best fit."}</p>
                   </div>
 
@@ -827,15 +830,13 @@ export default function NewProposalPage() {
                       ) : (
                         <Sparkles className="h-4 w-4 text-[#C7A962]" />
                       )}
-                      {aiDrafting ? "Drafting your proposal…" : "Draft entire proposal with Goldsainte AI"}
+                      {aiDrafting ? t("np.drafting", "Drafting your proposal…") : t("np.draftAll", "Draft entire proposal with Goldsainte AI")}
                     </button>
-                    <p className="mt-2 text-[12px] leading-relaxed text-[#0a2225]/55">
-                      Pre-fills every step from the trip request — pitch, scope, pricing, terms, deliverables. You review and edit each one before anything is sent. Add rough notes below first if you want them woven in.
-                    </p>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#0a2225]/55">{t("np.prefillsNote", "Pre-fills every step from the trip request — pitch, scope, pricing, terms, deliverables. You review and edit each one before anything is sent. Add rough notes below first if you want them woven in.")}</p>
                   </div>
 
                   <div style={isHire ? { display: "none" } : undefined} className="space-y-2">
-                    <Label className={labelClasses}>Your Role</Label>
+                    <Label className={labelClasses}>{t("np.yourRole", "Your Role")}</Label>
                     <div className="flex gap-3">
                       {(["agent", "creator"] as const).map((role) => (
                         <button
@@ -848,24 +849,24 @@ export default function NewProposalPage() {
                               : "border border-[#0a2225]/20 bg-white text-[#0a2225]/60 hover:border-[#C7A962]"
                           }`}
                         >
-                          {role === "agent" ? "Travel Agent" : "Creator"}
+                          {role === "agent" ? t("np.roleAgent", "Travel Agent") : t("np.roleCreator", "Creator")}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div className="space-y-2" style={isHire ? { display: "none" } : undefined}>
-                    <Label className={labelClasses} htmlFor="headline">Headline <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="headline">{t("np.headline", "Headline")}<span className="text-destructive">*</span></Label>
                     <Input
                       className={inputClasses}
                       id="headline"
-                      placeholder="e.g. 7-Night Luxury Safari with Private Guide"
+                      placeholder={t("np.headlinePh", "e.g. 7-Night Luxury Safari with Private Guide")}
                       value={headline}
                       onChange={(e) => setHeadline(e.target.value)}
                       maxLength={120}
                     />
                     {attempted && headline.length === 0 && (
-                      <p className="text-xs text-destructive">Required</p>
+                      <p className="text-xs text-destructive">{t("np.required", "Required")}</p>
                     )}
                   </div>
 
@@ -890,13 +891,13 @@ export default function NewProposalPage() {
                         ) : (
                           <Sparkles className="h-3.5 w-3.5" />
                         )}
-                        {aiPolishing ? "Refining…" : "Refine with Goldsainte AI"}
+                        {aiPolishing ? t("np.refining", "Refining…") : t("np.refinePitch", "Refine with Goldsainte AI")}
                       </button>
-                      <p className="text-[11px] text-[#0a2225]/40">AI drafts — you approve every word</p>
+                      <p className="text-[11px] text-[#0a2225]/40">{t("np.aiDraftsNote", "AI drafts — you approve every word")}</p>
                     </div>
                     <div className="flex justify-between">
                       {attempted && message.trim().length < 5 ? (
-                        <p className="text-xs text-destructive">Minimum 5 characters required</p>
+                        <p className="text-xs text-destructive">{t("np.min5", "Minimum 5 characters required")}</p>
                       ) : (
                         <span />
                       )}
@@ -905,7 +906,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2" style={isHire ? { display: "none" } : undefined}>
-                    <Label className={labelClasses} htmlFor="itinerary-summary">Itinerary Summary <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses} htmlFor="itinerary-summary">{t("np.itinSummary", "Itinerary Summary")}<span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <Textarea
                       id="itinerary-summary"
                       placeholder={"Day 1: Arrival & transfer to hotel\nDay 2: Guided city tour\nDay 3: Safari excursion\n..."}
@@ -913,7 +914,7 @@ export default function NewProposalPage() {
                       onChange={(e) => setItinerarySummary(e.target.value)}
                       className={`${textareaClasses} min-h-[120px]`}
                     />
-                    <p className="text-xs text-muted-foreground">Brief day-by-day overview of the proposed trip structure.</p>
+                    <p className="text-xs text-muted-foreground">{t("np.itinSub", "Brief day-by-day overview of the proposed trip structure.")}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -924,13 +925,13 @@ export default function NewProposalPage() {
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Two</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Scope of Services</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define exactly what is and isn't included in your proposal.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepTwo", "Step Two")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.scopeTitle", "Scope of Services")}</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{t("np.scopeSub", "Define exactly what is and isn't included in your proposal.")}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="inclusions">{isHire ? "What your rate covers" : "What's Included"} <span className="text-destructive">*</span></Label>
+                    <Label className={labelClasses} htmlFor="inclusions">{isHire ? t("np.rateCovers", "What your rate covers") : t("np.whatsIncluded", "What's Included")} <span className="text-destructive">*</span></Label>
                     <Textarea
                       id="inclusions"
                       placeholder={"Airport transfers\nHotel bookings (4-star+)\n2 guided excursions\nTravel insurance coordination\nRestaurant reservations"}
@@ -938,11 +939,11 @@ export default function NewProposalPage() {
                       onChange={(e) => setInclusionsText(e.target.value)}
                       className={`${textareaClasses} min-h-[140px]`}
                     />
-                    <p className="text-xs text-muted-foreground">One item per line. Be specific about what the traveler will receive.</p>
+                    <p className="text-xs text-muted-foreground">{t("np.inclHint", "One item per line. Be specific about what the traveler will receive.")}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="exclusions">{isHire ? "What the traveler covers" : "What's Not Included"}</Label>
+                    <Label className={labelClasses} htmlFor="exclusions">{isHire ? t("np.travelerCovers", "What the traveler covers") : t("np.whatsNotIncluded", "What's Not Included")}</Label>
                     <Textarea
                       id="exclusions"
                       placeholder={"International flights\nMeals not specified in itinerary\nPersonal expenses\nVisa fees\nTravel insurance premiums"}
@@ -950,7 +951,7 @@ export default function NewProposalPage() {
                       onChange={(e) => setExclusionsText(e.target.value)}
                       className={`${textareaClasses} min-h-[120px]`}
                     />
-                    <p className="text-xs text-muted-foreground">One item per line. Setting clear exclusions prevents disputes.</p>
+                    <p className="text-xs text-muted-foreground">{t("np.exclHint", "One item per line. Setting clear exclusions prevents disputes.")}</p>
                     <button
                       type="button"
                       onClick={handleAiScope}
@@ -962,17 +963,17 @@ export default function NewProposalPage() {
                       ) : (
                         <Sparkles className="h-3.5 w-3.5" />
                       )}
-                      {aiScoping ? "Tidying…" : "Tidy lists with Goldsainte AI"}
+                      {aiScoping ? t("np.tidying", "Tidying…") : t("np.tidyLists", "Tidy lists with Goldsainte AI")}
                     </button>
                   </div>
 
                   <div style={isHire ? { display: "none" } : undefined} className="space-y-3">
-                    <Label className={labelClasses}>Service Level</Label>
+                    <Label className={labelClasses}>{t("np.serviceLevel", "Service Level")}</Label>
                     <RadioGroup value={serviceLevel} onValueChange={setServiceLevel} className="space-y-2">
                       {[
-                        { value: "advisory", label: "Advisory", desc: "I provide recommendations; the traveler books independently" },
-                        { value: "full_service", label: "Full-Service", desc: "I handle all research, bookings, and coordination end-to-end" },
-                        { value: "concierge", label: "Concierge", desc: "Full-service plus on-trip support, reservations, and personal touches" },
+                        { value: "advisory", label: t("np.slAdvisory", "Advisory"), desc: t("np.slAdvisoryD", "I provide recommendations; the traveler books independently") },
+                        { value: "full_service", label: t("np.slFull", "Full-Service"), desc: t("np.slFullD", "I handle all research, bookings, and coordination end-to-end") },
+                        { value: "concierge", label: t("np.slConcierge", "Concierge"), desc: t("np.slConciergeD", "Full-service plus on-trip support, reservations, and personal touches") },
                       ].map((opt) => (
                         <label key={opt.value} className={`flex items-start gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${serviceLevel === opt.value ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
                           <RadioGroupItem value={opt.value} className="mt-0.5" />
@@ -987,25 +988,25 @@ export default function NewProposalPage() {
 
                   <div style={isHire ? { display: "none" } : undefined} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div style={isHire ? { display: "none" } : undefined} className="space-y-2">
-                      <Label className={labelClasses}>Itinerary Revisions Included</Label>
+                      <Label className={labelClasses}>{t("np.revisionsIncluded", "Itinerary Revisions Included")}</Label>
                       <Select value={revisionCount} onValueChange={setRevisionCount}>
                         <SelectTrigger className={selectTriggerClasses}><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="1">1 revision</SelectItem>
                           <SelectItem value="2">2 revisions</SelectItem>
                           <SelectItem value="3">3 revisions</SelectItem>
-                          <SelectItem value="unlimited">Unlimited within scope</SelectItem>
+                          <SelectItem value="unlimited">{t("np.unlimitedScope", "Unlimited within scope")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className={labelClasses}>Support Level</Label>
+                      <Label className={labelClasses}>{t("np.supportLevel", "Support Level")}</Label>
                       <Select value={supportLevel} onValueChange={setSupportLevel}>
                         <SelectTrigger className={selectTriggerClasses}><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="email">Email only</SelectItem>
-                          <SelectItem value="business_hours">Business hours phone</SelectItem>
+                          <SelectItem value="email">{t("np.emailOnly", "Email only")}</SelectItem>
+                          <SelectItem value="business_hours">{t("np.bizHoursPhone", "Business hours phone")}</SelectItem>
                           <SelectItem value="24_7">24/7 emergency</SelectItem>
                         </SelectContent>
                       </Select>
@@ -1020,8 +1021,8 @@ export default function NewProposalPage() {
                       className="mt-0.5"
                     />
                     <div style={isHire ? { display: "none" } : undefined}>
-                      <Label htmlFor="supplier-payments" className={`${labelClasses} cursor-pointer font-medium`}>I handle payments to suppliers</Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">I will process payments to hotels, tours, and other suppliers on behalf of the traveler.</p>
+                      <Label htmlFor="supplier-payments" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.handleSuppliers", "I handle payments to suppliers")}</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t("np.handleSuppliersD", "I will process payments to hotels, tours, and other suppliers on behalf of the traveler.")}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1033,21 +1034,21 @@ export default function NewProposalPage() {
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Three</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Pricing & Payment</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define your pricing structure and payment terms.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepThree", "Step Three")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.pricingPayment", "Pricing & Payment")}</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{t("np.pricingSub", "Define your pricing structure and payment terms.")}</p>
                   </div>
 
                   <div style={isHire ? { display: "none" } : undefined} className="space-y-3">
-                    <Label className={labelClasses}>Pricing Type</Label>
+                    <Label className={labelClasses}>{t("np.pricingType", "Pricing Type")}</Label>
                     <RadioGroup value={pricingType} onValueChange={setPricingType} className="flex gap-3">
                       <label className={`flex-1 flex items-center gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${pricingType === "per_person" ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
                         <RadioGroupItem value="per_person" />
-                        <span className="text-sm font-medium">Per Person</span>
+                        <span className="text-sm font-medium">{t("np.perPerson", "Per Person")}</span>
                       </label>
                       <label className={`flex-1 flex items-center gap-2 rounded-lg border p-3 cursor-pointer transition-colors ${pricingType === "total" ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
                         <RadioGroupItem value="total" />
-                        <span className="text-sm font-medium">Total Trip Cost</span>
+                        <span className="text-sm font-medium">{t("np.totalTripCost", "Total Trip Cost")}</span>
                       </label>
                     </RadioGroup>
                   </div>
@@ -1071,14 +1072,14 @@ export default function NewProposalPage() {
                   {/* Commission Pricing Model */}
                   <div className="space-y-4">
                     <div style={isHire ? { display: "none" } : undefined}>
-                      <Label className="text-sm font-semibold">How You Earn</Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">Select how your commission is structured for this trip.</p>
+                      <Label className="text-sm font-semibold">{t("np.howYouEarn", "How You Earn")}</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t("np.howYouEarnSub", "Select how your commission is structured for this trip.")}</p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {([
-                        { value: "percentage" as CommissionModel, label: "Percentage Commission", desc: "Earn a % of total trip value", icon: Percent },
-                        { value: "flat_fee" as CommissionModel, label: "Flat Planning Fee", desc: "Charge a fixed service fee", icon: DollarSign },
-                        { value: "hybrid" as CommissionModel, label: "Hybrid", desc: "Fixed fee + % commission", icon: Plus },
+                        { value: "percentage" as CommissionModel, label: t("np.cmPct", "Percentage Commission"), desc: t("np.cmPctD", "Earn a % of total trip value"), icon: Percent },
+                        { value: "flat_fee" as CommissionModel, label: t("np.cmFlat", "Flat Planning Fee"), desc: t("np.cmFlatD", "Charge a fixed service fee"), icon: DollarSign },
+                        { value: "hybrid" as CommissionModel, label: t("np.cmHybrid", "Hybrid"), desc: t("np.cmHybridD", "Fixed fee + % commission"), icon: Plus },
                       ]).map((opt) => (
                         <button
                           key={opt.value}
@@ -1104,14 +1105,14 @@ export default function NewProposalPage() {
                       <div className="space-y-4 pl-1">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Label className={labelClasses} htmlFor="commission-pct">Commission %</Label>
+                            <Label className={labelClasses} htmlFor="commission-pct">{t("np.commissionPct", "Commission %")}</Label>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-[280px]">
-                                  <p className="text-xs">Industry standard is 10–20% commission on total trip value. Luxury and bespoke experiences may command 15–25%.</p>
+                                  <p className="text-xs">{t("np.commissionHint", "Industry standard is 10–20% commission on total trip value. Luxury and bespoke experiences may command 15–25%.")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -1139,8 +1140,8 @@ export default function NewProposalPage() {
                             className="mt-0.5"
                           />
                           <div>
-                            <Label htmlFor="tiered-commission" className={`${labelClasses} cursor-pointer font-medium`}>Tiered commission</Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">e.g. 20% on the first $5,000 and 15% above</p>
+                            <Label htmlFor="tiered-commission" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.tieredCommission", "Tiered commission")}</Label>
+                            <p className="text-xs text-muted-foreground mt-0.5">{t("np.tieredHint", "e.g. 20% on the first $5,000 and 15% above")}</p>
                           </div>
                         </div>
 
@@ -1149,12 +1150,12 @@ export default function NewProposalPage() {
                             {commissionTiers.map((tier, i) => (
                               <div key={i} className="flex items-center gap-2">
                                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                  {i === 0 ? "First" : "Above"} $
+                                  {i === 0 ? t("np.tierFirst", "First") : t("np.tierAbove", "Above")} $
                                 </span>
                                 <Input
                                   type="number"
                                   min={0}
-                                  placeholder="Threshold"
+                                  placeholder={t("np.thresholdPh", "Threshold")}
                                   value={tier.threshold === Infinity ? "" : tier.threshold}
                                   onChange={(e) => {
                                     const next = [...commissionTiers];
@@ -1194,8 +1195,7 @@ export default function NewProposalPage() {
                                 { threshold: Infinity, pct: last.pct }
                               ]);
                             }}>
-                              <Plus className="h-3.5 w-3.5 mr-1" /> Add Tier
-                            </Button>
+                              <Plus className="h-3.5 w-3.5 mr-1" />{t("np.addTier", "Add Tier")}</Button>
                           </div>
                         )}
                       </div>
@@ -1206,14 +1206,14 @@ export default function NewProposalPage() {
                       <div className="space-y-4 pl-1">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Label className={labelClasses} htmlFor="flat-fee">Fee Amount</Label>
+                            <Label className={labelClasses} htmlFor="flat-fee">{t("np.feeAmount", "Fee Amount")}</Label>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-[280px]">
-                                  <p className="text-xs">Typical flat fees range from $299–$1,500+ depending on trip complexity.</p>
+                                  <p className="text-xs">{t("np.flatHint", "Typical flat fees range from $299–$1,500+ depending on trip complexity.")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -1232,13 +1232,13 @@ export default function NewProposalPage() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label className={labelClasses}>Fee Covers</Label>
+                          <Label className={labelClasses}>{t("np.feeCovers", "Fee Covers")}</Label>
                           <Select value={flatFeeCovers} onValueChange={setFlatFeeCovers}>
                             <SelectTrigger className={`${selectTriggerClasses} w-60`}><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="planning">Planning only</SelectItem>
-                              <SelectItem value="execution">Planning + Execution</SelectItem>
-                              <SelectItem value="full_service">Full service</SelectItem>
+                              <SelectItem value="planning">{t("np.coversPlanning", "Planning only")}</SelectItem>
+                              <SelectItem value="execution">{t("np.coversExecution", "Planning + Execution")}</SelectItem>
+                              <SelectItem value="full_service">{t("np.coversFull", "Full service")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1255,15 +1255,15 @@ export default function NewProposalPage() {
                                 <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                               </TooltipTrigger>
                               <TooltipContent className="max-w-[280px]">
-                                <p className="text-xs">Common hybrid: $500 planning fee + 10% commission on bookings.</p>
+                                <p className="text-xs">{t("np.hybridHint", "Common hybrid: $500 planning fee + 10% commission on bookings.")}</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          <span className="text-xs text-muted-foreground">Flat fee + percentage commission</span>
+                          <span className="text-xs text-muted-foreground">{t("np.hybridLabel", "Flat fee + percentage commission")}</span>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label className={labelClasses} htmlFor="hybrid-flat">Flat Fee</Label>
+                            <Label className={labelClasses} htmlFor="hybrid-flat">{t("np.flatFee", "Flat Fee")}</Label>
                             <div className="relative">
                               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
@@ -1278,7 +1278,7 @@ export default function NewProposalPage() {
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <Label className={labelClasses} htmlFor="hybrid-pct">Commission %</Label>
+                            <Label className={labelClasses} htmlFor="hybrid-pct">{t("np.commissionPct", "Commission %")}</Label>
                             <div className="relative">
                               <Input
                                 id="hybrid-pct"
@@ -1301,37 +1301,37 @@ export default function NewProposalPage() {
                   {/* Fee Breakdown Card */}
                   {commissionCalc.commission > 0 && (
                     <div className="rounded-lg border-2 border-[#0c4d47]/20 bg-[#0c4d47]/5 p-5 space-y-4">
-                      <p className="text-sm font-semibold text-foreground">Fee Breakdown</p>
+                      <p className="text-sm font-semibold text-foreground">{t("np.feeBreakdown", "Fee Breakdown")}</p>
 
                       {/* Agent side */}
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Your Commission</span>
+                          <span className="text-muted-foreground">{t("np.yourCommission", "Your Commission")}</span>
                           <span className="font-medium text-foreground">${commissionCalc.commission.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Platform fee (3.5%)</span>
+                          <span className="text-muted-foreground">{t("np.platformFee", "Platform fee (3.5%)")}</span>
                           <span className="text-destructive">-${commissionCalc.hostFee.toLocaleString()}</span>
                         </div>
                         <div className="border-t border-[#0c4d47]/20 pt-1.5 flex justify-between text-sm font-semibold">
-                          <span className="text-[#0c4d47]">Your Estimated Payout</span>
+                          <span className="text-[#0c4d47]">{t("np.estPayout", "Your Estimated Payout")}</span>
                           <span className="text-[#0c4d47]">${commissionCalc.agentPayout.toLocaleString()}</span>
                         </div>
                       </div>
 
                       {/* Traveler side */}
                       <div className="border-t border-[#0c4d47]/20 pt-3 space-y-1.5">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">What the Traveler Pays</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("np.travelerPays", "What the Traveler Pays")}</p>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Trip Cost</span>
+                          <span className="text-muted-foreground">{t("np.tripCost", "Trip Cost")}</span>
                           <span className="font-medium text-foreground">${(typeof priceFrom === "number" ? priceFrom : 0).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Service Fee (3.5%)</span>
+                          <span className="text-muted-foreground">{t("np.serviceFee35", "Service Fee (3.5%)")}</span>
                           <span className="text-foreground">+${commissionCalc.guestFee.toLocaleString()}</span>
                         </div>
                         <div className="border-t border-[#0c4d47]/20 pt-1.5 flex justify-between text-sm font-semibold">
-                          <span className="text-foreground">Traveler Total</span>
+                          <span className="text-foreground">{t("np.travelerTotal", "Traveler Total")}</span>
                           <span className="text-foreground">${commissionCalc.travelerTotal.toLocaleString()}</span>
                         </div>
                       </div>
@@ -1346,18 +1346,18 @@ export default function NewProposalPage() {
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Four</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Cancellation & Refund Policy</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Define your cancellation terms. These are binding commitments shown to the traveler.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepFour", "Step Four")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.cancelPolicy", "Cancellation & Refund Policy")}</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{t("np.cancelSub", "Define your cancellation terms. These are binding commitments shown to the traveler.")}</p>
                   </div>
 
                   <div className="space-y-3">
-                    <Label className={labelClasses}>Is Deposit Refundable?</Label>
+                    <Label className={labelClasses}>{t("np.isDepositRefundable", "Is Deposit Refundable?")}</Label>
                     <RadioGroup value={depositRefundable} onValueChange={setDepositRefundable} className="space-y-2">
                       {[
-                        { value: "fully_refundable", label: "Fully refundable" },
-                        { value: "partially_refundable", label: "Partially refundable" },
-                        { value: "non_refundable", label: "Non-refundable" },
+                        { value: "fully_refundable", label: t("np.fullyRefundable", "Fully refundable") },
+                        { value: "partially_refundable", label: t("np.partiallyRefundable", "Partially refundable") },
+                        { value: "non_refundable", label: t("np.nonRefundable", "Non-refundable") },
                       ].map((opt) => (
                         <label key={opt.value} className={`flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${depositRefundable === opt.value ? "border-[#0c4d47] bg-[#0c4d47]/5" : "hover:bg-muted/30"}`}>
                           <RadioGroupItem value={opt.value} />
@@ -1368,12 +1368,12 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className={labelClasses}>Cancellation Windows</Label>
-                    <p className="text-xs text-muted-foreground">Set the refund percentage for each cancellation window relative to the departure date.</p>
+                    <Label className={labelClasses}>{t("np.cancelWindows", "Cancellation Windows")}</Label>
+                    <p className="text-xs text-muted-foreground">{t("np.cancelWindowsSub", "Set the refund percentage for each cancellation window relative to the departure date.")}</p>
                     <div className="space-y-2">
                       {cancellationWindows.map((w, i) => (
                         <div key={w.band} className="flex items-center gap-3 rounded-lg border p-3">
-                          <span className="text-sm flex-1 min-w-0">{CANCELLATION_LABELS[w.band] || w.band}</span>
+                          <span className="text-sm flex-1 min-w-0">{t(`np.band.${w.band}`, CANCELLATION_LABELS[w.band] || w.band)}</span>
                           <Input
                             type="number"
                             min={0}
@@ -1393,7 +1393,7 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="change-fee">Change Fee After Acceptance <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses} htmlFor="change-fee">{t("np.changeFee", "Change Fee After Acceptance")}<span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -1406,7 +1406,7 @@ export default function NewProposalPage() {
                         onChange={(e) => setChangeFee(e.target.value ? Number(e.target.value) : "")}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">Fee charged for itinerary changes after the proposal is accepted.</p>
+                    <p className="text-xs text-muted-foreground">{t("np.changeFeeSub", "Fee charged for itinerary changes after the proposal is accepted.")}</p>
                   </div>
 
                   <div className="space-y-3">
@@ -1418,13 +1418,13 @@ export default function NewProposalPage() {
                         className="mt-0.5"
                       />
                       <div className="flex-1">
-                        <Label htmlFor="supplier-clause" className={`${labelClasses} cursor-pointer font-medium`}>Supplier-dependent cancellation clause</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Some components are subject to third-party supplier cancellation policies.</p>
+                        <Label htmlFor="supplier-clause" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.supplierClause", "Supplier-dependent cancellation clause")}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t("np.supplierClauseSub", "Some components are subject to third-party supplier cancellation policies.")}</p>
                       </div>
                     </div>
                     {supplierDependent && (
                       <Textarea
-                        placeholder="Specify which components are subject to supplier policies (e.g., safari bookings, boutique hotels with non-refundable rates)…"
+                        placeholder={t("np.supplierPh", "Specify which components are subject to supplier policies (e.g., safari bookings, boutique hotels with non-refundable rates)…")}
                         value={supplierDependentNote}
                         onChange={(e) => setSupplierDependentNote(e.target.value)}
                         className={`${textareaClasses} min-h-[80px]`}
@@ -1433,10 +1433,10 @@ export default function NewProposalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={labelClasses} htmlFor="custom-terms">Additional Cancellation Terms <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Label className={labelClasses} htmlFor="custom-terms">{t("np.additionalTerms", "Additional Cancellation Terms")}<span className="text-muted-foreground font-normal">(optional)</span></Label>
                     <Textarea
                       id="custom-terms"
-                      placeholder="Any additional cancellation or refund terms not covered above…"
+                      placeholder={t("np.additionalPh", "Any additional cancellation or refund terms not covered above…")}
                       value={customCancellationTerms}
                       onChange={(e) => setCustomCancellationTerms(e.target.value)}
                       className={`${textareaClasses} min-h-[80px]`}
@@ -1452,7 +1452,7 @@ export default function NewProposalPage() {
                       ) : (
                         <Sparkles className="h-3.5 w-3.5" />
                       )}
-                      {aiRefiningTerms ? "Refining…" : "Refine terms with Goldsainte AI"}
+                      {aiRefiningTerms ? t("np.refining", "Refining…") : t("np.refineTerms", "Refine terms with Goldsainte AI")}
                     </button>
                   </div>
                 </CardContent>
@@ -1464,9 +1464,9 @@ export default function NewProposalPage() {
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Five</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Deliverables</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Select and configure what the traveler will receive.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepFive", "Step Five")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.deliverables", "Deliverables")}</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{t("np.delivSub", "Select and configure what the traveler will receive.")}</p>
                   </div>
 
                   {/* Full Itinerary PDF */}
@@ -1474,8 +1474,8 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-itinerary" checked={delItinerary} onCheckedChange={(c) => setDelItinerary(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-itinerary" className={`${labelClasses} cursor-pointer font-medium`}>Full Itinerary PDF</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Day-by-day PDF with booking confirmations, maps, and contact details.</p>
+                        <Label htmlFor="del-itinerary" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.fullItinPdf", "Full Itinerary PDF")}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t("np.fullItinPdfD", "Day-by-day PDF with booking confirmations, maps, and contact details.")}</p>
                       </div>
                     </div>
                   </div>
@@ -1485,20 +1485,20 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-booking" checked={delBookingMgmt} onCheckedChange={(c) => setDelBookingMgmt(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-booking" className={`${labelClasses} cursor-pointer font-medium`}>Booking Management</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">How bookings for hotels, flights, and activities are handled.</p>
+                        <Label htmlFor="del-booking" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.bookingMgmt", "Booking Management")}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t("np.bookingMgmtD", "How bookings for hotels, flights, and activities are handled.")}</p>
                       </div>
                     </div>
                     {delBookingMgmt && (
                       <RadioGroup value={bookingMgmtLevel} onValueChange={setBookingMgmtLevel} className="pl-8 space-y-1">
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <RadioGroupItem value="advisory" /><span className="text-sm">Advisory only (recommendations)</span>
+                          <RadioGroupItem value="advisory" /><span className="text-sm">{t("np.bmAdvisory", "Advisory only (recommendations)")}</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <RadioGroupItem value="full_service" /><span className="text-sm">Full-service (I book everything)</span>
+                          <RadioGroupItem value="full_service" /><span className="text-sm">{t("np.bmFull", "Full-service (I book everything)")}</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <RadioGroupItem value="hybrid" /><span className="text-sm">Hybrid (I book key components)</span>
+                          <RadioGroupItem value="hybrid" /><span className="text-sm">{t("np.bmHybrid", "Hybrid (I book key components)")}</span>
                         </label>
                       </RadioGroup>
                     )}
@@ -1509,17 +1509,17 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-support" checked={delOnTripSupport} onCheckedChange={(c) => setDelOnTripSupport(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-support" className={`${labelClasses} cursor-pointer font-medium`}>On-Trip Support</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Support availability during the trip.</p>
+                        <Label htmlFor="del-support" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.onTripSupport", "On-Trip Support")}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t("np.onTripSupportD", "Support availability during the trip.")}</p>
                       </div>
                     </div>
                     {delOnTripSupport && (
                       <RadioGroup value={onTripSupportLevel} onValueChange={setOnTripSupportLevel} className="pl-8 space-y-1">
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <RadioGroupItem value="email" /><span className="text-sm">Email only</span>
+                          <RadioGroupItem value="email" /><span className="text-sm">{t("np.emailOnly", "Email only")}</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <RadioGroupItem value="business_hours" /><span className="text-sm">Business hours phone support</span>
+                          <RadioGroupItem value="business_hours" /><span className="text-sm">{t("np.bizHoursSupport", "Business hours phone support")}</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                           <RadioGroupItem value="24_7" /><span className="text-sm">24/7 emergency line</span>
@@ -1533,9 +1533,9 @@ export default function NewProposalPage() {
                     <div className="flex items-center gap-3">
                       <span className="text-[#0c4d47]">✓</span>
                       <div>
-                        <span className="font-medium text-sm">Revisions Included</span>
+                        <span className="font-medium text-sm">{t("np.revIncluded", "Revisions Included")}</span>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {revisionCount === "unlimited" ? "Unlimited within scope" : `${revisionCount} revision${revisionCount !== "1" ? "s" : ""}`} (set in Scope of Services)
+                          {revisionCount === "unlimited" ? t("np.unlimitedScope", "Unlimited within scope") : `${revisionCount} ${revisionCount !== "1" ? t("np.revWordMany", "revisions") : t("np.revWordOne", "revision")}`} (set in Scope of Services)
                         </p>
                       </div>
                     </div>
@@ -1546,13 +1546,13 @@ export default function NewProposalPage() {
                     <div className="flex items-start gap-3">
                       <Checkbox id="del-concierge" checked={delConcierge} onCheckedChange={(c) => setDelConcierge(!!c)} className="mt-0.5" />
                       <div>
-                        <Label htmlFor="del-concierge" className={`${labelClasses} cursor-pointer font-medium`}>Concierge Services</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Restaurant reservations, spa bookings, event tickets, etc.</p>
+                        <Label htmlFor="del-concierge" className={`${labelClasses} cursor-pointer font-medium`}>{t("np.conciergeServices", "Concierge Services")}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t("np.conciergeD", "Restaurant reservations, spa bookings, event tickets, etc.")}</p>
                       </div>
                     </div>
                     {delConcierge && (
                       <Input
-                        placeholder="Specify what's included (e.g., restaurant reservations, spa bookings, event tickets)"
+                        placeholder={t("np.conciergePh", "Specify what's included (e.g., restaurant reservations, spa bookings, event tickets)")}
                         value={conciergeDetails}
                         onChange={(e) => setConciergeDetails(e.target.value)}
                         className={`${inputClasses} ml-8`}
@@ -1568,23 +1568,23 @@ export default function NewProposalPage() {
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Six</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Attachments</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Upload supporting documents or add external links to strengthen your proposal.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepSix", "Step Six")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.attachments", "Attachments")}</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{t("np.attachSub", "Upload supporting documents or add external links to strengthen your proposal.")}</p>
                   </div>
 
                   {/* File uploads */}
                   <div className="space-y-3">
-                    <Label className={labelClasses}>Upload Files <span className="text-muted-foreground font-normal">(max 5 files, 10MB each)</span></Label>
+                    <Label className={labelClasses}>{t("np.uploadFiles", "Upload Files")}<span className="text-muted-foreground font-normal">(max 5 files, 10MB each)</span></Label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
                       className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/30 transition-colors"
                     >
                       <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">
-                        {uploading ? "Uploading…" : "Click or drag files here"}
+                        {uploading ? t("np.uploading", "Uploading…") : t("np.clickDrag", "Click or drag files here")}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG, WEBP</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("np.fileTypes", "PDF, JPG, PNG, WEBP")}</p>
                     </div>
                     <input
                       ref={fileInputRef}
@@ -1613,8 +1613,8 @@ export default function NewProposalPage() {
 
                   {/* External links */}
                   <div className="space-y-3">
-                    <Label className={labelClasses}>External Links <span className="text-muted-foreground font-normal">(optional)</span></Label>
-                    <p className="text-xs text-muted-foreground">Portfolio, sample itineraries, or any supporting URLs.</p>
+                    <Label className={labelClasses}>{t("np.externalLinks", "External Links")}<span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <p className="text-xs text-muted-foreground">{t("np.externalLinksD", "Portfolio, sample itineraries, or any supporting URLs.")}</p>
                     {externalLinks.map((link, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <Input
@@ -1636,8 +1636,7 @@ export default function NewProposalPage() {
                     ))}
                     {externalLinks.length < 5 && (
                       <Button variant="outline" size="sm" onClick={() => setExternalLinks((prev) => [...prev, ""])}>
-                        <Plus className="h-3.5 w-3.5 mr-1" /> Add Link
-                      </Button>
+                        <Plus className="h-3.5 w-3.5 mr-1" />{t("np.addLink", "Add Link")}</Button>
                     )}
                   </div>
                 </CardContent>
@@ -1649,19 +1648,19 @@ export default function NewProposalPage() {
               <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
                 <CardContent className="p-6 md:p-8 space-y-6">
                   <div>
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">Step Seven</p>
-                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">Review & Submit</h2>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">Review your contract proposal before submitting.</p>
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("np.stepSeven", "Step Seven")}</p>
+                    <h2 className="font-secondary text-[24px] leading-snug text-[#0a2225]">{t("np.reviewSubmit", "Review & Submit")}</h2>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#0a2225]/55">{t("np.reviewSub", "Review your contract proposal before submitting.")}</p>
                   </div>
 
                   {/* Pitch Summary */}
                   <div className="rounded-lg border p-4 space-y-3">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Proposal Summary</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.proposalSummary", "Proposal Summary")}</h3>
                     <p className="font-semibold">{headline}</p>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">{message}</p>
                     {itinerarySummary && (
                       <div className="mt-2 pt-2 border-t">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Itinerary Summary</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t("np.itinSummary", "Itinerary Summary")}</p>
                         <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-6">{itinerarySummary}</p>
                       </div>
                     )}
@@ -1670,18 +1669,18 @@ export default function NewProposalPage() {
 
                   {/* Scope */}
                   <div className="rounded-lg border p-4 space-y-3">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Scope of Services</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.scopeTitle", "Scope of Services")}</h3>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                      <span className="text-muted-foreground">Service Level</span>
+                      <span className="text-muted-foreground">{t("np.serviceLevel", "Service Level")}</span>
                       <span className="font-medium capitalize">{serviceLevel.replace("_", "-")}</span>
-                      <span className="text-muted-foreground">Revisions</span>
+                      <span className="text-muted-foreground">{t("np.revisions", "Revisions")}</span>
                       <span className="font-medium">{revisionCount === "unlimited" ? "Unlimited" : revisionCount}</span>
-                      <span className="text-muted-foreground">Support</span>
+                      <span className="text-muted-foreground">{t("np.supportWord", "Support")}</span>
                       <span className="font-medium capitalize">{supportLevel.replace("_", " ")}</span>
                     </div>
                     {inclusionsText.trim() && (
                       <div>
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">Inclusions</p>
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">{t("np.inclusions", "Inclusions")}</p>
                         <ul className="text-sm space-y-0.5">
                           {inclusionsText.split("\n").filter(Boolean).map((item, i) => (
                             <li key={i} className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>{item}</li>
@@ -1691,7 +1690,7 @@ export default function NewProposalPage() {
                     )}
                     {exclusionsText.trim() && (
                       <div>
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">Exclusions</p>
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">{t("np.exclusions", "Exclusions")}</p>
                         <ul className="text-sm space-y-0.5">
                           {exclusionsText.split("\n").filter(Boolean).map((item, i) => (
                             <li key={i} className="flex items-start gap-2"><span className="text-destructive">✗</span>{item}</li>
@@ -1703,27 +1702,27 @@ export default function NewProposalPage() {
 
                   {/* Pricing */}
                   <div className="rounded-lg border p-4 space-y-2">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pricing</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.pricing", "Pricing")}</h3>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                      <span className="text-muted-foreground">Pricing Type</span>
+                      <span className="text-muted-foreground">{t("np.pricingType", "Pricing Type")}</span>
                       <span className="font-medium">{pricingType === "per_person" ? "Per Person" : "Total Trip Cost"}</span>
-                      <span className="text-muted-foreground">Trip Cost</span>
+                      <span className="text-muted-foreground">{t("np.tripCost", "Trip Cost")}</span>
                       <span className="font-medium">${typeof priceFrom === "number" ? priceFrom.toLocaleString() : "—"}</span>
                       {hasPlanningFee && planningFee && (
                         <>
-                          <span className="text-muted-foreground">Planning Fee</span>
+                          <span className="text-muted-foreground">{t("np.planningFee", "Planning Fee")}</span>
                           <span className="font-medium">${Number(planningFee).toLocaleString()} {planningFeeRefundable ? "(refundable)" : "(non-refundable)"}</span>
                         </>
                       )}
-                      <span className="text-muted-foreground">Deposit</span>
+                      <span className="text-muted-foreground">{t("np.deposit", "Deposit")}</span>
                       <span className="font-medium">{depositPct}%{typeof priceFrom === "number" ? ` ($${Math.round(priceFrom * depositPct / 100).toLocaleString()})` : ""}</span>
-                      <span className="text-muted-foreground">Deposit Due Within</span>
+                      <span className="text-muted-foreground">{t("np.depositDueWithin", "Deposit Due Within")}</span>
                       <span className="font-medium">{depositDueDays || "—"} days</span>
-                      <span className="text-muted-foreground">Balance Due</span>
+                      <span className="text-muted-foreground">{t("np.balanceDue", "Balance Due")}</span>
                       <span className="font-medium capitalize">{balanceDue.replace(/_/g, " ")}</span>
-                      <span className="text-muted-foreground">Pricing Status</span>
+                      <span className="text-muted-foreground">{t("np.pricingStatus", "Pricing Status")}</span>
                       <span className={`font-medium ${pricingConfirmed === "estimate" ? "text-amber-600" : ""}`}>
-                        {pricingConfirmed === "confirmed" ? "Confirmed" : "Estimate (subject to availability)"}
+                        {pricingConfirmed === "confirmed" ? t("np.confirmed", "Confirmed") : t("np.estimateSubject", "Estimate (subject to availability)")}
                       </span>
                     </div>
                   </div>
@@ -1731,11 +1730,11 @@ export default function NewProposalPage() {
                   {/* Payment Schedule — derived from the deposit terms above */}
                   {typeof depositPct === "number" && depositPct > 0 && depositPct < 100 && (
                     <div className="rounded-lg border p-4 space-y-2">
-                      <h3 className="text-xs font-semibold text-[#0a2225]/75 uppercase tracking-wider">Payment Schedule</h3>
+                      <h3 className="text-xs font-semibold text-[#0a2225]/75 uppercase tracking-wider">{t("np.paymentSchedule", "Payment Schedule")}</h3>
                       <div className="space-y-1">
                         {[
-                          { name: "Deposit", percentage: depositPct, due: typeof depositDueDays === "number" ? `within ${depositDueDays} days of acceptance` : "on acceptance" },
-                          { name: "Balance", percentage: 100 - depositPct, due: "before departure" },
+                          { name: t("np.msDeposit", "Deposit"), percentage: depositPct, due: typeof depositDueDays === "number" ? t("np.withinDays", { n: depositDueDays, defaultValue: "within {{n}} days of acceptance" }) : t("np.onAcceptance", "on acceptance") },
+                          { name: t("np.msBalance", "Balance"), percentage: 100 - depositPct, due: t("np.beforeDeparture", "before departure") },
                         ].map((m, i) => (
                           <div key={i} className="flex justify-between text-[15px]">
                             <span>{m.name} <span className="text-[#0a2225]/60">({m.due})</span></span>
@@ -1748,21 +1747,21 @@ export default function NewProposalPage() {
 
                   {/* Cancellation Policy */}
                   <div className="rounded-lg border p-4 space-y-3">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cancellation & Refund Policy</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.cancelPolicy", "Cancellation & Refund Policy")}</h3>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                      <span className="text-muted-foreground">Deposit</span>
+                      <span className="text-muted-foreground">{t("np.deposit", "Deposit")}</span>
                       <span className="font-medium capitalize">{depositRefundable.replace(/_/g, " ")}</span>
                     </div>
                     <div className="rounded bg-muted/50 p-3 space-y-1">
                       {cancellationWindows.map((w) => (
                         <div key={w.band} className="flex justify-between text-sm">
-                          <span>{CANCELLATION_LABELS[w.band]}</span>
+                          <span>{t(`np.band.${w.band}`, CANCELLATION_LABELS[w.band] || w.band)}</span>
                           <span className="font-medium">{w.refund_pct}% refund</span>
                         </div>
                       ))}
                     </div>
                     {changeFee && (
-                      <p className="text-sm"><span className="text-muted-foreground">Change fee:</span> <span className="font-medium">${Number(changeFee).toLocaleString()}</span></p>
+                      <p className="text-sm"><span className="text-muted-foreground">{t("np.changeFeeLabel", "Change fee:")}</span> <span className="font-medium">${Number(changeFee).toLocaleString()}</span></p>
                     )}
                     {supplierDependent && (
                       <p className="text-sm text-amber-600 flex items-start gap-1">
@@ -1778,20 +1777,20 @@ export default function NewProposalPage() {
 
                   {/* Deliverables */}
                   <div className="rounded-lg border p-4 space-y-2">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Deliverables</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.deliverables", "Deliverables")}</h3>
                     <ul className="space-y-1 text-sm">
-                      {delItinerary && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>Full Itinerary PDF</li>}
+                      {delItinerary && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>{t("np.fullItinPdf", "Full Itinerary PDF")}</li>}
                       {delBookingMgmt && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>Booking Management — {bookingMgmtLevel === "full_service" ? "Full-service" : bookingMgmtLevel === "advisory" ? "Advisory" : "Hybrid"}</li>}
-                      {delOnTripSupport && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>On-Trip Support — {onTripSupportLevel === "24_7" ? "24/7 emergency" : onTripSupportLevel === "business_hours" ? "Business hours" : "Email only"}</li>}
-                      <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>Revisions — {revisionCount === "unlimited" ? "Unlimited within scope" : `${revisionCount} revision${revisionCount !== "1" ? "s" : ""}`}</li>
-                      {delConcierge && conciergeDetails && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>Concierge — {conciergeDetails}</li>}
+                      {delOnTripSupport && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>{t("np.onTripSupport", "On-Trip Support")} — {onTripSupportLevel === "24_7" ? t("np.emergency247", "24/7 emergency") : onTripSupportLevel === "business_hours" ? t("np.businessHours", "Business hours") : t("np.emailOnly", "Email only")}</li>}
+                      <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>{t("np.revisions", "Revisions")} — {revisionCount === "unlimited" ? "Unlimited within scope" : `${revisionCount} revision${revisionCount !== "1" ? "s" : ""}`}</li>
+                      {delConcierge && conciergeDetails && <li className="flex items-start gap-2"><span className="text-[#0c4d47]">✓</span>{t("np.conciergeWord", "Concierge")} — {conciergeDetails}</li>}
                     </ul>
                   </div>
 
                   {/* Attachments */}
                   {(uploadedFiles.length > 0 || externalLinks.some((l) => l.trim())) && (
                     <div className="rounded-lg border p-4 space-y-2">
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Attachments</h3>
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.attachments", "Attachments")}</h3>
                       {uploadedFiles.map((f) => (
                         <div key={f.path} className="flex items-center gap-2 text-sm">
                           <FileText className="h-3.5 w-3.5 text-muted-foreground" />
@@ -1806,26 +1805,26 @@ export default function NewProposalPage() {
 
                   {/* Legal checkboxes */}
                   <div className="space-y-3 pt-4 border-t">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Terms & Acknowledgements</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("np.termsAck", "Terms & Acknowledgements")}</h3>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-terms" checked={ackTerms} onCheckedChange={(c) => setAckTerms(!!c)} className="mt-0.5" />
                       <Label htmlFor="ack-terms" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
-                        I agree to Goldsainte's <a href="/terms" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>marketplace terms and conditions</a>
+                        {t("np.ack1", "I agree to Goldsainte's")} <a href="/terms" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{t("np.ack1Link", "marketplace terms and conditions")}</a>
                       </Label>
                     </div>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-deposit" checked={ackDeposit} onCheckedChange={(c) => setAckDeposit(!!c)} className="mt-0.5" />
                       <Label htmlFor="ack-deposit" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
-                        I understand the <a href="/terms" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>deposit handling rules and payment processing terms</a>
+                        {t("np.ack2", "I understand the")} <a href="/terms" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{t("np.ack2Link", "deposit handling rules and payment processing terms")}</a>
                       </Label>
                     </div>
 
                     <div className="flex items-start gap-3 rounded-lg border p-4">
                       <Checkbox id="ack-cancel" checked={ackCancellation} onCheckedChange={(c) => setAckCancellation(!!c)} className="mt-0.5" />
                       <Label htmlFor="ack-cancel" className={`${labelClasses} text-sm cursor-pointer leading-relaxed`}>
-                        I acknowledge that the <a href="/cancellation-refund-policy" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>cancellation policy and refund terms</a> stated above are binding commitments
+                        {t("np.ack3", "I acknowledge that the")} <a href="/cancellation-refund-policy" className="underline decoration-[#C7A962] underline-offset-2 hover:text-[#0c4d47]" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{t("np.ack3Link", "cancellation policy and refund terms")}</a> {t("np.ack3End", "stated above are binding commitments")}
                       </Label>
                     </div>
                   </div>
@@ -1838,17 +1837,17 @@ export default function NewProposalPage() {
           <div className="space-y-4">
             <Card className="rounded-2xl border-0 bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
               <CardContent className="p-5 space-y-4">
-                <h3 className={eyebrowClasses}>Bid Context</h3>
+                <h3 className={eyebrowClasses}>{t("np.bidContext", "Bid Context")}</h3>
 
                 <div className="space-y-3">
                   <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
-                    <span className="text-[12.5px] text-[#0a2225]/55">Proposals</span>
+                    <span className="text-[12.5px] text-[#0a2225]/55">{t("np.proposalsWord", "Proposals")}</span>
                     <span className="font-secondary text-[15px] text-[#0a2225]">{proposalCount}</span>
                   </div>
 
                   {(tripData.budget_min || tripData.budget_max) && (
                     <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
-                      <span className="text-[12.5px] text-[#0a2225]/55">{isHire ? "Estimate" : "Budget"}</span>
+                      <span className="text-[12.5px] text-[#0a2225]/55">{isHire ? t("np.estimateWord", "Estimate") : t("np.budgetWord", "Budget")}</span>
                       <span className="font-secondary text-[15px] text-[#0a2225]">
                         {isHire && tripData.budget_max ? (
                           <>{"\u2248 "}${tripData.budget_max.toLocaleString()}</>
@@ -1864,22 +1863,22 @@ export default function NewProposalPage() {
                   )}
 
                   <div className="flex items-baseline justify-between border-b border-[#0a2225]/8 pb-2.5">
-                    <span className="text-[12.5px] text-[#0a2225]/55">Validity</span>
+                    <span className="text-[12.5px] text-[#0a2225]/55">{t("np.validity", "Validity")}</span>
                     <span className="font-secondary text-[15px] text-[#0a2225]">14 days</span>
                   </div>
 
                   {isHire && Number(priceFrom) > 0 && (
                     <div className="pb-0.5">
                       <div className="flex items-baseline justify-between">
-                        <span className="text-[12.5px] text-[#0a2225]/55">Your payout</span>
+                        <span className="text-[12.5px] text-[#0a2225]/55">{t("np.yourPayout", "Your payout")}</span>
                         <span className="font-secondary text-[15px] text-[#8D6B2F]">${Math.round(Number(priceFrom) * 0.93).toLocaleString()}</span>
                       </div>
-                      <p className="mt-0.5 text-right text-[10.5px] text-[#0a2225]/40">after the 7% platform fee</p>
+                      <p className="mt-0.5 text-right text-[10.5px] text-[#0a2225]/40">{t("np.afterFee", "after the 7% platform fee")}</p>
                     </div>
                   )}
                   {!isHire && commissionCalc.agentPayout > 0 && (
                     <div className="flex items-baseline justify-between pb-0.5">
-                      <span className="text-[12.5px] text-[#0a2225]/55">Est. payout</span>
+                      <span className="text-[12.5px] text-[#0a2225]/55">{t("np.estPayoutShort", "Est. payout")}</span>
                       <span className="font-secondary text-[15px] text-[#8D6B2F]">${commissionCalc.agentPayout.toLocaleString()}</span>
                     </div>
                   )}
@@ -1887,7 +1886,7 @@ export default function NewProposalPage() {
                   {/* Price vs budget indicator */}
                   {priceVsBudget && (
                     <div className={`rounded-xl px-3 py-2 text-[12px] leading-relaxed ${priceVsBudget === "within" ? "border border-[#0c4d47]/25 bg-[#0c4d47]/[0.06] text-[#0c4d47]" : "border border-[#C7A962]/40 bg-[#C7A962]/10 text-[#8D6B2F]"}`}>
-                      {priceVsBudget === "within" ? "✓ Your price is within budget" : "Your price exceeds the stated budget"}
+                      {priceVsBudget === "within" ? t("np.withinBudget", "✓ Your price is within budget") : t("np.exceedsBudget", "Your price exceeds the stated budget")}
                     </div>
                   )}
                 </div>
@@ -1897,9 +1896,9 @@ export default function NewProposalPage() {
             {/* Current step indicator */}
             <div className="rounded-2xl bg-gradient-to-br from-[#0c4d47] to-[#0a2225] p-4 text-center">
               <p className="text-[10px] uppercase tracking-[0.22em] text-[#C7A962]">
-                Step {step + 1} of {STEPS.length}
+                {t("np.stepOf", { n: step + 1, total: STEPS.length, defaultValue: "Step {{n}} of {{total}}" })}
               </p>
-              <p className="mt-1 font-secondary text-[17px] text-[#fdfaf2]">{STEPS[step]}</p>
+              <p className="mt-1 font-secondary text-[17px] text-[#fdfaf2]">{t(STEP_KEYS[step], STEPS[step])}</p>
             </div>
           </div>
         </div>
@@ -1914,14 +1913,12 @@ export default function NewProposalPage() {
             disabled={step === 0}
             className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[#0a2225]/60 transition-colors hover:text-[#0a2225] disabled:pointer-events-none disabled:opacity-0"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back
-          </button>
+            <ArrowLeft className="h-3.5 w-3.5" />{t("np.back", "Back")}</button>
 
           <div className="flex items-center gap-3">
             {attempted && !canAdvance() && (
               <p className="text-xs text-destructive flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" /> Fill in required fields to continue
-              </p>
+                <AlertCircle className="h-3 w-3" />{t("np.fillRequired", "Fill in required fields to continue")}</p>
             )}
             {step < 6 ? (
               <button
@@ -1932,8 +1929,7 @@ export default function NewProposalPage() {
                   setStep((s) => s + 1);
                 }}
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
-              >
-                Continue <ArrowRight className="h-3.5 w-3.5" />
+              >{t("np.continue", "Continue")}<ArrowRight className="h-3.5 w-3.5" />
               </button>
             ) : (
               <button
@@ -1945,7 +1941,7 @@ export default function NewProposalPage() {
                 disabled={submitting}
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0c4d47] px-8 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
               >
-                {submitting ? (isEditing ? "Saving…" : "Submitting…") : isEditing ? "Save Changes" : "Submit Proposal"} <Send className="h-3.5 w-3.5" />
+                {submitting ? (isEditing ? t("np.saving", "Saving…") : t("np.submitting", "Submitting…")) : isEditing ? t("np.saveChanges", "Save Changes") : t("np.submitBtn", "Submit Proposal")} <Send className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
