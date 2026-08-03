@@ -206,7 +206,7 @@ export default function BookingDetailPage() {
           .single();
 
         if (bookingErr) throw bookingErr;
-        if (!bookingRow) throw new Error("Booking not found.");
+        if (!bookingRow) throw new Error(tr("bk.notFound", "Booking not found."));
 
         if (bookingRow.traveler_id !== user.id) {
           navigate("/my-bookings");
@@ -433,11 +433,11 @@ export default function BookingDetailPage() {
     const isPrePaymentBooking = !["confirmed", "paid_in_full", "completed"].includes(String(booking.status));
     const priorAttested = (booking.metadata as any)?.residence_state as string | undefined;
     if (isPrePaymentBooking && !priorAttested && !residenceState) {
-      setPayError("Please select your state of residence in the Payment section above, then try again.");
+      setPayError(tr("bk.selectState", "Please select your state of residence in the Payment section above, then try again."));
       return;
     }
     if (isSotBlockedState(residenceState)) {
-      setPayError("Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington.");
+      setPayError(tr("bk.stateUnavailable", "Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington."));
       return;
     }
     setContractGate(null);
@@ -469,7 +469,7 @@ export default function BookingDetailPage() {
     } catch (e: any) {
       console.error("Pay balance failed", e);
       let msg =
-        "We couldn't start checkout. Please try again — if it persists, contact support.";
+        tr("bk.checkoutFailed", "We couldn't start checkout. Please try again — if it persists, contact support.");
       try {
         const resp = e?.context;
         if (resp && typeof resp.json === "function") {
@@ -544,7 +544,7 @@ export default function BookingDetailPage() {
     trip?.title ||
     (booking?.metadata as any)?.trip_title ||
     trip?.destination ||
-    "Goldsainte trip";
+    tr("bk.goldsainteTrip", "Goldsainte trip");
   const specialistName =
     partnerProfile?.display_name ||
     partnerProfile?.full_name ||
@@ -734,7 +734,7 @@ export default function BookingDetailPage() {
                 {title}
               </h1>
               <p className="mt-3.5 text-[16px] text-[#0a2225]/60">
-                {trip?.destination ? trip.destination : "Your custom trip"}
+                {trip?.destination ? trip.destination : tr("bk.customTrip", "Your custom trip")}
               </p>
               <span className="mt-5 inline-block rounded-full bg-[#0c4d47] px-5 py-2.5 text-[11px] uppercase tracking-[0.16em] text-[#E5DFC6]">
                 {humanBookingStatus(booking.status)}
@@ -990,7 +990,7 @@ export default function BookingDetailPage() {
                           ? tr("bk.status.paidInFull", "Paid in full")
                           : anyPaid
                             ? tr("bk.balanceDue", "Balance due")
-                            : "Due"}
+                            : tr("bk.due", "Due")}
                       </span>
                     </span>
                     <span className="text-[13px] font-medium text-[#8D6B2F]">
@@ -1028,10 +1028,10 @@ export default function BookingDetailPage() {
                         className="mt-5 w-full rounded-full bg-[#0c4d47] px-7 py-4 text-[13px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
                       >
                         {payingBalance
-                          ? "Preparing\u2026"
+                          ? tr("bk.preparing", "Preparing\u2026")
                           : depositPaid
-                            ? `Pay balance \u2014 ${formatMoney(balance, currency)} + 3.5% fee`
-                            : `Pay deposit \u2014 ${formatMoney(deposit, currency)} + 3.5% fee`}
+                            ? tr("bk.payBalanceFee", { amount: formatMoney(balance, currency), defaultValue: "Pay balance \u2014 {{amount}} + 3.5% fee" })
+                            : tr("bk.payDepositFee", { amount: formatMoney(deposit, currency), defaultValue: "Pay deposit \u2014 {{amount}} + 3.5% fee" })}
                       </button>
                     )}
                     {payError && (
