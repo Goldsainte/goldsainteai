@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { capLabel } from "@/lib/onTripCapabilities";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -471,7 +472,7 @@ export default function TripRequestDetail() {
                     Posted by <span className="font-secondary text-[16px]">{travelerName}</span>
                     {travelerProfile.created_at && (
                       <span className="text-[14.5px] text-[#0a2225]/50">
-                        {" "}· Member since {new Date(travelerProfile.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                        {" "}· Member since {new Date(travelerProfile.created_at).toLocaleDateString(gsIntlLocale(), { month: "short", year: "numeric" })}
                       </span>
                     )}
                   </p>
