@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,6 +117,7 @@ export default function ContractSignPage() {
 
   // Signature state
   const [signatureMode, setSignatureMode] = useState(false);
+  const { t } = useTranslation();
   const [signature, setSignature] = useState("");
   const [signaturePadRef, setSignaturePadRef] = useState<any>(null);
 
@@ -216,8 +218,8 @@ export default function ContractSignPage() {
       console.error("Error loading contract:", err);
       toast({
         variant: "destructive",
-        title: "Failed to load contract",
-        description: err.message ?? "An unexpected error occurred.",
+        title: t("contract.loadFailed", "Failed to load contract"),
+        description: err.message ?? t("contract.unexpected", "An unexpected error occurred."),
       });
     } finally {
       setLoading(false);
@@ -283,8 +285,8 @@ export default function ContractSignPage() {
       console.error("Error proposing revision:", err);
       toast({
         variant: "destructive",
-        title: "Failed to propose changes",
-        description: err.message ?? "An unexpected error occurred.",
+        title: t("contract.proposeFailed", "Failed to propose changes"),
+        description: err.message ?? t("contract.unexpected", "An unexpected error occurred."),
       });
     } finally {
       setSaving(false);
@@ -330,8 +332,8 @@ export default function ContractSignPage() {
       console.error("Error accepting revision:", err);
       toast({
         variant: "destructive",
-        title: "Failed to accept changes",
-        description: err.message ?? "An unexpected error occurred.",
+        title: t("contract.acceptFailed", "Failed to accept changes"),
+        description: err.message ?? t("contract.unexpected", "An unexpected error occurred."),
       });
     } finally {
       setSaving(false);
@@ -379,8 +381,8 @@ export default function ContractSignPage() {
       console.error("Error rejecting revision:", err);
       toast({
         variant: "destructive",
-        title: "Failed to reject changes",
-        description: err.message ?? "An unexpected error occurred.",
+        title: t("contract.rejectFailed", "Failed to reject changes"),
+        description: err.message ?? t("contract.unexpected", "An unexpected error occurred."),
       });
     } finally {
       setSaving(false);
@@ -456,7 +458,7 @@ export default function ContractSignPage() {
       toast({
         title: "Contract signed",
         description:
-          "Your signature has been recorded. If both parties have signed, you'll be able to proceed to deposit.",
+          t("contract.signRecorded", "Your signature has been recorded. If both parties have signed, you'll be able to proceed to deposit."),
       });
       setSignatureMode(false);
       setSignature("");
@@ -465,8 +467,8 @@ export default function ContractSignPage() {
       console.error("Error signing contract:", err);
       toast({
         variant: "destructive",
-        title: "Failed to record signature",
-        description: err.message ?? "An unexpected error occurred.",
+        title: t("contract.signFailed", "Failed to record signature"),
+        description: err.message ?? t("contract.unexpected", "An unexpected error occurred."),
       });
     } finally {
       setSaving(false);
@@ -511,7 +513,7 @@ export default function ContractSignPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading contract…</p>
+          <p className="text-muted-foreground">{t("contract.loading", "Loading contract…")}</p>
         </div>
       </div>
     );
@@ -522,14 +524,14 @@ export default function ContractSignPage() {
       <div className="flex min-h-screen items-center justify-center px-4">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Not authorized</CardTitle>
+            <CardTitle>{t("contract.notAuthorized", "Not authorized")}</CardTitle>
             <CardDescription>
-              You don't have permission to view this contract.
+              {t("contract.noPermission", "You don't have permission to view this contract.")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate("/my-bookings")}>
-              Back to my bookings
+              {t("contract.backToBookings", "Back to my bookings")}
             </Button>
           </CardContent>
         </Card>
@@ -556,14 +558,14 @@ export default function ContractSignPage() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              aria-label="Back"
+              aria-label={t("contract.backAria", "Back")}
               className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border border-[#E5DFC6]/28 text-[#E5DFC6] transition-colors hover:bg-white/10"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="min-w-0 flex-1">
               <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">
-                Trip Service Agreement
+                {t("contract.agreementTitle", "Trip Service Agreement")}
               </p>
               <h1 className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">
                 {contract.trip_info?.destination ?? "Your Trip"}
@@ -576,8 +578,8 @@ export default function ContractSignPage() {
                 className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#C7A962] px-6 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d]"
               >
                 <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Download PDF</span>
-                <span className="sm:hidden">PDF</span>
+                <span className="hidden sm:inline">{t("contract.downloadPdf", "Download PDF")}</span>
+                <span className="sm:hidden">{t("contract.pdfShort", "PDF")}</span>
               </button>
             ) : (
               <span className="shrink-0 rounded-full border border-[#E5DFC6]/35 px-4 py-2 text-[10.5px] uppercase tracking-[0.16em] text-[#E5DFC6]">
@@ -592,7 +594,7 @@ export default function ContractSignPage() {
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">
                 {String((contract.field_values as any)?.agentName || "A").trim().charAt(0).toUpperCase()}
               </span>
-              <span className="hidden sm:inline">{(contract.field_values as any)?.agentName || "Agent"}</span>
+              <span className="hidden sm:inline">{(contract.field_values as any)?.agentName || t("contract.agent", "Agent")}</span>
               <span className={`h-[9px] w-[9px] rounded-full ${contract.agent_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
             </span>
             <span className="flex items-center gap-2 text-[13px] text-[#fdfaf2]">
@@ -600,26 +602,26 @@ export default function ContractSignPage() {
                 {String(contract.traveler_info?.firstName || "T").trim().charAt(0).toUpperCase()}
               </span>
               <span className="hidden sm:inline">
-                {`${contract.traveler_info?.firstName ?? ""} ${contract.traveler_info?.lastName ?? ""}`.trim() || "Traveler"}
+                {`${contract.traveler_info?.firstName ?? ""} ${contract.traveler_info?.lastName ?? ""}`.trim() || t("contract.traveler", "Traveler")}
               </span>
               <span className={`h-[9px] w-[9px] rounded-full ${contract.traveler_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
             </span>
             {contract.creator_id && (
               <span className="flex items-center gap-2 text-[13px] text-[#fdfaf2]">
                 <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[11px] font-semibold text-[#0a2225]">C</span>
-                <span className="hidden sm:inline">Creator</span>
+                <span className="hidden sm:inline">{t("contract.creator", "Creator")}</span>
                 <span className={`h-[9px] w-[9px] rounded-full ${contract.creator_signed_at ? "bg-[#C7A962]" : "bg-[#E5DFC6]/25"}`} />
               </span>
             )}
             <div className="flex-1" />
             {contract.status === "fully_executed" ? (
               <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#C7A962]">
-                <CheckCircle2 className="h-4 w-4" /> Fully executed
+                <CheckCircle2 className="h-4 w-4" /> {t("contract.fullyExecuted", "Fully executed")}
               </span>
             ) : hasSigned ? (
-              <span className="text-[12.5px] text-[#fdfaf2]">Waiting for the other party</span>
+              <span className="text-[12.5px] text-[#fdfaf2]">{t("contract.waitingOther", "Waiting for the other party")}</span>
             ) : (
-              <span className="text-[12.5px] text-[#fdfaf2]">Awaiting your signature</span>
+              <span className="text-[12.5px] text-[#fdfaf2]">{t("contract.awaitingYours", "Awaiting your signature")}</span>
             )}
           </div>
         </div>
@@ -634,12 +636,12 @@ export default function ContractSignPage() {
                 <ShieldCheck className="h-6 w-6 text-green-700 shrink-0 mt-0.5" />
                 <div className="min-w-0">
                   <p className="font-medium text-green-900">
-                    This contract is fully executed.
+                    {t("contract.executedBanner", "This contract is fully executed.")}
                   </p>
                   <p className="text-sm text-green-800">
                     {userRole === "traveler"
-                      ? "Both parties have signed. Next: pay your deposit from your booking — it's charged securely through Stripe directly to your specialist, your seller of record."
-                      : "Both parties have signed. Next: the traveler pays the deposit — you'll be notified. Then share the confirmed reservations in Messages so they can release it to you."}
+                      ? t("contract.executedTraveler", "Both parties have signed. Next: pay your deposit from your booking — it's charged securely through Stripe directly to your specialist, your seller of record.")
+                      : t("contract.executedPartner", "Both parties have signed. Next: the traveler pays the deposit — you'll be notified. Then share the confirmed reservations in Messages so they can release it to you.")}
                   </p>
                 </div>
               </div>
@@ -650,7 +652,7 @@ export default function ContractSignPage() {
                   className="gap-2 w-full sm:w-auto"
                 >
                   <Download className="h-4 w-4" />
-                  Download PDF
+                  {t("contract.downloadPdf", "Download PDF")}
                 </Button>
                 {contract.booking_id && (
                   <Button
@@ -659,7 +661,7 @@ export default function ContractSignPage() {
                     }
                     className="gap-2 w-full sm:w-auto"
                   >
-                    Continue to deposit
+                    {t("contract.continueDeposit", "Continue to deposit")}
                   </Button>
                 )}
               </div>
@@ -692,8 +694,8 @@ export default function ContractSignPage() {
                       <div>
                         <p className="font-medium">
                           {isMine
-                            ? "Your proposed changes"
-                            : `Proposed by the ${rev.proposed_by_role}`}
+                            ? t("contract.yourChanges", "Your proposed changes")
+                            : t("contract.proposedBy", { role: rev.proposed_by_role, defaultValue: "Proposed by the {{role}}" })}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(rev.created_at).toLocaleString()}
@@ -707,14 +709,14 @@ export default function ContractSignPage() {
                             onClick={() => setRevisionToReject(rev.id)}
                             disabled={saving}
                           >
-                            Reject
+                            {t("contract.reject", "Reject")}
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => handleAcceptRevision(rev.id)}
                             disabled={saving}
                           >
-                            Accept
+                            {t("contract.accept", "Accept")}
                           </Button>
                         </div>
                       )}
@@ -726,7 +728,7 @@ export default function ContractSignPage() {
                     )}
                     <div className="space-y-2">
                       <p className="text-xs font-medium text-muted-foreground">
-                        Changes:
+                        {t("contract.changesLabel", "Changes:")}
                       </p>
                       {Object.entries(rev.changes).map(([k, v]) => (
                         <div
@@ -736,7 +738,7 @@ export default function ContractSignPage() {
                           <span className="font-medium">{fieldLabel(k)}:</span>
                           <span>
                             <span className="line-through text-muted-foreground">
-                              {contract.field_values[k] || "(empty)"}
+                              {contract.field_values[k] || t("contract.emptyVal", "(empty)")}
                             </span>
                             <span className="mx-2">→</span>
                             <span className="font-medium">{v}</span>
@@ -753,10 +755,10 @@ export default function ContractSignPage() {
 
         {plainSummary && (
           <div className="mb-8 rounded-2xl border border-[#E5DFC6] bg-[#fdfaf2] px-6 py-5">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">In plain English</p>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("contract.plainEnglish", "In plain English")}</p>
             <p className="mt-2 text-[14.5px] leading-relaxed text-[#0a2225]/80">{plainSummary}</p>
             <p className="mt-3 text-[11.5px] text-[#0a2225]/45">
-              A courtesy summary generated by Goldsainte AI — the agreement below is the document you're signing.
+              {t("contract.plainNote", "A courtesy summary generated by Goldsainte AI — the agreement below is the document you're signing.")}
             </p>
           </div>
         )}
@@ -765,9 +767,9 @@ export default function ContractSignPage() {
         {contract.source_type === "uploaded" ? (
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle className="text-xl">Agreement Document</CardTitle>
+              <CardTitle className="text-xl">{t("contract.agreementDoc", "Agreement Document")}</CardTitle>
               <CardDescription>
-                This agreement was provided by your travel specialist. Review the full document below, then sign underneath.
+                {t("contract.agreementDocNote", "This agreement was provided by your travel specialist. Review the full document below, then sign underneath.")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -780,12 +782,12 @@ export default function ContractSignPage() {
                       rel="noreferrer"
                       className="inline-flex items-center rounded-full bg-[#0c4d47] px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
                     >
-                      Open in new tab
+                      {t("contract.openNewTab", "Open in new tab")}
                     </a>
                   </div>
                   <iframe
                     src={uploadedPdfUrl}
-                    title="Contract document"
+                    title={t("contract.docTitle", "Contract document")}
                     className="h-[720px] w-full rounded-lg border"
                   />
                 </>
@@ -867,7 +869,7 @@ export default function ContractSignPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Pencil className="h-5 w-5" />
-                  Need changes before signing?
+                  {t("contract.needChanges", "Need changes before signing?")}
                 </CardTitle>
                 <CardDescription>
                   Suggest edits to any field. Your changes will be sent to the
@@ -884,12 +886,12 @@ export default function ContractSignPage() {
                     </p>
                     <div>
                       <Label htmlFor="revision-message">
-                        Message to the agent (optional)
+                        {t("contract.msgToAgent", "Message to the agent (optional)")}
                       </Label>
                       <Textarea
                         id="revision-message"
                         rows={3}
-                        placeholder="Explain why you'd like these changes…"
+                        placeholder={t("contract.explainPh", "Explain why you'd like these changes…")}
                         value={revisionMessage}
                         onChange={(e) => setRevisionMessage(e.target.value)}
                       />
@@ -916,7 +918,7 @@ export default function ContractSignPage() {
                         }}
                         disabled={saving}
                       >
-                        Cancel
+                        {t("prop.list.cancelWord", "Cancel")}
                       </Button>
                     </div>
                   </div>
@@ -927,7 +929,7 @@ export default function ContractSignPage() {
                     className="gap-2"
                   >
                     <Pencil className="h-4 w-4" />
-                    Suggest changes
+                    {t("contract.suggestChanges", "Suggest changes")}
                   </Button>
                 )}
               </CardContent>
@@ -940,7 +942,7 @@ export default function ContractSignPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Your signature
+                {t("contract.yourSignature", "Your signature")}
               </CardTitle>
               <CardDescription>
                 {hasSigned
@@ -993,7 +995,7 @@ export default function ContractSignPage() {
                       }}
                       disabled={saving}
                     >
-                      Clear
+                      {t("contract.clear", "Clear")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -1003,7 +1005,7 @@ export default function ContractSignPage() {
                       }}
                       disabled={saving}
                     >
-                      Cancel
+                      {t("prop.list.cancelWord", "Cancel")}
                     </Button>
                   </div>
                 </div>
@@ -1015,12 +1017,12 @@ export default function ContractSignPage() {
                   className="gap-2"
                 >
                   <FileText className="h-4 w-4" />
-                  Sign contract
+                  {t("contract.signContract", "Sign contract")}
                 </Button>
               )}
               {pendingRevisions.length > 0 && !hasSigned && (
                 <p className="text-sm text-amber-700">
-                  Resolve the pending revisions above before signing.
+                  {t("contract.resolvePending", "Resolve the pending revisions above before signing.")}
                 </p>
               )}
             </CardContent>
@@ -1040,7 +1042,7 @@ export default function ContractSignPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reject proposed changes?</AlertDialogTitle>
+            <AlertDialogTitle>{t("contract.rejectTitle", "Reject proposed changes?")}</AlertDialogTitle>
             <AlertDialogDescription>
               The other party will be notified that you rejected their proposed
               changes. The contract will keep its current text. Optionally leave
@@ -1060,10 +1062,10 @@ export default function ContractSignPage() {
                 setRejectMessage("");
               }}
             >
-              Cancel
+              {t("prop.list.cancelWord", "Cancel")}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleRejectRevision} disabled={saving}>
-              Reject changes
+              {t("contract.rejectChanges", "Reject changes")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
