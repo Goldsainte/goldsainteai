@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
  * "This week on Goldsainte" — soft serif numerals, no dashboard tiles.
  */
 export function ThisWeekFooter() {
+  const { t } = useTranslation();
   const { data } = useQuery({
     queryKey: ["this-week-stats"],
     queryFn: async () => {
@@ -35,13 +37,13 @@ export function ThisWeekFooter() {
   return (
     <section className="mt-20 border-t border-[#E5DFC6] py-10">
       <p className="text-center font-secondary text-[11px] uppercase tracking-widest text-[#C7B892]">
-        This week on Goldsainte
+        {t("mp.week.heading", "This week on Goldsainte")}
       </p>
       <div className="mt-6 grid grid-cols-2 gap-y-8 sm:grid-cols-4 sm:gap-x-10">
-        <Stat label="Destinations covered" value={stats.destinations} />
-        <Stat label="Curated trips" value={stats.trips} />
-        <Stat label="Trending now" value={stats.trending} />
-        <Stat label="Recent bookings" value={stats.bookings} />
+        <Stat label={t("mp.week.destinations", "Destinations covered")} value={stats.destinations} />
+        <Stat label={t("mp.week.trips", "Curated trips")} value={stats.trips} />
+        <Stat label={t("mp.week.trending", "Trending now")} value={stats.trending} />
+        <Stat label={t("mp.week.bookings", "Recent bookings")} value={stats.bookings} />
       </div>
     </section>
   );
