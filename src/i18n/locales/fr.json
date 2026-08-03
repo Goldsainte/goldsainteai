@@ -1673,7 +1673,16 @@
     "upcoming": "À venir",
     "viewBreakdown": "Voir le détail",
     "yourSpecialist": "Votre spécialiste",
-    "youreHere": "Vous êtes ici"
+    "youreHere": "Vous êtes ici",
+    "checkoutFailed": "Impossible de démarrer le paiement. Réessayez — si le problème persiste, contactez l'assistance.",
+    "customTrip": "Votre voyage sur mesure",
+    "due": "À régler",
+    "goldsainteTrip": "Voyage Goldsainte",
+    "notFound": "Réservation introuvable.",
+    "payBalanceFee": "Payer le solde — {{amount}} + 3,5 % de frais",
+    "payDepositFee": "Payer l'acompte — {{amount}} + 3,5 % de frais",
+    "selectState": "Sélectionnez votre État de résidence dans la section Paiement ci-dessus, puis réessayez.",
+    "stateUnavailable": "Les réservations de voyage ne sont pas encore disponibles pour les résidents de Californie, Floride, Hawaï, Iowa et Washington."
   },
   "hire": {
     "acceptNote": "Ils acceptent et versent l'acompte — réglé directement sur votre compte Stripe.",
@@ -1948,5 +1957,38 @@
       "14-29": "14 à 29 jours avant le départ",
       "<14": "Moins de 14 jours avant le départ"
     }
+  },
+  "msg": {
+    "acceptFailed": "Impossible d'accepter la demande",
+    "convArchived": "Conversation archivée",
+    "convDeleted": "Conversation supprimée",
+    "convDeletedPerm": "Conversation supprimée définitivement",
+    "deleteFailed": "Impossible de supprimer le message",
+    "error": "Erreur",
+    "fileTooLarge": "Fichier trop volumineux",
+    "fileTooLargeD": "{{name}} dépasse 10 Mo.",
+    "messageDeleted": "Message supprimé",
+    "openAttachFailed": "Impossible d'ouvrir la pièce jointe",
+    "requestAccepted": "Demande acceptée",
+    "requestAcceptedD": "Vous pouvez maintenant vous écrire.",
+    "requestDeclined": "Demande refusée",
+    "tryAgain": "Veuillez réessayer.",
+    "uploadFailed": "Échec du téléversement",
+    "userBlocked": "Utilisateur bloqué"
+  },
+  "sett": {
+    "checkoutOpened": "Paiement ouvert dans un nouvel onglet",
+    "clearCacheFailed": "Impossible de vider le cache de recherche",
+    "imageTooLarge": "L'image doit faire moins de 5 Mo",
+    "loadProfileFailed": "Impossible de charger le profil",
+    "openingCheckout": "Ouverture du paiement…",
+    "paySuccess": "Paiement réussi ! Vérification du statut en cours…",
+    "photoFailed": "Impossible de téléverser la photo",
+    "photoUpdated": "Photo de profil mise à jour !",
+    "profileUpdated": "Profil mis à jour !",
+    "selectImage": "Veuillez sélectionner un fichier image",
+    "updateProfileFailed": "Impossible de mettre à jour le profil",
+    "verifCancelled": "Vérification annulée",
+    "verifStartFailed": "Impossible de lancer la vérification"
   }
 }
