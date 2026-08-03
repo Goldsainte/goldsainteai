@@ -1180,5 +1180,116 @@
     "alreadyApplied": "已经申请过？",
     "checkStatus": "随时登录查看申请进度。",
     "questions": "关于成为专家的疑问 —"
+  },
+  "mp": {
+    "header": {
+      "h1": "旅程、跟团游与指南——由真正去过的人打造。",
+      "sub": "真实可订的旅程——直接来自设计它们的认证当地人与顾问。",
+      "trust1": "每个上架项目都经团队审核",
+      "trust2": "Stripe 保障结账",
+      "trust3": "与你的专家直接沟通"
+    },
+    "tabs": {
+      "requests": "旅行需求",
+      "requestsS": "需求",
+      "trips": "精选旅程",
+      "tripsS": "旅程",
+      "tours": "跟团游",
+      "toursS": "跟团游",
+      "guides": "行程指南",
+      "guidesS": "指南"
+    },
+    "filters": {
+      "sortNewest": "最新",
+      "sortPopular": "最热门",
+      "sortPriceLow": "价格从低到高",
+      "sortPriceHigh": "价格从高到低",
+      "destination": "目的地",
+      "duration": "时长",
+      "price": "价格",
+      "daysSuffix": "天",
+      "destinationsPanel": "目的地",
+      "priceRange": "价格区间",
+      "clearPrice": "清除价格",
+      "sortBy": "排序方式"
+    },
+    "empty": {
+      "noResults": "没有符合筛选条件的结果",
+      "tryAdjusting": "调整搜索条件或清除筛选，即可查看全部可选项。",
+      "clearFilters": "清除筛选",
+      "tripsTitle": "未找到旅程",
+      "tripsDesc": "抢先发布你的梦想旅程，让创作者来实现它。",
+      "tripsCta": "发布你的梦想旅程",
+      "creatorsTitle": "未找到创作者",
+      "creatorsDesc": "敬请期待，鼓舞人心的旅行创作者即将到来。",
+      "creatorsCta": "浏览全部创作者",
+      "agentsTitle": "未找到代理",
+      "agentsDesc": "认证旅行代理通过审核后将显示在这里。",
+      "agentsCta": "浏览全部代理",
+      "brandsTitle": "未找到品牌",
+      "brandsDesc": "经认证的酒店、公寓与品牌上线 Goldsainte 后将显示在这里。",
+      "brandsCta": "浏览全部品牌",
+      "briefsTitle": "暂无旅行者需求",
+      "briefsDesc": "旅行者发布需求后会显示在这里，供你查看并提交提案。",
+      "briefsCta": "发布你的梦想旅程"
+    },
+    "week": {
+      "heading": "本周的 Goldsainte",
+      "destinations": "覆盖目的地",
+      "trips": "精选旅程",
+      "trending": "当前热门",
+      "bookings": "近期预订"
+    },
+    "grid": {
+      "deleteTitle": "删除这条旅行需求？",
+      "deleteDesc": "该旅行需求及所有相关消息将被永久删除。此操作无法撤销。",
+      "cancel": "取消",
+      "deleting": "删除中…",
+      "delete": "删除",
+      "deleteAria": "删除旅行需求",
+      "seeking": "正在征集提案",
+      "travelerOne": "位旅客",
+      "travelerMany": "位旅客",
+      "fromBudget": "{{amount}} 美元起",
+      "upToBudget": "最高 {{amount}} 美元",
+      "proposalOne": "份提案",
+      "proposalMany": "份提案"
+    },
+    "card": {
+      "signInToSave": "登录后即可收藏旅程",
+      "trending": "热门",
+      "new": "新上架",
+      "bookedTimes": "本周已被预订 {{count}} 次",
+      "roleAgent": "旅行代理",
+      "roleCreator": "创作者",
+      "removeSaved": "取消收藏",
+      "saveTrip": "收藏旅程",
+      "nights": "晚",
+      "from": "起价"
+    },
+    "meta": {
+      "title": "旅行市集 — Goldsainte",
+      "desc": "浏览来自 50 多个国家的认证专家与旅行创作者的精选旅程。即刻预订，或发布你的梦想旅程并收到量身定制的提案。"
+    },
+    "tours": {
+      "searchPh": "搜索跟团游——城市、地标或活动",
+      "searchAria": "搜索跟团游",
+      "collectionsAria": "跟团游合集",
+      "editors": "编辑精选",
+      "fromCreators": "来自创作者",
+      "noneFor": "暂时没有“{{place}}”的跟团游",
+      "noneMatch": "没有符合条件的跟团游",
+      "tryNearby": "试试附近的城市、某个地标，或“美食之旅”这类活动。",
+      "willAppear": "创作者与旅行社的可预订跟团游将显示在这里。"
+    },
+    "coll": {
+      "slowLuxury": "慢奢之旅",
+      "slowLuxuryK": "更从容的节奏",
+      "hiddenCities": "隐秘之城",
+      "hiddenCitiesK": "避开寻常",
+      "quietAdventure": "静谧探险",
+      "quietAdventureK": "值得的独处"
+    },
+    "disclaimer": "Goldsainte 是一个旅行市集。所有旅程均由独立的专家、代理与供应商设计并履行。旅行需求的提案适用其各自的取消、退款与订金条款。"
   }
 }
