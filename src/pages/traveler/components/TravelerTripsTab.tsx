@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Calendar, Users, ArrowRight, Plus } from "lucide-react";
@@ -52,7 +53,7 @@ export function TravelerTripsTab({ userId }: TravelerTripsTabProps) {
 
   const formatDate = (date: string | null) => {
     if (!date) return "Flexible";
-    return new Date(date).toLocaleDateString("en-US", {
+    return new Date(date).toLocaleDateString(gsIntlLocale(), {
       month: "short",
       day: "numeric",
       year: "numeric",
