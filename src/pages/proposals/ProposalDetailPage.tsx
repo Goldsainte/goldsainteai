@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 // src/pages/proposals/ProposalDetailPage.tsx
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState, useRef } from "react";
@@ -75,17 +76,18 @@ function formatDate(dateStr?: string | null) {
   return d.toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric", year: "numeric" });
 }
 
-function humanStatus(status: string) {
-  const map: Record<string, string> = {
-    pending: "Awaiting Review",
-    sent: "Awaiting Review",
-    traveler_review: "Under Review",
-    accepted: "Accepted",
-    declined: "Declined",
-    withdrawn: "Withdrawn",
-    expired: "Expired",
+function humanStatus(status: string, t: (key: string, defaultValue: string) => string) {
+  const map: Record<string, [string, string]> = {
+    pending: ["prop.status.awaiting", "Awaiting Review"],
+    sent: ["prop.status.awaiting", "Awaiting Review"],
+    traveler_review: ["prop.status.underReview", "Under Review"],
+    accepted: ["prop.status.accepted", "Accepted"],
+    declined: ["prop.status.declined", "Declined"],
+    withdrawn: ["prop.status.withdrawn", "Withdrawn"],
+    expired: ["prop.status.expired", "Expired"],
   };
-  return map[status] || status;
+  const hit = map[status];
+  return hit ? t(hit[0], hit[1]) : status;
 }
 
 function statusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
@@ -129,6 +131,7 @@ export default function ProposalDetailPage() {
   const [accountType, setAccountType] = useState<AccountType>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
   const [actionLoading, setActionLoading] = useState<"accept" | "decline" | "withdraw" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -157,7 +160,7 @@ export default function ProposalDetailPage() {
         }
         setProposal(detail);
       } catch (err: any) {
-        if (!cancelled) setError(err.message || "Failed to load proposal.");
+        if (!cancelled) setError(err.message || t("prop.detail.loadFailed", "Failed to load proposal."));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -196,7 +199,7 @@ export default function ProposalDetailPage() {
         setProposal(refreshed);
       }
     } catch (err: any) {
-      setActionError(err.message || "We couldn't accept this proposal.");
+      setActionError(err.message || t("prop.detail.acceptFailed", "We couldn't accept this proposal."));
     } finally {
       setActionLoading(null);
     }
@@ -211,7 +214,7 @@ export default function ProposalDetailPage() {
       const refreshed = await getProposalDetail(proposalId);
       setProposal(refreshed);
     } catch (err: any) {
-      setActionError(err.message || "We couldn't update this proposal.");
+      setActionError(err.message || t("prop.detail.updateFailed", "We couldn't update this proposal."));
     } finally {
       setActionLoading(null);
     }
@@ -226,18 +229,18 @@ export default function ProposalDetailPage() {
       const refreshed = await getProposalDetail(proposalId);
       setProposal(refreshed);
     } catch (err: any) {
-      setActionError(err.message || "We couldn't withdraw this proposal.");
+      setActionError(err.message || t("prop.detail.withdrawFailed", "We couldn't withdraw this proposal."));
     } finally {
       setActionLoading(null);
     }
   }
 
   const trip = proposal?.trip_request;
-  const title = proposal?.headline || trip?.title || trip?.destination || "Trip Proposal";
+  const title = proposal?.headline || trip?.title || trip?.destination || t("prop.detail.tripProposal", "Trip Proposal");
   const pb = proposal?.price_breakdown;
   const hireInfo: any = (pb as any)?.hire ?? null;
   const isHireProposal = Boolean(hireInfo);
-  const hirePartnerFirst = (proposal?.proposer?.display_name || "your host").split(" ")[0];
+  const hirePartnerFirst = (proposal?.proposer?.display_name || t("prop.detail.yourHost", "your host")).split(" ")[0];
   const depositAmount = proposal?.price_from && proposal?.deposit_percentage
     ? Math.round(proposal.price_from * proposal.deposit_percentage / 100)
     : null;
@@ -255,7 +258,7 @@ export default function ProposalDetailPage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-[15px] text-destructive">{error}</p>
-        <Button variant="link" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/marketplace/trip-requests'))}>Go back</Button>
+        <Button variant="link" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/marketplace/trip-requests'))}>{t("prop.detail.goBack", "Go back")}</Button>
       </div>
     );
   }
@@ -264,20 +267,18 @@ export default function ProposalDetailPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-[#FDF9F0] px-6">
         <div className="max-w-md rounded-[20px] border border-[#E5DFC6] bg-white p-8 text-center">
-          <p className="text-[12px] uppercase tracking-[0.28em] text-[#0c4d47]/70">Proposal</p>
+          <p className="text-[12px] uppercase tracking-[0.28em] text-[#0c4d47]/70">{t("prop.detail.eyebrowSolo", "Proposal")}</p>
           <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">
-            This proposal isn't available
+            {t("prop.detail.notAvailTitle", "This proposal isn't available")}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-[#0a2225]/60">
-            It may have been withdrawn, or your account may not have access to
-            it. If you arrived from an email, make sure you're signed in with
-            the address the trip request was posted under.
+            {t("prop.detail.notAvailDesc", "It may have been withdrawn, or your account may not have access to it. If you arrived from an email, make sure you're signed in with the address the trip request was posted under.")}
           </p>
           <button
             onClick={() => navigate("/my-bookings")}
             className="mt-6 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-6 py-2.5 text-[15px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors"
           >
-            Go to my journeys
+            {t("prop.detail.goToJourneys", "Go to my journeys")}
           </button>
         </div>
       </div>
@@ -298,17 +299,17 @@ export default function ProposalDetailPage() {
             className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to trips
+            {t("prop.list.back", "Back to trips")}
           </Link>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <p className="text-[13px] uppercase tracking-[0.18em] text-primary font-semibold">
-                  Trip Proposal
+                  {t("prop.detail.tripProposal", "Trip Proposal")}
                 </p>
                 <Badge variant={statusVariant(proposal.status)}>
-                  {humanStatus(proposal.status)}
+                  {humanStatus(proposal.status, t)}
                 </Badge>
               </div>
               <h1 className="font-secondary text-2xl md:text-3xl leading-tight text-foreground font-semibold">
@@ -329,7 +330,7 @@ export default function ProposalDetailPage() {
                   </span>
                 )}
                 {proposal.nights && (
-                  <span>{proposal.nights} night{proposal.nights === 1 ? "" : "s"}</span>
+                  <span>{proposal.nights} {proposal.nights === 1 ? t("prop.detail.nightOne", "night") : t("prop.detail.nightMany", "nights")}</span>
                 )}
               </div>
             </div>
@@ -338,11 +339,11 @@ export default function ProposalDetailPage() {
             <Card className="md:min-w-[280px] border-primary/20 bg-primary/5">
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-[13px] uppercase tracking-wide text-muted-foreground font-medium">Total Price</span>
+                  <span className="text-[13px] uppercase tracking-wide text-muted-foreground font-medium">{t("prop.detail.totalPrice", "Total Price")}</span>
                   {pb?.pricing_confirmed ? (
-                    <Badge variant="default" className="text-[12px]">Confirmed</Badge>
+                    <Badge variant="default" className="text-[12px]">{t("prop.detail.confirmed", "Confirmed")}</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-[12px]">Estimate</Badge>
+                    <Badge variant="outline" className="text-[12px]">{t("prop.detail.estimate", "Estimate")}</Badge>
                   )}
                 </div>
                 <p className="font-secondary text-3xl font-bold text-foreground">
@@ -354,7 +355,7 @@ export default function ProposalDetailPage() {
                 <div className="border-t pt-3 space-y-1.5">
                   {depositAmount && (
                     <div className="flex justify-between text-[15px]">
-                      <span className="text-muted-foreground">Deposit Due</span>
+                      <span className="text-muted-foreground">{t("prop.detail.depositDue", "Deposit Due")}</span>
                       <span className="font-semibold text-foreground">
                         {formatMoney(depositAmount, proposal.currency || "USD")}
                         <span className="text-[13px] text-muted-foreground ml-1">({proposal.deposit_percentage}%)</span>
@@ -363,13 +364,13 @@ export default function ProposalDetailPage() {
                   )}
                   {pb?.balance_due && (
                     <div className="flex justify-between text-[15px]">
-                      <span className="text-muted-foreground">Balance Due</span>
+                      <span className="text-muted-foreground">{t("prop.detail.balanceDue", "Balance Due")}</span>
                       <span className="text-foreground">{humanize(pb.balance_due)}</span>
                     </div>
                   )}
                   {proposal.valid_until && isPending && (
                     <div className="flex justify-between text-[15px]">
-                      <span className="text-muted-foreground">Valid Until</span>
+                      <span className="text-muted-foreground">{t("prop.detail.validUntil", "Valid Until")}</span>
                       <span className={`font-medium ${validDays !== null && validDays <= 3 ? "text-destructive" : "text-foreground"}`}>
                         {formatDate(proposal.valid_until)}
                         {validDays !== null && validDays <= 3 && (
@@ -399,7 +400,7 @@ export default function ProposalDetailPage() {
                 <CardContent className="p-6 md:p-8">
                   {proposal.message && (
                     <div className="border-l-4 border-primary pl-5">
-                      <p className="text-[13px] uppercase tracking-[0.16em] text-primary font-semibold mb-3">The Pitch</p>
+                      <p className="text-[13px] uppercase tracking-[0.16em] text-primary font-semibold mb-3">{t("prop.detail.pitch", "The Pitch")}</p>
                       <p className="text-[16px] leading-relaxed text-foreground whitespace-pre-line">
                         {proposal.message}
                       </p>
@@ -407,7 +408,7 @@ export default function ProposalDetailPage() {
                   )}
                   {proposal.itinerary_summary && (
                     <div className={proposal.message ? "mt-6 pt-6 border-t" : ""}>
-                      <p className="text-[13px] uppercase tracking-[0.16em] text-muted-foreground font-semibold mb-3">Trip Overview</p>
+                      <p className="text-[13px] uppercase tracking-[0.16em] text-muted-foreground font-semibold mb-3">{t("prop.detail.overview", "Trip Overview")}</p>
                       <p className="text-[16px] leading-relaxed text-foreground whitespace-pre-line">
                         {proposal.itinerary_summary}
                       </p>
@@ -421,13 +422,13 @@ export default function ProposalDetailPage() {
             {(inclusionsList.length > 0 || exclusionsList.length > 0 || pb?.service_level) && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Scope of Services</CardTitle>
+                  <CardTitle className="text-base">{t("prop.detail.scope", "Scope of Services")}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 pt-2 space-y-5">
                   <div className="grid md:grid-cols-2 gap-6">
                     {inclusionsList.length > 0 && (
                       <div>
-                        <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-3">Included</p>
+                        <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-3">{t("prop.detail.included", "Included")}</p>
                         <ul className="space-y-2">
                           {inclusionsList.map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5 text-[15px] text-foreground">
@@ -440,7 +441,7 @@ export default function ProposalDetailPage() {
                     )}
                     {exclusionsList.length > 0 && (
                       <div>
-                        <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-3">Not Included</p>
+                        <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-3">{t("prop.detail.notIncluded", "Not Included")}</p>
                         <ul className="space-y-2">
                           {exclusionsList.map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5 text-[15px] text-muted-foreground">
@@ -463,17 +464,17 @@ export default function ProposalDetailPage() {
                       )}
                       {pb?.support_level && (
                         <Badge variant="outline" className="text-[13px]">
-                          Support: {pb.support_level}
+                          {t("prop.detail.supportPrefix", "Support:")} {pb.support_level}
                         </Badge>
                       )}
                       {pb?.revision_count !== undefined && pb.revision_count !== null && (
                         <Badge variant="outline" className="text-[13px]">
-                          {pb.revision_count} revision{pb.revision_count === 1 ? "" : "s"} included
+                          {pb.revision_count} {pb.revision_count === 1 ? t("prop.detail.revIncludedOne", "revision included") : t("prop.detail.revIncludedMany", "revisions included")}
                         </Badge>
                       )}
                       {pb?.handles_supplier_payments && (
                         <Badge variant="outline" className="text-[13px]">
-                          Supplier payments handled
+                          {t("prop.detail.supplierHandled", "Supplier payments handled")}
                         </Badge>
                       )}
                     </div>
@@ -487,24 +488,24 @@ export default function ProposalDetailPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />
-                  Payment & Cancellation Terms
+                  {t("prop.detail.termsTitle", "Payment & Cancellation Terms")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6 pt-2 space-y-6">
 
                 {/* Pricing Breakdown */}
                 <div className="space-y-3">
-                  <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Pricing Breakdown</p>
+                  <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">{t("prop.detail.pricingBreakdown", "Pricing Breakdown")}</p>
                   <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                     {pb?.pricing_type && (
                       <div className="flex justify-between text-[16px]">
-                        <span className="text-[#0a2225]/75">Pricing Type</span>
+                        <span className="text-[#0a2225]/75">{t("prop.detail.pricingType", "Pricing Type")}</span>
                         <span className="font-medium text-foreground">{humanize(pb.pricing_type)}</span>
                       </div>
                     )}
                     {proposal.price_from && (
                       <div className="flex justify-between text-[16px]">
-                        <span className="text-[#0a2225]/75">Trip Cost</span>
+                        <span className="text-[#0a2225]/75">{t("prop.detail.tripCost", "Trip Cost")}</span>
                         <span className="font-semibold text-foreground">
                           {formatMoney(proposal.price_from, proposal.currency || "USD")}
                         </span>
@@ -514,27 +515,27 @@ export default function ProposalDetailPage() {
                     {/* Commission Structure */}
                     {pb?.commission_model && (
                       <div className="border-t pt-2 mt-2 space-y-1.5">
-                        <p className="text-[13px] font-semibold text-[#0a2225]/75 uppercase tracking-wide">Commission Structure</p>
+                        <p className="text-[13px] font-semibold text-[#0a2225]/75 uppercase tracking-wide">{t("prop.detail.commissionStructure", "Commission Structure")}</p>
                         {pb.commission_model === "percentage" && (
                           <div className="flex justify-between text-[16px]">
-                            <span className="text-[#0a2225]/75">Commission</span>
-                            <span className="font-medium text-foreground">{pb.commission_pct}% on total trip value</span>
+                            <span className="text-[#0a2225]/75">{t("prop.detail.commission", "Commission")}</span>
+                            <span className="font-medium text-foreground">{t("prop.detail.pctOnTotal", { pct: pb.commission_pct, defaultValue: "{{pct}}% on total trip value" })}</span>
                           </div>
                         )}
                         {pb.commission_model === "flat_fee" && (
                           <div className="flex justify-between text-[16px]">
-                            <span className="text-[#0a2225]/75">Service Fee</span>
+                            <span className="text-[#0a2225]/75">{t("prop.detail.serviceFee", "Service Fee")}</span>
                             <span className="font-medium text-foreground">
                               {formatMoney(pb.flat_fee_amount, proposal.currency || "USD")}
                               <span className="text-[13px] text-[#0a2225]/75 ml-1">
-                                ({pb.flat_fee_covers === "planning" ? "Planning only" : pb.flat_fee_covers === "execution" ? "Planning + Execution" : "Full service"})
+                                ({pb.flat_fee_covers === "planning" ? t("prop.detail.coversPlanning", "Planning only") : pb.flat_fee_covers === "execution" ? t("prop.detail.coversExecution", "Planning + Execution") : t("prop.detail.coversFull", "Full service")})
                               </span>
                             </span>
                           </div>
                         )}
                         {pb.commission_model === "hybrid" && (
                           <div className="flex justify-between text-[16px]">
-                            <span className="text-[#0a2225]/75">Service Fee + Commission</span>
+                            <span className="text-[#0a2225]/75">{t("prop.detail.serviceFeeCommission", "Service Fee + Commission")}</span>
                             <span className="font-medium text-foreground">
                               {formatMoney(pb.hybrid_flat_fee, proposal.currency || "USD")} + {pb.hybrid_commission_pct}%
                             </span>
@@ -545,11 +546,11 @@ export default function ProposalDetailPage() {
                             {(pb.commission_tiers as Array<{threshold: number; pct: number}>).map((tier, i) => (
                               <p key={i} className="text-[13px] text-[#0a2225]/75">
                                 {tier.threshold === Infinity || !tier.threshold
-                                  ? `Above previous tier`
+                                  ? t("prop.detail.tierAbovePrev", "Above previous tier")
                                   : i === 0
-                                    ? `First ${formatMoney(tier.threshold, proposal.currency || "USD")}`
-                                    : `Above ${formatMoney((pb.commission_tiers as Array<{threshold: number}>)[i - 1]?.threshold, proposal.currency || "USD")}`
-                                } at {tier.pct}%
+                                    ? t("prop.detail.tierFirst", { amount: formatMoney(tier.threshold, proposal.currency || "USD"), defaultValue: "First {{amount}}" })
+                                    : t("prop.detail.tierAbove", { amount: formatMoney((pb.commission_tiers as Array<{threshold: number}>)[i - 1]?.threshold, proposal.currency || "USD"), defaultValue: "Above {{amount}}" })
+                                } {t("prop.detail.tierAt", { pct: tier.pct, defaultValue: "at {{pct}}%" })}
                               </p>
                             ))}
                           </div>
@@ -562,15 +563,15 @@ export default function ProposalDetailPage() {
                       <div className="border-t pt-2 mt-2 space-y-1.5">
                         <div className="flex justify-between text-[16px]">
                           <span className="text-[#0a2225]/75 flex items-center gap-1">
-                            Service Fee (3.5%)
-                            <span title="Covers Goldsainte traveler protection, support, and secure payment processing." className="cursor-help">
+                            {t("prop.detail.serviceFee35", "Service Fee (3.5%)")}
+                            <span title={t("prop.detail.sfTooltip", "Covers Goldsainte traveler protection, support, and secure payment processing.")} className="cursor-help">
                               <Info className="h-3 w-3 text-[#0a2225]/75" />
                             </span>
                           </span>
                           <span className="text-foreground">+{formatMoney(pb.guest_service_fee_estimate, proposal.currency || "USD")}</span>
                         </div>
                         <div className="flex justify-between text-[16px] font-semibold">
-                          <span className="text-foreground">Traveler Total</span>
+                          <span className="text-foreground">{t("prop.detail.travelerTotal", "Traveler Total")}</span>
                           <span className="text-foreground">{formatMoney(pb.traveler_total_estimate, proposal.currency || "USD")}</span>
                         </div>
                       </div>
@@ -579,17 +580,17 @@ export default function ProposalDetailPage() {
                     {/* Agent-facing rows (only for proposer) */}
                     {isProposer && pb?.agent_commission_estimate != null && (
                       <div className="border-t pt-2 mt-2 space-y-1.5">
-                        <p className="text-[13px] font-semibold text-[#0a2225]/75 uppercase tracking-wide">Your Earnings</p>
+                        <p className="text-[13px] font-semibold text-[#0a2225]/75 uppercase tracking-wide">{t("prop.detail.yourEarnings", "Your Earnings")}</p>
                         <div className="flex justify-between text-[16px]">
-                          <span className="text-[#0a2225]/75">Your Commission</span>
+                          <span className="text-[#0a2225]/75">{t("prop.detail.yourCommission", "Your Commission")}</span>
                           <span className="font-medium text-foreground">{formatMoney(pb.agent_commission_estimate, proposal.currency || "USD")}</span>
                         </div>
                         <div className="flex justify-between text-[16px]">
-                          <span className="text-[#0a2225]/75">Platform Fee (3.5%)</span>
+                          <span className="text-[#0a2225]/75">{t("prop.detail.platformFee35", "Platform Fee (3.5%)")}</span>
                           <span className="text-destructive">-{formatMoney(Math.round((proposal.price_from || 0) * 0.035), proposal.currency || "USD")}</span>
                         </div>
                         <div className="flex justify-between text-[16px] font-semibold">
-                          <span className="text-emerald-700">Your Payout</span>
+                          <span className="text-emerald-700">{t("prop.detail.yourPayout", "Your Payout")}</span>
                           <span className="text-emerald-700">{formatMoney(pb.agent_payout_estimate, proposal.currency || "USD")}</span>
                         </div>
                       </div>
@@ -598,10 +599,10 @@ export default function ProposalDetailPage() {
                     {pb?.planning_fee && (
                       <div className="flex justify-between text-[16px]">
                         <span className="text-[#0a2225]/75">
-                          Planning Fee
+                          {t("prop.detail.planningFee", "Planning Fee")}
                           {pb.planning_fee_refundable !== undefined && (
                             <Badge variant={pb.planning_fee_refundable ? "default" : "secondary"} className="text-[12px] ml-2">
-                              {pb.planning_fee_refundable ? "Refundable" : "Non-refundable"}
+                              {pb.planning_fee_refundable ? t("prop.detail.refundable", "Refundable") : t("prop.detail.nonRefundable", "Non-refundable")}
                             </Badge>
                           )}
                         </span>
@@ -612,12 +613,12 @@ export default function ProposalDetailPage() {
                     )}
                     {depositAmount && (
                       <div className="flex justify-between text-[16px]">
-                        <span className="text-[#0a2225]/75">Deposit ({proposal.deposit_percentage}%)</span>
+                        <span className="text-[#0a2225]/75">{t("prop.detail.depositPct", { pct: proposal.deposit_percentage, defaultValue: "Deposit ({{pct}}%)" })}</span>
                         <span className="font-medium text-foreground">
                           {formatMoney(depositAmount, proposal.currency || "USD")}
                           {proposal.deposit_due_days && (
                             <span className="text-[13px] text-[#0a2225]/75 ml-1">
-                              due within {proposal.deposit_due_days} day{proposal.deposit_due_days === 1 ? "" : "s"}
+                              {t("prop.detail.dueWithin", { count: proposal.deposit_due_days, defaultValue: "due within {{count}} days" })}
                             </span>
                           )}
                         </span>
@@ -625,7 +626,7 @@ export default function ProposalDetailPage() {
                     )}
                     {pb?.balance_due && (
                       <div className="flex justify-between text-[16px]">
-                        <span className="text-[#0a2225]/75">Balance Due</span>
+                        <span className="text-[#0a2225]/75">{t("prop.detail.balanceDue", "Balance Due")}</span>
                         <span className="text-foreground">{humanize(pb.balance_due)}</span>
                       </div>
                     )}
@@ -635,10 +636,10 @@ export default function ProposalDetailPage() {
                 {/* Cancellation Policy */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <p className="text-[13px] uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">Cancellation Policy</p>
+                    <p className="text-[13px] uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">{t("prop.detail.cancellationPolicy", "Cancellation Policy")}</p>
                     {pb?.deposit_refundable && (
                       <Badge variant={pb.deposit_refundable === "fully" ? "default" : pb.deposit_refundable === "partial" ? "outline" : "secondary"} className="text-[12px]">
-                        Deposit: {pb.deposit_refundable === "fully" ? "Fully Refundable" : pb.deposit_refundable === "partial" ? "Partially Refundable" : "Non-refundable"}
+                        {t("prop.detail.depositPrefix", "Deposit:")} {pb.deposit_refundable === "fully" ? t("prop.detail.fullyRefundable", "Fully Refundable") : pb.deposit_refundable === "partial" ? t("prop.detail.partiallyRefundable", "Partially Refundable") : t("prop.detail.nonRefundable", "Non-refundable")}
                       </Badge>
                     )}
                   </div>
@@ -654,7 +655,7 @@ export default function ProposalDetailPage() {
                             className={`flex items-center justify-between px-4 py-3 text-[15px] border-b last:border-0 ${cancellationTierColor(label)}`}
                           >
                             <span className="font-medium">{label}</span>
-                            <span className="font-semibold">{refund}% refund</span>
+                            <span className="font-semibold">{t("prop.detail.pctRefund", { pct: refund, defaultValue: "{{pct}}% refund" })}</span>
                           </div>
                         );
                       })}
@@ -662,7 +663,7 @@ export default function ProposalDetailPage() {
                   ) : (
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-[15px] text-[#0a2225]/75">
-                        Standard Goldsainte cancellation policy applies. Contact your partner for specific terms.
+                        {t("prop.detail.standardPolicy", "Standard Goldsainte cancellation policy applies. Contact your partner for specific terms.")}
                       </p>
                     </div>
                   )}
@@ -670,20 +671,20 @@ export default function ProposalDetailPage() {
                   {pb?.change_fee && (
                     <p className="text-[15px] text-[#0a2225]/75 flex items-center gap-2">
                       <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                      Change fee: {formatMoney(pb.change_fee, proposal.currency || "USD")} per revision after approval
+                      {t("prop.detail.changeFee", { amount: formatMoney(pb.change_fee, proposal.currency || "USD"), defaultValue: "Change fee: {{amount}} per revision after approval" })}
                     </p>
                   )}
 
                   {pb?.supplier_dependent && (
                     <p className="text-[15px] text-[#0a2225]/75 flex items-center gap-2">
                       <Info className="h-3.5 w-3.5 text-[#0a2225]/75" />
-                      {pb.supplier_dependent_note || "Supplier cancellation policies may also apply."}
+                      {pb.supplier_dependent_note || t("prop.detail.supplierNote", "Supplier cancellation policies may also apply.")}
                     </p>
                   )}
 
                   {proposal.custom_cancellation_terms && (
                     <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-[13px] uppercase tracking-wide text-[#0a2225]/75 font-semibold mb-1">Additional Terms</p>
+                      <p className="text-[13px] uppercase tracking-wide text-[#0a2225]/75 font-semibold mb-1">{t("prop.detail.additionalTerms", "Additional Terms")}</p>
                       <p className="text-[15px] text-foreground whitespace-pre-line">{proposal.custom_cancellation_terms}</p>
                     </div>
                   )}
@@ -691,7 +692,7 @@ export default function ProposalDetailPage() {
 
                 {/* Payment Schedule */}
                 <div className="space-y-3">
-                  <p className="text-[13px] uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">Payment Schedule</p>
+                  <p className="text-[13px] uppercase tracking-[0.14em] text-[#0a2225]/75 font-semibold">{t("prop.detail.paymentSchedule", "Payment Schedule")}</p>
                   {(() => {
                     // Heal proposals saved with the old bogus "Full Payment
                     // 100%" default: when the stored schedule contradicts the
@@ -703,8 +704,8 @@ export default function ProposalDetailPage() {
                       Number(stored[0]?.percentage) === 100 && dep > 0 && dep < 100;
                     const schedule = (!stored || stored.length === 0 || isBogusDefault) && dep > 0 && dep < 100
                       ? [
-                          { name: "Deposit", percentage: dep, due: (proposal as any).deposit_due_days ? `Within ${(proposal as any).deposit_due_days} days of acceptance` : "On acceptance" },
-                          { name: "Balance", percentage: 100 - dep, due: "Before departure" },
+                          { name: t("prop.detail.msDeposit", "Deposit"), percentage: dep, due: (proposal as any).deposit_due_days ? t("prop.detail.withinDaysAccept", { count: (proposal as any).deposit_due_days, defaultValue: "Within {{count}} days of acceptance" }) : t("prop.detail.onAcceptance", "On acceptance") },
+                          { name: t("prop.detail.msBalance", "Balance"), percentage: 100 - dep, due: t("prop.detail.beforeDeparture", "Before departure") },
                         ]
                       : stored;
                     return schedule && schedule.length > 0 ? (
@@ -712,9 +713,9 @@ export default function ProposalDetailPage() {
                       <div className="overflow-x-auto"><table className="w-full text-[15px]">
                         <thead className="bg-muted/50">
                           <tr>
-                            <th className="text-left px-4 py-2.5 font-medium text-[#0a2225]/75">Milestone</th>
-                            <th className="text-left px-4 py-2.5 font-medium text-[#0a2225]/75">Due</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-[#0a2225]/75">Amount</th>
+                            <th className="text-left px-4 py-2.5 font-medium text-[#0a2225]/75">{t("prop.detail.milestone", "Milestone")}</th>
+                            <th className="text-left px-4 py-2.5 font-medium text-[#0a2225]/75">{t("prop.detail.due", "Due")}</th>
+                            <th className="text-right px-4 py-2.5 font-medium text-[#0a2225]/75">{t("prop.detail.amount", "Amount")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -741,7 +742,7 @@ export default function ProposalDetailPage() {
                   ) : (
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-[15px] text-[#0a2225]/75">
-                        Payment schedule hasn't been specified yet. Confirm the deposit and balance structure with your partner before proceeding.
+                        {t("prop.detail.scheduleUnspecified", "Payment schedule hasn't been specified yet. Confirm the deposit and balance structure with your partner before proceeding.")}
                       </p>
                     </div>
                   );
@@ -749,7 +750,7 @@ export default function ProposalDetailPage() {
                 </div>
 
                 <p className="text-[13px] text-[#0a2225]/75 pt-2 border-t">
-                  All payments are handled through Goldsainte's secure flow so your booking and any eligible refunds stay protected.
+                  {t("prop.detail.secureNote", "All payments are handled through Goldsainte's secure flow so your booking and any eligible refunds stay protected.")}
                 </p>
               </CardContent>
             </Card>
@@ -760,7 +761,7 @@ export default function ProposalDetailPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
-                    Attachments & Resources
+                    {t("prop.detail.attachments", "Attachments & Resources")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 pt-2 space-y-3">
@@ -782,7 +783,7 @@ export default function ProposalDetailPage() {
                   ))}
                   {pb?.external_links?.map((link: any, i: number) => {
                     const url = typeof link === "string" ? link : link?.url || "";
-                    const label = typeof link === "string" ? link : (link?.label || link?.url || "Link");
+                    const label = typeof link === "string" ? link : (link?.label || link?.url || t("prop.detail.linkFallback", "Link"));
                     return (
                     <div key={i} className="flex items-center justify-between gap-3 py-2.5 border-b last:border-0 min-w-0">
                       <div className="flex items-start gap-3 text-[15px] min-w-0">
@@ -807,11 +808,11 @@ export default function ProposalDetailPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Clock className="h-4 w-4 text-primary" />
-                    What Happens Next
+                    {t("prop.detail.whatNext", "What Happens Next")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 pt-2">
-                  <p className="text-[15px] text-muted-foreground mb-3">If the traveler accepts this proposal:</p>
+                  <p className="text-[15px] text-muted-foreground mb-3">{t("prop.detail.ifAccepts", "If the traveler accepts this proposal:")}</p>
                   <ol className="space-y-2.5">
                     {(isProposer
                       ? isHireProposal
@@ -883,7 +884,7 @@ export default function ProposalDetailPage() {
               {/* Proposer info */}
               <Card className="bg-muted/50">
                 <CardContent className="p-5">
-                  <p className="text-[13px] uppercase tracking-[0.14em] text-primary font-semibold mb-3">Your Goldsainte Partner</p>
+                  <p className="text-[13px] uppercase tracking-[0.14em] text-primary font-semibold mb-3">{t("prop.detail.partner", "Your Goldsainte Partner")}</p>
                   {proposal.proposer && (
                     <div className="space-y-1">
                       <p className="text-base font-semibold text-foreground">
@@ -896,7 +897,7 @@ export default function ProposalDetailPage() {
                   )}
                   {proposal.traveler && (
                     <p className="text-[13px] text-muted-foreground mt-3">
-                      Prepared for <span className="font-medium">{proposal.traveler.display_name}</span>
+                      {t("prop.detail.preparedFor", "Prepared for")} <span className="font-medium">{proposal.traveler.display_name}</span>
                     </p>
                   )}
                 </CardContent>
@@ -905,21 +906,21 @@ export default function ProposalDetailPage() {
               {/* Proposal metadata */}
               <Card>
                 <CardContent className="p-5 space-y-2">
-                  <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-2">Proposal Details</p>
+                  <p className="text-[13px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-2">{t("prop.detail.details", "Proposal Details")}</p>
                   <div className="flex justify-between text-[15px]">
-                    <span className="text-muted-foreground">Submitted</span>
+                    <span className="text-muted-foreground">{t("prop.detail.submitted", "Submitted")}</span>
                     <span className="text-foreground">{formatDate(proposal.created_at)}</span>
                   </div>
                   {proposal.valid_until && (
                     <div className="flex justify-between text-[15px]">
-                      <span className="text-muted-foreground">Valid Until</span>
+                      <span className="text-muted-foreground">{t("prop.detail.validUntil", "Valid Until")}</span>
                       <span className={`font-medium ${validDays !== null && validDays <= 3 ? "text-destructive" : "text-foreground"}`}>
                         {formatDate(proposal.valid_until)}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between text-[15px]">
-                    <span className="text-muted-foreground">Proposal ID</span>
+                    <span className="text-muted-foreground">{t("prop.detail.proposalId", "Proposal ID")}</span>
                     <span className="text-foreground font-mono text-[13px]">{proposal.id.slice(0, 8)}</span>
                   </div>
                 </CardContent>
@@ -929,7 +930,7 @@ export default function ProposalDetailPage() {
               <Card>
                 <CardContent className="p-5 space-y-4">
                   <p className="text-[13px] uppercase tracking-[0.14em] text-primary font-semibold">
-                    {isProposer ? "Manage Proposal" : "Next Steps"}
+                    {isProposer ? t("prop.detail.manage", "Manage Proposal") : t("prop.detail.nextSteps", "Next Steps")}
                   </p>
 
                   {actionError && <p className="text-[15px] text-destructive">{actionError}</p>}
@@ -958,7 +959,7 @@ export default function ProposalDetailPage() {
                             onClick={() => navigate(`/proposals/new?tripId=${trip?.id}&edit=${proposal.id}`)}
                           >
                             <Pencil className="h-4 w-4 mr-2" />
-                            Edit Proposal
+                            {t("prop.detail.edit", "Edit Proposal")}
                           </Button>
 
                           <AlertDialog>
@@ -969,19 +970,19 @@ export default function ProposalDetailPage() {
                                 disabled={actionLoading === "withdraw"}
                               >
                                 <Ban className="h-4 w-4 mr-2" />
-                                {actionLoading === "withdraw" ? "Withdrawing…" : "Withdraw Proposal"}
+                                {actionLoading === "withdraw" ? t("prop.detail.withdrawing", "Withdrawing…") : t("prop.detail.withdrawBtn", "Withdraw Proposal")}
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Withdraw this proposal?</AlertDialogTitle>
+                                <AlertDialogTitle>{t("prop.detail.wdTitle", "Withdraw this proposal?")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  The traveler will no longer be able to accept this proposal. You can submit a new one later.
+                                  {t("prop.detail.wdDesc", "The traveler will no longer be able to accept this proposal. You can submit a new one later.")}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleWithdraw}>Withdraw</AlertDialogAction>
+                                <AlertDialogCancel>{t("prop.list.cancelWord", "Cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleWithdraw}>{t("prop.detail.withdraw", "Withdraw")}</AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
@@ -992,7 +993,7 @@ export default function ProposalDetailPage() {
                             onClick={() => navigate(`/proposals/new?tripId=${trip?.id}&duplicate=${proposal.id}`)}
                           >
                             <Copy className="h-4 w-4 mr-2" />
-                            Duplicate Proposal
+                            {t("prop.detail.duplicate", "Duplicate Proposal")}
                           </Button>
                         </>
                       )}
@@ -1002,9 +1003,9 @@ export default function ProposalDetailPage() {
                       {isPending && (
                         <div className="space-y-4">
                           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                            <p className="text-[15px] font-semibold text-foreground">Before you confirm</p>
+                            <p className="text-[15px] font-semibold text-foreground">{t("prop.detail.beforeConfirm", "Before you confirm")}</p>
                             <p className="text-[15px] text-muted-foreground leading-relaxed">
-                              Make sure you're comfortable with the itinerary, total price, and cancellation terms. Keep all changes and payments inside Goldsainte for protection.
+                              {t("prop.detail.confirmNote", "Make sure you're comfortable with the itinerary, total price, and cancellation terms. Keep all changes and payments inside Goldsainte for protection.")}
                             </p>
                             <button
                               type="button"
@@ -1021,7 +1022,7 @@ export default function ProposalDetailPage() {
                             className="w-full"
                             size="lg"
                           >
-                            {actionLoading === "accept" ? "Accepting…" : "Accept & Continue to Booking"}
+                            {actionLoading === "accept" ? t("prop.detail.accepting", "Accepting…") : t("prop.detail.acceptContinue", "Accept & Continue to Booking")}
                             <CheckCircle2 className="h-4 w-4 ml-2" />
                           </Button>
 
@@ -1031,7 +1032,7 @@ export default function ProposalDetailPage() {
                             disabled={actionLoading === "decline"}
                             className="w-full"
                           >
-                            {actionLoading === "decline" ? "Updating…" : "Decline This Proposal"}
+                            {actionLoading === "decline" ? t("prop.detail.updating", "Updating…") : t("prop.detail.declineThis", "Decline This Proposal")}
                             <XCircle className="h-4 w-4 ml-2" />
                           </Button>
                         </div>
@@ -1041,18 +1042,18 @@ export default function ProposalDetailPage() {
                         <div className="bg-primary/10 rounded-lg p-4 space-y-2">
                           <p className="text-[15px] font-semibold text-primary">
                             {acceptedBooking?.status === "deposit_pending"
-                              ? "Accepted \u2014 your deposit locks it in"
-                              : "Your booking is confirmed"}
+                              ? t("prop.detail.acceptedDeposit", "Accepted \u2014 your deposit locks it in")
+                              : t("prop.detail.bookingConfirmed", "Your booking is confirmed")}
                           </p>
                           <p className="text-[15px] text-muted-foreground">
-                            All future changes, questions, and approvals should be handled inside Goldsainte to keep your trip protected.
+                            {t("prop.detail.keepInside", "All future changes, questions, and approvals should be handled inside Goldsainte to keep your trip protected.")}
                           </p>
                           {acceptedBooking && (
                             <Link
                               to={`/bookings/${acceptedBooking.id}`}
                               className="mt-1 inline-flex items-center gap-1.5 text-[15px] font-medium text-[#0c4d47] underline underline-offset-4 decoration-[#0a2225]/25 transition-colors hover:decoration-[#C7A962]"
                             >
-                              {acceptedBooking.status === "deposit_pending" ? "Continue to your booking \u2014 pay the deposit" : "View your booking"}
+                              {acceptedBooking.status === "deposit_pending" ? t("prop.detail.continueBooking", "Continue to your booking \u2014 pay the deposit") : t("prop.detail.viewBooking", "View your booking")}
                               <span className="font-secondary">{"\u2192"}</span>
                             </Link>
                           )}
@@ -1061,14 +1062,14 @@ export default function ProposalDetailPage() {
 
                       {!isPending && proposal.status !== "accepted" && (
                         <p className="text-[15px] text-muted-foreground">
-                          This proposal is <span className="font-semibold">{humanStatus(proposal.status)}</span>.
-                          You can post a new trip or review other proposals from your trip view.
+                          {t("prop.detail.proposalIs", "This proposal is")} <span className="font-semibold">{humanStatus(proposal.status, t)}</span>.{" "}
+                          {t("prop.detail.postNewNote", "You can post a new trip or review other proposals from your trip view.")}
                         </p>
                       )}
                     </>
                   ) : (
                     <p className="text-[15px] text-muted-foreground">
-                      This is how the traveler will see your proposal. You can send clarifications via the trip chat.
+                      {t("prop.detail.previewNote", "This is how the traveler will see your proposal. You can send clarifications via the trip chat.")}
                     </p>
                   )}
                 </CardContent>
