@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Users, FileText, Trash2 } from "lucide-react";
@@ -59,6 +60,7 @@ function getTripLength(req: TripRequest): number | null {
 }
 
 export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGridProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -76,19 +78,19 @@ export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGrid
     <AlertDialog open={!!confirmId} onOpenChange={(open) => !open && setConfirmId(null)}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this trip request?</AlertDialogTitle>
+          <AlertDialogTitle>{t("mp.grid.deleteTitle", "Delete this trip request?")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the trip request and all associated messages. This action cannot be undone.
+            {t("mp.grid.deleteDesc", "This will permanently delete the trip request and all associated messages. This action cannot be undone.")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("mp.grid.cancel", "Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => confirmId && handleDelete(confirmId)}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             disabled={!!deletingId}
           >
-            {deletingId ? "Deleting…" : "Delete"}
+            {deletingId ? t("mp.grid.deleting", "Deleting…") : t("mp.grid.delete", "Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -119,7 +121,7 @@ export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGrid
               <div className="absolute bottom-2 left-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-semibold text-[#0a2225] shadow-sm">
                   <FileText className="h-3 w-3" />
-                  Seeking proposals
+                  {t("mp.grid.seeking", "Seeking proposals")}
                 </span>
               </div>
 
@@ -132,7 +134,7 @@ export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGrid
                   }}
                   disabled={deletingId === request.id}
                   className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-red-600 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-red-50 disabled:opacity-50"
-                  aria-label="Delete trip request"
+                  aria-label={t("mp.grid.deleteAria", "Delete trip request")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -151,7 +153,7 @@ export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGrid
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-[12px] text-[#6B7280] truncate">
-                  {travelerName} · {travelerCount} {travelerCount === 1 ? "traveler" : "travelers"}
+                  {travelerName} · {travelerCount} {travelerCount === 1 ? t("mp.grid.travelerOne", "traveler") : t("mp.grid.travelerMany", "travelers")}
                 </span>
               </div>
 
@@ -191,8 +193,8 @@ export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGrid
                     {request.budget_min && request.budget_max
                       ? `$${request.budget_min.toLocaleString()}–$${request.budget_max.toLocaleString()}`
                       : request.budget_min
-                      ? `From $${request.budget_min.toLocaleString()}`
-                      : `Up to $${request.budget_max?.toLocaleString()}`}
+                      ? t("mp.grid.fromBudget", { amount: request.budget_min.toLocaleString(), defaultValue: "From ${{amount}}" })
+                      : t("mp.grid.upToBudget", { amount: request.budget_max?.toLocaleString(), defaultValue: "Up to ${{amount}}" })}
                   </span>
                 )}
                 {proposalCount > 0 && (
@@ -200,7 +202,7 @@ export function TripRequestGrid({ requests, isAdmin, onDelete }: TripRequestGrid
                     variant="outline"
                     className="rounded-full text-[10px] px-2 py-0 border-[#BFAD72] text-[#BFAD72] font-medium"
                   >
-                    {proposalCount} {proposalCount === 1 ? "proposal" : "proposals"}
+                    {proposalCount} {proposalCount === 1 ? t("mp.grid.proposalOne", "proposal") : t("mp.grid.proposalMany", "proposals")}
                   </Badge>
                 )}
               </div>
