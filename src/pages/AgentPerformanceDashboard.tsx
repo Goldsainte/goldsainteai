@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -232,7 +233,7 @@ export default function AgentPerformanceDashboard() {
               <div className="flex items-center gap-2">
                 <Clock className="h-6 w-6 text-muted-foreground" />
                 <div className="text-lg font-semibold">
-                  {new Date(agent.created_at).toLocaleDateString('en-US', { 
+                  {new Date(agent.created_at).toLocaleDateString(gsIntlLocale(), { 
                     month: 'short', 
                     year: 'numeric' 
                   })}
