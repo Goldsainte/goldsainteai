@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,7 +32,7 @@ const STATUS_COPY: Record<string, { label: string; note: string }> = {
 };
 
 function formatLongDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleDateString(gsIntlLocale(), {
     year: "numeric",
     month: "long",
     day: "numeric",
