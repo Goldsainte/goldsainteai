@@ -1,5 +1,6 @@
 // Helper functions to enrich and format trip request data
 
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { Database } from "@/integrations/supabase/types";
 
 type TripRequest = Database["public"]["Tables"]["trip_requests"]["Row"];
@@ -16,14 +17,14 @@ export function formatDateRange(
   const start = new Date(startDate);
   const end = endDate ? new Date(endDate) : null;
 
-  const startMonth = start.toLocaleDateString("en-US", { month: "short" });
+  const startMonth = start.toLocaleDateString(gsIntlLocale(), { month: "short" });
   const startDay = start.getDate();
 
   if (!end) {
     return `${startMonth} ${startDay}`;
   }
 
-  const endMonth = end.toLocaleDateString("en-US", { month: "short" });
+  const endMonth = end.toLocaleDateString(gsIntlLocale(), { month: "short" });
   const endDay = end.getDate();
 
   // Same month
