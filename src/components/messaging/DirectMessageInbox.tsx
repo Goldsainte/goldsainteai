@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
@@ -57,6 +58,7 @@ export function DirectMessageInbox() {
   const [activeTab, setActiveTab] = useState("primary");
   // IG-style inbox search — client-side filter across the active folder.
   const [inboxQuery, setInboxQuery] = useState("");
+  const { t } = useTranslation();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [pendingAttachments, setPendingAttachments] = useState<MessageAttachment[]>([]);
@@ -68,14 +70,14 @@ export function DirectMessageInbox() {
     setUploadingAttachment(true);
     for (const file of Array.from(files)) {
       if (file.size > 10 * 1024 * 1024) {
-        toast({ title: "File too large", description: `${file.name} is over 10 MB.`, variant: "destructive" });
+        toast({ title: t("msg.fileTooLarge", "File too large"), description: t("msg.fileTooLargeD", { name: file.name, defaultValue: "{{name}} is over 10 MB." }), variant: "destructive" });
         continue;
       }
       const cleanName = file.name.replace(/[^\w.\- ]+/g, "_");
       const path = `${user.id}/${Date.now()}_${cleanName}`;
       const { error } = await supabase.storage.from("message-attachments").upload(path, file);
       if (error) {
-        toast({ title: "Upload failed", description: `${file.name}: ${error.message}`, variant: "destructive" });
+        toast({ title: t("msg.uploadFailed", "Upload failed"), description: `${file.name}: ${error.message}`, variant: "destructive" });
         continue;
       }
       setPendingAttachments((prev) => [
@@ -97,7 +99,7 @@ export function DirectMessageInbox() {
       .from("message-attachments")
       .createSignedUrl(att.path, 3600);
     if (error || !data?.signedUrl) {
-      toast({ title: "Couldn't open attachment", description: error?.message ?? "Please try again.", variant: "destructive" });
+      toast({ title: t("msg.openAttachFailed", "Couldn't open attachment"), description: error?.message ?? t("msg.tryAgain", "Please try again."), variant: "destructive" });
       return;
     }
     window.open(data.signedUrl, "_blank", "noopener");
@@ -366,14 +368,14 @@ export function DirectMessageInbox() {
 
     try {
       await manageConversation(selectedConversation.id, "accept");
-      toast({ title: "Request accepted", description: "You can now message each other." });
+      toast({ title: t("msg.requestAccepted", "Request accepted"), description: t("msg.requestAcceptedD", "You can now message each other.") });
       setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 200);
     } catch (e: any) {
       // Revert
       setSelectedConversation((prev) =>
         prev ? { ...prev, status: "request" } : prev
       );
-      toast({ title: "Couldn't accept request", description: e.message, variant: "destructive" });
+      toast({ title: t("msg.acceptFailed", "Couldn't accept request"), description: e.message, variant: "destructive" });
     } finally {
       setAcceptingRequest(false);
     }
@@ -384,9 +386,9 @@ export function DirectMessageInbox() {
     try {
       await manageConversation(selectedConversation.id, "decline");
       setSelectedConversation(null);
-      toast({ title: "Request declined" });
+      toast({ title: t("msg.requestDeclined", "Request declined") });
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: t("msg.error", "Error"), description: e.message, variant: "destructive" });
     }
   };
 
@@ -395,9 +397,9 @@ export function DirectMessageInbox() {
     try {
       await manageConversation(selectedConversation.id, "block");
       setSelectedConversation(null);
-      toast({ title: "User blocked" });
+      toast({ title: t("msg.userBlocked", "User blocked") });
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: t("msg.error", "Error"), description: e.message, variant: "destructive" });
     }
   };
 
@@ -406,9 +408,9 @@ export function DirectMessageInbox() {
     try {
       await manageConversation(selectedConversation.id, "archive");
       setSelectedConversation(null);
-      toast({ title: "Conversation archived" });
+      toast({ title: t("msg.convArchived", "Conversation archived") });
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: t("msg.error", "Error"), description: e.message, variant: "destructive" });
     }
   };
 
@@ -420,9 +422,9 @@ export function DirectMessageInbox() {
         .eq("id", messageId)
         .eq("sender_id", user?.id);
       if (error) throw error;
-      toast({ title: "Message deleted" });
+      toast({ title: t("msg.messageDeleted", "Message deleted") });
     } catch (e: any) {
-      toast({ title: "Couldn't delete message", description: e.message, variant: "destructive" });
+      toast({ title: t("msg.deleteFailed", "Couldn't delete message"), description: e.message, variant: "destructive" });
     }
   };
 
@@ -580,9 +582,9 @@ export function DirectMessageInbox() {
                       try {
                         await manageConversation(conv.id, "delete");
                         if (selectedConversation?.id === conv.id) setSelectedConversation(null);
-                        toast({ title: "Conversation deleted permanently" });
+                        toast({ title: t("msg.convDeletedPerm", "Conversation deleted permanently") });
                       } catch (e: any) {
-                        toast({ title: "Error", description: e.message, variant: "destructive" });
+                        toast({ title: t("msg.error", "Error"), description: e.message, variant: "destructive" });
                       }
                     } : undefined}
                   />
@@ -685,7 +687,7 @@ export function DirectMessageInbox() {
                       if (selectedConversation) {
                         manageConversation(selectedConversation.id, "delete");
                         setSelectedConversation(null);
-                        toast({ title: "Conversation deleted" });
+                        toast({ title: t("msg.convDeleted", "Conversation deleted") });
                       }
                     }} className="text-red-600">
                       <Trash2 className="h-4 w-4 mr-2" />
