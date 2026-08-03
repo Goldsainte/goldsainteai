@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { useNavigate, useParams } from "react-router-dom";
@@ -208,7 +209,7 @@ export default function PartnerBookingDetailPage() {
   const heroImage = cover || (trip?.destination ? getTripRequestImageUrl(trip.destination) : null);
 
   const fmt = (d?: string | null) =>
-    d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : null;
+    d ? new Date(d).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric" }) : null;
   const dates =
     trip?.start_date && trip?.end_date
       ? `${fmt(trip.start_date)} – ${fmt(trip.end_date)}`
