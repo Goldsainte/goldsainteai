@@ -1180,5 +1180,116 @@
     "alreadyApplied": "이미 지원하셨나요?",
     "checkStatus": "언제든 로그인해 지원 현황을 확인하세요.",
     "questions": "전문가 합류에 대한 문의 —"
+  },
+  "mp": {
+    "header": {
+      "h1": "여행, 투어, 가이드 — 직접 다녀온 사람들이 만들었습니다.",
+      "sub": "정말로 예약할 수 있는 진짜 여행 — 설계한 인증된 현지인과 전문가에게서 바로.",
+      "trust1": "모든 상품을 팀이 검수",
+      "trust2": "Stripe 보안 결제",
+      "trust3": "전문가와 바로 연결"
+    },
+    "tabs": {
+      "requests": "여행 요청",
+      "requestsS": "요청",
+      "trips": "엄선된 여행",
+      "tripsS": "여행",
+      "tours": "투어",
+      "toursS": "투어",
+      "guides": "일정 가이드",
+      "guidesS": "가이드"
+    },
+    "filters": {
+      "sortNewest": "최신순",
+      "sortPopular": "인기순",
+      "sortPriceLow": "가격 낮은순",
+      "sortPriceHigh": "가격 높은순",
+      "destination": "여행지",
+      "duration": "기간",
+      "price": "가격",
+      "daysSuffix": "일",
+      "destinationsPanel": "여행지",
+      "priceRange": "가격 범위",
+      "clearPrice": "가격 초기화",
+      "sortBy": "정렬 기준"
+    },
+    "empty": {
+      "noResults": "필터에 맞는 결과가 없습니다",
+      "tryAdjusting": "검색 조건을 조정하거나 필터를 초기화해 모든 옵션을 확인해 보세요.",
+      "clearFilters": "필터 초기화",
+      "tripsTitle": "여행을 찾을 수 없습니다",
+      "tripsDesc": "가장 먼저 꿈의 여행을 올리고 크리에이터가 만들게 해보세요.",
+      "tripsCta": "꿈의 여행 올리기",
+      "creatorsTitle": "크리에이터를 찾을 수 없습니다",
+      "creatorsDesc": "영감을 주는 여행 크리에이터들이 곧 찾아옵니다.",
+      "creatorsCta": "크리에이터 전체 보기",
+      "agentsTitle": "에이전트를 찾을 수 없습니다",
+      "agentsDesc": "인증된 여행 에이전트는 확인이 끝나면 여기에 표시됩니다.",
+      "agentsCta": "에이전트 전체 보기",
+      "brandsTitle": "브랜드를 찾을 수 없습니다",
+      "brandsDesc": "인증된 호텔, 레지던스, 브랜드가 Goldsainte에 공개되면 여기에 표시됩니다.",
+      "brandsCta": "브랜드 전체 보기",
+      "briefsTitle": "아직 여행자 요청이 없습니다",
+      "briefsDesc": "여행자들이 요청을 올리면 여기에서 확인하고 제안할 수 있습니다.",
+      "briefsCta": "꿈의 여행 올리기"
+    },
+    "week": {
+      "heading": "이번 주 Goldsainte",
+      "destinations": "커버하는 여행지",
+      "trips": "큐레이션된 여행",
+      "trending": "지금 인기",
+      "bookings": "최근 예약"
+    },
+    "grid": {
+      "deleteTitle": "이 여행 요청을 삭제할까요?",
+      "deleteDesc": "여행 요청과 관련 메시지가 모두 영구 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+      "cancel": "취소",
+      "deleting": "삭제 중…",
+      "delete": "삭제",
+      "deleteAria": "여행 요청 삭제",
+      "seeking": "제안 모집 중",
+      "travelerOne": "명",
+      "travelerMany": "명",
+      "fromBudget": "{{amount}}달러부터",
+      "upToBudget": "최대 {{amount}}달러",
+      "proposalOne": "건의 제안",
+      "proposalMany": "건의 제안"
+    },
+    "card": {
+      "signInToSave": "여행을 저장하려면 로그인하세요",
+      "trending": "인기",
+      "new": "신규",
+      "bookedTimes": "이번 주 {{count}}회 예약됨",
+      "roleAgent": "여행 에이전트",
+      "roleCreator": "크리에이터",
+      "removeSaved": "저장 목록에서 제거",
+      "saveTrip": "여행 저장",
+      "nights": "박",
+      "from": "최저"
+    },
+    "meta": {
+      "title": "여행 마켓플레이스 — Goldsainte",
+      "desc": "50개국 이상의 인증 전문가와 여행 크리에이터가 엄선한 여행을 둘러보세요. 바로 예약하거나 꿈의 여행을 올리고 맞춤 제안을 받아보세요."
+    },
+    "tours": {
+      "searchPh": "투어 검색 — 도시, 명소, 액티비티",
+      "searchAria": "투어 검색",
+      "collectionsAria": "투어 컬렉션",
+      "editors": "에디터 추천",
+      "fromCreators": "크리에이터의 투어",
+      "noneFor": "‘{{place}}’ 투어가 아직 없습니다",
+      "noneMatch": "맞는 투어가 없습니다",
+      "tryNearby": "근처 도시나 명소, ‘푸드 투어’ 같은 액티비티로 검색해 보세요.",
+      "willAppear": "크리에이터와 투어 운영사의 예약 가능한 투어가 여기에 표시됩니다."
+    },
+    "coll": {
+      "slowLuxury": "느린 럭셔리",
+      "slowLuxuryK": "더 고요한 방식",
+      "hiddenCities": "숨은 도시",
+      "hiddenCitiesK": "뻔하지 않게",
+      "quietAdventure": "조용한 모험",
+      "quietAdventureK": "애써 얻은 고독"
+    },
+    "disclaimer": "Goldsainte는 여행 마켓플레이스입니다. 모든 여행은 독립적인 전문가, 에이전트, 공급자가 설계하고 이행합니다. 여행 요청에 대한 제안에는 각자의 취소·환불·계약금 조건이 적용됩니다."
   }
 }
