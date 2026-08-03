@@ -817,36 +817,36 @@ export default function ProposalDetailPage() {
                     {(isProposer
                       ? isHireProposal
                         ? [
-                            "The proposal becomes an active booking \u2014 no contract step for hires; the scope you sent is the agreement.",
-                            `The traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 charged securely through Stripe.`,
-                            "Coordinate the days in Messages; the balance is paid before departure.",
-                            "Travel with them and deliver everything in your scope.",
-                            "Payments settle straight to your own Stripe account \u2014 your total minus the 7% platform fee.",
+                            t("prop.next.ph1", "The proposal becomes an active booking \u2014 no contract step for hires; the scope you sent is the agreement."),
+                            t("prop.next.ph2", { deposit: depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : "", defaultValue: "The traveler pays the {{deposit}}deposit \u2014 charged securely through Stripe." }),
+                            t("prop.next.ph3", "Coordinate the days in Messages; the balance is paid before departure."),
+                            t("prop.next.ph4", "Travel with them and deliver everything in your scope."),
+                            t("prop.next.ph5", "Payments settle straight to your own Stripe account \u2014 your total minus the 7% platform fee."),
                           ]
                         : [
-                          "The proposal becomes an active booking — and the first move is YOURS: open the booking and hit Create contract (Goldsainte AI can draft it for you), then send it. Both of you sign; nothing moves until it's fully executed.",
-                          `Once both signatures are in, the traveler pays the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 charged directly on your Stripe account.`,
-                          "You secure the reservations and share the confirmations with the traveler in Messages.",
-                          "Keep the traveler posted in Messages as you confirm each piece of the trip.",
-                          "The traveler pays the balance before departure \u2014 settled to your account like the deposit.",
-                          "After the trip, the traveler confirms completion and you close out the booking.",
+                          t("prop.next.pc1", "The proposal becomes an active booking — and the first move is YOURS: open the booking and hit Create contract (Goldsainte AI can draft it for you), then send it. Both of you sign; nothing moves until it's fully executed."),
+                          t("prop.next.pc2", { deposit: depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : "", defaultValue: "Once both signatures are in, the traveler pays the {{deposit}}deposit \u2014 charged directly on your Stripe account." }),
+                          t("prop.next.pc3", "You secure the reservations and share the confirmations with the traveler in Messages."),
+                          t("prop.next.pc4", "Keep the traveler posted in Messages as you confirm each piece of the trip."),
+                          t("prop.next.pc5", "The traveler pays the balance before departure \u2014 settled to your account like the deposit."),
+                          t("prop.next.pc6", "After the trip, the traveler confirms completion and you close out the booking."),
                         ]
                       : isHireProposal
                         ? [
-                            "Accepting creates your booking. The scope above is what you've both agreed to \u2014 no separate contract step for hires.",
-                            `You pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 paid securely through Stripe to your specialist, your seller of record.`,
-                            `${hirePartnerFirst} plans around your dates and stays in touch in Messages.`,
-                            "The balance is due before departure \u2014 paid the same secure way.",
-                            `${hirePartnerFirst} joins your trip and delivers everything in the scope.`,
-                            "When the trip wraps, confirm it went as agreed \u2014 Goldsainte support has your back if anything fell short.",
+                            t("prop.next.th1", "Accepting creates your booking. The scope above is what you've both agreed to \u2014 no separate contract step for hires."),
+                            t("prop.next.th2", { deposit: depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : "", defaultValue: "You pay the {{deposit}}deposit \u2014 paid securely through Stripe to your specialist, your seller of record." }),
+                            t("prop.next.th3", { name: hirePartnerFirst, defaultValue: "{{name}} plans around your dates and stays in touch in Messages." }),
+                            t("prop.next.th4", "The balance is due before departure \u2014 paid the same secure way."),
+                            t("prop.next.th5", { name: hirePartnerFirst, defaultValue: "{{name}} joins your trip and delivers everything in the scope." }),
+                            t("prop.next.th6", "When the trip wraps, confirm it went as agreed \u2014 Goldsainte support has your back if anything fell short."),
                           ]
                         : [
-                          "Accepting creates your booking. Your specialist prepares and sends the contract for both of you to sign — nothing is owed until it's fully executed.",
-                          `Once both signatures are in, you pay the ${depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : ""}deposit \u2014 paid securely through Stripe to your specialist, your seller of record.`,
-                          "Your specialist secures the reservations and shares the confirmations with you in Messages.",
-                          "Review the confirmations as they arrive \u2014 everything stays documented in your booking.",
-                          "The balance is due before departure \u2014 paid the same secure way.",
-                          "When the trip wraps, confirm it went as agreed \u2014 Goldsainte support has your back if anything fell short.",
+                          t("prop.next.tc1", "Accepting creates your booking. Your specialist prepares and sends the contract for both of you to sign — nothing is owed until it's fully executed."),
+                          t("prop.next.tc2", { deposit: depositAmount ? formatMoney(depositAmount, proposal.currency || "USD") + " " : "", defaultValue: "Once both signatures are in, you pay the {{deposit}}deposit \u2014 paid securely through Stripe to your specialist, your seller of record." }),
+                          t("prop.next.tc3", "Your specialist secures the reservations and shares the confirmations with you in Messages."),
+                          t("prop.next.tc4", "Review the confirmations as they arrive \u2014 everything stays documented in your booking."),
+                          t("prop.next.tc5", "The balance is due before departure \u2014 paid the same secure way."),
+                          t("prop.next.tc6", "When the trip wraps, confirm it went as agreed \u2014 Goldsainte support has your back if anything fell short."),
                         ]
                     ).map((step, i) => (
                       <li key={i} className="flex items-start gap-3 text-[15px] text-foreground">
@@ -866,7 +866,7 @@ export default function ProposalDetailPage() {
               <Card className="bg-muted/50">
                 <CardContent className="p-6 text-center">
                   <p className="text-[15px] text-muted-foreground">
-                    This proposal doesn't have detailed notes yet. Ask your {proposal.proposer?.role || "partner"} for more information via chat.
+                    {t("prop.next.noNotes", { role: proposal.proposer?.role || t("prop.next.partnerWord", "partner"), defaultValue: "This proposal doesn't have detailed notes yet. Ask your {{role}} for more information via chat." })}
                   </p>
                 </CardContent>
               </Card>
