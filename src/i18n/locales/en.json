@@ -1180,5 +1180,116 @@
     "alreadyApplied": "Already applied?",
     "checkStatus": "Sign in any time to check your application status.",
     "questions": "Questions about becoming a specialist —"
+  },
+  "mp": {
+    "header": {
+      "h1": "Trips, tours & guides — built by people who've been.",
+      "sub": "Real trips you can actually book — directly from the verified locals and advisors who designed them.",
+      "trust1": "Every listing reviewed by our team",
+      "trust2": "Stripe-secured checkout",
+      "trust3": "Direct line to your specialist"
+    },
+    "tabs": {
+      "requests": "Trip Requests",
+      "requestsS": "Requests",
+      "trips": "Handpicked Trips",
+      "tripsS": "Trips",
+      "tours": "Tours",
+      "toursS": "Tours",
+      "guides": "Itinerary Guides",
+      "guidesS": "Guides"
+    },
+    "filters": {
+      "sortNewest": "Newest",
+      "sortPopular": "Most popular",
+      "sortPriceLow": "Price: Low",
+      "sortPriceHigh": "Price: High",
+      "destination": "Destination",
+      "duration": "Duration",
+      "price": "Price",
+      "daysSuffix": "days",
+      "destinationsPanel": "Destinations",
+      "priceRange": "Price range",
+      "clearPrice": "Clear price",
+      "sortBy": "Sort by"
+    },
+    "empty": {
+      "noResults": "No results match your filters",
+      "tryAdjusting": "Try adjusting your search criteria or clearing your filters to see all available options.",
+      "clearFilters": "Clear filters",
+      "tripsTitle": "No trips found",
+      "tripsDesc": "Be the first to post your dream journey and let creators build it.",
+      "tripsCta": "Post your dream trip",
+      "creatorsTitle": "No creators found",
+      "creatorsDesc": "Check back soon for inspiring travel creators and content partners.",
+      "creatorsCta": "Browse all creators",
+      "agentsTitle": "No agents found",
+      "agentsDesc": "Certified travel agents will appear here once verified.",
+      "agentsCta": "Browse all agents",
+      "brandsTitle": "No brands found",
+      "brandsDesc": "Verified hotels, residences and brands will appear here once they're live on Goldsainte.",
+      "brandsCta": "Browse all brands",
+      "briefsTitle": "No traveler briefs yet",
+      "briefsDesc": "When travelers post trip requests, they'll appear here for you to review and propose on.",
+      "briefsCta": "Post your dream trip"
+    },
+    "week": {
+      "heading": "This week on Goldsainte",
+      "destinations": "Destinations covered",
+      "trips": "Curated trips",
+      "trending": "Trending now",
+      "bookings": "Recent bookings"
+    },
+    "grid": {
+      "deleteTitle": "Delete this trip request?",
+      "deleteDesc": "This will permanently delete the trip request and all associated messages. This action cannot be undone.",
+      "cancel": "Cancel",
+      "deleting": "Deleting…",
+      "delete": "Delete",
+      "deleteAria": "Delete trip request",
+      "seeking": "Seeking proposals",
+      "travelerOne": "traveler",
+      "travelerMany": "travelers",
+      "fromBudget": "From ${{amount}}",
+      "upToBudget": "Up to ${{amount}}",
+      "proposalOne": "proposal",
+      "proposalMany": "proposals"
+    },
+    "card": {
+      "signInToSave": "Sign in to save trips",
+      "trending": "Trending",
+      "new": "New",
+      "bookedTimes": "Booked {{count}} times this week",
+      "roleAgent": "Travel Agent",
+      "roleCreator": "Creator",
+      "removeSaved": "Remove from saved",
+      "saveTrip": "Save trip",
+      "nights": "nights",
+      "from": "From"
+    },
+    "meta": {
+      "title": "Travel Marketplace — Goldsainte",
+      "desc": "Browse handpicked trips from certified travel specialists and travel creators across 50+ countries. Book instantly or post your dream trip and receive custom proposals."
+    },
+    "tours": {
+      "searchPh": "Search tours — city, landmark, or activity",
+      "searchAria": "Search tours",
+      "collectionsAria": "Tour collections",
+      "editors": "Editors' Picks",
+      "fromCreators": "From Creators",
+      "noneFor": "No tours found for “{{place}}” yet",
+      "noneMatch": "No tours match yet",
+      "tryNearby": "Try a nearby city, a landmark, or an activity like “food tour”.",
+      "willAppear": "Bookable tours from creators and tour operators will appear here."
+    },
+    "coll": {
+      "slowLuxury": "Slow Luxury",
+      "slowLuxuryK": "A quieter way",
+      "hiddenCities": "Hidden Cities",
+      "hiddenCitiesK": "Off the obvious",
+      "quietAdventure": "Quiet Adventure",
+      "quietAdventureK": "Earned solitude"
+    },
+    "disclaimer": "Goldsainte is a travel marketplace. All trips are designed and fulfilled by independent travel specialists, agents, and suppliers. Trip Request proposals reflect their own cancellation, refund, and deposit terms."
   }
 }
