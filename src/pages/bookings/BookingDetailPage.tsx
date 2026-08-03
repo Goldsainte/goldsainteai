@@ -1,5 +1,6 @@
 // src/pages/bookings/BookingDetailPage.tsx
 import { gsIntlLocale } from "@/lib/i18nFormat";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ShieldAlert, CalendarX, CheckCircle2, ChevronDown } from "lucide-react";
@@ -77,18 +78,18 @@ function formatMoney(amount: number | null | undefined, currency?: string | null
   }
 }
 
-function humanBookingStatus(status: string) {
+function humanBookingStatus(status: string, tr: (k: string, d: string) => string) {
   switch (status) {
     case "payment_pending":
-      return "Awaiting payment";
+      return tr("bk.status.awaitingPayment", "Awaiting payment");
     case "confirmed":
-      return "Confirmed";
+      return tr("bk.status.confirmed", "Confirmed");
     case "paid_in_full":
-      return "Paid in full";
+      return tr("bk.status.paidInFull", "Paid in full");
     case "completed":
-      return "Completed";
+      return tr("bk.status.completed", "Completed");
     case "cancelled":
-      return "Cancelled";
+      return tr("bk.status.cancelled", "Cancelled");
     default:
       return status.replace(/_/g, " ");
   }
@@ -111,6 +112,7 @@ function humanCancellationStatus(status: string) {
 
 export default function BookingDetailPage() {
   const { bookingId } = useParams<{ bookingId: string }>();
+  const { t: tr } = useTranslation();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingRow | null>(null);
   const [isHireBooking, setIsHireBooking] = useState(false);
@@ -309,7 +311,7 @@ export default function BookingDetailPage() {
           setPartnerProfile(partnerRow);
         }
       } catch (err: any) {
-        if (!cancelled) setError(err.message || "Failed to load booking.");
+        if (!cancelled) setError(err.message || tr("bk.loadFailed", "Failed to load booking."));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -601,7 +603,7 @@ export default function BookingDetailPage() {
   // (done/cur/next) is computed here from booking status; only the wording
   // comes from the shared journey table.
   const firstName = (specialistName || "your specialist").split(/\s+/)[0];
-  const journeyCopy = buildJourneyCopy(hireCapabilities, "traveler", firstName);
+  const journeyCopy = buildJourneyCopy(hireCapabilities, "traveler", firstName, tr);
 
   type TL = { title: string; sub: string; state: "done" | "cur" | "next"; when?: string };
 
@@ -635,7 +637,7 @@ export default function BookingDetailPage() {
       const stageNum = n as 1 | 2 | 3;
       if (stage >= stageNum) return { state: "done" as const };
       const isCurrent = stageNum === stage + 1 && fullyPaidForWork;
-      if (isCurrent) return { state: "cur" as const, when: "You're here" };
+      if (isCurrent) return { state: "cur" as const, when: tr("bk.youreHere", "You're here") };
       return { state: "next" as const };
     }
   );
@@ -655,7 +657,7 @@ export default function BookingDetailPage() {
 
   // Deliverables (dynamic, from hire_capabilities). Null → single fallback line.
   const deliverables = buildDeliverables(hireCapabilities);
-  const deliverablesHead = deliverablesHeading(hireCapabilities, firstName, "traveler");
+  const deliverablesHead = deliverablesHeading(hireCapabilities, firstName, "traveler", tr);
 
   // Has the traveler paid anything at all yet? Gate the payment container copy.
   const anyPaid = amountPaid > 0.01;
@@ -666,12 +668,12 @@ export default function BookingDetailPage() {
         <div className="mx-auto max-w-[860px] px-6 pt-6">
           <div className="rounded-2xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-5 py-4">
             <p className="font-secondary text-[17px] text-[#0a2225]">
-              Payment received — thank you.
+              {tr("bk.paidThanks", "Payment received — thank you.")}
             </p>
             <p className="mt-1 text-[14.5px] leading-relaxed text-[#0a2225]/65">
               {booking?.status === "paid_in_full" || booking?.status === "completed"
-                ? "Your trip is paid in full. Your specialist will confirm the remaining details \u2014 keep an eye on your Messages, and a receipt is on its way to your email."
-                : "A receipt is on its way to your email, and the numbers below may take a few seconds to update. Next: your specialist secures your reservations and shares them with you in Messages."}
+                ? tr("bk.paidFullNote", "Your trip is paid in full. Your specialist will confirm the remaining details \u2014 keep an eye on your Messages, and a receipt is on its way to your email.")
+                : tr("bk.paidDepositNote", "A receipt is on its way to your email, and the numbers below may take a few seconds to update. Next: your specialist secures your reservations and shares them with you in Messages.")}
             </p>
           </div>
         </div>
@@ -683,7 +685,7 @@ export default function BookingDetailPage() {
           className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
         >
           <ArrowLeft className="h-3 w-3" />
-          Back to My Bookings
+          {tr("bk.backToBookings", "Back to My Bookings")}
         </Link>
       </section>
 
@@ -805,7 +807,7 @@ export default function BookingDetailPage() {
               {/* Happening now */}
               <div className="mx-auto mt-14 max-w-[520px] rounded-[20px] bg-white p-9 text-center shadow-[0_24px_64px_-40px_rgba(10,34,37,0.35)]">
                 <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                  Happening now
+                  {tr("bk.happeningNow", "Happening now")}
                 </p>
                 <h3 className="mt-4 font-secondary text-[21px] text-[#0a2225]">
                   {currentStep.title}.
@@ -830,7 +832,7 @@ export default function BookingDetailPage() {
                 </div>
                 <div className="text-left">
                   <small className="block text-[12px] uppercase tracking-[0.16em] text-[#0a2225]/50">
-                    Your specialist
+                    {tr("bk.yourSpecialist", "Your specialist")}
                   </small>
                   <span className="font-secondary text-[20px] text-[#0a2225]">
                     {specialistName}
@@ -862,7 +864,7 @@ export default function BookingDetailPage() {
             <section id="messages" className="mt-14">
               <div className="text-center">
                 <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                  Messages
+                  {tr("bk.messages", "Messages")}
                 </p>
               </div>
               {booking.partner_id ? (
@@ -876,11 +878,11 @@ export default function BookingDetailPage() {
                       {firstName}
                     </span>
                     <span className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#8D6B2F]">
-                      {messagesOpen ? "Collapse" : "Open"}
+                      {messagesOpen ? tr("bk.collapse", "Collapse") : tr("bk.open", "Open")}
                     </span>
                     {hasUnread && (
                       <span className="rounded-full bg-[#0c4d47] px-2.5 py-1 text-[11px] uppercase tracking-[0.1em] text-[#E5DFC6]">
-                        New
+                        {tr("bk.new", "New")}
                       </span>
                     )}
                   </button>
@@ -897,7 +899,7 @@ export default function BookingDetailPage() {
                 </div>
               ) : (
                 <p className="mx-auto mt-6 max-w-[520px] text-center text-[15px] text-[#0a2225]/55">
-                  Messaging opens once your specialist is assigned.
+                  {tr("bk.messagingOpens", "Messaging opens once your specialist is assigned.")}
                 </p>
               )}
             </section>
@@ -930,7 +932,7 @@ export default function BookingDetailPage() {
                             : "text-[#0a2225]/35")
                         }
                       >
-                        {d.state === "active" ? "In progress" : "Upcoming"}
+                        {d.state === "active" ? tr("bk.inProgress", "In progress") : tr("bk.upcoming", "Upcoming")}
                       </span>
                     </div>
                   ))
@@ -947,20 +949,20 @@ export default function BookingDetailPage() {
             <section className="mt-20">
               <div className="text-center">
                 <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                  Travel documents
+                  {tr("bk.travelDocs", "Travel documents")}
                 </p>
               </div>
               <div className="mx-auto mt-6 max-w-[520px]">
                 <div className="flex items-center justify-between gap-4 border-b border-[#0a2225]/10 py-5 text-[15px]">
-                  <span className="text-[#0a2225]">Itinerary</span>
+                  <span className="text-[#0a2225]">{tr("bk.itinerary", "Itinerary")}</span>
                   <span className="text-[14.5px] text-[#0a2225]/45">
-                    Arrives when your specialist delivers
+                    {tr("bk.itinArrives", "Arrives when your specialist delivers")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-4 border-b border-[#0a2225]/10 py-5 text-[15px]">
-                  <span className="text-[#0a2225]">Confirmations</span>
+                  <span className="text-[#0a2225]">{tr("bk.confirmations", "Confirmations")}</span>
                   <span className="text-[14.5px] text-[#0a2225]/45">
-                    Shared here as they're booked
+                    {tr("bk.confShared", "Shared here as they're booked")}
                   </span>
                 </div>
               </div>
@@ -971,7 +973,7 @@ export default function BookingDetailPage() {
             <section className="mt-20">
               <div className="text-center">
                 <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                  Payment
+                  {tr("bk.payment", "Payment")}
                 </p>
               </div>
               <div className="mx-auto mt-6 max-w-[520px]">
@@ -985,33 +987,33 @@ export default function BookingDetailPage() {
                       </span>
                       <span className="ml-3.5 rounded-full bg-[#EAF3EC] px-3.5 py-1.5 text-[11px] uppercase tracking-[0.12em] text-[#0c4d47]">
                         {fullyPaid
-                          ? "Paid in full"
+                          ? tr("bk.status.paidInFull", "Paid in full")
                           : anyPaid
-                            ? "Balance due"
+                            ? tr("bk.balanceDue", "Balance due")
                             : "Due"}
                       </span>
                     </span>
                     <span className="text-[13px] font-medium text-[#8D6B2F]">
-                      View breakdown
+                      {tr("bk.viewBreakdown", "View breakdown")}
                     </span>
                   </summary>
                   <div className="py-6">
                     <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
-                      <span>Deposit</span>
+                      <span>{tr("bk.deposit", "Deposit")}</span>
                       <span>
                         {formatMoney(deposit, currency)}
                         {depositPaid ? " \u2713" : ""}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
-                      <span>Balance</span>
+                      <span>{tr("bk.balance", "Balance")}</span>
                       <span>
                         {formatMoney(balance, currency)}
                         {fullyPaid ? " \u2713" : ""}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 text-[15px] text-[#0a2225]/70">
-                      <span>Paid so far</span>
+                      <span>{tr("bk.paidSoFar", "Paid so far")}</span>
                       <span>{Math.round((anyPaid ? amountPaid : 0) / (total || 1) * 100)}%</span>
                     </div>
                     <p className="mt-4 text-[13px] leading-relaxed text-[#0a2225]/50">
@@ -1044,10 +1046,10 @@ export default function BookingDetailPage() {
             <section className="mt-20">
               <div className="text-center">
                 <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                  Support
+                  {tr("bk.support", "Support")}
                 </p>
                 <h2 className="mt-4 font-secondary text-[22px] text-[#0a2225]">
-                  If you need anything
+                  {tr("bk.ifYouNeed", "If you need anything")}
                 </h2>
               </div>
               <div className="mx-auto mt-6 max-w-[520px]">
@@ -1061,7 +1063,7 @@ export default function BookingDetailPage() {
                     }
                     className="flex w-full items-center justify-between border-b border-[#0a2225]/10 py-5 text-left text-[15px]"
                   >
-                    <span>Message your specialist</span>
+                    <span>{tr("bk.messageSpecialist", "Message your specialist")}</span>
                     <span className="text-[#0a2225]/35">{"\u2192"}</span>
                   </button>
                 )}
@@ -1072,7 +1074,7 @@ export default function BookingDetailPage() {
                   to="/community-guidelines"
                   className="flex items-center justify-between border-b border-[#0a2225]/10 py-5 text-[15px]"
                 >
-                  <span>Community guidelines</span>
+                  <span>{tr("bk.communityGuidelines", "Community guidelines")}</span>
                   <span className="text-[#0a2225]/35">{"\u2192"}</span>
                 </Link>
               </div>
@@ -1083,7 +1085,7 @@ export default function BookingDetailPage() {
               <section className="mt-20">
                 <div className="text-center">
                   <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                    Agreement
+                    {tr("bk.agreement", "Agreement")}
                   </p>
                 </div>
                 <div className="mx-auto mt-6 max-w-[520px]">
@@ -1107,7 +1109,7 @@ export default function BookingDetailPage() {
                     </div>
                   ) : (
                     <p className="text-center text-[13.5px] text-[#6B7280]">
-                      Your agreement with this professional is handled directly between you.
+                      {tr("bk.agreementNote", "Your agreement with this professional is handled directly between you.")}
                     </p>
                   )}
                 </div>
@@ -1123,7 +1125,7 @@ export default function BookingDetailPage() {
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-                {depositPaid ? "Balance" : "Deposit"}
+                {depositPaid ? tr("bk.balance", "Balance") : tr("bk.deposit", "Deposit")}
               </p>
               <p className="truncate font-secondary text-[16px] text-[#0a2225]">
                 {formatMoney(depositPaid ? balance : deposit, currency)} + 3.5% fee
@@ -1135,7 +1137,7 @@ export default function BookingDetailPage() {
               disabled={payingBalance}
               className="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-full bg-[#0c4d47] px-6 py-3 text-[13.5px] font-medium uppercase tracking-[0.12em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225] disabled:opacity-50"
             >
-              {payingBalance ? "Preparing\u2026" : depositPaid ? "Pay balance" : "Pay deposit"}
+              {payingBalance ? tr("bk.preparing", "Preparing\u2026") : depositPaid ? tr("bk.payBalance", "Pay balance") : tr("bk.payDeposit", "Pay deposit")}
             </button>
           </div>
         </div>
