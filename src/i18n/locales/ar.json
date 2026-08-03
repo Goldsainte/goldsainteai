@@ -1673,7 +1673,16 @@
     "upcoming": "قادم",
     "viewBreakdown": "اعرض التفاصيل",
     "yourSpecialist": "مختصّك",
-    "youreHere": "أنت هنا"
+    "youreHere": "أنت هنا",
+    "checkoutFailed": "تعذّر بدء الدفع. حاول مجدداً — وإن استمرت المشكلة فتواصل مع الدعم.",
+    "customTrip": "رحلتك المصممة",
+    "due": "مستحق",
+    "goldsainteTrip": "رحلة Goldsainte",
+    "notFound": "الحجز غير موجود.",
+    "payBalanceFee": "ادفع الرصيد — {{amount}} + رسوم 3.5%",
+    "payDepositFee": "ادفع العربون — {{amount}} + رسوم 3.5%",
+    "selectState": "اختر ولاية إقامتك في قسم الدفع أعلاه ثم حاول مجدداً.",
+    "stateUnavailable": "حجوزات الرحلات غير متاحة بعد لسكان كاليفورنيا وفلوريدا وهاواي وآيوا وواشنطن."
   },
   "hire": {
     "acceptNote": "يقبلون ويدفعون العربون — يصل مباشرة إلى حساب Stripe الخاص بك.",
@@ -1948,5 +1957,38 @@
       "14-29": "14–29 يوماً قبل المغادرة",
       "<14": "أقل من 14 يوماً قبل المغادرة"
     }
+  },
+  "msg": {
+    "acceptFailed": "تعذّر قبول الطلب",
+    "convArchived": "أُرشفت المحادثة",
+    "convDeleted": "حُذفت المحادثة",
+    "convDeletedPerm": "حُذفت المحادثة نهائياً",
+    "deleteFailed": "تعذّر حذف الرسالة",
+    "error": "خطأ",
+    "fileTooLarge": "الملف كبير جداً",
+    "fileTooLargeD": "{{name}} يتجاوز 10 ميغابايت.",
+    "messageDeleted": "حُذفت الرسالة",
+    "openAttachFailed": "تعذّر فتح المرفق",
+    "requestAccepted": "قُبل الطلب",
+    "requestAcceptedD": "يمكنكما الآن المراسلة.",
+    "requestDeclined": "رُفض الطلب",
+    "tryAgain": "حاول مرة أخرى.",
+    "uploadFailed": "فشل الرفع",
+    "userBlocked": "حُظر المستخدم"
+  },
+  "sett": {
+    "checkoutOpened": "فُتح الدفع في تبويب جديد",
+    "clearCacheFailed": "تعذّر مسح ذاكرة البحث",
+    "imageTooLarge": "يجب أن تكون الصورة أقل من 5 ميغابايت",
+    "loadProfileFailed": "تعذّر تحميل الملف الشخصي",
+    "openingCheckout": "جارٍ فتح الدفع…",
+    "paySuccess": "تم الدفع بنجاح! جارٍ التحقق من الحالة…",
+    "photoFailed": "تعذّر رفع الصورة",
+    "photoUpdated": "تم تحديث صورة الملف!",
+    "profileUpdated": "تم تحديث الملف الشخصي!",
+    "selectImage": "يرجى اختيار ملف صورة",
+    "updateProfileFailed": "تعذّر تحديث الملف الشخصي",
+    "verifCancelled": "أُلغي التحقق",
+    "verifStartFailed": "تعذّر بدء عملية التحقق"
   }
 }
