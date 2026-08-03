@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ interface Profile {
 const TravelSettings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<Profile>({
     username: '',
     avatar_url: null,
@@ -60,7 +62,7 @@ const TravelSettings = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('verification') === 'success') {
-      toast.success('Payment successful! Checking verification status...');
+      toast.success(t("sett.paySuccess", "Payment successful! Checking verification status..."));
       // Wait a moment for Stripe webhook to process, then check
       setTimeout(() => {
         checkVerificationStatus();
@@ -68,7 +70,7 @@ const TravelSettings = () => {
       // Clean up URL
       window.history.replaceState({}, '', window.location.pathname);
     } else if (params.get('verification') === 'cancelled') {
-      toast.info('Verification cancelled');
+      toast.info(t("sett.verifCancelled", "Verification cancelled"));
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
@@ -98,7 +100,7 @@ const TravelSettings = () => {
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      toast.error('Failed to load profile');
+      toast.error(t("sett.loadProfileFailed", "Failed to load profile"));
     } finally {
       setLoading(false);
     }
@@ -143,12 +145,12 @@ const TravelSettings = () => {
 
       if (error) throw error;
       
-      toast.success('Profile updated successfully!');
+      toast.success(t("sett.profileUpdated", "Profile updated successfully!"));
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (currentUser) navigate(`/creator/${currentUser.id}`);
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      toast.error(t("sett.updateProfileFailed", "Failed to update profile"));
     } finally {
       setSaving(false);
     }
@@ -160,13 +162,13 @@ const TravelSettings = () => {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t("sett.selectImage", "Please select an image file"));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be less than 5MB');
+      toast.error(t("sett.imageTooLarge", "Image must be less than 5MB"));
       return;
     }
 
@@ -197,10 +199,10 @@ const TravelSettings = () => {
       if (updateError) throw updateError;
 
       setProfile({ ...profile, avatar_url: publicUrl });
-      toast.success('Profile photo updated!');
+      toast.success(t("sett.photoUpdated", "Profile photo updated!"));
     } catch (error) {
       console.error('Error uploading photo:', error);
-      toast.error('Failed to upload photo');
+      toast.error(t("sett.photoFailed", "Failed to upload photo"));
     } finally {
       setUploadingPhoto(false);
     }
@@ -208,7 +210,7 @@ const TravelSettings = () => {
 
   const handleGetVerified = async () => {
     try {
-      toast.loading('Opening checkout...');
+      toast.loading(t("sett.openingCheckout", "Opening checkout..."));
       
       // Get auth token for Edge Function calls
       const { data: sessionData } = await supabase.auth.getSession();
@@ -223,11 +225,11 @@ const TravelSettings = () => {
       
       if (data?.url) {
         window.open(data.url, '_blank');
-        toast.success('Checkout opened in new tab');
+        toast.success(t("sett.checkoutOpened", "Checkout opened in new tab"));
       }
     } catch (error: any) {
       console.error('Error creating checkout:', error);
-      toast.error(error.message || 'Failed to start verification process');
+      toast.error(error.message || t("sett.verifStartFailed", "Failed to start verification process"));
     }
   };
 
@@ -245,7 +247,7 @@ const TravelSettings = () => {
       }
     } catch (error: any) {
       console.error('Error clearing cache:', error);
-      toast.error(error.message || 'Failed to clear search cache');
+      toast.error(error.message || t("sett.clearCacheFailed", "Failed to clear search cache"));
     } finally {
       setClearingCache(false);
     }
