@@ -6,6 +6,12 @@
 // Shared by the traveler page and the partner page so both stay in sync.
 import { capLabel } from "@/lib/onTripCapabilities";
 
+/** Optional translator: (key, defaultValue) => string. Localized pages pass
+ *  i18next's t; the partner page omits it until its own batch and every
+ *  string falls back to the English default. */
+export type TFn = (key: string, defaultValue: string) => string;
+const idT: TFn = (_k, d) => d;
+
 export interface DeliverableRow {
   /** Human label, e.g. "Photography sessions" */
   label: string;
@@ -17,20 +23,23 @@ export interface DeliverableRow {
 export function deliverablesHeading(
   capabilities: string[] | null | undefined,
   firstName: string,
-  perspective: "traveler" | "partner"
+  perspective: "traveler" | "partner",
+  t: TFn = idT
 ): string {
   const caps = capabilities ?? [];
-  const has = (id: string) => caps.includes(id);
+  const has = (c: string) => caps.includes(c);
   if (perspective === "partner") return "What you're delivering";
-  // Traveler perspective — verb matches the work.
-  if (has("content") || has("photography")) return `What ${firstName} is capturing`;
-  if (has("host") || has("guide")) return `What ${firstName} is putting together`;
-  return `What ${firstName} is arranging`;
+  // Traveler perspective — verb matches the work. {name} is a stable token
+  // translators must keep; it's filled manually below.
+  const fill = (s: string) => s.split("{name}").join(firstName);
+  if (has("content") || has("photography")) return fill(t("bk.deliv.capturing", "What {name} is capturing"));
+  if (has("host") || has("guide")) return fill(t("bk.deliv.putting", "What {name} is putting together"));
+  return fill(t("bk.deliv.arranging", "What {name} is arranging"));
 }
 
 /** The eyebrow above the deliverables section. */
-export function deliverablesEyebrow(perspective: "traveler" | "partner"): string {
-  return perspective === "partner" ? "The engagement" : "Your trip, assembled";
+export function deliverablesEyebrow(perspective: "traveler" | "partner", t: TFn = idT): string {
+  return perspective === "partner" ? "The engagement" : t("bk.deliv.eyebrow", "Your trip, assembled");
 }
 
 /**
@@ -51,6 +60,12 @@ export function buildDeliverables(
 /** The single line shown when no capability data exists. */
 export const DELIVERABLES_FALLBACK =
   "Your specialist is preparing everything for your trip";
+
+/** Localized form of the fallback line; the const above remains for callers
+ *  not yet threading a translator. */
+export function deliverablesFallback(t: TFn = idT): string {
+  return t("bk.deliv.fallback", DELIVERABLES_FALLBACK);
+}
 
 // ============================================================================
 // PERSONA-AWARE JOURNEY
@@ -95,56 +110,56 @@ export interface JourneyCopy {
 // Traveler-facing journeys, by persona. {name} is replaced with the
 // specialist's first name. Six steps, always in the same lifecycle order:
 // reserved → secured → prepared → in-progress(you're here) → begins → complete.
-const TRAVELER_JOURNEYS: Record<Persona, JourneyCopy> = {
+const travelerJourneys = (t: TFn): Record<Persona, JourneyCopy> => ({
   creative: {
-    trackerEyebrow: "Your session, step by step",
-    progressLabel: "of your session arranged",
+    trackerEyebrow: t("bk.j.creative.eyebrow", "Your session, step by step"),
+    progressLabel: t("bk.j.creative.progress", "of your session arranged"),
     steps: [
-      { title: "Your session is booked", sub: "You're all set — {name} takes it from here." },
-      { title: "Your dates are locked in", sub: "{name} has confirmed and your spot is held." },
-      { title: "Everything's planned", sub: "Nothing left for you to do but show up." },
-      { title: "{name} is shooting", sub: "Your photos are being taken as each session happens." },
-      { title: "Your photos are being edited", sub: "{name} is picking the best shots and finishing them up." },
-      { title: "Your gallery is ready", sub: "Have a look, and once you're happy, you're all done." },
+      { title: t("bk.j.creative.s1t", "Your session is booked"), sub: t("bk.j.creative.s1s", "You're all set — {name} takes it from here.") },
+      { title: t("bk.j.creative.s2t", "Your dates are locked in"), sub: t("bk.j.creative.s2s", "{name} has confirmed and your spot is held.") },
+      { title: t("bk.j.creative.s3t", "Everything's planned"), sub: t("bk.j.creative.s3s", "Nothing left for you to do but show up.") },
+      { title: t("bk.j.creative.s4t", "{name} is shooting"), sub: t("bk.j.creative.s4s", "Your photos are being taken as each session happens.") },
+      { title: t("bk.j.creative.s5t", "Your photos are being edited"), sub: t("bk.j.creative.s5s", "{name} is picking the best shots and finishing them up.") },
+      { title: t("bk.j.creative.s6t", "Your gallery is ready"), sub: t("bk.j.creative.s6s", "Have a look, and once you're happy, you're all done.") },
     ],
   },
   family: {
-    trackerEyebrow: "Your support, step by step",
-    progressLabel: "of your support arranged",
+    trackerEyebrow: t("bk.j.family.eyebrow", "Your support, step by step"),
+    progressLabel: t("bk.j.family.progress", "of your support arranged"),
     steps: [
-      { title: "Your support is booked", sub: "You're all set — {name} takes it from here." },
-      { title: "Your dates are locked in", sub: "{name} has confirmed and your dates are held." },
-      { title: "Everything's ready", sub: "Nothing left for you to do." },
-      { title: "{name} is on hand", sub: "An extra set of hands, right when you need them." },
-      { title: "Your trip is underway", sub: "{name} is just a message away the whole time." },
-      { title: "Your trip's a wrap", sub: "Once you're back and all's well, you're all done." },
+      { title: t("bk.j.family.s1t", "Your support is booked"), sub: t("bk.j.family.s1s", "You're all set — {name} takes it from here.") },
+      { title: t("bk.j.family.s2t", "Your dates are locked in"), sub: t("bk.j.family.s2s", "{name} has confirmed and your dates are held.") },
+      { title: t("bk.j.family.s3t", "Everything's ready"), sub: t("bk.j.family.s3s", "Nothing left for you to do.") },
+      { title: t("bk.j.family.s4t", "{name} is on hand"), sub: t("bk.j.family.s4s", "An extra set of hands, right when you need them.") },
+      { title: t("bk.j.family.s5t", "Your trip is underway"), sub: t("bk.j.family.s5s", "{name} is just a message away the whole time.") },
+      { title: t("bk.j.family.s6t", "Your trip's a wrap"), sub: t("bk.j.family.s6s", "Once you're back and all's well, you're all done.") },
     ],
   },
   trip: {
-    trackerEyebrow: "Your trip, step by step",
-    progressLabel: "of your trip planned",
+    trackerEyebrow: t("bk.j.trip.eyebrow", "Your trip, step by step"),
+    progressLabel: t("bk.j.trip.progress", "of your trip planned"),
     steps: [
-      { title: "Your trip is booked", sub: "You're all set — {name} takes it from here." },
-      { title: "Your spot is held", sub: "{name} has confirmed and your dates are locked in." },
-      { title: "Everything's arranged", sub: "Nothing left for you to do but pack." },
-      { title: "{name} is planning your days", sub: "Your bookings and plans show up here as they're set." },
-      { title: "Your trip is underway", sub: "{name} is just a message away the whole time." },
-      { title: "Your trip's a wrap", sub: "Once you're back and all's well, you're all done." },
+      { title: t("bk.j.trip.s1t", "Your trip is booked"), sub: t("bk.j.trip.s1s", "You're all set — {name} takes it from here.") },
+      { title: t("bk.j.trip.s2t", "Your spot is held"), sub: t("bk.j.trip.s2s", "{name} has confirmed and your dates are locked in.") },
+      { title: t("bk.j.trip.s3t", "Everything's arranged"), sub: t("bk.j.trip.s3s", "Nothing left for you to do but pack.") },
+      { title: t("bk.j.trip.s4t", "{name} is planning your days"), sub: t("bk.j.trip.s4s", "Your bookings and plans show up here as they're set.") },
+      { title: t("bk.j.trip.s5t", "Your trip is underway"), sub: t("bk.j.trip.s5s", "{name} is just a message away the whole time.") },
+      { title: t("bk.j.trip.s6t", "Your trip's a wrap"), sub: t("bk.j.trip.s6s", "Once you're back and all's well, you're all done.") },
     ],
   },
   generic: {
-    trackerEyebrow: "Your trip, step by step",
-    progressLabel: "of your trip planned",
+    trackerEyebrow: t("bk.j.generic.eyebrow", "Your trip, step by step"),
+    progressLabel: t("bk.j.generic.progress", "of your trip planned"),
     steps: [
-      { title: "Your trip is booked", sub: "You're all set — {name} takes it from here." },
-      { title: "Your spot is held", sub: "{name} has confirmed and your dates are locked in." },
-      { title: "Everything's arranged", sub: "Nothing left for you to do but pack." },
-      { title: "{name} is putting it together", sub: "The details show up here as they're set." },
-      { title: "Your trip is underway", sub: "{name} is just a message away the whole time." },
-      { title: "Your trip's a wrap", sub: "Once you're back and all's well, you're all done." },
+      { title: t("bk.j.generic.s1t", "Your trip is booked"), sub: t("bk.j.generic.s1s", "You're all set — {name} takes it from here.") },
+      { title: t("bk.j.generic.s2t", "Your spot is held"), sub: t("bk.j.generic.s2s", "{name} has confirmed and your dates are locked in.") },
+      { title: t("bk.j.generic.s3t", "Everything's arranged"), sub: t("bk.j.generic.s3s", "Nothing left for you to do but pack.") },
+      { title: t("bk.j.generic.s4t", "{name} is putting it together"), sub: t("bk.j.generic.s4s", "The details show up here as they're set.") },
+      { title: t("bk.j.generic.s5t", "Your trip is underway"), sub: t("bk.j.generic.s5s", "{name} is just a message away the whole time.") },
+      { title: t("bk.j.generic.s6t", "Your trip's a wrap"), sub: t("bk.j.generic.s6s", "Once you're back and all's well, you're all done.") },
     ],
   },
-};
+});
 
 // Partner-facing journeys, by persona. {client} is replaced with the client's
 // first name. Same six-step lifecycle from the partner's side of the work.
@@ -205,10 +220,11 @@ const PARTNER_JOURNEYS: Record<Persona, JourneyCopy> = {
 export function buildJourneyCopy(
   capabilities: string[] | null | undefined,
   perspective: "traveler" | "partner",
-  who: string
+  who: string,
+  t: TFn = idT
 ): JourneyCopy {
   const persona = personaFromCapabilities(capabilities);
-  const table = perspective === "partner" ? PARTNER_JOURNEYS : TRAVELER_JOURNEYS;
+  const table = perspective === "partner" ? PARTNER_JOURNEYS : travelerJourneys(t);
   const src = table[persona];
   const token = perspective === "partner" ? "{client}" : "{name}";
   const fill = (s: string) => s.split(token).join(who);
