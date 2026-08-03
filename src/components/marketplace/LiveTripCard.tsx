@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { MapPin, Calendar, Heart, Star } from "lucide-react";
 import { CreatorAttribution } from "./CreatorAttribution";
@@ -46,6 +47,7 @@ interface LiveTripCardProps {
 export function LiveTripCard({ trip }: LiveTripCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t, t: tr } = useTranslation();
   const [isSaved, setIsSaved] = useState(false);
   const [savingPending, setSavingPending] = useState(false);
 
@@ -72,7 +74,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
   const handleSave = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user?.id) {
-      toast.message("Sign in to save trips");
+      toast.message(t("mp.card.signInToSave", "Sign in to save trips"));
       navigate("/auth?mode=signup");
       return;
     }
@@ -131,11 +133,11 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
   })();
 
   const signalLabel = derivedSignal === "trending"
-    ? "Trending"
+    ? t("mp.card.trending", "Trending")
     : derivedSignal === "new"
-      ? "New"
+      ? t("mp.card.new", "New")
       : derivedSignal === "recently-booked"
-        ? `Booked ${trip.weekly_booking_count} times this week`
+        ? t("mp.card.bookedTimes", { count: trip.weekly_booking_count ?? 0, defaultValue: "Booked {{count}} times this week" })
         : null;
 
   const styleTag = trip.creator?.content_style_tags?.[0];
@@ -145,8 +147,8 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
   const roleBadge = (() => {
     const t = trip.creator_type;
     if (!t || t === "platform") return null;
-    if (t === "agent") return { label: "Travel Agent", className: "bg-[#0c4d47]/8 text-[#0c4d47] ring-[#0c4d47]/20" };
-    if (t === "creator") return { label: "Creator", className: "bg-[#C7A962]/15 text-[#7a5a13] ring-[#C7A962]/30" };
+    if (t === "agent") return { label: tr("mp.card.roleAgent", "Travel Agent"), className: "bg-[#0c4d47]/8 text-[#0c4d47] ring-[#0c4d47]/20" };
+    if (t === "creator") return { label: tr("mp.card.roleCreator", "Creator"), className: "bg-[#C7A962]/15 text-[#7a5a13] ring-[#C7A962]/30" };
     return null;
   })();
 
@@ -177,7 +179,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           <button
             type="button"
             onClick={handleSave}
-            aria-label={isSaved ? "Remove from saved" : "Save trip"}
+            aria-label={isSaved ? t("mp.card.removeSaved", "Remove from saved") : t("mp.card.saveTrip", "Save trip")}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur shadow-sm ring-1 ring-black/5 transition hover:bg-white"
           >
             <Heart
@@ -213,7 +215,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
               )}
             </span>
           ) : (
-            <span>{getDuration()} nights{trip.trip_type ? ` · ${trip.trip_type.charAt(0).toUpperCase()}${trip.trip_type.slice(1)}` : ""}</span>
+            <span>{getDuration()} {t("mp.card.nights", "nights")}{trip.trip_type ? ` · ${trip.trip_type.charAt(0).toUpperCase()}${trip.trip_type.slice(1)}` : ""}</span>
           )}
           {typeof trip.max_participants === "number" &&
             typeof trip.current_bookings === "number" &&
@@ -254,7 +256,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           )}
           <div className="shrink-0 text-right">
             <p className="text-[10.5px] text-[#9CA3AF]" style={{ fontFamily: "Inter, sans-serif" }}>
-              From
+              {t("mp.card.from", "From")}
             </p>
             <p className="text-[15px] font-semibold text-[#0a2225]" style={{ fontFamily: "Inter, sans-serif" }}>
               {formatPrice(trip.price_per_person, trip.currency)}
