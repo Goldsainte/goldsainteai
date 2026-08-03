@@ -149,7 +149,7 @@ const AuthVerify = () => {
                     value={resendEmail}
                     onChange={(e) => setResendEmail(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleResend()}
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPh', "you@example.com")}
                     className="h-11 flex-1 rounded-xl border border-[#E5DFC6] bg-white px-4 text-sm text-[#0a2225] outline-none focus:border-[#C7A962]"
                   />
                   <button
@@ -169,7 +169,7 @@ const AuthVerify = () => {
               onClick={() => navigate('/marketplace', { replace: true })}
               className="inline-flex items-center justify-center rounded-full border border-[#0c4d47] px-6 py-3 text-sm font-medium text-[#0c4d47] hover:bg-[#0c4d47]/5 transition-colors"
             >
-              Browse trips
+              {t('auth.browseTrips', "Browse trips")}
             </button>
           </div>
         ) : (
