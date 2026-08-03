@@ -1180,5 +1180,116 @@
     "alreadyApplied": "Já se candidatou?",
     "checkStatus": "Entre a qualquer momento para acompanhar o status da candidatura.",
     "questions": "Dúvidas sobre como se tornar especialista —"
+  },
+  "mp": {
+    "header": {
+      "h1": "Viagens, tours e guias — criados por quem já esteve lá.",
+      "sub": "Viagens de verdade, que você pode realmente reservar — direto dos locais e consultores verificados que as desenharam.",
+      "trust1": "Cada anúncio revisado pela nossa equipe",
+      "trust2": "Checkout protegido pela Stripe",
+      "trust3": "Linha direta com o seu especialista"
+    },
+    "tabs": {
+      "requests": "Pedidos de viagem",
+      "requestsS": "Pedidos",
+      "trips": "Viagens selecionadas",
+      "tripsS": "Viagens",
+      "tours": "Tours",
+      "toursS": "Tours",
+      "guides": "Guias de roteiro",
+      "guidesS": "Guias"
+    },
+    "filters": {
+      "sortNewest": "Mais recentes",
+      "sortPopular": "Mais populares",
+      "sortPriceLow": "Preço: menor",
+      "sortPriceHigh": "Preço: maior",
+      "destination": "Destino",
+      "duration": "Duração",
+      "price": "Preço",
+      "daysSuffix": "dias",
+      "destinationsPanel": "Destinos",
+      "priceRange": "Faixa de preço",
+      "clearPrice": "Limpar preço",
+      "sortBy": "Ordenar por"
+    },
+    "empty": {
+      "noResults": "Nenhum resultado corresponde aos seus filtros",
+      "tryAdjusting": "Ajuste os critérios de busca ou limpe os filtros para ver todas as opções disponíveis.",
+      "clearFilters": "Limpar filtros",
+      "tripsTitle": "Nenhuma viagem encontrada",
+      "tripsDesc": "Seja o primeiro a publicar a viagem dos seus sonhos e deixe os criadores construí-la.",
+      "tripsCta": "Publique a viagem dos seus sonhos",
+      "creatorsTitle": "Nenhum criador encontrado",
+      "creatorsDesc": "Volte em breve para conhecer criadores de viagem inspiradores.",
+      "creatorsCta": "Ver todos os criadores",
+      "agentsTitle": "Nenhum agente encontrado",
+      "agentsDesc": "Agentes de viagem certificados aparecerão aqui após a verificação.",
+      "agentsCta": "Ver todos os agentes",
+      "brandsTitle": "Nenhuma marca encontrada",
+      "brandsDesc": "Hotéis, residências e marcas verificados aparecerão aqui assim que estiverem ativos na Goldsainte.",
+      "brandsCta": "Ver todas as marcas",
+      "briefsTitle": "Ainda não há pedidos de viajantes",
+      "briefsDesc": "Quando viajantes publicarem pedidos de viagem, eles aparecerão aqui para você avaliar e propor.",
+      "briefsCta": "Publique a viagem dos seus sonhos"
+    },
+    "week": {
+      "heading": "Esta semana na Goldsainte",
+      "destinations": "Destinos cobertos",
+      "trips": "Viagens curadas",
+      "trending": "Em alta agora",
+      "bookings": "Reservas recentes"
+    },
+    "grid": {
+      "deleteTitle": "Excluir este pedido de viagem?",
+      "deleteDesc": "O pedido de viagem e todas as mensagens associadas serão excluídos permanentemente. Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "deleting": "Excluindo…",
+      "delete": "Excluir",
+      "deleteAria": "Excluir pedido de viagem",
+      "seeking": "Buscando propostas",
+      "travelerOne": "viajante",
+      "travelerMany": "viajantes",
+      "fromBudget": "A partir de US$ {{amount}}",
+      "upToBudget": "Até US$ {{amount}}",
+      "proposalOne": "proposta",
+      "proposalMany": "propostas"
+    },
+    "card": {
+      "signInToSave": "Entre para salvar viagens",
+      "trending": "Em alta",
+      "new": "Novo",
+      "bookedTimes": "Reservado {{count}} vezes esta semana",
+      "roleAgent": "Agente de viagem",
+      "roleCreator": "Criador",
+      "removeSaved": "Remover dos salvos",
+      "saveTrip": "Salvar viagem",
+      "nights": "noites",
+      "from": "A partir de"
+    },
+    "meta": {
+      "title": "Marketplace de viagens — Goldsainte",
+      "desc": "Explore viagens selecionadas de especialistas certificados e criadores de viagem em mais de 50 países. Reserve na hora ou publique a viagem dos seus sonhos e receba propostas sob medida."
+    },
+    "tours": {
+      "searchPh": "Buscar tours — cidade, ponto turístico ou atividade",
+      "searchAria": "Buscar tours",
+      "collectionsAria": "Coleções de tours",
+      "editors": "Escolhas da equipe",
+      "fromCreators": "De criadores",
+      "noneFor": "Ainda não há tours para “{{place}}”",
+      "noneMatch": "Nenhum tour corresponde",
+      "tryNearby": "Tente uma cidade próxima, um ponto turístico ou uma atividade como “tour gastronômico”.",
+      "willAppear": "Tours reserváveis de criadores e operadores aparecerão aqui."
+    },
+    "coll": {
+      "slowLuxury": "Luxo sem pressa",
+      "slowLuxuryK": "Um ritmo mais calmo",
+      "hiddenCities": "Cidades escondidas",
+      "hiddenCitiesK": "Longe do óbvio",
+      "quietAdventure": "Aventura tranquila",
+      "quietAdventureK": "Solidão merecida"
+    },
+    "disclaimer": "A Goldsainte é um marketplace de viagens. Todas as viagens são desenhadas e realizadas por especialistas, agentes e fornecedores independentes. Propostas a pedidos de viagem seguem as próprias condições de cancelamento, reembolso e depósito de cada um."
   }
 }
