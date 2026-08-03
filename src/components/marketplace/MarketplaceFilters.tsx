@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ArrowUpDown } from "lucide-react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
@@ -19,6 +20,7 @@ type PanelKey = "destination" | "duration" | "price" | "sort" | null;
    flushes effects before the opening click finishes bubbling — the same-
    click-collapse bug we shipped once and won't ship twice). */
 export function MarketplaceFilters({ filters, onFilterChange, destinationOptions = [] }: MarketplaceFiltersProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState<PanelKey>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     filters.minPrice ?? 0,
@@ -47,10 +49,10 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
 
   const priceActive = (filters.minPrice ?? 0) > 0 || (filters.maxPrice ?? 10000) < 10000;
   const sortLabels: Record<string, string> = {
-    newest: "Newest",
-    "top-rated": "Most popular",
-    "price-low": "Price: Low",
-    "price-high": "Price: High",
+    newest: t("mp.filters.sortNewest", "Newest"),
+    "top-rated": t("mp.filters.sortPopular", "Most popular"),
+    "price-low": t("mp.filters.sortPriceLow", "Price: Low"),
+    "price-high": t("mp.filters.sortPriceHigh", "Price: High"),
   };
 
   const btn = (key: PanelKey, label: string, active: boolean) => (
@@ -80,18 +82,18 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
   return (
     <div className="relative flex items-center gap-2" ref={wrapRef} style={{ fontFamily: "Inter, sans-serif" }}>
       {destinationOptions.length > 0 &&
-        btn("destination", filters.destination ? filters.destination : "Destination", Boolean(filters.destination))}
-      {btn("duration", filters.durationBucket ? `${filters.durationBucket} days` : "Duration", Boolean(filters.durationBucket))}
+        btn("destination", filters.destination ? filters.destination : t("mp.filters.destination", "Destination"), Boolean(filters.destination))}
+      {btn("duration", filters.durationBucket ? `${filters.durationBucket} ${t("mp.filters.daysSuffix", "days")}` : t("mp.filters.duration", "Duration"), Boolean(filters.durationBucket))}
       {btn(
         "price",
-        priceActive ? `$${(filters.minPrice ?? 0).toLocaleString()}–$${(filters.maxPrice ?? 10000).toLocaleString()}` : "Price",
+        priceActive ? `$${(filters.minPrice ?? 0).toLocaleString()}–$${(filters.maxPrice ?? 10000).toLocaleString()}` : t("mp.filters.price", "Price"),
         priceActive
       )}
       {btn("sort", sortLabels[filters.sortBy ?? "newest"], false)}
 
       {open === "destination" && (
         <div className={panelCls}>
-          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">Destinations</p>
+          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">{t("mp.filters.destinationsPanel", "Destinations")}</p>
           <div className="flex max-w-[320px] flex-wrap gap-2">
             {destinationOptions.map((city) => {
               const isActive = (filters.destination || "").toLowerCase() === city.toLowerCase();
@@ -115,7 +117,7 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
 
       {open === "duration" && (
         <div className={panelCls}>
-          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">Duration</p>
+          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">{t("mp.filters.duration", "Duration")}</p>
           <div className="flex gap-2">
             {(["1-3", "4-6", "7+"] as const).map((b) => {
               const isActive = filters.durationBucket === b;
@@ -129,7 +131,7 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
                   }}
                   className={chip(isActive)}
                 >
-                  {b} days
+                  {b} {t("mp.filters.daysSuffix", "days")}
                 </button>
               );
             })}
@@ -140,7 +142,7 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
       {open === "price" && (
         <div className={panelCls}>
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">Price range</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">{t("mp.filters.priceRange", "Price range")}</p>
             <span className="text-xs tabular-nums text-[#0a2225]">
               ${priceRange[0].toLocaleString()} – ${priceRange[1].toLocaleString()}
               {priceRange[1] >= 10000 ? "+" : ""}
@@ -171,7 +173,7 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
               }}
               className="mt-3 text-xs font-medium text-[#BFAD72] hover:underline"
             >
-              Clear price
+              {t("mp.filters.clearPrice", "Clear price")}
             </button>
           )}
         </div>
@@ -179,7 +181,7 @@ export function MarketplaceFilters({ filters, onFilterChange, destinationOptions
 
       {open === "sort" && (
         <div className={panelCls} style={{ minWidth: 200 }}>
-          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">Sort by</p>
+          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#8D8D8D]">{t("mp.filters.sortBy", "Sort by")}</p>
           <div className="flex flex-col gap-1">
             {(Object.keys(sortLabels) as (keyof typeof sortLabels)[]).map((v) => (
               <button
