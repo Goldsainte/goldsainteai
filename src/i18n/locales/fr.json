@@ -1291,5 +1291,49 @@
       "quietAdventureK": "Une solitude méritée"
     },
     "disclaimer": "Goldsainte est une place de marché du voyage. Tous les voyages sont conçus et réalisés par des spécialistes, agents et prestataires indépendants. Les propositions liées aux demandes de voyage reflètent leurs propres conditions d'annulation, de remboursement et d'acompte."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "Votre pipeline",
+      "h1": "Mes propositions",
+      "desc": "Chaque proposition envoyée — et où chacune en est."
+    },
+    "card": {
+      "proposer": "Auteur de la proposition",
+      "unnamed": "Créateur/agent sans nom",
+      "roleAgent": "Agent de voyage",
+      "roleCreator": "Créateur",
+      "estTotal": "Total estimé",
+      "itinerary": "Aperçu de l'itinéraire",
+      "noItinerary": "Aucun itinéraire fourni.",
+      "included": "Ce qui est inclus",
+      "notIncluded": "Non inclus / options en supplément",
+      "terms": "Conditions d'annulation et de paiement"
+    },
+    "status": {
+      "awaiting": "En attente d'examen",
+      "underReview": "En cours d'examen",
+      "accepted": "Acceptée",
+      "declined": "Refusée",
+      "withdrawn": "Retirée",
+      "expired": "Expirée"
+    },
+    "list": {
+      "tripNotFound": "Voyage introuvable.",
+      "loadFailed": "Impossible de charger les propositions.",
+      "tripFallback": "Voyage",
+      "back": "Retour aux voyages",
+      "eyebrow": "Propositions reçues",
+      "optionsFor": "Options pour « {{title}} »",
+      "compareSub": "Comparez côte à côte les propositions des créateurs et des agents de voyage. Ouvrez chaque proposition pour voir tous les détails et entrer dans le parcours de réservation protégé de Goldsainte.",
+      "destination": "Destination",
+      "budget": "Budget",
+      "noBudget": "Aucun budget défini",
+      "datesFlexible": "Dates flexibles",
+      "emptyTitle": "Pas encore de propositions",
+      "emptyDesc": "Dès que créateurs et agents répondront, elles apparaîtront ici pour que vous puissiez les comparer avant de décider.",
+      "proposalOne": "proposition",
+      "proposalMany": "propositions"
+    }
   }
 }
