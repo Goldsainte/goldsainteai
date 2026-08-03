@@ -1673,7 +1673,16 @@
     "upcoming": "In arrivo",
     "viewBreakdown": "Vedi dettaglio",
     "yourSpecialist": "Il tuo specialista",
-    "youreHere": "Sei qui"
+    "youreHere": "Sei qui",
+    "checkoutFailed": "Impossibile avviare il pagamento. Riprova — se persiste, contatta l'assistenza.",
+    "customTrip": "Il tuo viaggio su misura",
+    "due": "Da pagare",
+    "goldsainteTrip": "Viaggio Goldsainte",
+    "notFound": "Prenotazione non trovata.",
+    "payBalanceFee": "Paga saldo — {{amount}} + 3,5% di commissione",
+    "payDepositFee": "Paga acconto — {{amount}} + 3,5% di commissione",
+    "selectState": "Seleziona il tuo stato di residenza nella sezione Pagamento qui sopra e riprova.",
+    "stateUnavailable": "Le prenotazioni non sono ancora disponibili per i residenti di California, Florida, Hawaii, Iowa e Washington."
   },
   "hire": {
     "acceptNote": "Loro accettano e versano l'acconto — pagato direttamente sul tuo conto Stripe.",
@@ -1948,5 +1957,38 @@
       "14-29": "14–29 giorni prima della partenza",
       "<14": "Meno di 14 giorni prima della partenza"
     }
+  },
+  "msg": {
+    "acceptFailed": "Impossibile accettare la richiesta",
+    "convArchived": "Conversazione archiviata",
+    "convDeleted": "Conversazione eliminata",
+    "convDeletedPerm": "Conversazione eliminata definitivamente",
+    "deleteFailed": "Impossibile eliminare il messaggio",
+    "error": "Errore",
+    "fileTooLarge": "File troppo grande",
+    "fileTooLargeD": "{{name}} supera i 10 MB.",
+    "messageDeleted": "Messaggio eliminato",
+    "openAttachFailed": "Impossibile aprire l'allegato",
+    "requestAccepted": "Richiesta accettata",
+    "requestAcceptedD": "Ora potete scrivervi.",
+    "requestDeclined": "Richiesta rifiutata",
+    "tryAgain": "Riprova.",
+    "uploadFailed": "Caricamento non riuscito",
+    "userBlocked": "Utente bloccato"
+  },
+  "sett": {
+    "checkoutOpened": "Pagamento aperto in una nuova scheda",
+    "clearCacheFailed": "Impossibile svuotare la cache di ricerca",
+    "imageTooLarge": "L'immagine deve pesare meno di 5 MB",
+    "loadProfileFailed": "Impossibile caricare il profilo",
+    "openingCheckout": "Apertura del pagamento…",
+    "paySuccess": "Pagamento riuscito! Verifica dello stato in corso…",
+    "photoFailed": "Impossibile caricare la foto",
+    "photoUpdated": "Foto profilo aggiornata!",
+    "profileUpdated": "Profilo aggiornato!",
+    "selectImage": "Seleziona un file immagine",
+    "updateProfileFailed": "Impossibile aggiornare il profilo",
+    "verifCancelled": "Verifica annullata",
+    "verifStartFailed": "Impossibile avviare la verifica"
   }
 }
