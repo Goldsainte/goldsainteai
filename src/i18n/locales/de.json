@@ -1291,5 +1291,49 @@
       "quietAdventureK": "Verdiente Einsamkeit"
     },
     "disclaimer": "Goldsainte ist ein Reise-Marktplatz. Alle Reisen werden von unabhängigen Spezialisten, Agenten und Anbietern gestaltet und durchgeführt. Angebote auf Reiseanfragen unterliegen deren eigenen Storno-, Erstattungs- und Anzahlungsbedingungen."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "Ihre Pipeline",
+      "h1": "Meine Angebote",
+      "desc": "Jedes gesendete Angebot — und wo es gerade steht."
+    },
+    "card": {
+      "proposer": "Anbieter",
+      "unnamed": "Unbenannter Creator/Agent",
+      "roleAgent": "Reiseexperte",
+      "roleCreator": "Creator",
+      "estTotal": "Geschätzte Gesamtsumme",
+      "itinerary": "Reiseplan im Überblick",
+      "noItinerary": "Kein Reiseplan hinterlegt.",
+      "included": "Was enthalten ist",
+      "notIncluded": "Nicht enthalten / optionale Extras",
+      "terms": "Storno- und Zahlungsbedingungen"
+    },
+    "status": {
+      "awaiting": "Wartet auf Prüfung",
+      "underReview": "In Prüfung",
+      "accepted": "Angenommen",
+      "declined": "Abgelehnt",
+      "withdrawn": "Zurückgezogen",
+      "expired": "Abgelaufen"
+    },
+    "list": {
+      "tripNotFound": "Reise nicht gefunden.",
+      "loadFailed": "Angebote konnten nicht geladen werden.",
+      "tripFallback": "Reise",
+      "back": "Zurück zu den Reisen",
+      "eyebrow": "Eingegangene Angebote",
+      "optionsFor": "Optionen für „{{title}}“",
+      "compareSub": "Vergleichen Sie Angebote von Creators und Reiseexperten Seite an Seite. Öffnen Sie ein Angebot für alle Details und wechseln Sie in Goldsaintes geschützten Buchungsablauf.",
+      "destination": "Reiseziel",
+      "budget": "Budget",
+      "noBudget": "Kein Budget festgelegt",
+      "datesFlexible": "Flexible Daten",
+      "emptyTitle": "Noch keine Angebote",
+      "emptyDesc": "Sobald Creator und Reiseexperten antworten, erscheinen sie hier — zum Vergleichen, bevor Sie entscheiden.",
+      "proposalOne": "Angebot",
+      "proposalMany": "Angebote"
+    }
   }
 }
