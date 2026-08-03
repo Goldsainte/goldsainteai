@@ -1291,5 +1291,49 @@
       "quietAdventureK": "Solidão merecida"
     },
     "disclaimer": "A Goldsainte é um marketplace de viagens. Todas as viagens são desenhadas e realizadas por especialistas, agentes e fornecedores independentes. Propostas a pedidos de viagem seguem as próprias condições de cancelamento, reembolso e depósito de cada um."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "Seu pipeline",
+      "h1": "Minhas propostas",
+      "desc": "Cada proposta que você enviou — e em que ponto cada uma está."
+    },
+    "card": {
+      "proposer": "Autor da proposta",
+      "unnamed": "Criador/agente sem nome",
+      "roleAgent": "Agente de viagem",
+      "roleCreator": "Criador",
+      "estTotal": "Total estimado",
+      "itinerary": "Resumo do roteiro",
+      "noItinerary": "Nenhum roteiro fornecido.",
+      "included": "O que está incluído",
+      "notIncluded": "Não incluído / extras opcionais",
+      "terms": "Condições de cancelamento e pagamento"
+    },
+    "status": {
+      "awaiting": "Aguardando análise",
+      "underReview": "Em análise",
+      "accepted": "Aceita",
+      "declined": "Recusada",
+      "withdrawn": "Retirada",
+      "expired": "Expirada"
+    },
+    "list": {
+      "tripNotFound": "Viagem não encontrada.",
+      "loadFailed": "Não foi possível carregar as propostas.",
+      "tripFallback": "Viagem",
+      "back": "Voltar às viagens",
+      "eyebrow": "Propostas recebidas",
+      "optionsFor": "Opções para “{{title}}”",
+      "compareSub": "Compare lado a lado propostas de criadores e agentes de viagem. Abra qualquer proposta para ver todos os detalhes e seguir para o fluxo de reserva protegido da Goldsainte.",
+      "destination": "Destino",
+      "budget": "Orçamento",
+      "noBudget": "Nenhum orçamento definido",
+      "datesFlexible": "Datas flexíveis",
+      "emptyTitle": "Ainda sem propostas",
+      "emptyDesc": "À medida que criadores e agentes responderem, elas aparecerão aqui para você comparar antes de decidir.",
+      "proposalOne": "proposta",
+      "proposalMany": "propostas"
+    }
   }
 }
