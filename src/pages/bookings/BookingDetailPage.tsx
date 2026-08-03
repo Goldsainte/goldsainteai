@@ -1,4 +1,5 @@
 // src/pages/bookings/BookingDetailPage.tsx
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ShieldAlert, CalendarX, CheckCircle2, ChevronDown } from "lucide-react";
@@ -1097,7 +1098,7 @@ export default function BookingDetailPage() {
                         {" — "}
                         {(booking.metadata as any).client_agreement.accepted_name}
                         {", "}
-                        {new Date((booking.metadata as any).client_agreement.accepted_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                        {new Date((booking.metadata as any).client_agreement.accepted_at).toLocaleDateString(gsIntlLocale(), { month: "long", day: "numeric", year: "numeric" })}
                       </p>
                       <a href={(booking.metadata as any).client_agreement.url} target="_blank" rel="noopener noreferrer"
                         className="mt-2 inline-block text-[13px] text-[#0c4d47] underline underline-offset-2">
