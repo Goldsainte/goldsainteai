@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,7 +117,7 @@ export function CreatorProposalsTab() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {rows.map((r) => {
-        const submitted = new Date(r.created_at).toLocaleDateString("en-US", {
+        const submitted = new Date(r.created_at).toLocaleDateString(gsIntlLocale(), {
           month: "short",
           day: "numeric",
           year: "numeric",
