@@ -1291,5 +1291,49 @@
       "quietAdventureK": "勝ち取る孤独"
     },
     "disclaimer": "Goldsainte は旅のマーケットプレイスです。すべての旅は独立したスペシャリスト、エージェント、サプライヤーが設計・催行します。旅のリクエストへの提案には、各提供者のキャンセル・返金・手付金条件が適用されます。"
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "あなたのパイプライン",
+      "h1": "送った提案",
+      "desc": "送信したすべての提案と、それぞれの現在地。"
+    },
+    "card": {
+      "proposer": "提案者",
+      "unnamed": "名前未設定のクリエイター/エージェント",
+      "roleAgent": "旅行エージェント",
+      "roleCreator": "クリエイター",
+      "estTotal": "見積合計",
+      "itinerary": "旅程の概要",
+      "noItinerary": "旅程はまだ提示されていません。",
+      "included": "含まれるもの",
+      "notIncluded": "含まれないもの / 任意の追加",
+      "terms": "キャンセル・支払い条件"
+    },
+    "status": {
+      "awaiting": "確認待ち",
+      "underReview": "確認中",
+      "accepted": "承諾",
+      "declined": "辞退",
+      "withdrawn": "取り下げ",
+      "expired": "期限切れ"
+    },
+    "list": {
+      "tripNotFound": "旅が見つかりません。",
+      "loadFailed": "提案を読み込めませんでした。",
+      "tripFallback": "旅",
+      "back": "旅の一覧へ戻る",
+      "eyebrow": "届いた提案",
+      "optionsFor": "「{{title}}」への選択肢",
+      "compareSub": "クリエイターと旅行エージェントの提案を並べて比較。気になる提案を開いて詳細を確認し、Goldsainte の保護された予約フローへ進めます。",
+      "destination": "目的地",
+      "budget": "予算",
+      "noBudget": "予算は未設定",
+      "datesFlexible": "日程は柔軟",
+      "emptyTitle": "まだ提案はありません",
+      "emptyDesc": "クリエイターやエージェントが応答すると、ここに表示され、決める前に見比べられます。",
+      "proposalOne": "件の提案",
+      "proposalMany": "件の提案"
+    }
   }
 }
