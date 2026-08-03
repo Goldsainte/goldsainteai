@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,6 +8,7 @@ import logomark from '@/assets/logomark-gold.png';
 import { Loader2 } from 'lucide-react';
 
 export default function CompleteProfile() {
+  const { t } = useTranslation();
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -88,10 +90,10 @@ export default function CompleteProfile() {
             className="h-14 w-auto mx-auto mb-6"
           loading="lazy"/>
           <h1 className="text-3xl font-secondary text-[#0a2225] mb-2">
-            Complete Your Profile
+            {t('auth.completeProfileTitle', "Complete Your Profile")}
           </h1>
           <p className="text-base text-[#6B7280]">
-            Just a few more details to get started
+            {t('auth.completeProfileSub', "Just a few more details to get started")}
           </p>
         </div>
 
