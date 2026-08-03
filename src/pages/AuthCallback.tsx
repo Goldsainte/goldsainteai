@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { trackEvent } from '@/lib/analytics/events';
 
 const AuthCallback = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   // Guard against React StrictMode's double-invoke (and any re-render) running
@@ -424,9 +426,9 @@ const AuthCallback = () => {
 
   return (
     <EditorialLoader
-      eyebrow="Member Portal"
-      title="One moment"
-      subtitle="Completing sign in and preparing your account."
+      eyebrow={t('auth.memberPortal', "Member Portal")}
+      title={t('auth.oneMoment', "One moment")}
+      subtitle={t('auth.completingSignIn', "Completing sign in and preparing your account.")}
     />
   );
 };
