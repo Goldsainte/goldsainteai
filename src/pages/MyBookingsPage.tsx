@@ -1,4 +1,5 @@
 // src/pages/MyBookingsPage.tsx
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -327,7 +328,7 @@ function BookingCard({
               ? `${trip.duration_days} ${trip.duration_days === 1 ? "day" : "days"} · `
               : ""}
             Booked{" "}
-            {new Date(booking.created_at).toLocaleDateString("en-US", {
+            {new Date(booking.created_at).toLocaleDateString(gsIntlLocale(), {
               month: "short",
               day: "numeric",
               year: "numeric",
