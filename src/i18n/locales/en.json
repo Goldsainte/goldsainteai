@@ -1291,5 +1291,49 @@
       "quietAdventureK": "Earned solitude"
     },
     "disclaimer": "Goldsainte is a travel marketplace. All trips are designed and fulfilled by independent travel specialists, agents, and suppliers. Trip Request proposals reflect their own cancellation, refund, and deposit terms."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "Your pipeline",
+      "h1": "My Proposals",
+      "desc": "Every proposal you've sent — and where each one stands."
+    },
+    "card": {
+      "proposer": "Proposer",
+      "unnamed": "Unnamed Creator/Agent",
+      "roleAgent": "Travel Agent",
+      "roleCreator": "Creator",
+      "estTotal": "Estimated total",
+      "itinerary": "Itinerary Overview",
+      "noItinerary": "No itinerary provided.",
+      "included": "What's Included",
+      "notIncluded": "Not Included / Optional Add-ons",
+      "terms": "Cancellation & Payment Terms"
+    },
+    "status": {
+      "awaiting": "Awaiting Review",
+      "underReview": "Under Review",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "list": {
+      "tripNotFound": "Trip not found.",
+      "loadFailed": "Failed to load proposals.",
+      "tripFallback": "Trip",
+      "back": "Back to trips",
+      "eyebrow": "Proposals Received",
+      "optionsFor": "Options for \"{{title}}\"",
+      "compareSub": "Compare proposals from creators and travel agents side by side. Open any proposal to see full details and move into Goldsainte's protected booking flow.",
+      "destination": "Destination",
+      "budget": "Budget",
+      "noBudget": "No budget set",
+      "datesFlexible": "Dates flexible",
+      "emptyTitle": "No proposals yet",
+      "emptyDesc": "As creators and travel agents respond, you'll see them here and can compare them before deciding.",
+      "proposalOne": "Proposal",
+      "proposalMany": "Proposals"
+    }
   }
 }
