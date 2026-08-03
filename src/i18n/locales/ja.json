@@ -1180,5 +1180,116 @@
     "alreadyApplied": "応募済みですか？",
     "checkStatus": "いつでもサインインして選考状況を確認できます。",
     "questions": "スペシャリストへの参加に関するご質問は —"
+  },
+  "mp": {
+    "header": {
+      "h1": "旅、ツアー、ガイド — 実際に行った人がつくりました。",
+      "sub": "本当に予約できる、本物の旅 — 設計した認証済みの現地の人とアドバイザーから直接。",
+      "trust1": "すべての掲載をチームが審査",
+      "trust2": "Stripe による安全な決済",
+      "trust3": "スペシャリストと直接つながる"
+    },
+    "tabs": {
+      "requests": "旅のリクエスト",
+      "requestsS": "リクエスト",
+      "trips": "厳選された旅",
+      "tripsS": "旅",
+      "tours": "ツアー",
+      "toursS": "ツアー",
+      "guides": "旅程ガイド",
+      "guidesS": "ガイド"
+    },
+    "filters": {
+      "sortNewest": "新着順",
+      "sortPopular": "人気順",
+      "sortPriceLow": "価格の安い順",
+      "sortPriceHigh": "価格の高い順",
+      "destination": "目的地",
+      "duration": "日数",
+      "price": "価格",
+      "daysSuffix": "日",
+      "destinationsPanel": "目的地",
+      "priceRange": "価格帯",
+      "clearPrice": "価格をクリア",
+      "sortBy": "並べ替え"
+    },
+    "empty": {
+      "noResults": "条件に合う結果がありません",
+      "tryAdjusting": "検索条件を変えるか、フィルターをクリアしてすべての選択肢をご覧ください。",
+      "clearFilters": "フィルターをクリア",
+      "tripsTitle": "旅が見つかりません",
+      "tripsDesc": "最初に夢の旅を投稿して、クリエイターに形にしてもらいましょう。",
+      "tripsCta": "夢の旅を投稿する",
+      "creatorsTitle": "クリエイターが見つかりません",
+      "creatorsDesc": "心を動かすトラベルクリエイターがまもなく登場します。",
+      "creatorsCta": "クリエイターをすべて見る",
+      "agentsTitle": "エージェントが見つかりません",
+      "agentsDesc": "認定された旅行エージェントは、確認が済み次第ここに表示されます。",
+      "agentsCta": "エージェントをすべて見る",
+      "brandsTitle": "ブランドが見つかりません",
+      "brandsDesc": "認証済みのホテル・レジデンス・ブランドは、Goldsainte で公開され次第ここに表示されます。",
+      "brandsCta": "ブランドをすべて見る",
+      "briefsTitle": "旅行者のリクエストはまだありません",
+      "briefsDesc": "旅行者がリクエストを投稿すると、ここに表示され、提案を送れるようになります。",
+      "briefsCta": "夢の旅を投稿する"
+    },
+    "week": {
+      "heading": "今週の Goldsainte",
+      "destinations": "カバーする目的地",
+      "trips": "厳選された旅",
+      "trending": "いま話題",
+      "bookings": "最近の予約"
+    },
+    "grid": {
+      "deleteTitle": "この旅のリクエストを削除しますか？",
+      "deleteDesc": "リクエストと関連するメッセージがすべて完全に削除されます。この操作は取り消せません。",
+      "cancel": "キャンセル",
+      "deleting": "削除中…",
+      "delete": "削除",
+      "deleteAria": "旅のリクエストを削除",
+      "seeking": "提案を募集中",
+      "travelerOne": "名",
+      "travelerMany": "名",
+      "fromBudget": "{{amount}}ドルから",
+      "upToBudget": "{{amount}}ドルまで",
+      "proposalOne": "件の提案",
+      "proposalMany": "件の提案"
+    },
+    "card": {
+      "signInToSave": "旅を保存するにはサインインしてください",
+      "trending": "話題",
+      "new": "新着",
+      "bookedTimes": "今週{{count}}回予約されました",
+      "roleAgent": "旅行エージェント",
+      "roleCreator": "クリエイター",
+      "removeSaved": "保存から外す",
+      "saveTrip": "旅を保存",
+      "nights": "泊",
+      "from": "料金"
+    },
+    "meta": {
+      "title": "旅のマーケットプレイス — Goldsainte",
+      "desc": "50か国以上の認定スペシャリストとトラベルクリエイターが厳選した旅を。すぐ予約するか、夢の旅を投稿してオーダーメイドの提案を受け取りましょう。"
+    },
+    "tours": {
+      "searchPh": "ツアーを検索 — 都市・名所・アクティビティ",
+      "searchAria": "ツアーを検索",
+      "collectionsAria": "ツアーコレクション",
+      "editors": "編集部のおすすめ",
+      "fromCreators": "クリエイターから",
+      "noneFor": "「{{place}}」のツアーはまだありません",
+      "noneMatch": "条件に合うツアーがありません",
+      "tryNearby": "近くの都市や名所、「フードツアー」などのアクティビティで試してみてください。",
+      "willAppear": "クリエイターやツアー会社の予約可能なツアーがここに表示されます。"
+    },
+    "coll": {
+      "slowLuxury": "スローラグジュアリー",
+      "slowLuxuryK": "静かな流儀",
+      "hiddenCities": "隠れた街",
+      "hiddenCitiesK": "定番の先へ",
+      "quietAdventure": "静かな冒険",
+      "quietAdventureK": "勝ち取る孤独"
+    },
+    "disclaimer": "Goldsainte は旅のマーケットプレイスです。すべての旅は独立したスペシャリスト、エージェント、サプライヤーが設計・催行します。旅のリクエストへの提案には、各提供者のキャンセル・返金・手付金条件が適用されます。"
   }
 }
