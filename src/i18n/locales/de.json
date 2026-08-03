@@ -1673,7 +1673,16 @@
     "upcoming": "Ausstehend",
     "viewBreakdown": "Aufschlüsselung ansehen",
     "yourSpecialist": "Ihr Spezialist",
-    "youreHere": "Sie sind hier"
+    "youreHere": "Sie sind hier",
+    "checkoutFailed": "Der Checkout konnte nicht gestartet werden. Bitte erneut versuchen — bei anhaltendem Problem den Support kontaktieren.",
+    "customTrip": "Ihre maßgeschneiderte Reise",
+    "due": "Fällig",
+    "goldsainteTrip": "Goldsainte-Reise",
+    "notFound": "Buchung nicht gefunden.",
+    "payBalanceFee": "Restbetrag zahlen — {{amount}} + 3,5 % Gebühr",
+    "payDepositFee": "Anzahlung zahlen — {{amount}} + 3,5 % Gebühr",
+    "selectState": "Wählen Sie oben im Zahlungsbereich Ihren Wohnsitzstaat aus und versuchen Sie es erneut.",
+    "stateUnavailable": "Reisebuchungen sind für Einwohner von Kalifornien, Florida, Hawaii, Iowa und Washington noch nicht verfügbar."
   },
   "hire": {
     "acceptNote": "Sie nehmen an und zahlen die Anzahlung — direkt auf Ihr Stripe-Konto.",
@@ -1948,5 +1957,38 @@
       "14-29": "14–29 Tage vor Abreise",
       "<14": "Weniger als 14 Tage vor Abreise"
     }
+  },
+  "msg": {
+    "acceptFailed": "Anfrage konnte nicht angenommen werden",
+    "convArchived": "Unterhaltung archiviert",
+    "convDeleted": "Unterhaltung gelöscht",
+    "convDeletedPerm": "Unterhaltung endgültig gelöscht",
+    "deleteFailed": "Nachricht konnte nicht gelöscht werden",
+    "error": "Fehler",
+    "fileTooLarge": "Datei zu groß",
+    "fileTooLargeD": "{{name}} ist größer als 10 MB.",
+    "messageDeleted": "Nachricht gelöscht",
+    "openAttachFailed": "Anhang konnte nicht geöffnet werden",
+    "requestAccepted": "Anfrage angenommen",
+    "requestAcceptedD": "Ihr könnt euch jetzt schreiben.",
+    "requestDeclined": "Anfrage abgelehnt",
+    "tryAgain": "Bitte erneut versuchen.",
+    "uploadFailed": "Upload fehlgeschlagen",
+    "userBlocked": "Nutzer blockiert"
+  },
+  "sett": {
+    "checkoutOpened": "Checkout in neuem Tab geöffnet",
+    "clearCacheFailed": "Suchcache konnte nicht geleert werden",
+    "imageTooLarge": "Bild muss kleiner als 5 MB sein",
+    "loadProfileFailed": "Profil konnte nicht geladen werden",
+    "openingCheckout": "Checkout wird geöffnet …",
+    "paySuccess": "Zahlung erfolgreich! Verifizierungsstatus wird geprüft …",
+    "photoFailed": "Foto konnte nicht hochgeladen werden",
+    "photoUpdated": "Profilfoto aktualisiert!",
+    "profileUpdated": "Profil aktualisiert!",
+    "selectImage": "Bitte eine Bilddatei auswählen",
+    "updateProfileFailed": "Profil konnte nicht aktualisiert werden",
+    "verifCancelled": "Verifizierung abgebrochen",
+    "verifStartFailed": "Verifizierung konnte nicht gestartet werden"
   }
 }
