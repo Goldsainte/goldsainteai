@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,25 +12,27 @@ interface Props {
   defaultType?: AccountType;
 }
 
-const roleOptions: { type: AccountType; title: string; description: string }[] = [
+type RoleT = (key: string, defaultValue: string) => string;
+const roleOptions = (t: RoleT): { type: AccountType; title: string; description: string }[] => [
   {
     type: "traveler",
-    title: "Traveler",
-    description: "You want inspiration, trip ideas, and help turning moodboards into real itineraries.",
+    title: t("auth.roleTraveler", "Traveler"),
+    description: t("auth.roleTravelerD", "You want inspiration, trip ideas, and help turning moodboards into real itineraries."),
   },
   {
     type: "creator",
-    title: "Creator",
-    description: "You make travel content and want hosted stays, brand collabs, and access to Goldsainte trips.",
+    title: t("auth.roleCreator", "Creator"),
+    description: t("auth.roleCreatorD", "You make travel content and want hosted stays, brand collabs, and access to Goldsainte trips."),
   },
   {
     type: "agent",
-    title: "Travel Agent",
-    description: "You design and book trips for clients and want a pipeline of qualified trip requests.",
+    title: t("auth.roleAgent", "Travel Agent"),
+    description: t("auth.roleAgentD", "You design and book trips for clients and want a pipeline of qualified trip requests."),
   },
 ];
 
 export function AccountTypeStep({ onComplete, defaultType }: Props) {
+  const { t } = useTranslation();
   const [accountType, setAccountType] = useState<AccountType | null>(defaultType ?? null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -55,11 +58,11 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
     setError(null);
 
     if (!accountType) {
-      setError("Please choose what kind of Goldsainte account you're creating.");
+      setError(t('auth.vChooseKind', "Please choose what kind of Goldsainte account you're creating."));
       return;
     }
     if (!firstName.trim() || !lastName.trim()) {
-      setError("Please enter your first and last name.");
+      setError(t('auth.vEnterName', "Please enter your first and last name."));
       return;
     }
 
@@ -67,7 +70,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
-        setError("You need to be signed in to complete your profile.");
+        setError(t('auth.vSignedIn', "You need to be signed in to complete your profile."));
         setSaving(false);
         return;
       }
@@ -88,7 +91,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
 
       if (upsertError) {
         console.error("Error updating profile", upsertError);
-        setError("Could not save your profile. Please try again.");
+        setError(t('auth.vSaveFailed', "Could not save your profile. Please try again."));
       } else {
         // Fire one-time welcome email for travelers (idempotent per user id).
         if (accountType === "traveler" && user.email) {
@@ -114,9 +117,9 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
     <div className="space-y-6">
       {/* Section header */}
       <div className="space-y-1">
-        <h2 className="text-xl font-secondary text-[#0a2225]">Tell us who you are</h2>
+        <h2 className="text-xl font-secondary text-[#0a2225]">{t('auth.tellUsWho', "Tell us who you are")}</h2>
         <p className="text-sm text-[#6B7280]">
-          Goldsainte works best when we understand your role in the marketplace.
+          {t('auth.tellUsWhoSub', "Goldsainte works best when we understand your role in the marketplace.")}
         </p>
       </div>
 
@@ -125,7 +128,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
 
         {/* Role selection */}
         <div className="flex flex-col gap-3">
-          {roleOptions.map((role) => {
+          {roleOptions(t).map((role) => {
             const isSelected = accountType === role.type;
             return (
               <button
@@ -160,11 +163,11 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-sm font-medium text-[#0a2225]">
-                First name
+                {t('auth.firstName', "First name")}
               </Label>
               <Input
                 id="firstName"
-                placeholder="Jordan"
+                placeholder={t('auth.firstNamePh', "Jordan")}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
@@ -172,11 +175,11 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName" className="text-sm font-medium text-[#0a2225]">
-                Last name
+                {t('auth.lastName', "Last name")}
               </Label>
               <Input
                 id="lastName"
-                placeholder="Smith"
+                placeholder={t('auth.lastNamePh', "Smith")}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
@@ -186,7 +189,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
 
           <div className="space-y-2">
             <Label htmlFor="phone" className="text-sm font-medium text-[#0a2225]">
-              Mobile number <span className="font-normal text-[#6B7280]">(optional)</span>
+              {t('auth.mobileNumber', "Mobile number")} <span className="font-normal text-[#6B7280]">{t('auth.optionalParen', "(optional)")}</span>
             </Label>
             <Input
               id="phone"
@@ -195,7 +198,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
               onChange={(e) => setPhone(e.target.value)}
               className="border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-xl h-11"
             />
-            <p className="text-xs text-[#6B7280]">You can add this later from your profile settings.</p>
+            <p className="text-xs text-[#6B7280]">{t('auth.addLaterNote', "You can add this later from your profile settings.")}</p>
           </div>
 
           {/* Error message */}
@@ -214,7 +217,7 @@ export function AccountTypeStep({ onComplete, defaultType }: Props) {
         disabled={saving}
         className="w-full rounded-full bg-[#0c4d47] hover:bg-[#073331] text-[#E5DFC6] py-3 h-12 text-base font-semibold"
       >
-        {saving ? "Saving profile…" : "Continue to Goldsainte"}
+        {saving ? t('auth.savingProfile', "Saving profile…") : t('auth.continueToGoldsainte', "Continue to Goldsainte")}
       </Button>
     </div>
   );
