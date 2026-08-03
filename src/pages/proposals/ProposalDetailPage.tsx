@@ -1,4 +1,5 @@
 // src/pages/proposals/ProposalDetailPage.tsx
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -71,7 +72,7 @@ function formatDate(dateStr?: string | null) {
   if (!dateStr) return null;
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric", year: "numeric" });
 }
 
 function humanStatus(status: string) {
