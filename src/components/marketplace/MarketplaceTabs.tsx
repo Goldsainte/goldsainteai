@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Map, Ticket, BookOpen, PenLine } from "lucide-react";
 
 interface MarketplaceTabsProps {
@@ -12,11 +13,12 @@ interface MarketplaceTabsProps {
    category row — icon above a small label, active tab underlined,
    horizontally scrollable. */
 export function MarketplaceTabs({ activeTab, onTabChange, counts }: MarketplaceTabsProps) {
+  const { t } = useTranslation();
   const tabs = [
-    { id: "trip-requests", label: "Trip Requests", shortLabel: "Requests", Icon: PenLine },
-    { id: "trips", label: "Handpicked Trips", shortLabel: "Trips", Icon: Map },
-    { id: "tours", label: "Tours", shortLabel: "Tours", Icon: Ticket },
-    { id: "itinerary-guides", label: "Itinerary Guides", shortLabel: "Guides", Icon: BookOpen },
+    { id: "trip-requests", label: t("mp.tabs.requests", "Trip Requests"), shortLabel: t("mp.tabs.requestsS", "Requests"), Icon: PenLine },
+    { id: "trips", label: t("mp.tabs.trips", "Handpicked Trips"), shortLabel: t("mp.tabs.tripsS", "Trips"), Icon: Map },
+    { id: "tours", label: t("mp.tabs.tours", "Tours"), shortLabel: t("mp.tabs.toursS", "Tours"), Icon: Ticket },
+    { id: "itinerary-guides", label: t("mp.tabs.guides", "Itinerary Guides"), shortLabel: t("mp.tabs.guidesS", "Guides"), Icon: BookOpen },
   ] as const;
 
   return (
