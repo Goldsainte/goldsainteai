@@ -1180,5 +1180,116 @@
     "alreadyApplied": "Déjà candidat ?",
     "checkStatus": "Connectez-vous à tout moment pour suivre votre candidature.",
     "questions": "Des questions sur le métier de spécialiste —"
+  },
+  "mp": {
+    "header": {
+      "h1": "Voyages, tours et guides — créés par ceux qui y sont allés.",
+      "sub": "De vrais voyages, vraiment réservables — directement auprès des locaux et conseillers vérifiés qui les ont conçus.",
+      "trust1": "Chaque annonce vérifiée par notre équipe",
+      "trust2": "Paiement sécurisé par Stripe",
+      "trust3": "Ligne directe avec votre spécialiste"
+    },
+    "tabs": {
+      "requests": "Demandes de voyage",
+      "requestsS": "Demandes",
+      "trips": "Voyages sélectionnés",
+      "tripsS": "Voyages",
+      "tours": "Tours",
+      "toursS": "Tours",
+      "guides": "Guides d'itinéraires",
+      "guidesS": "Guides"
+    },
+    "filters": {
+      "sortNewest": "Nouveautés",
+      "sortPopular": "Les plus populaires",
+      "sortPriceLow": "Prix : croissant",
+      "sortPriceHigh": "Prix : décroissant",
+      "destination": "Destination",
+      "duration": "Durée",
+      "price": "Prix",
+      "daysSuffix": "jours",
+      "destinationsPanel": "Destinations",
+      "priceRange": "Fourchette de prix",
+      "clearPrice": "Effacer le prix",
+      "sortBy": "Trier par"
+    },
+    "empty": {
+      "noResults": "Aucun résultat ne correspond à vos filtres",
+      "tryAdjusting": "Ajustez vos critères ou effacez vos filtres pour voir toutes les options disponibles.",
+      "clearFilters": "Effacer les filtres",
+      "tripsTitle": "Aucun voyage trouvé",
+      "tripsDesc": "Soyez le premier à publier le voyage de vos rêves et laissez les créateurs le construire.",
+      "tripsCta": "Publiez le voyage de vos rêves",
+      "creatorsTitle": "Aucun créateur trouvé",
+      "creatorsDesc": "Revenez bientôt pour découvrir des créateurs voyage inspirants.",
+      "creatorsCta": "Voir tous les créateurs",
+      "agentsTitle": "Aucun agent trouvé",
+      "agentsDesc": "Les agents de voyage certifiés apparaîtront ici une fois vérifiés.",
+      "agentsCta": "Voir tous les agents",
+      "brandsTitle": "Aucune marque trouvée",
+      "brandsDesc": "Les hôtels, résidences et marques vérifiés apparaîtront ici dès leur arrivée sur Goldsainte.",
+      "brandsCta": "Voir toutes les marques",
+      "briefsTitle": "Pas encore de demandes de voyageurs",
+      "briefsDesc": "Quand des voyageurs publieront des demandes, elles apparaîtront ici pour que vous puissiez y répondre.",
+      "briefsCta": "Publiez le voyage de vos rêves"
+    },
+    "week": {
+      "heading": "Cette semaine sur Goldsainte",
+      "destinations": "Destinations couvertes",
+      "trips": "Voyages sélectionnés",
+      "trending": "Tendance en ce moment",
+      "bookings": "Réservations récentes"
+    },
+    "grid": {
+      "deleteTitle": "Supprimer cette demande de voyage ?",
+      "deleteDesc": "La demande de voyage et tous les messages associés seront définitivement supprimés. Cette action est irréversible.",
+      "cancel": "Annuler",
+      "deleting": "Suppression…",
+      "delete": "Supprimer",
+      "deleteAria": "Supprimer la demande de voyage",
+      "seeking": "En attente de propositions",
+      "travelerOne": "voyageur",
+      "travelerMany": "voyageurs",
+      "fromBudget": "À partir de {{amount}} $",
+      "upToBudget": "Jusqu'à {{amount}} $",
+      "proposalOne": "proposition",
+      "proposalMany": "propositions"
+    },
+    "card": {
+      "signInToSave": "Connectez-vous pour enregistrer des voyages",
+      "trending": "Tendance",
+      "new": "Nouveau",
+      "bookedTimes": "Réservé {{count}} fois cette semaine",
+      "roleAgent": "Agent de voyage",
+      "roleCreator": "Créateur",
+      "removeSaved": "Retirer des favoris",
+      "saveTrip": "Enregistrer le voyage",
+      "nights": "nuits",
+      "from": "À partir de"
+    },
+    "meta": {
+      "title": "Marketplace du voyage — Goldsainte",
+      "desc": "Parcourez des voyages sélectionnés, conçus par des spécialistes certifiés et des créateurs voyage dans plus de 50 pays. Réservez immédiatement ou publiez le voyage de vos rêves et recevez des propositions sur mesure."
+    },
+    "tours": {
+      "searchPh": "Rechercher des tours — ville, monument ou activité",
+      "searchAria": "Rechercher des tours",
+      "collectionsAria": "Collections de tours",
+      "editors": "Choix de la rédaction",
+      "fromCreators": "Par les créateurs",
+      "noneFor": "Aucun tour trouvé pour « {{place}} » pour le moment",
+      "noneMatch": "Aucun tour ne correspond",
+      "tryNearby": "Essayez une ville voisine, un monument ou une activité comme « food tour ».",
+      "willAppear": "Les tours réservables de créateurs et d'opérateurs apparaîtront ici."
+    },
+    "coll": {
+      "slowLuxury": "Luxe au ralenti",
+      "slowLuxuryK": "Une autre cadence",
+      "hiddenCities": "Villes secrètes",
+      "hiddenCitiesK": "Loin de l'évidence",
+      "quietAdventure": "Aventure paisible",
+      "quietAdventureK": "Une solitude méritée"
+    },
+    "disclaimer": "Goldsainte est une place de marché du voyage. Tous les voyages sont conçus et réalisés par des spécialistes, agents et prestataires indépendants. Les propositions liées aux demandes de voyage reflètent leurs propres conditions d'annulation, de remboursement et d'acompte."
   }
 }
