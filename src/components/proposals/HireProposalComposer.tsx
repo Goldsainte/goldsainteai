@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,19 +24,25 @@ const F =
   "w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] placeholder:text-[#0a2225]/35 focus:outline-none focus:ring-2 focus:ring-[#C7A962]/50";
 const EYEBROW = "text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]";
 
-const HOSTING_OPTIONS = [
-  "Traveling with you full-time",
-  "Joining for planned activities only",
-  "Creating content independently",
-  "Combination",
+type HireT = (key: string, defaultValue: string) => string;
+const hostingOptions = (t: HireT) => [
+  t("hire.host1", "Traveling with you full-time"),
+  t("hire.host2", "Joining for planned activities only"),
+  t("hire.host3", "Creating content independently"),
+  t("hire.host4", "Combination"),
 ];
-const COMMS_OPTIONS = ["Entire day", "During planned shoots", "Mornings only", "Flexible"];
-const RESPONSIBILITY_ITEMS = [
-  { id: "accommodation", label: "Accommodation" },
-  { id: "transportation", label: "Transportation" },
-  { id: "meals", label: "Meals" },
-  { id: "activities", label: "Activity access" },
-  { id: "flights", label: "Flights" },
+const commsOptions = (t: HireT) => [
+  t("hire.comms1", "Entire day"),
+  t("hire.comms2", "During planned shoots"),
+  t("hire.comms3", "Mornings only"),
+  t("hire.comms4", "Flexible"),
+];
+const responsibilityItems = (t: HireT) => [
+  { id: "accommodation", label: t("hire.respAccommodation", "Accommodation") },
+  { id: "transportation", label: t("hire.respTransportation", "Transportation") },
+  { id: "meals", label: t("hire.respMeals", "Meals") },
+  { id: "activities", label: t("hire.respActivities", "Activity access") },
+  { id: "flights", label: t("hire.respFlights", "Flights") },
 ];
 
 interface Props {
@@ -92,6 +99,7 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
   // 9. Communication
   const [comms, setComms] = useState("");
   // 8. Traveler responsibilities: id -> "traveler" | "me"
+  const { t } = useTranslation();
   const [responsibilities, setResponsibilities] = useState<Record<string, "traveler" | "me">>({});
   // 10. Special requests
   const [specialRequests, setSpecialRequests] = useState("");
@@ -165,24 +173,24 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
 
   const handleSubmit = async () => {
     if (!availabilityConfirmed) {
-      toast.error("Confirm your availability for these dates first.");
+      toast.error(t("hire.vAvail", "Confirm your availability for these dates first."));
       return;
     }
     if (!arrival || !departure) {
-      toast.error("Set your arrival and departure dates.");
+      toast.error(t("hire.vDates", "Set your arrival and departure dates."));
       return;
     }
     if (!hostingDesc.trim() && !hostingStyle) {
-      toast.error("Tell them how you'll host and work during the trip.");
+      toast.error(t("hire.vHosting", "Tell them how you'll host and work during the trip."));
       return;
     }
     if (!Number.isFinite(priceNum) || priceNum <= 0) {
-      toast.error("Set your total for the trip.");
+      toast.error(t("hire.vPrice", "Set your total for the trip."));
       return;
     }
     const dep = parseFloat(depositPct);
     if (!Number.isFinite(dep) || dep <= 0 || dep >= 100) {
-      toast.error("Deposit must be between 1 and 99 percent.");
+      toast.error(t("hire.vDeposit", "Deposit must be between 1 and 99 percent."));
       return;
     }
     setSubmitting(true);
@@ -231,10 +239,10 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
       };
       const { data, error } = await supabase.from("trip_proposals").insert(payload).select("id").single();
       if (error) throw error;
-      toast.success("Proposal sent");
+      toast.success(t("hire.sent", "Proposal sent"));
       navigate(`/proposals/${(data as any).id}`);
     } catch (err: any) {
-      toast.error("Couldn't send your proposal" + (err?.message ? `: ${err.message}` : ""));
+      toast.error(t("hire.sendFailed", "Couldn't send your proposal") + (err?.message ? `: ${err.message}` : ""));
     } finally {
       setSubmitting(false);
     }
@@ -283,57 +291,57 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
   return (
     <div className="min-h-screen bg-[#FDF9F0] px-4 py-10 md:py-14">
       <div className="mx-auto max-w-2xl">
-        <p className={EYEBROW}>Your reply</p>
+        <p className={EYEBROW}>{t("hire.eyebrowReply", "Your reply")}</p>
         <h1 className="mt-2 font-secondary text-2xl leading-tight text-[#0a2225] md:text-3xl">
-          Hired for {hireCaps.length > 0 ? hireCaps.map(capLabel).join(", ") : "your trip"}
+          {t("hire.hiredFor", "Hired for")} {hireCaps.length > 0 ? hireCaps.map(capLabel).join(", ") : t("hire.yourTrip", "your trip")}
         </h1>
         <p className="mt-2 text-[14px] leading-relaxed text-[#0a2225]/70">
           {tripData?.destination}
-          {hireDays > 0 ? `, ${hireDays} days` : ""}
-          {hireRate ? ` \u00b7 your listed rate $${hireRate}/day` : ""}
-          {hireEstimate ? ` \u00b7 \u2248 $${hireEstimate.toLocaleString()} total` : ""}
+          {hireDays > 0 ? `, ${hireDays} ${t("hire.daysWord", "days")}` : ""}
+          {hireRate ? ` \u00b7 ${t("hire.listedRate", { rate: hireRate, defaultValue: "your listed rate ${{rate}}/day" })}` : ""}
+          {hireEstimate ? ` \u00b7 \u2248 ${t("hire.estTotal", { total: hireEstimate.toLocaleString(), defaultValue: "${{total}} total" })}` : ""}
         </p>
 
         <div className="mt-8 space-y-8">
           {/* 1 — Availability confirmation */}
           <div className="border-t border-[#E5DFC6] pt-6">
-            <p className={EYEBROW}>Availability</p>
+            <p className={EYEBROW}>{t("hire.availability", "Availability")}</p>
             <button type="button" onClick={() => setAvailabilityConfirmed((c) => !c)}
               className="mt-3 flex w-full items-center gap-3 rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-left transition-colors hover:border-[#C7A962] !min-h-0">
               <span className={`flex h-5 w-5 items-center justify-center rounded-md border text-[12px] ${
                 availabilityConfirmed ? "border-[#0c4d47] bg-[#0c4d47] text-[#f7f3ea]" : "border-[#C7A962]/60 bg-white text-transparent"
               }`}>{"\u2713"}</span>
-              <span className="text-[14px] text-[#0a2225]">I confirm I am available for these dates <span className="text-[#B3261E]">*</span></span>
+              <span className="text-[14px] text-[#0a2225]">{t("hire.confirmAvail", "I confirm I am available for these dates")} <span className="text-[#B3261E]">*</span></span>
             </button>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">Arrival *</label>
+                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">{t("hire.arrival", "Arrival")} *</label>
                 <input type="date" className={F} value={arrival} onChange={(e) => setArrival(e.target.value)} />
               </div>
               <div>
-                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">Departure *</label>
+                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">{t("hire.departure", "Departure")} *</label>
                 <input type="date" className={F} value={departure} onChange={(e) => setDeparture(e.target.value)} />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">Any date limitations</label>
+                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">{t("hire.dateLimits", "Any date limitations")}</label>
                 <input type="text" className={F} value={dateLimitations} onChange={(e) => setDateLimitations(e.target.value)}
-                  placeholder="e.g. I need to depart by 2pm on the last day" />
+                  placeholder={t("hire.dateLimitsPh", "e.g. I need to depart by 2pm on the last day")} />
               </div>
             </div>
           </div>
 
           {/* 2 — Hosting / working style */}
           <div className="border-t border-[#E5DFC6] pt-6">
-            <p className={EYEBROW}>Hosting & working style</p>
-            <p className="mb-2 mt-2 text-[12.5px] text-[#0a2225]/70">During the trip I'll primarily be:</p>
-            <Radio name="hosting" options={HOSTING_OPTIONS} value={hostingStyle} onChange={setHostingStyle} />
+            <p className={EYEBROW}>{t("hire.hostingTitle", "Hosting & working style")}</p>
+            <p className="mb-2 mt-2 text-[12.5px] text-[#0a2225]/70">{t("hire.hostingSub", "During the trip I'll primarily be:")}</p>
+            <Radio name="hosting" options={hostingOptions(t)} value={hostingStyle} onChange={setHostingStyle} />
             <div className="mt-3">
               <div className="mb-1 flex items-center justify-between">
-                <label className="text-[12.5px] text-[#0a2225]/70">Describe how you'll host and work during the trip</label>
+                <label className="text-[12.5px] text-[#0a2225]/70">{t("hire.hostingDesc", "Describe how you'll host and work during the trip")}</label>
                 <AIRewriteButton value={hostingDesc} onRewrite={setHostingDesc} fieldLabel="Hosting & working style" />
               </div>
               <textarea rows={3} className={F} value={hostingDesc} onChange={(e) => setHostingDesc(e.target.value)}
-                placeholder="I plan the days around your pace — shooting in golden hours, off-camera the rest…" />
+                placeholder={t("hire.hostingDescPh", "I plan the days around your pace — shooting in golden hours, off-camera the rest…")} />
             </div>
           </div>
 
@@ -345,7 +353,7 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
               <div key={cap} className="border-t border-[#E5DFC6] pt-6">
                 <p className={EYEBROW}>{capLabel(cap)}</p>
                 {fields.length === 0 ? (
-                  <p className="mt-2 text-[13.5px] text-[#0a2225]/60">Covered by your hosted days {"\u2014"} nothing extra to define.</p>
+                  <p className="mt-2 text-[13.5px] text-[#0a2225]/60">{t("hire.coveredByDays", "Covered by your hosted days \u2014 nothing extra to define.")}</p>
                 ) : (
                   <div className="mt-3 space-y-4">
                     {fields.map((f) => {
@@ -371,10 +379,10 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
 
           {/* 8 — Traveler responsibilities */}
           <div className="border-t border-[#E5DFC6] pt-6">
-            <p className={EYEBROW}>Who covers what</p>
-            <p className="mb-3 mt-2 text-[12.5px] text-[#0a2225]/70">Clear terms prevent disputes {"\u2014"} tap each item.</p>
+            <p className={EYEBROW}>{t("hire.whoCovers", "Who covers what")}</p>
+            <p className="mb-3 mt-2 text-[12.5px] text-[#0a2225]/70">{t("hire.whoCoversSub", "Clear terms prevent disputes \u2014 tap each item.")}</p>
             <div className="space-y-2.5">
-              {RESPONSIBILITY_ITEMS.map((r) => (
+              {responsibilityItems(t).map((r) => (
                 <div key={r.id} className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-[#0a2225]">{r.label}</span>
                   <div className="inline-flex rounded-lg border border-[#E5DFC6] bg-white p-0.5">
@@ -383,7 +391,7 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
                         className={`h-8 rounded-md px-3 text-[12px] font-medium transition-colors !min-h-0 !min-w-0 ${
                           responsibilities[r.id] === who ? "bg-[#0c4d47] text-[#f7f3ea]" : "text-[#0a2225]/70 hover:bg-[#f7f3ea]"
                         }`}>
-                        {who === "traveler" ? "Traveler provides" : "In my fee"}
+                        {who === "traveler" ? t("hire.travelerProvides", "Traveler provides") : t("hire.inMyFee", "In my fee")}
                       </button>
                     ))}
                   </div>
@@ -394,50 +402,50 @@ export function HireProposalComposer({ tripData, userId, hireCaps, hireRate, hir
 
           {/* 9 — Communication expectations */}
           <div className="border-t border-[#E5DFC6] pt-6">
-            <p className={EYEBROW}>Communication</p>
-            <p className="mb-2 mt-2 text-[12.5px] text-[#0a2225]/70">During the trip I'll be available:</p>
-            <Radio name="comms" options={COMMS_OPTIONS} value={comms} onChange={setComms} />
+            <p className={EYEBROW}>{t("hire.communication", "Communication")}</p>
+            <p className="mb-2 mt-2 text-[12.5px] text-[#0a2225]/70">{t("hire.commsSub", "During the trip I'll be available:")}</p>
+            <Radio name="comms" options={commsOptions(t)} value={comms} onChange={setComms} />
           </div>
 
           {/* 10 — Special requests */}
           <div className="border-t border-[#E5DFC6] pt-6">
             <div className="flex items-center justify-between">
-              <p className={EYEBROW}>Anything they should know</p>
+              <p className={EYEBROW}>{t("hire.anythingKnow", "Anything they should know")}</p>
               <AIRewriteButton value={specialRequests} onRewrite={setSpecialRequests} fieldLabel="Special requests" />
             </div>
             <textarea rows={3} className={`${F} mt-3`} value={specialRequests} onChange={(e) => setSpecialRequests(e.target.value)}
-              placeholder="Dietary restrictions, accessibility, preferred accommodations, luggage & equipment, visa requirements…" />
+              placeholder={t("hire.specialPh", "Dietary restrictions, accessibility, preferred accommodations, luggage & equipment, visa requirements…")} />
           </div>
 
           {/* Price */}
           <div className="border-t border-[#E5DFC6] pt-6">
-            <p className={EYEBROW}>Price</p>
+            <p className={EYEBROW}>{t("hire.price", "Price")}</p>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">
-                  Total for the trip{hireDays > 0 && hireRate ? ` (\u2248 ${hireDays} \u00d7 $${hireRate}/day)` : ""} *
+                  {t("hire.totalForTrip", "Total for the trip")}{hireDays > 0 && hireRate ? ` (\u2248 ${hireDays} \u00d7 $${hireRate}${t("hire.perDay", "/day")})` : ""} *
                 </label>
                 <input type="number" min="0" className={F} value={price} onChange={(e) => setPrice(e.target.value)} />
               </div>
               <div>
-                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">Deposit on acceptance (%)</label>
+                <label className="mb-1 block text-[12.5px] text-[#0a2225]/70">{t("hire.depositOnAccept", "Deposit on acceptance (%)")}</label>
                 <input type="number" min="1" max="99" className={F} value={depositPct} onChange={(e) => setDepositPct(e.target.value)} />
               </div>
             </div>
             {payout && (
               <p className="mt-3 text-[13px] text-[#0a2225]/70">
-                Your payout {"\u2248"} <span className="font-secondary text-[16px] text-[#8D6B2F]">${payout.toLocaleString()}</span>{" "}
-                after the 7% platform fee {"\u00b7"} charged straight to your Stripe account.
+                {t("hire.yourPayout", "Your payout")} {"\u2248"} <span className="font-secondary text-[16px] text-[#8D6B2F]">${payout.toLocaleString()}</span>{" "}
+                {t("hire.payoutAfter", "after the 7% platform fee \u00b7 charged straight to your Stripe account.")}
               </p>
             )}
           </div>
 
           <button type="button" disabled={submitting} onClick={handleSubmit}
             className="w-full rounded-full bg-[#0c4d47] px-6 py-4 text-[15px] font-medium text-[#f7f3ea] transition-colors hover:bg-[#0a2225] disabled:opacity-60">
-            {submitting ? "Sending\u2026" : "Send proposal"}
+            {submitting ? t("hire.sending", "Sending\u2026") : t("hire.sendProposal", "Send proposal")}
           </button>
           <p className="-mt-4 text-center text-[12px] text-[#0a2225]/55">
-            They accept and pay the deposit {"\u2014"} paid direct to your Stripe account.
+            {t("hire.acceptNote", "They accept and pay the deposit \u2014 paid direct to your Stripe account.")}
           </p>
         </div>
       </div>
