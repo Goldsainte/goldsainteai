@@ -1180,5 +1180,116 @@
     "alreadyApplied": "Schon beworben?",
     "checkStatus": "Melden Sie sich jederzeit an, um Ihren Bewerbungsstatus einzusehen.",
     "questions": "Fragen zum Weg zum Spezialisten —"
+  },
+  "mp": {
+    "header": {
+      "h1": "Reisen, Touren und Guides — von Menschen, die dort waren.",
+      "sub": "Echte Reisen, wirklich buchbar — direkt von den verifizierten Einheimischen und Beratern, die sie gestaltet haben.",
+      "trust1": "Jedes Angebot von unserem Team geprüft",
+      "trust2": "Stripe-gesicherter Checkout",
+      "trust3": "Direkter Draht zu Ihrem Spezialisten"
+    },
+    "tabs": {
+      "requests": "Reiseanfragen",
+      "requestsS": "Anfragen",
+      "trips": "Ausgewählte Reisen",
+      "tripsS": "Reisen",
+      "tours": "Touren",
+      "toursS": "Touren",
+      "guides": "Reiseguides",
+      "guidesS": "Guides"
+    },
+    "filters": {
+      "sortNewest": "Neueste",
+      "sortPopular": "Am beliebtesten",
+      "sortPriceLow": "Preis: aufsteigend",
+      "sortPriceHigh": "Preis: absteigend",
+      "destination": "Reiseziel",
+      "duration": "Dauer",
+      "price": "Preis",
+      "daysSuffix": "Tage",
+      "destinationsPanel": "Reiseziele",
+      "priceRange": "Preisspanne",
+      "clearPrice": "Preis zurücksetzen",
+      "sortBy": "Sortieren nach"
+    },
+    "empty": {
+      "noResults": "Keine Ergebnisse zu Ihren Filtern",
+      "tryAdjusting": "Passen Sie Ihre Suche an oder setzen Sie die Filter zurück, um alle Optionen zu sehen.",
+      "clearFilters": "Filter zurücksetzen",
+      "tripsTitle": "Keine Reisen gefunden",
+      "tripsDesc": "Schreiben Sie als Erster Ihre Traumreise aus und lassen Sie Creator sie bauen.",
+      "tripsCta": "Traumreise ausschreiben",
+      "creatorsTitle": "Keine Creator gefunden",
+      "creatorsDesc": "Schauen Sie bald wieder vorbei — inspirierende Travel-Creator sind unterwegs.",
+      "creatorsCta": "Alle Creator ansehen",
+      "agentsTitle": "Keine Agenten gefunden",
+      "agentsDesc": "Zertifizierte Reiseexperten erscheinen hier nach der Verifizierung.",
+      "agentsCta": "Alle Agenten ansehen",
+      "brandsTitle": "Keine Marken gefunden",
+      "brandsDesc": "Verifizierte Hotels, Residenzen und Marken erscheinen hier, sobald sie auf Goldsainte live sind.",
+      "brandsCta": "Alle Marken ansehen",
+      "briefsTitle": "Noch keine Reiseanfragen",
+      "briefsDesc": "Sobald Reisende Anfragen posten, erscheinen sie hier zur Ansicht und für Ihre Angebote.",
+      "briefsCta": "Traumreise ausschreiben"
+    },
+    "week": {
+      "heading": "Diese Woche auf Goldsainte",
+      "destinations": "Abgedeckte Reiseziele",
+      "trips": "Kuratierte Reisen",
+      "trending": "Gerade im Trend",
+      "bookings": "Neueste Buchungen"
+    },
+    "grid": {
+      "deleteTitle": "Diese Reiseanfrage löschen?",
+      "deleteDesc": "Die Reiseanfrage und alle zugehörigen Nachrichten werden dauerhaft gelöscht. Diese Aktion lässt sich nicht rückgängig machen.",
+      "cancel": "Abbrechen",
+      "deleting": "Wird gelöscht …",
+      "delete": "Löschen",
+      "deleteAria": "Reiseanfrage löschen",
+      "seeking": "Sucht Angebote",
+      "travelerOne": "Reisender",
+      "travelerMany": "Reisende",
+      "fromBudget": "Ab {{amount}} $",
+      "upToBudget": "Bis {{amount}} $",
+      "proposalOne": "Angebot",
+      "proposalMany": "Angebote"
+    },
+    "card": {
+      "signInToSave": "Melden Sie sich an, um Reisen zu speichern",
+      "trending": "Im Trend",
+      "new": "Neu",
+      "bookedTimes": "Diese Woche {{count}}-mal gebucht",
+      "roleAgent": "Reiseexperte",
+      "roleCreator": "Creator",
+      "removeSaved": "Aus Gespeicherten entfernen",
+      "saveTrip": "Reise speichern",
+      "nights": "Nächte",
+      "from": "Ab"
+    },
+    "meta": {
+      "title": "Reise-Marktplatz — Goldsainte",
+      "desc": "Stöbern Sie in ausgewählten Reisen von zertifizierten Spezialisten und Travel-Creators aus über 50 Ländern. Sofort buchen oder Traumreise ausschreiben und maßgeschneiderte Angebote erhalten."
+    },
+    "tours": {
+      "searchPh": "Touren suchen — Stadt, Sehenswürdigkeit oder Aktivität",
+      "searchAria": "Touren suchen",
+      "collectionsAria": "Touren-Kollektionen",
+      "editors": "Redaktionstipps",
+      "fromCreators": "Von Creators",
+      "noneFor": "Noch keine Touren für „{{place}}“ gefunden",
+      "noneMatch": "Keine passenden Touren",
+      "tryNearby": "Versuchen Sie eine Stadt in der Nähe, eine Sehenswürdigkeit oder eine Aktivität wie „Food-Tour“.",
+      "willAppear": "Buchbare Touren von Creators und Veranstaltern erscheinen hier."
+    },
+    "coll": {
+      "slowLuxury": "Entschleunigter Luxus",
+      "slowLuxuryK": "Ein leiserer Takt",
+      "hiddenCities": "Verborgene Städte",
+      "hiddenCitiesK": "Abseits des Offensichtlichen",
+      "quietAdventure": "Stilles Abenteuer",
+      "quietAdventureK": "Verdiente Einsamkeit"
+    },
+    "disclaimer": "Goldsainte ist ein Reise-Marktplatz. Alle Reisen werden von unabhängigen Spezialisten, Agenten und Anbietern gestaltet und durchgeführt. Angebote auf Reiseanfragen unterliegen deren eigenen Storno-, Erstattungs- und Anzahlungsbedingungen."
   }
 }
