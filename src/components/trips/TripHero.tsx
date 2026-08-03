@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useState } from "react";
 import { MapPin, Calendar, Users, Clock, Star } from "lucide-react";
 
@@ -34,9 +35,9 @@ export function TripHero({ trip, spotsLeft }: TripHeroProps) {
     const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
     if (trip.available_until) {
       const end = new Date(trip.available_until);
-      return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}, ${end.getFullYear()}`;
+      return `${start.toLocaleDateString(gsIntlLocale(), options)} - ${end.toLocaleDateString(gsIntlLocale(), options)}, ${end.getFullYear()}`;
     }
-    return start.toLocaleDateString("en-US", { ...options, year: "numeric" });
+    return start.toLocaleDateString(gsIntlLocale(), { ...options, year: "numeric" });
   };
 
   const getDifficultyLabel = (level: string | null) => {
