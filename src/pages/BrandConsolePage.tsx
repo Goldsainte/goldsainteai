@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
@@ -411,7 +412,7 @@ export default function BrandConsolePage() {
                             <div>
                               <p className="text-[15px] font-medium text-[#0a2225]">{inq.sender_name || "Traveler"}</p>
                               <p className="text-[12px] text-[#0a2225]/45">
-                                {new Date(inq.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric" })}
+                                {new Date(inq.created_at).toLocaleDateString(gsIntlLocale(), { month: "long", day: "numeric" })}
                               </p>
                             </div>
                           </div>
