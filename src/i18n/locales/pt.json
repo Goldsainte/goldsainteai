@@ -1673,7 +1673,16 @@
     "upcoming": "Em breve",
     "viewBreakdown": "Ver detalhamento",
     "yourSpecialist": "Seu especialista",
-    "youreHere": "Você está aqui"
+    "youreHere": "Você está aqui",
+    "checkoutFailed": "Não foi possível iniciar o pagamento. Tente de novo — se persistir, fale com o suporte.",
+    "customTrip": "Sua viagem sob medida",
+    "due": "A pagar",
+    "goldsainteTrip": "Viagem Goldsainte",
+    "notFound": "Reserva não encontrada.",
+    "payBalanceFee": "Pagar saldo — {{amount}} + taxa de 3,5%",
+    "payDepositFee": "Pagar depósito — {{amount}} + taxa de 3,5%",
+    "selectState": "Selecione seu estado de residência na seção Pagamento acima e tente novamente.",
+    "stateUnavailable": "Reservas de viagem ainda não estão disponíveis para residentes de Califórnia, Flórida, Havaí, Iowa ou Washington."
   },
   "hire": {
     "acceptNote": "Eles aceitam e pagam o depósito — direto na sua conta Stripe.",
@@ -1948,5 +1957,38 @@
       "14-29": "14–29 dias antes da partida",
       "<14": "Menos de 14 dias antes da partida"
     }
+  },
+  "msg": {
+    "acceptFailed": "Não foi possível aceitar o pedido",
+    "convArchived": "Conversa arquivada",
+    "convDeleted": "Conversa excluída",
+    "convDeletedPerm": "Conversa excluída permanentemente",
+    "deleteFailed": "Não foi possível excluir a mensagem",
+    "error": "Erro",
+    "fileTooLarge": "Arquivo muito grande",
+    "fileTooLargeD": "{{name}} passa de 10 MB.",
+    "messageDeleted": "Mensagem excluída",
+    "openAttachFailed": "Não foi possível abrir o anexo",
+    "requestAccepted": "Pedido aceito",
+    "requestAcceptedD": "Agora vocês podem trocar mensagens.",
+    "requestDeclined": "Pedido recusado",
+    "tryAgain": "Tente novamente.",
+    "uploadFailed": "Falha no envio",
+    "userBlocked": "Usuário bloqueado"
+  },
+  "sett": {
+    "checkoutOpened": "Pagamento aberto em nova aba",
+    "clearCacheFailed": "Não foi possível limpar o cache de busca",
+    "imageTooLarge": "A imagem deve ter menos de 5 MB",
+    "loadProfileFailed": "Não foi possível carregar o perfil",
+    "openingCheckout": "Abrindo o pagamento…",
+    "paySuccess": "Pagamento concluído! Verificando o status…",
+    "photoFailed": "Não foi possível enviar a foto",
+    "photoUpdated": "Foto de perfil atualizada!",
+    "profileUpdated": "Perfil atualizado!",
+    "selectImage": "Selecione um arquivo de imagem",
+    "updateProfileFailed": "Não foi possível atualizar o perfil",
+    "verifCancelled": "Verificação cancelada",
+    "verifStartFailed": "Não foi possível iniciar a verificação"
   }
 }
