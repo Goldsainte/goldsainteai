@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -248,7 +249,7 @@ function TripRequestRow({ req }: { req: TripRequestWithProposals }) {
             {req.title || `Trip to ${req.destination || "somewhere special"}`}
           </p>
           <p className="mt-1.5 text-[12.5px] text-[#fdfaf2]/80">
-            Posted {new Date(req.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            Posted {new Date(req.created_at).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric", year: "numeric" })}
             {(req as any).addresseeName ? ` \u00b7 Sent to ${(req as any).addresseeName}` : ""}
           </p>
         </div>
