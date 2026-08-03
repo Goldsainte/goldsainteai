@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -97,6 +98,7 @@ export default function Marketplace() {
   const rawTab = (searchParams.get("tab") as string) || "trips";
   const initialTab: Tab = validTabs.includes(rawTab as Tab) ? (rawTab as Tab) : "trips";
 
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [filters, setFilters] = useState<SearchFilters>({
     destination: searchParams.get("destination") || "",
@@ -682,8 +684,8 @@ export default function Marketplace() {
               type="search"
               value={tourSearchDraft}
               onChange={(e) => setTourSearchDraft(e.target.value)}
-              placeholder="Search tours — city, landmark, or activity"
-              aria-label="Search tours"
+              placeholder={t("mp.tours.searchPh", "Search tours — city, landmark, or activity")}
+              aria-label={t("mp.tours.searchAria", "Search tours")}
               className="w-full rounded-full border border-[#E5DFC6] bg-white py-2.5 pl-11 pr-4 text-sm text-[#0a2225] placeholder:text-[#9CA3AF] focus:border-[#C7A962] focus:outline-none"
             />
           </div>
@@ -724,11 +726,11 @@ export default function Marketplace() {
           className="mb-6 inline-flex items-center rounded-full border border-[#E5DFC6] bg-white p-1"
           style={{ fontFamily: "Inter, sans-serif" }}
           role="tablist"
-          aria-label="Tour collections"
+          aria-label={t("mp.tours.collectionsAria", "Tour collections")}
         >
           {([
-            { id: "editors", label: "Editors' Picks" },
-            { id: "creators", label: "From Creators" },
+            { id: "editors", label: t("mp.tours.editors", "Editors' Picks") },
+            { id: "creators", label: t("mp.tours.fromCreators", "From Creators") },
           ] as const).map(({ id, label }) => {
             const active = toursView === id;
             return (
@@ -781,12 +783,12 @@ export default function Marketplace() {
           {!filteredTours?.length && partnerTourCount === 0 && (
             <div className="py-16 text-center">
               <h3 className="font-secondary text-xl text-[#0a2225]">
-                {toursLocation ? `No tours found for “${toursLocation}” yet` : "No tours match yet"}
+                {toursLocation ? t("mp.tours.noneFor", { place: toursLocation, defaultValue: "No tours found for “{{place}}” yet" }) : t("mp.tours.noneMatch", "No tours match yet")}
               </h3>
               <p className="mt-2 text-sm text-[#6B7280]">
                 {toursLocation
-                  ? "Try a nearby city, a landmark, or an activity like “food tour”."
-                  : "Bookable tours from creators and tour operators will appear here."}
+                  ? t("mp.tours.tryNearby", "Try a nearby city, a landmark, or an activity like “food tour”.")
+                  : t("mp.tours.willAppear", "Bookable tours from creators and tour operators will appear here.")}
               </p>
             </div>
           )}
@@ -800,10 +802,10 @@ export default function Marketplace() {
   return (
     <>
       <Helmet>
-        <title>Travel Marketplace — Goldsainte</title>
+        <title>{t("mp.meta.title", "Travel Marketplace — Goldsainte")}</title>
         <meta
           name="description"
-          content="Browse handpicked trips from certified travel specialists and travel creators across 50+ countries. Book instantly or post your dream trip and receive custom proposals."
+          content={t("mp.meta.desc", "Browse handpicked trips from certified travel specialists and travel creators across 50+ countries. Book instantly or post your dream trip and receive custom proposals.")}
         />
       </Helmet>
 
@@ -897,26 +899,27 @@ export default function Marketplace() {
 
           {/* Marketplace legal line — moved from the hero (mockup spec) */}
           <p className="mx-auto mt-14 max-w-2xl text-center text-[11px] leading-relaxed text-[#9CA3AF]">
-            Goldsainte is a travel marketplace. All trips are designed and fulfilled by independent travel
-            specialists, agents, and suppliers. Trip Request proposals reflect their own cancellation,
-            refund, and deposit terms.
+            {t(
+              "mp.disclaimer",
+              "Goldsainte is a travel marketplace. All trips are designed and fulfilled by independent travel specialists, agents, and suppliers. Trip Request proposals reflect their own cancellation, refund, and deposit terms."
+            )}
           </p>
 
           {activeTab === "trips" && (
             <>
               <AdaptiveCollectionRow
-                title="Slow Luxury"
-                kicker="A quieter way"
+                title={t("mp.coll.slowLuxury", "Slow Luxury")}
+                kicker={t("mp.coll.slowLuxuryK", "A quieter way")}
                 tags={["wellness", "Wellness", "luxury", "Luxury", "spa"]}
               />
               <AdaptiveCollectionRow
-                title="Hidden Cities"
-                kicker="Off the obvious"
+                title={t("mp.coll.hiddenCities", "Hidden Cities")}
+                kicker={t("mp.coll.hiddenCitiesK", "Off the obvious")}
                 tags={["city", "City breaks", "design-led", "Design-led", "boutique"]}
               />
               <AdaptiveCollectionRow
-                title="Quiet Adventure"
-                kicker="Earned solitude"
+                title={t("mp.coll.quietAdventure", "Quiet Adventure")}
+                kicker={t("mp.coll.quietAdventureK", "Earned solitude")}
                 tags={["adventure", "Adventure", "nature", "eco-conscious"]}
               />
               <ThisWeekFooter />
