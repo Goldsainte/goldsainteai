@@ -1,4 +1,5 @@
 // src/pages/PartnerBookingsPage.tsx
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -249,7 +250,7 @@ function PartnerBookingRowCard({ isHireBooking, booking,
 
   const fmt = (d?: string | null) =>
     d
-      ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      ? new Date(d).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric" })
       : null;
   const dates =
     trip?.start_date && trip?.end_date
@@ -257,7 +258,7 @@ function PartnerBookingRowCard({ isHireBooking, booking,
       : fmt(trip?.start_date) || null;
 
   const reference = `GS-${booking.id.slice(0, 8).toUpperCase()}`;
-  const booked = new Date(booking.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const booked = new Date(booking.created_at).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric", year: "numeric" });
   // Use the booking's own cover (loaded by the page and stamped on the row)
   // first; fall back to a destination stock image. Chat-proposal bookings have
   // neither — those render the compact card below instead of a giant empty
