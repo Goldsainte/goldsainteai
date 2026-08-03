@@ -1673,7 +1673,16 @@
     "upcoming": "Upcoming",
     "viewBreakdown": "View breakdown",
     "yourSpecialist": "Your specialist",
-    "youreHere": "You're here"
+    "youreHere": "You're here",
+    "checkoutFailed": "We couldn't start checkout. Please try again — if it persists, contact support.",
+    "customTrip": "Your custom trip",
+    "due": "Due",
+    "goldsainteTrip": "Goldsainte trip",
+    "notFound": "Booking not found.",
+    "payBalanceFee": "Pay balance — {{amount}} + 3.5% fee",
+    "payDepositFee": "Pay deposit — {{amount}} + 3.5% fee",
+    "selectState": "Please select your state of residence in the Payment section above, then try again.",
+    "stateUnavailable": "Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington."
   },
   "hire": {
     "acceptNote": "They accept and pay the deposit — paid direct to your Stripe account.",
@@ -1948,5 +1957,38 @@
       "14-29": "14–29 days before departure",
       "<14": "Less than 14 days before departure"
     }
+  },
+  "msg": {
+    "acceptFailed": "Couldn't accept request",
+    "convArchived": "Conversation archived",
+    "convDeleted": "Conversation deleted",
+    "convDeletedPerm": "Conversation deleted permanently",
+    "deleteFailed": "Couldn't delete message",
+    "error": "Error",
+    "fileTooLarge": "File too large",
+    "fileTooLargeD": "{{name}} is over 10 MB.",
+    "messageDeleted": "Message deleted",
+    "openAttachFailed": "Couldn't open attachment",
+    "requestAccepted": "Request accepted",
+    "requestAcceptedD": "You can now message each other.",
+    "requestDeclined": "Request declined",
+    "tryAgain": "Please try again.",
+    "uploadFailed": "Upload failed",
+    "userBlocked": "User blocked"
+  },
+  "sett": {
+    "checkoutOpened": "Checkout opened in new tab",
+    "clearCacheFailed": "Failed to clear search cache",
+    "imageTooLarge": "Image must be less than 5MB",
+    "loadProfileFailed": "Failed to load profile",
+    "openingCheckout": "Opening checkout...",
+    "paySuccess": "Payment successful! Checking verification status...",
+    "photoFailed": "Failed to upload photo",
+    "photoUpdated": "Profile photo updated!",
+    "profileUpdated": "Profile updated successfully!",
+    "selectImage": "Please select an image file",
+    "updateProfileFailed": "Failed to update profile",
+    "verifCancelled": "Verification cancelled",
+    "verifStartFailed": "Failed to start verification process"
   }
 }
