@@ -1291,5 +1291,49 @@
       "quietAdventureK": "值得的独处"
     },
     "disclaimer": "Goldsainte 是一个旅行市集。所有旅程均由独立的专家、代理与供应商设计并履行。旅行需求的提案适用其各自的取消、退款与订金条款。"
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "你的进行中",
+      "h1": "我的提案",
+      "desc": "你发出的每一份提案，以及各自的进展。"
+    },
+    "card": {
+      "proposer": "提案人",
+      "unnamed": "未命名的创作者/代理",
+      "roleAgent": "旅行代理",
+      "roleCreator": "创作者",
+      "estTotal": "预计总价",
+      "itinerary": "行程概览",
+      "noItinerary": "尚未提供行程。",
+      "included": "包含内容",
+      "notIncluded": "不包含 / 可选加购",
+      "terms": "取消与付款条款"
+    },
+    "status": {
+      "awaiting": "待审阅",
+      "underReview": "审阅中",
+      "accepted": "已接受",
+      "declined": "已婉拒",
+      "withdrawn": "已撤回",
+      "expired": "已过期"
+    },
+    "list": {
+      "tripNotFound": "未找到该旅程。",
+      "loadFailed": "提案加载失败。",
+      "tripFallback": "旅程",
+      "back": "返回旅程列表",
+      "eyebrow": "收到的提案",
+      "optionsFor": "“{{title}}”的方案",
+      "compareSub": "并排比较创作者与旅行代理的提案。打开任意提案查看完整细节，并进入 Goldsainte 受保护的预订流程。",
+      "destination": "目的地",
+      "budget": "预算",
+      "noBudget": "未设置预算",
+      "datesFlexible": "日期灵活",
+      "emptyTitle": "还没有提案",
+      "emptyDesc": "创作者和旅行代理回应后会显示在这里，你可以在决定前逐一比较。",
+      "proposalOne": "份提案",
+      "proposalMany": "份提案"
+    }
   }
 }
