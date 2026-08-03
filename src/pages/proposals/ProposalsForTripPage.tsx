@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 // src/pages/proposals/ProposalsForTripPage.tsx
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
@@ -31,21 +32,23 @@ function formatDate(dateStr?: string | null) {
   return d.toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric", year: "numeric" });
 }
 
-function humanStatus(status: string) {
-  const map: Record<string, string> = {
-    pending: "Awaiting Review",
-    sent: "Awaiting Review",
-    traveler_review: "Under Review",
-    accepted: "Accepted",
-    declined: "Declined",
-    withdrawn: "Withdrawn",
-    expired: "Expired",
+function humanStatus(status: string, t: (key: string, defaultValue: string) => string) {
+  const map: Record<string, [string, string]> = {
+    pending: ["prop.status.awaiting", "Awaiting Review"],
+    sent: ["prop.status.awaiting", "Awaiting Review"],
+    traveler_review: ["prop.status.underReview", "Under Review"],
+    accepted: ["prop.status.accepted", "Accepted"],
+    declined: ["prop.status.declined", "Declined"],
+    withdrawn: ["prop.status.withdrawn", "Withdrawn"],
+    expired: ["prop.status.expired", "Expired"],
   };
-  return map[status] || status;
+  const hit = map[status];
+  return hit ? t(hit[0], hit[1]) : status;
 }
 
 export default function ProposalsForTripPage() {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const tripId = searchParams.get("tripId");
 
   const [trip, setTrip] = useState<TripRequestDetail | null>(null);
@@ -58,7 +61,7 @@ export default function ProposalsForTripPage() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      if (!tripId) { setError("Trip not found."); setLoading(false); return; }
+      if (!tripId) { setError(t("prop.list.tripNotFound", "Trip not found.")); setLoading(false); return; }
       try {
         const [{ data: authData }, tripDetail, proposalsList] = await Promise.all([
           supabase.auth.getUser(),
@@ -70,7 +73,7 @@ export default function ProposalsForTripPage() {
         setProposals(proposalsList);
         setCurrentUserId(authData.user?.id ?? null);
       } catch (err: any) {
-        if (!cancelled) setError(err.message || "Failed to load proposals.");
+        if (!cancelled) setError(err.message || t("prop.list.loadFailed", "Failed to load proposals."));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -80,7 +83,7 @@ export default function ProposalsForTripPage() {
   }, [tripId]);
 
   const isTraveler = trip && currentUserId && trip.user_id === currentUserId;
-  const title = trip?.title || trip?.destination || "Trip";
+  const title = trip?.title || trip?.destination || t("prop.list.tripFallback", "Trip");
 
   if (loading) {
     return (
@@ -109,18 +112,18 @@ export default function ProposalsForTripPage() {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to trips
+            {t("prop.list.back", "Back to trips")}
           </Link>
 
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.18em] text-[#C7A962] font-medium">
-              Proposals Received
+              {t("prop.list.eyebrow", "Proposals Received")}
             </p>
             <h1 className="font-secondary text-2xl md:text-[28px] leading-tight text-[#0a2225]">
-              Options for "{title}"
+              {t("prop.list.optionsFor", { title, defaultValue: "Options for \"{{title}}\"" })}
             </h1>
             <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              Compare proposals from creators and travel agents side by side. Open any proposal to see full details and move into Goldsainte's protected booking flow.
+              {t("prop.list.compareSub", "Compare proposals from creators and travel agents side by side. Open any proposal to see full details and move into Goldsainte's protected booking flow.")}
             </p>
           </div>
         </div>
@@ -131,18 +134,18 @@ export default function ProposalsForTripPage() {
         <section className="mx-auto max-w-5xl px-4 pt-8">
           <div className="bg-[#FDF9F0] rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Destination</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("prop.list.destination", "Destination")}</p>
               <p className="text-base font-semibold text-[#0a2225]">{trip.destination || "Flexible"}</p>
               <p className="text-sm text-muted-foreground mt-0.5">
                 {trip.start_date
                   ? `${formatDate(trip.start_date)}${trip.end_date ? ` – ${formatDate(trip.end_date)}` : ""}`
-                  : "Dates flexible"}
+                  : t("prop.list.datesFlexible", "Dates flexible")}
               </p>
             </div>
             <div className="text-right">
               {(trip.budget_min || trip.budget_max) ? (
                 <>
-                  <p className="text-xs text-muted-foreground mb-1">Budget</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t("prop.list.budget", "Budget")}</p>
                   <p className="text-base font-semibold text-[#0a2225]">
                     {trip.budget_min && trip.budget_max
                       ? `${formatMoney(trip.budget_min)} – ${formatMoney(trip.budget_max)}`
@@ -152,7 +155,7 @@ export default function ProposalsForTripPage() {
                   </p>
                 </>
               ) : (
-                <p className="text-xs text-muted-foreground">No budget set</p>
+                <p className="text-xs text-muted-foreground">{t("prop.list.noBudget", "No budget set")}</p>
               )}
             </div>
           </div>
@@ -163,15 +166,15 @@ export default function ProposalsForTripPage() {
       <section className="mx-auto max-w-5xl px-4 py-8 md:py-10">
         {proposals.length === 0 ? (
           <div className="text-center py-16">
-            <p className="font-secondary text-xl text-[#0a2225] mb-2">No proposals yet</p>
+            <p className="font-secondary text-xl text-[#0a2225] mb-2">{t("prop.list.emptyTitle", "No proposals yet")}</p>
             <p className="text-sm text-muted-foreground">
-              As creators and travel agents respond, you'll see them here and can compare them before deciding.
+              {t("prop.list.emptyDesc", "As creators and travel agents respond, you'll see them here and can compare them before deciding.")}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.16em] text-[#C7A962] font-medium">
-              {proposals.length} Proposal{proposals.length !== 1 ? "s" : ""}
+              {proposals.length} {proposals.length === 1 ? t("prop.list.proposalOne", "Proposal") : t("prop.list.proposalMany", "Proposals")}
             </p>
             {proposals.map((p) => (
               <ProposalCard key={p.id} proposal={p} />
@@ -222,7 +225,7 @@ function ProposalCard({ proposal }: { proposal: ProposalListItem }) {
             {formatMoney(proposal.price_from, proposal.currency || "USD")}
           </p>
           <span className="inline-flex items-center gap-1.5 text-sm text-[#0c4d47] font-medium group-hover:gap-2 transition-all">
-            {humanStatus(proposal.status)}
+            {humanStatus(proposal.status, t)}
             <ArrowRight className="h-3.5 w-3.5" />
           </span>
         </div>
