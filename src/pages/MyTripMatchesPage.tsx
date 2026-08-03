@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -202,7 +203,7 @@ export default function MyTripMatchesPage() {
             const tags = metadata.tags || [];
 
             const dateRange = match.trip_requests.start_date && match.trip_requests.end_date
-              ? `${new Date(match.trip_requests.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              ? `${new Date(match.trip_requests.start_date).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric" })}`
               : null;
 
             const travelers = 
@@ -258,7 +259,7 @@ export default function MyTripMatchesPage() {
             const collectionTitle = metadata.collection_title || "Trip Request";
 
             const dateRange = match.trip_requests.start_date && match.trip_requests.end_date
-              ? `${new Date(match.trip_requests.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              ? `${new Date(match.trip_requests.start_date).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric" })} – ${new Date(match.trip_requests.end_date).toLocaleDateString(gsIntlLocale(), { month: "short", day: "numeric" })}`
               : null;
 
             const budgetRange = match.trip_requests.budget_min && match.trip_requests.budget_max
