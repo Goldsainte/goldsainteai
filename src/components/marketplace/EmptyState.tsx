@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Compass, Users, Briefcase, MapPin, SearchX } from "lucide-react";
 
@@ -9,6 +10,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ type, onAction, hasFilters, onClearFilters }: EmptyStateProps) {
+  const { t } = useTranslation();
   // Filtered empty state
   if (hasFilters) {
     return (
@@ -16,15 +18,15 @@ export function EmptyState({ type, onAction, hasFilters, onClearFilters }: Empty
         <div className="mb-4 rounded-full bg-[#FBF9F0] p-4">
           <SearchX className="h-8 w-8 text-[#BFAD72]" />
         </div>
-        <h3 className="mb-2 font-display text-2xl text-[#0a2225]">No results match your filters</h3>
+        <h3 className="mb-2 font-display text-2xl text-[#0a2225]">{t("mp.empty.noResults", "No results match your filters")}</h3>
         <p className="mb-6 max-w-sm text-sm text-[#4a4a4a]">
-          Try adjusting your search criteria or clearing your filters to see all available options.
+          {t("mp.empty.tryAdjusting", "Try adjusting your search criteria or clearing your filters to see all available options.")}
         </p>
         <Button
           onClick={onClearFilters || onAction}
           className="rounded-full bg-[#0c4d47] px-6 py-2.5 font-semibold text-[#E5DFC6] hover:bg-[#073331]"
         >
-          Clear filters
+          {t("mp.empty.clearFilters", "Clear filters")}
         </Button>
       </div>
     );
@@ -33,33 +35,33 @@ export function EmptyState({ type, onAction, hasFilters, onClearFilters }: Empty
   const config = {
     trips: {
       icon: MapPin,
-      title: "No trips found",
-      description: "Be the first to post your dream journey and let creators build it.",
-      actionLabel: "Post your dream trip",
+      title: t("mp.empty.tripsTitle", "No trips found"),
+      description: t("mp.empty.tripsDesc", "Be the first to post your dream journey and let creators build it."),
+      actionLabel: t("mp.empty.tripsCta", "Post your dream trip"),
     },
     creators: {
       icon: Users,
-      title: "No creators found",
-      description: "Check back soon for inspiring travel creators and content partners.",
-      actionLabel: "Browse all creators",
+      title: t("mp.empty.creatorsTitle", "No creators found"),
+      description: t("mp.empty.creatorsDesc", "Check back soon for inspiring travel creators and content partners."),
+      actionLabel: t("mp.empty.creatorsCta", "Browse all creators"),
     },
     agents: {
       icon: Briefcase,
-      title: "No agents found",
-      description: "Certified travel agents will appear here once verified.",
-      actionLabel: "Browse all agents",
+      title: t("mp.empty.agentsTitle", "No agents found"),
+      description: t("mp.empty.agentsDesc", "Certified travel agents will appear here once verified."),
+      actionLabel: t("mp.empty.agentsCta", "Browse all agents"),
     },
     brands: {
       icon: Briefcase,
-      title: "No brands found",
-      description: "Verified hotels, residences and brands will appear here once they're live on Goldsainte.",
-      actionLabel: "Browse all brands",
+      title: t("mp.empty.brandsTitle", "No brands found"),
+      description: t("mp.empty.brandsDesc", "Verified hotels, residences and brands will appear here once they're live on Goldsainte."),
+      actionLabel: t("mp.empty.brandsCta", "Browse all brands"),
     },
     "trip-requests": {
       icon: Compass,
-      title: "No traveler briefs yet",
-      description: "When travelers post trip requests, they'll appear here for you to review and propose on.",
-      actionLabel: "Post your dream trip",
+      title: t("mp.empty.briefsTitle", "No traveler briefs yet"),
+      description: t("mp.empty.briefsDesc", "When travelers post trip requests, they'll appear here for you to review and propose on."),
+      actionLabel: t("mp.empty.briefsCta", "Post your dream trip"),
     },
   };
 
