@@ -1,3 +1,4 @@
+import { gsIntlLocale } from "@/lib/i18nFormat";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -248,7 +249,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
                   </h3>
                   <p className="text-[13px] text-[#0a2225]/55 mt-1">
                     {proposal.destination} ·{" "}
-                    {new Date(proposal.createdAt).toLocaleDateString("en-US", {
+                    {new Date(proposal.createdAt).toLocaleDateString(gsIntlLocale(), {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
