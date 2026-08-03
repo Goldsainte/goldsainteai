@@ -1291,5 +1291,49 @@
       "quietAdventureK": "애써 얻은 고독"
     },
     "disclaimer": "Goldsainte는 여행 마켓플레이스입니다. 모든 여행은 독립적인 전문가, 에이전트, 공급자가 설계하고 이행합니다. 여행 요청에 대한 제안에는 각자의 취소·환불·계약금 조건이 적용됩니다."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "나의 파이프라인",
+      "h1": "보낸 제안",
+      "desc": "보낸 모든 제안과 각 제안의 현재 상태."
+    },
+    "card": {
+      "proposer": "제안자",
+      "unnamed": "이름 없는 크리에이터/에이전트",
+      "roleAgent": "여행 에이전트",
+      "roleCreator": "크리에이터",
+      "estTotal": "예상 총액",
+      "itinerary": "일정 개요",
+      "noItinerary": "제공된 일정이 없습니다.",
+      "included": "포함 사항",
+      "notIncluded": "불포함 / 선택 추가 항목",
+      "terms": "취소 및 결제 조건"
+    },
+    "status": {
+      "awaiting": "검토 대기",
+      "underReview": "검토 중",
+      "accepted": "수락됨",
+      "declined": "거절됨",
+      "withdrawn": "철회됨",
+      "expired": "만료됨"
+    },
+    "list": {
+      "tripNotFound": "여행을 찾을 수 없습니다.",
+      "loadFailed": "제안을 불러오지 못했습니다.",
+      "tripFallback": "여행",
+      "back": "여행 목록으로",
+      "eyebrow": "받은 제안",
+      "optionsFor": "‘{{title}}’을 위한 선택지",
+      "compareSub": "크리에이터와 여행 에이전트의 제안을 나란히 비교하세요. 제안을 열어 상세 내용을 확인하고 Goldsainte의 보호된 예약 절차로 이동할 수 있습니다.",
+      "destination": "여행지",
+      "budget": "예산",
+      "noBudget": "예산 미설정",
+      "datesFlexible": "날짜 유동적",
+      "emptyTitle": "아직 제안이 없습니다",
+      "emptyDesc": "크리에이터와 에이전트가 응답하면 여기에 표시되며, 결정 전에 비교해 볼 수 있습니다.",
+      "proposalOne": "건의 제안",
+      "proposalMany": "건의 제안"
+    }
   }
 }
