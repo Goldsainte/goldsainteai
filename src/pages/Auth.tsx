@@ -514,7 +514,7 @@ const Auth = () => {
       if (error) {
         console.error("Sign up error:", error);
         let title = t('auth.tCouldNotCreate');
-        let description = error.message || "An unexpected error occurred.";
+        let description = error.message || t('auth.tUnexpected');
         const msg = error.message?.toLowerCase() || "";
 
         if (isDuplicateEmailError(error)) {
@@ -525,7 +525,7 @@ const Auth = () => {
             description,
             variant: "destructive",
             action: (
-              <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
+              <ToastAction altText={t('auth.signIn')} onClick={() => setStep('signin')}>
                 {t('auth.signIn')}
               </ToastAction>
             ),
@@ -538,7 +538,7 @@ const Auth = () => {
           return;
         } else if (msg.includes("failed to fetch") || msg.includes("network")) {
           title = t('auth.tConnection');
-          description = "Unable to reach our servers. Check your internet and try again.";
+          description = t('auth.tConnectionD', "Unable to reach our servers. Check your internet and try again.");
         } else if (
           msg.includes("rate limit") ||
           msg.includes("too many") ||
@@ -547,7 +547,7 @@ const Auth = () => {
         ) {
           title = t('auth.tTooMany');
           description =
-            "We've sent several confirmation emails to this address recently and our provider has paused new sends for about an hour. Please wait ~60 minutes and try again, or use a different email address.";
+            t('auth.tTooManyD', "We've sent several confirmation emails to this address recently and our provider has paused new sends for about an hour. Please wait ~60 minutes and try again, or use a different email address.");
         } else if (msg.includes("password")) {
           title = t('auth.tPasswordIssue');
           description = error.message;
@@ -573,7 +573,7 @@ const Auth = () => {
           description: t('auth.tExistsD'),
           variant: "destructive",
           action: (
-            <ToastAction altText="Sign in" onClick={() => setStep('signin')}>
+            <ToastAction altText={t('auth.signIn')} onClick={() => setStep('signin')}>
               {t('auth.signIn')}
             </ToastAction>
           ),
@@ -654,8 +654,8 @@ const Auth = () => {
       toast({ title: t('auth.tResetSent'), description: t('auth.tResetSentD') });
       setStep('email');
     } catch (error: any) {
-      const errorMessage = error?.message || "Failed to send reset email.";
-      toast({ title: "Error", description: errorMessage, variant: "destructive" });
+      const errorMessage = error?.message || t('auth.tResetFailed', "Failed to send reset email.");
+      toast({ title: t('auth.tError'), description: errorMessage, variant: "destructive" });
     }
     setIsLoading(false);
   };
@@ -689,7 +689,7 @@ const Auth = () => {
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FDF9F0' }}>
         <div className="text-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin mx-auto" style={{ color: '#C7A962' }} />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t('auth.loading', "Loading...")}</p>
         </div>
       </div>
     );
@@ -842,7 +842,7 @@ const Auth = () => {
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Loading...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('auth.loading', "Loading...")}</>
                   ) : 'Continue'}
                 </Button>
               </div>
@@ -947,7 +947,7 @@ const Auth = () => {
                   <span>{t('auth.agentEmailNote')}</span>
                 </p>
               )}
-              <Input id="signupEmail" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+              <Input id="signupEmail" type="email" placeholder={t('auth.emailPh', "you@example.com")} value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -997,7 +997,7 @@ const Auth = () => {
                 style={{ borderColor: '#E8E2D0', color: '#0a2225' }}
                 disabled={isLoading}
               >
-                Back
+                {t('auth.back', "Back")}
               </Button>
               <Button
                 type="submit" 
@@ -1085,12 +1085,12 @@ const Auth = () => {
                 {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('auth.sending')}</> : t('auth.resendConfirmation')}
               </Button>
               <button type="button" onClick={() => setStep("email")} className="block w-full text-sm transition-colors" style={{ color: '#9A9384' }}>
-                Use a different email
+                {t('auth.useDifferentEmail', "Use a different email")}
               </button>
             </div>
             <div className="mt-6 pt-6" style={{ borderTop: '1px solid #E8E2D0' }}>
               <p className="text-sm" style={{ color: '#9A9384' }}>
-                Once you verify your email, you'll be redirected back to complete your profile.
+                {t('auth.verifyRedirectNote', "Once you verify your email, you'll be redirected back to complete your profile.")}
               </p>
               <button
                 type="button"
@@ -1138,10 +1138,10 @@ const Auth = () => {
         {step === 'forgot-password' && (
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="reset-email" className="text-sm font-medium" style={{ color: '#0a2225' }}>Email</Label>
-              <Input id="reset-email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
+              <Label htmlFor="reset-email" className="text-sm font-medium" style={{ color: '#0a2225' }}>{t('auth.emailLabel', "Email")}</Label>
+              <Input id="reset-email" type="email" placeholder={t('auth.enterEmailPh', "Enter your email")} value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="h-12 rounded-xl" style={{ borderColor: '#E8E2D0' }} />
               <p className="text-sm" style={{ color: '#9A9384' }}>
-                We'll send you a link to reset your password.
+                {t('auth.resetLinkNote', "We'll send you a link to reset your password.")}
               </p>
             </div>
             <Button 
@@ -1150,7 +1150,7 @@ const Auth = () => {
               style={{ backgroundColor: '#0c4d47', color: '#E5DFC6' }}
               disabled={isLoading}
             >
-              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending...</> : 'Send Reset Link'}
+              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('auth.sending')}</> : t('auth.sendResetLink', 'Send Reset Link')}
             </Button>
             <div className="text-center">
               <button type="button" onClick={() => setStep('signin')} className="text-sm transition-colors" style={{ color: '#9A9384' }}>
