@@ -1291,5 +1291,49 @@
       "quietAdventureK": "Solitudine meritata"
     },
     "disclaimer": "Goldsainte è un marketplace di viaggi. Tutti i viaggi sono progettati e realizzati da specialisti, agenti e fornitori indipendenti. Le proposte alle richieste di viaggio riflettono le loro condizioni di cancellazione, rimborso e acconto."
+  },
+  "prop": {
+    "my": {
+      "eyebrow": "La tua pipeline",
+      "h1": "Le mie proposte",
+      "desc": "Ogni proposta inviata — e a che punto è ciascuna."
+    },
+    "card": {
+      "proposer": "Proponente",
+      "unnamed": "Creator/agente senza nome",
+      "roleAgent": "Agente di viaggio",
+      "roleCreator": "Creator",
+      "estTotal": "Totale stimato",
+      "itinerary": "Panoramica dell'itinerario",
+      "noItinerary": "Nessun itinerario fornito.",
+      "included": "Cosa è incluso",
+      "notIncluded": "Non incluso / extra opzionali",
+      "terms": "Condizioni di cancellazione e pagamento"
+    },
+    "status": {
+      "awaiting": "In attesa di revisione",
+      "underReview": "In revisione",
+      "accepted": "Accettata",
+      "declined": "Rifiutata",
+      "withdrawn": "Ritirata",
+      "expired": "Scaduta"
+    },
+    "list": {
+      "tripNotFound": "Viaggio non trovato.",
+      "loadFailed": "Impossibile caricare le proposte.",
+      "tripFallback": "Viaggio",
+      "back": "Torna ai viaggi",
+      "eyebrow": "Proposte ricevute",
+      "optionsFor": "Opzioni per «{{title}}»",
+      "compareSub": "Confronta fianco a fianco le proposte di creator e agenti di viaggio. Apri una proposta per tutti i dettagli e passa al flusso di prenotazione protetto di Goldsainte.",
+      "destination": "Destinazione",
+      "budget": "Budget",
+      "noBudget": "Nessun budget impostato",
+      "datesFlexible": "Date flessibili",
+      "emptyTitle": "Ancora nessuna proposta",
+      "emptyDesc": "Man mano che creator e agenti risponderanno, le vedrai qui e potrai confrontarle prima di decidere.",
+      "proposalOne": "proposta",
+      "proposalMany": "proposte"
+    }
   }
 }
