@@ -1673,7 +1673,16 @@
     "upcoming": "即将进行",
     "viewBreakdown": "查看明细",
     "yourSpecialist": "你的专家",
-    "youreHere": "当前位置"
+    "youreHere": "当前位置",
+    "checkoutFailed": "无法启动支付。请重试——若仍失败，请联系客服。",
+    "customTrip": "你的定制旅程",
+    "due": "待支付",
+    "goldsainteTrip": "Goldsainte 旅程",
+    "notFound": "未找到该预订。",
+    "payBalanceFee": "支付尾款 — {{amount}} + 3.5% 手续费",
+    "payDepositFee": "支付订金 — {{amount}} + 3.5% 手续费",
+    "selectState": "请先在上方付款区选择你的居住州，然后重试。",
+    "stateUnavailable": "加州、佛罗里达、夏威夷、爱荷华和华盛顿州居民暂无法使用旅程预订。"
   },
   "hire": {
     "acceptNote": "对方接受并支付订金 — 直接进入你的 Stripe 账户。",
@@ -1948,5 +1957,38 @@
       "14-29": "出发前 14–29 天",
       "<14": "出发前不足 14 天"
     }
+  },
+  "msg": {
+    "acceptFailed": "无法接受请求",
+    "convArchived": "会话已归档",
+    "convDeleted": "会话已删除",
+    "convDeletedPerm": "会话已永久删除",
+    "deleteFailed": "无法删除消息",
+    "error": "错误",
+    "fileTooLarge": "文件过大",
+    "fileTooLargeD": "{{name}} 超过 10 MB。",
+    "messageDeleted": "消息已删除",
+    "openAttachFailed": "无法打开附件",
+    "requestAccepted": "已接受请求",
+    "requestAcceptedD": "现在可以互发消息了。",
+    "requestDeclined": "已拒绝请求",
+    "tryAgain": "请重试。",
+    "uploadFailed": "上传失败",
+    "userBlocked": "已屏蔽用户"
+  },
+  "sett": {
+    "checkoutOpened": "已在新标签页打开支付",
+    "clearCacheFailed": "无法清除搜索缓存",
+    "imageTooLarge": "图片须小于 5MB",
+    "loadProfileFailed": "无法加载个人资料",
+    "openingCheckout": "正在打开支付…",
+    "paySuccess": "支付成功！正在检查认证状态…",
+    "photoFailed": "照片上传失败",
+    "photoUpdated": "头像已更新！",
+    "profileUpdated": "个人资料已更新！",
+    "selectImage": "请选择图片文件",
+    "updateProfileFailed": "个人资料更新失败",
+    "verifCancelled": "已取消认证",
+    "verifStartFailed": "无法启动认证流程"
   }
 }
