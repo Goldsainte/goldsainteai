@@ -1974,7 +1974,10 @@
     "requestDeclined": "Richiesta rifiutata",
     "tryAgain": "Riprova.",
     "uploadFailed": "Caricamento non riuscito",
-    "userBlocked": "Utente bloccato"
+    "userBlocked": "Utente bloccato",
+    "showOriginal": "Mostra originale",
+    "showTranslation": "Mostra traduzione",
+    "translated": "Tradotto"
   },
   "sett": {
     "checkoutOpened": "Pagamento aperto in una nuova scheda",
