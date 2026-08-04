@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -15,6 +16,7 @@ export default function TripBuilderPage() {
   const { isAgent, isCreator, isBrand, loading: roleLoading } = useUserRole();
   const listingNoun = isBrand || (isCreator && !isAgent) ? "tour" : "trip";
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
 
@@ -42,7 +44,7 @@ export default function TripBuilderPage() {
       return;
     }
     if (!isAgent && !isCreator && !isBrand) {
-      toast.error("Only agents and creators can access the Trip Builder");
+      toast.error(t("tb.onlyAgents", "Only agents and creators can access the Trip Builder"));
       navigate("/");
       return;
     }
@@ -67,14 +69,14 @@ export default function TripBuilderPage() {
       
       // Check ownership
       if (data.agent_id !== user?.id && data.creator_id !== user?.id) {
-        toast.error("You don't have permission to edit this trip");
+        toast.error(t("tb.noPermission", "You don't have permission to edit this trip"));
         navigate("/trip-builder");
         return;
       }
       
       setTripData(data);
     } catch (error: any) {
-      toast.error("Failed to load trip: " + error.message);
+      toast.error(t("tb.loadFailed", "Failed to load trip:") + " " + error.message);
       navigate("/trip-builder");
     } finally {
       setLoading(false);
@@ -121,12 +123,12 @@ export default function TripBuilderPage() {
           persistedStatus = tripData?.status === "published" ? "published" : "draft";
           if (persistedStatus === "draft") {
             publishBlocked = true;
-            toast.error("We couldn't verify your payout account just now — your listing was saved as a draft. Please try publishing again.");
+            toast.error(t("tb.payoutVerifyFailed", "We couldn't verify your payout account just now — your listing was saved as a draft. Please try publishing again."));
           }
         } else if (!prof?.stripe_account_id && !prof?.stripe_connect_account_id) {
           persistedStatus = tripData?.status === "published" ? "published" : "draft";
           publishBlocked = true;
-          toast.error("Connect your Stripe payout account before publishing — we saved your listing as a draft.");
+          toast.error(t("tb.connectStripe", "Connect your Stripe payout account before publishing — we saved your listing as a draft."));
         }
       }
 
@@ -215,7 +217,7 @@ export default function TripBuilderPage() {
         navigate(`/marketplace/trip/${savedSlug}`);
         return tripId ?? null;
       } else if (!publishBlocked && status === "draft" && persistedStatus === "draft") {
-        toast.success("Draft saved");
+        toast.success(t("tb.draftSaved", "Draft saved"));
       }
       // publishBlocked → the error toast above already explained what happened.
       // Draft-saves of an already-live trip stay silent: nothing changed for the user.
@@ -225,7 +227,7 @@ export default function TripBuilderPage() {
       }
       return tripId ?? null;
     } catch (error: any) {
-      toast.error("Failed to save: " + error.message);
+      toast.error(t("tb.saveFailed", "Failed to save:") + " " + error.message);
       return null;
     } finally {
       setSaving(false);
@@ -264,10 +266,10 @@ export default function TripBuilderPage() {
     }
     const currentData = formRef.current?.getCurrentData();
     if (!currentData?.title || !currentData?.destination) {
-      toast.info("Add a title and destination first, then we can save and preview.");
+      toast.info(t("tb.addTitleFirst", "Add a title and destination first, then we can save and preview."));
       return;
     }
-    toast.info("Saving draft and opening preview...");
+    toast.info(t("tb.savingPreview", "Saving draft and opening preview..."));
     await handleSave(currentData, "draft");
   };
 
