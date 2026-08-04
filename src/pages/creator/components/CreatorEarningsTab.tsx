@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, AlertCircle } from "lucide-react";
@@ -29,6 +30,7 @@ function formatMoneyExact(amountCents: number, currency: string) {
 }
 
 export function CreatorEarningsTab() {
+  const { t } = useTranslation();
   const [snapshot, setSnapshot] = useState<PartnerEarningSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,7 @@ export function CreatorEarningsTab() {
         const data = await getPartnerBookingEarnings("creator");
         if (!cancelled) setSnapshot(data);
       } catch (err: any) {
-        if (!cancelled) setError(err?.message || "Failed to load earnings.");
+        if (!cancelled) setError(err?.message || t("dash.c.loadEarningsFailed", "Failed to load earnings."));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -79,19 +81,19 @@ export function CreatorEarningsTab() {
       {/* Summary cards */}
       <div className="grid gap-x-10 gap-y-6 md:grid-cols-3">
         <SummaryCard
-          label="Paid"
+          label={t("dash.c.statPaid", "Paid")}
           value={snapshot ? formatMoney(snapshot.released, currency) : "—"}
-          description="Settled to your account"
+          description={t("dash.c.statPaidD", "Settled to your account")}
         />
         <SummaryCard
-          label="Pending"
+          label={t("dash.c.statPending", "Pending")}
           value={snapshot ? formatMoney(snapshot.pending, currency) : "—"}
-          description="Processing or awaiting release"
+          description={t("dash.c.statPendingD", "Processing or awaiting release")}
         />
         <SummaryCard
-          label="Lifetime"
+          label={t("dash.c.statLifetime", "Lifetime")}
           value={snapshot || tips ? formatMoney(total, currency) : "—"}
-          description="Total earned — bookings and tips"
+          description={t("dash.c.statLifetimeD", "Total earned — bookings and tips")}
           highlight
         />
       </div>
@@ -125,10 +127,10 @@ export function CreatorEarningsTab() {
       <div className="border-t border-[#0a2225]/15 pt-6 space-y-4">
         <div>
           <p className="text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">
-            Booking payouts
+            {t("dash.c.bookingPayouts", "Booking payouts")}
           </p>
           <p className="font-secondary text-[20px] text-[#0a2225] mt-1.5">
-            Latest activity
+            {t("dash.c.latestActivity", "Latest activity")}
           </p>
         </div>
 
@@ -137,7 +139,7 @@ export function CreatorEarningsTab() {
 
         {!loading && !error && snapshot && snapshot.bookings.length === 0 && (
           <p className="text-[16px] text-[#6B7280]">
-            Once travelers confirm bookings with you, each payout will appear here.
+            {t("dash.c.payoutsEmpty", "Once travelers confirm bookings with you, each payout will appear here.")}
           </p>
         )}
 
@@ -165,7 +167,7 @@ export function CreatorEarningsTab() {
                     {new Date(booking.created_at).toLocaleDateString()}
                   </p>
                   <div className="inline-flex items-center gap-1 text-[14.5px] text-[#0c4d47] font-medium">
-                    View booking
+                    {t("dash.c.viewBooking", "View booking")}
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
