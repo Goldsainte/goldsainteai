@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, Navigate, useSearchParams } from "react-router-dom";
 import { invokeWithAuth } from "@/lib/supabaseHelpers";
@@ -78,6 +79,7 @@ interface Profile {
 export default function CreatorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const { hasCreatorAccess, loading: roleLoading } = useUserRole();
@@ -201,7 +203,7 @@ export default function CreatorDashboard() {
     return <Navigate to="/traveler" replace />;
   }
 
-  const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Creator";
+  const displayName = profile?.display_name || profile?.first_name || profile?.full_name || t("dash.c.creator", "Creator");
 
   // Leaf tabs are the actual content panels — every existing deep link
   // (?tab=portfolio, ?tab=earnings, ?tab=settings, etc.) targets one of these
@@ -227,34 +229,34 @@ export default function CreatorDashboard() {
   // push secondary items (here: Settings) into a "More" menu.
   type GroupKey = "overview" | "pipeline" | "catalog" | "growth" | "earnings";
   const GROUPS: { key: GroupKey; label: string; children: { key: LeafKey; label: string }[] }[] = [
-    { key: "overview", label: "Studio", children: [{ key: "overview", label: "Studio" }] },
+    { key: "overview", label: t("dash.t.tabStudio", "Studio"), children: [{ key: "overview", label: t("dash.t.tabStudio", "Studio") }] },
     {
       key: "pipeline",
-      label: "Pipeline",
+      label: t("dash.c.pipeline", "Pipeline"),
       children: [
-        { key: "requests", label: "Requests" },
-        { key: "proposals", label: "Proposals" },
-        { key: "trips", label: "Trips" },
+        { key: "requests", label: t("dash.t.requests", "Requests") },
+        { key: "proposals", label: t("dash.c.proposals", "Proposals") },
+        { key: "trips", label: t("dash.c.trips", "Trips") },
       ],
     },
     {
       key: "catalog",
-      label: "Catalog",
+      label: t("dash.c.catalog", "Catalog"),
       children: [
-        { key: "guides", label: "Guides" },
-        { key: "services", label: "Services" },
+        { key: "guides", label: t("dash.c.guides", "Guides") },
+        { key: "services", label: t("dash.c.services", "Services") },
       ],
     },
     {
       key: "growth",
-      label: "Growth",
+      label: t("dash.c.growth", "Growth"),
       children: [
-        { key: "performance", label: "Performance" },
-        { key: "affiliate", label: "Affiliate" },
-        { key: "content", label: "Content" },
+        { key: "performance", label: t("dash.c.performance", "Performance") },
+        { key: "affiliate", label: t("dash.c.affiliate", "Affiliate") },
+        { key: "content", label: t("dash.c.content", "Content") },
       ],
     },
-    { key: "earnings", label: "Earnings", children: [{ key: "earnings", label: "Earnings" }] },
+    { key: "earnings", label: t("dash.c.earnings", "Earnings"), children: [{ key: "earnings", label: t("dash.c.earnings", "Earnings") }] },
   ];
 
   const LEAF_TO_GROUP = GROUPS.reduce((acc, group) => {
@@ -328,13 +330,13 @@ export default function CreatorDashboard() {
         <header className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-              The Atelier
+              {t("dash.c.eyebrow", "The Atelier")}
             </p>
             <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
-              {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
+              {loading ? t("dash.t.welcome", "Welcome") : `${t("dash.t.welcome", "Welcome")}, ${displayName.split(" ")[0]}`}
             </h1>
             <p className="mt-2 text-base text-[#0a2225]/70 max-w-xl">
-              Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.
+              {t("dash.c.subtitle", "Your studio for shaping trip proposals, packaging journeys, and growing what you earn on-platform.")}
             </p>
           </div>
           {user && (
@@ -343,7 +345,7 @@ export default function CreatorDashboard() {
               className="inline-flex items-center justify-center gap-2 rounded-full border border-[#0c4d47]/25 px-5 py-2.5 text-sm font-medium text-[#0a2225] hover:bg-white transition-colors whitespace-nowrap shrink-0"
             >
               <ExternalLink className="w-4 h-4" />
-              View public profile
+              {t("dash.c.viewProfile", "View public profile")}
             </Link>
           )}
         </header>
@@ -364,7 +366,7 @@ export default function CreatorDashboard() {
               to="/onboarding/creator"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm font-medium text-[#f7f3ea] hover:bg-[#0a2225] transition-colors whitespace-nowrap w-full sm:w-auto shrink-0"
             >
-              Complete Setup
+              {t("dash.c.completeSetup", "Complete Setup")}
             </Link>
           </div>
         )}
@@ -387,7 +389,7 @@ export default function CreatorDashboard() {
               <div className="flex items-center gap-2">
                 <Select value={activeGroup} onValueChange={handleGroupChange}>
                   <SelectTrigger className="flex-1 bg-transparent border-[#0a2225]/15 rounded-full h-11 px-5 text-sm font-medium text-[#0a2225]">
-                    <SelectValue>{GROUPS.find((g) => g.key === activeGroup)?.label ?? "Studio"}</SelectValue>
+                    <SelectValue>{GROUPS.find((g) => g.key === activeGroup)?.label ?? t("dash.t.tabStudio", "Studio")}</SelectValue>
                   </SelectTrigger>
                   <SelectContent className="bg-[#f7f3ea] border-[#0a2225]/15 rounded-xl">
                     {GROUPS.map((group) => (
@@ -405,7 +407,7 @@ export default function CreatorDashboard() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-[#f7f3ea] border-[#0a2225]/15">
                     <DropdownMenuItem onClick={() => setActiveLeaf("settings")}>
-                      Settings
+                      {t("dash.c.settings", "Settings")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -464,13 +466,13 @@ export default function CreatorDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                Find work
+                {t("dash.c.findWork", "Find work")}
               </p>
               <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                Browse open trip requests
+                {t("dash.c.browseRequests", "Browse open trip requests")}
               </h3>
               <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
-                See what travelers are dreaming up and send a tailored proposal to win the brief.
+                {t("dash.c.findWorkSub", "See what travelers are dreaming up and send a tailored proposal to win the brief.")}
               </p>
               <Link
                 to="/marketplace?tab=trip-requests"
@@ -481,13 +483,13 @@ export default function CreatorDashboard() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                Package a trip
+                {t("dash.c.packageTrip", "Package a trip")}
               </p>
               <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                Build something to sell
+                {t("dash.c.buildSell", "Build something to sell")}
               </h3>
               <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
-                Turn your taste into bookable tours and digital guides — published in minutes, sold on-platform.
+                {t("dash.c.packageSub", "Turn your taste into bookable tours and digital guides — published in minutes, sold on-platform.")}
               </p>
               <Link
                 to="/trip-builder"
@@ -498,13 +500,13 @@ export default function CreatorDashboard() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                New here?
+                {t("dash.t.newHere", "New here?")}
               </p>
               <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                How creators earn on Goldsainte
+                {t("dash.c.howEarn", "How creators earn on Goldsainte")}
               </h3>
               <p className="mt-2 text-[15px] text-[#0a2225]/70 leading-relaxed">
-                A short guide to proposals, payouts, fees and how the marketplace splits work.
+                {t("dash.c.howEarnSub", "A short guide to proposals, payouts, fees and how the marketplace splits work.")}
               </p>
               <Link
                 to="/how-it-works/creator"
