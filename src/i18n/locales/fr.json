@@ -1974,7 +1974,10 @@
     "requestDeclined": "Demande refusée",
     "tryAgain": "Veuillez réessayer.",
     "uploadFailed": "Échec du téléversement",
-    "userBlocked": "Utilisateur bloqué"
+    "userBlocked": "Utilisateur bloqué",
+    "showOriginal": "Voir l'original",
+    "showTranslation": "Voir la traduction",
+    "translated": "Traduit"
   },
   "sett": {
     "checkoutOpened": "Paiement ouvert dans un nouvel onglet",
