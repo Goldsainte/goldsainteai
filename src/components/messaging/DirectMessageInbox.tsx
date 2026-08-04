@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useTranslatedContent } from "@/hooks/useTranslatedContent";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
@@ -1049,9 +1050,13 @@ function MessageBubble({
   onMentionClick?: (username: string) => void;
   onOpenAttachment?: (att: MessageAttachment) => void;
 }) {
+  const { t } = useTranslation();
   const [hovered, setHovered] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [reactions, setReactions] = useState<{ emoji: string; user_id: string }[]>([]);
+  // Translate incoming messages into the viewer's app language (cache-first;
+  // silently falls back to the original on any failure).
+  const translated = useTranslatedContent(message.body, { enabled: !isSelf });
 
   const REACTION_OPTIONS = ["👍", "❤️", "😂", "🙏", "✈️"];
 
@@ -1150,7 +1155,7 @@ function MessageBubble({
             lineHeight: "1.35",
           }}
         >
-          {renderTextWithMentions(message.body, () => {}).map((part, idx) =>
+          {renderTextWithMentions(translated.text, () => {}).map((part, idx) =>
             typeof part === "string" ? (
               <span key={idx}>{part}</span>
             ) : (
@@ -1168,6 +1173,22 @@ function MessageBubble({
             )
           )}
         </p>
+        {translated.isTranslated && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              translated.toggle();
+            }}
+            className={`mt-0.5 text-[11.5px] underline-offset-2 hover:underline ${
+              isSelf ? "text-[#f7f3ea]/60" : "text-[#0a2225]/45"
+            }`}
+          >
+            {translated.showOriginal
+              ? t("msg.showTranslation", "Show translation")
+              : `${t("msg.translated", "Translated")} · ${t("msg.showOriginal", "Show original")}`}
+          </button>
+        )}
         {Array.isArray((message as any).attachments) && (message as any).attachments.length > 0 && (
           <div className="mt-1.5 flex flex-col gap-1">
             {((message as any).attachments as MessageAttachment[]).map((att) => (
