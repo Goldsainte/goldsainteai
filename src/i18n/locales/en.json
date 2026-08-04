@@ -1564,7 +1564,9 @@
       "capturing": "What {name} is capturing",
       "eyebrow": "Your trip, assembled",
       "fallback": "Your specialist is preparing everything for your trip",
-      "putting": "What {name} is putting together"
+      "putting": "What {name} is putting together",
+      "delivering": "What you're delivering",
+      "engagement": "The engagement"
     },
     "j": {
       "creative": {
@@ -1682,7 +1684,86 @@
     "payBalanceFee": "Pay balance — {{amount}} + 3.5% fee",
     "payDepositFee": "Pay deposit — {{amount}} + 3.5% fee",
     "selectState": "Please select your state of residence in the Payment section above, then try again.",
-    "stateUnavailable": "Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington."
+    "stateUnavailable": "Trip bookings aren't yet available to residents of California, Florida, Hawaii, Iowa, or Washington.",
+    "pj": {
+      "creative": {
+        "eyebrow": "This engagement, step by step",
+        "progress": "of this engagement complete",
+        "s1t": "Booking confirmed",
+        "s1s": "{client}'s session is confirmed and yours to deliver.",
+        "s2t": "Deposit secured",
+        "s2s": "The deposit has been charged to your Stripe account.",
+        "s3t": "Paid in full",
+        "s3s": "The full engagement has been charged directly to you.",
+        "s4t": "Shoot & capture",
+        "s4s": "Capture the sessions and share previews in Messages as you go.",
+        "s5t": "Edit & deliver the gallery",
+        "s5s": "Finish the images and deliver the gallery.",
+        "s6t": "Complete",
+        "s6s": "Once {client} has their gallery and all is well, the engagement closes."
+      },
+      "family": {
+        "eyebrow": "This engagement, step by step",
+        "progress": "of this engagement complete",
+        "s1t": "Booking confirmed",
+        "s1s": "{client}'s booking is confirmed and yours to deliver.",
+        "s2t": "Deposit secured",
+        "s2s": "The deposit has been charged to your Stripe account.",
+        "s3t": "Paid in full",
+        "s3s": "The full engagement has been charged directly to you.",
+        "s4t": "Prepare for the trip",
+        "s4s": "Confirm the details and coordinate in Messages.",
+        "s5t": "Support the trip",
+        "s5s": "Be the extra set of hands, throughout.",
+        "s6t": "Complete",
+        "s6s": "Once {client} has returned and all is well, the engagement closes."
+      },
+      "trip": {
+        "eyebrow": "This engagement, step by step",
+        "progress": "of this engagement complete",
+        "s1t": "Booking confirmed",
+        "s1s": "{client}'s booking is confirmed and yours to deliver.",
+        "s2t": "Deposit secured",
+        "s2s": "The deposit has been charged to your Stripe account.",
+        "s3t": "Paid in full",
+        "s3s": "The full trip has been charged directly to you.",
+        "s4t": "Prepare & share {client}'s reservations",
+        "s4s": "Confirm the details and share them in Messages as you go.",
+        "s5t": "The trip",
+        "s5s": "You're a message away throughout.",
+        "s6t": "Complete",
+        "s6s": "Once {client} has returned and all is well, the engagement closes."
+      },
+      "generic": {
+        "eyebrow": "This engagement, step by step",
+        "progress": "of this engagement complete",
+        "s1t": "Booking confirmed",
+        "s1s": "{client}'s booking is confirmed and yours to deliver.",
+        "s2t": "Deposit secured",
+        "s2s": "The deposit has been charged to your Stripe account.",
+        "s3t": "Paid in full",
+        "s3s": "The full trip has been charged directly to you.",
+        "s4t": "Prepare & share the details",
+        "s4s": "Confirm the details and share them in Messages as you go.",
+        "s5t": "The trip",
+        "s5s": "You're a message away throughout.",
+        "s6t": "Complete",
+        "s6s": "Once {client} has returned and all is well, the engagement closes."
+      }
+    },
+    "p": {
+      "backToBookings": "Back to bookings",
+      "estPayout": "Est. payout (96.5%)",
+      "loadFailed": "Couldn't load this booking.",
+      "markDone": "Mark this done",
+      "progressFailed": "Couldn't update progress. Please try again.",
+      "progressUpdated": "Progress updated — your client has been notified.",
+      "sellerNote": "You are the seller of record. Traveler payments are charged directly to your own Stripe account at checkout — deposit and balance alike — and you keep 96.5%. Goldsainte's flat 3.5% applies on each side.",
+      "tripFallback": "Goldsainte Trip",
+      "yourClient": "Your client",
+      "yourNextStep": "Your next step",
+      "yourPayout": "Your payout"
+    }
   },
   "hire": {
     "acceptNote": "They accept and pay the deposit — paid direct to your Stripe account.",
