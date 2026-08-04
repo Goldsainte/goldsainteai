@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { TravelerTripsTab } from "./TravelerTripsTab";
 import { TravelerBookingsTab } from "./TravelerBookingsTab";
@@ -7,16 +8,17 @@ interface Props {
 }
 
 export function TravelerJourneysTab({ userId }: Props) {
+  const { t } = useTranslation();
   const [view, setView] = useState<"requests" | "bookings">("requests");
 
   return (
     <div className="space-y-8">
       <div className="border-t border-[#0a2225]/10 pt-8">
         <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-          Your Journeys
+          {t("dash.t.yourJourneys", "Your Journeys")}
         </p>
         <h2 className="mt-2 md:mt-3 font-secondary text-2xl md:text-3xl text-[#0a2225] leading-tight">
-          Requests, proposals and confirmed trips
+          {t("dash.t.journeysSub", "Requests, proposals and confirmed trips")}
         </h2>
       </div>
 
@@ -30,7 +32,7 @@ export function TravelerJourneysTab({ userId }: Props) {
               : "text-[#0a2225]/70 hover:text-[#0a2225]"
           }`}
         >
-          Requests
+          {t("dash.t.requests", "Requests")}
         </button>
         <button
           type="button"
@@ -41,7 +43,7 @@ export function TravelerJourneysTab({ userId }: Props) {
               : "text-[#0a2225]/70 hover:text-[#0a2225]"
           }`}
         >
-          Bookings
+          {t("dash.t.bookings", "Bookings")}
         </button>
       </div>
 
