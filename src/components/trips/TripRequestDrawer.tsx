@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -352,7 +353,7 @@ export function TripRequestDrawer({
                               : "bg-[#F5F0E0] text-[#0a2225]"
                           }`}
                         >
-                          <p className="whitespace-pre-line">{msg.body}</p>
+                          <p className="whitespace-pre-line"><TranslatedMessageText text={msg.body} enabled={msg.sender_id !== currentUserId} /></p>
                           <p className="mt-1 text-[10px] opacity-70">
                             {new Date(msg.created_at).toLocaleTimeString(
                               undefined,
