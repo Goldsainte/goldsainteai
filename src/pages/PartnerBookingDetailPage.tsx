@@ -1,4 +1,5 @@
 import { gsIntlLocale } from "@/lib/i18nFormat";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { getTripRequestImageUrl } from "@/utils/tripImages";
 import { useNavigate, useParams } from "react-router-dom";
@@ -40,7 +41,8 @@ type BookingRow = {
 export default function PartnerBookingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [booking, setBooking] = useState<BookingRow | null>(null);
+    const { t: tr } = useTranslation();
+    const [booking, setBooking] = useState<BookingRow | null>(null);
   const [isHireBooking, setIsHireBooking] = useState(false);
   const [travelerName, setTravelerName] = useState<string | null>(null);
   const [cover, setCover] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export default function PartnerBookingDetailPage() {
           .eq("id", id)
           .maybeSingle();
         if (error) throw error;
-        if (!data) throw new Error("Booking not found.");
+        if (!data) throw new Error(tr("bk.notFound", "Booking not found."));
 
         // Partners only — travelers get their own page.
         if (data.partner_id !== user.id) {
@@ -131,7 +133,7 @@ export default function PartnerBookingDetailPage() {
         setCover((coverRes.data as any)?.cover_image_url ?? null);
       } catch (e: any) {
         console.error("Booking load failed:", e);
-        toast.error(e.message || "Couldn't load this booking.");
+        toast.error(e.message || tr("bk.p.loadFailed", "Couldn't load this booking."));
         navigate("/partner-bookings", { replace: true });
       } finally {
         if (alive) setLoading(false);
@@ -167,9 +169,9 @@ export default function PartnerBookingDetailPage() {
       setBooking((prev) =>
         prev ? { ...prev, fulfillment_stage: toStage } : prev
       );
-      toast.success("Progress updated — your client has been notified.");
+      toast.success(tr("bk.p.progressUpdated", "Progress updated — your client has been notified."));
     } catch (err: any) {
-      toast.error(err?.message || "Couldn't update progress. Please try again.");
+      toast.error(err?.message || tr("bk.p.progressFailed", "Couldn't update progress. Please try again."));
     } finally {
       setAdvancingTo(null);
     }
@@ -180,7 +182,7 @@ export default function PartnerBookingDetailPage() {
     trip?.title ||
     (booking.metadata as any)?.trip_title ||
     trip?.destination ||
-    "Goldsainte Trip";
+    tr("bk.p.tripFallback", "Goldsainte Trip");
   const clientName = travelerName || "your client";
   const clientFirst = clientName.split(/\s+/)[0];
   const initial = (travelerName || "T").trim().charAt(0).toUpperCase();
@@ -195,8 +197,8 @@ export default function PartnerBookingDetailPage() {
       : Math.round((Number(booking.total_price || 0) / 100) * 96.5) / 100;
   const payoutLabel =
     booking.partner_payout && booking.partner_payout > 0
-      ? "Your payout"
-      : "Est. payout (96.5%)";
+      ? tr("bk.p.yourPayout", "Your payout")
+      : tr("bk.p.estPayout", "Est. payout (96.5%)");
   const balance = Math.max(
     0,
     Number(booking.total_price || 0) - Number(booking.deposit_amount || 0)
@@ -216,11 +218,11 @@ export default function PartnerBookingDetailPage() {
       : fmt(trip?.start_date) || null;
 
   const humanStatus = tripComplete
-    ? "Complete"
+    ? tr("bk.pj.generic.s6t", "Complete")
     : balancePaid
-      ? "Paid in full"
+      ? tr("bk.status.paidInFull", "Paid in full")
       : depositPaid
-        ? "Deposit secured"
+        ? tr("bk.pj.generic.s2t", "Deposit secured")
         : booking.status.replace(/_/g, " ");
 
   // Progress %, partner-framed (their delivery arc, not money release).
@@ -230,7 +232,7 @@ export default function PartnerBookingDetailPage() {
   // Persona-aware step copy (photographer vs trip specialist vs …), keyed off
   // the same hire_capabilities the deliverables use. Lifecycle STATE is
   // computed here; wording comes from the shared table.
-  const partnerJourney = buildJourneyCopy(hireCapabilities, "partner", clientFirst);
+  const partnerJourney = buildJourneyCopy(hireCapabilities, "partner", clientFirst, tr);
 
   // The six steps split into two halves:
   //  • Steps 1-3 (indices 0,1,2) are PAYMENT-driven and advance on their own.
@@ -268,7 +270,7 @@ export default function PartnerBookingDetailPage() {
       // stage AND the work phase is unlocked (fully paid).
       const isNextToMark = stageNum === stage + 1;
       if (isNextToMark && workUnlocked) {
-        return { state: "cur" as const, advanceTo: stageNum, when: "You're here" };
+        return { state: "cur" as const, advanceTo: stageNum, when: tr("bk.youreHere", "You're here") };
       }
       return { state: "next" as const };
     });
@@ -288,7 +290,7 @@ export default function PartnerBookingDetailPage() {
   const engagementPct = Math.round((doneCount / timeline.length) * 100);
 
   const deliverables = buildDeliverables(hireCapabilities);
-  const deliverablesHead = deliverablesHeading(hireCapabilities, clientFirst, "partner");
+  const deliverablesHead = deliverablesHeading(hireCapabilities, clientFirst, "partner", tr);
 
   return (
     <main className="min-h-screen bg-[#f7f3ea] text-[#0a2225]">
@@ -299,7 +301,7 @@ export default function PartnerBookingDetailPage() {
           className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.22em] text-[#0a2225]/50 transition-colors hover:text-[#0a2225]"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
-          Back to bookings
+          {tr("bk.p.backToBookings", "Back to bookings")}
         </button>
       </section>
 
@@ -400,7 +402,7 @@ export default function PartnerBookingDetailPage() {
                         Updating…
                       </>
                     ) : (
-                      <>Mark this done</>
+                      <>{tr("bk.p.markDone", "Mark this done")}</>
                     )}
                   </button>
                 )}
@@ -411,7 +413,7 @@ export default function PartnerBookingDetailPage() {
           {/* Happening now */}
           <div className="mx-auto mt-14 max-w-[520px] rounded-[20px] bg-white p-9 text-center shadow-[0_24px_64px_-40px_rgba(10,34,37,0.35)]">
             <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-              Your next step
+              {tr("bk.p.yourNextStep", "Your next step")}
             </p>
             <h3 className="mt-4 font-secondary text-[21px] text-[#0a2225]">{currentStep.title}.</h3>
             <p className="mx-auto mt-2 max-w-[420px] text-[15px] text-[#0a2225]/65">
@@ -426,7 +428,7 @@ export default function PartnerBookingDetailPage() {
             </div>
             <div className="text-left">
               <small className="block text-[12px] uppercase tracking-[0.16em] text-[#0a2225]/50">
-                Your client
+                {tr("bk.p.yourClient", "Your client")}
               </small>
               <span className="font-secondary text-[20px] text-[#0a2225]">{clientName}</span>
             </div>
@@ -451,7 +453,7 @@ export default function PartnerBookingDetailPage() {
         <section className="mt-14">
           <div className="text-center">
             <p className="text-[12px] uppercase tracking-[0.22em] text-[#8D6B2F]">
-              The engagement
+              {tr("bk.deliv.engagement", "The engagement")}
             </p>
             <h2 className="mt-4 font-secondary text-[22px] text-[#0a2225]">{deliverablesHead}</h2>
           </div>
@@ -469,12 +471,12 @@ export default function PartnerBookingDetailPage() {
                       (d.state === "active" ? "text-[#8D6B2F]" : "text-[#0a2225]/35")
                     }
                   >
-                    {d.state === "active" ? "In progress" : "Upcoming"}
+                    {d.state === "active" ? tr("bk.inProgress", "In progress") : tr("bk.upcoming", "Upcoming")}
                   </span>
                 </div>
               ))
             ) : (
-              <p className="text-center text-[15px] text-[#0a2225]/60">{DELIVERABLES_FALLBACK}.</p>
+              <p className="text-center text-[15px] text-[#0a2225]/60">{tr("bk.deliv.fallback", DELIVERABLES_FALLBACK)}.</p>
             )}
           </div>
         </section>
@@ -514,9 +516,7 @@ export default function PartnerBookingDetailPage() {
               </div>
             </div>
             <p className="mt-4 text-[13px] leading-relaxed text-[#0a2225]/50">
-              You are the seller of record. Traveler payments are charged directly
-              to your own Stripe account at checkout — deposit and balance alike —
-              and you keep 96.5%. Goldsainte's flat 3.5% applies on each side.
+              {tr("bk.p.sellerNote", "You are the seller of record. Traveler payments are charged directly to your own Stripe account at checkout — deposit and balance alike — and you keep 96.5%. Goldsainte's flat 3.5% applies on each side.")}
             </p>
           </div>
         </section>
