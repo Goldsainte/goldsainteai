@@ -1564,7 +1564,9 @@
       "capturing": "Ce que {name} immortalise",
       "eyebrow": "Votre voyage, pièce par pièce",
       "fallback": "Votre spécialiste prépare tout pour votre voyage",
-      "putting": "Ce que {name} met en place"
+      "putting": "Ce que {name} met en place",
+      "delivering": "Ce que vous livrez",
+      "engagement": "L'engagement"
     },
     "j": {
       "creative": {
@@ -1682,7 +1684,86 @@
     "payBalanceFee": "Payer le solde — {{amount}} + 3,5 % de frais",
     "payDepositFee": "Payer l'acompte — {{amount}} + 3,5 % de frais",
     "selectState": "Sélectionnez votre État de résidence dans la section Paiement ci-dessus, puis réessayez.",
-    "stateUnavailable": "Les réservations de voyage ne sont pas encore disponibles pour les résidents de Californie, Floride, Hawaï, Iowa et Washington."
+    "stateUnavailable": "Les réservations de voyage ne sont pas encore disponibles pour les résidents de Californie, Floride, Hawaï, Iowa et Washington.",
+    "pj": {
+      "creative": {
+        "eyebrow": "Cet engagement, étape par étape",
+        "progress": "de cet engagement accompli",
+        "s1t": "Réservation confirmée",
+        "s1s": "La séance de {client} est confirmée ; à vous de la réaliser.",
+        "s2t": "Acompte encaissé",
+        "s2s": "L'acompte a été prélevé sur votre compte Stripe.",
+        "s3t": "Payé en totalité",
+        "s3s": "La totalité de l'engagement vous a été versée directement.",
+        "s4t": "Shooting",
+        "s4s": "Réalisez les séances et partagez des aperçus dans Messages au fil de l'eau.",
+        "s5t": "Retouche et livraison de la galerie",
+        "s5s": "Finalisez les images et livrez la galerie.",
+        "s6t": "Terminé",
+        "s6s": "Dès que {client} a sa galerie et que tout va bien, l'engagement se clôture."
+      },
+      "family": {
+        "eyebrow": "Cet engagement, étape par étape",
+        "progress": "de cet engagement accompli",
+        "s1t": "Réservation confirmée",
+        "s1s": "La réservation de {client} est confirmée ; à vous de la réaliser.",
+        "s2t": "Acompte encaissé",
+        "s2s": "L'acompte a été prélevé sur votre compte Stripe.",
+        "s3t": "Payé en totalité",
+        "s3s": "La totalité de l'engagement vous a été versée directement.",
+        "s4t": "Préparer le voyage",
+        "s4s": "Confirmez les détails et coordonnez-vous dans Messages.",
+        "s5t": "Accompagner le voyage",
+        "s5s": "Soyez la paire de mains en plus, tout du long.",
+        "s6t": "Terminé",
+        "s6s": "Dès que {client} est rentré et que tout va bien, l'engagement se clôture."
+      },
+      "trip": {
+        "eyebrow": "Cet engagement, étape par étape",
+        "progress": "de cet engagement accompli",
+        "s1t": "Réservation confirmée",
+        "s1s": "La réservation de {client} est confirmée ; à vous de la réaliser.",
+        "s2t": "Acompte encaissé",
+        "s2s": "L'acompte a été prélevé sur votre compte Stripe.",
+        "s3t": "Payé en totalité",
+        "s3s": "La totalité du voyage vous a été versée directement.",
+        "s4t": "Préparer et partager les réservations de {client}",
+        "s4s": "Confirmez les détails et partagez-les dans Messages au fil de l'eau.",
+        "s5t": "Le voyage",
+        "s5s": "Vous restez à un message, tout du long.",
+        "s6t": "Terminé",
+        "s6s": "Dès que {client} est rentré et que tout va bien, l'engagement se clôture."
+      },
+      "generic": {
+        "eyebrow": "Cet engagement, étape par étape",
+        "progress": "de cet engagement accompli",
+        "s1t": "Réservation confirmée",
+        "s1s": "La réservation de {client} est confirmée ; à vous de la réaliser.",
+        "s2t": "Acompte encaissé",
+        "s2s": "L'acompte a été prélevé sur votre compte Stripe.",
+        "s3t": "Payé en totalité",
+        "s3s": "La totalité du voyage vous a été versée directement.",
+        "s4t": "Préparer et partager les détails",
+        "s4s": "Confirmez les détails et partagez-les dans Messages au fil de l'eau.",
+        "s5t": "Le voyage",
+        "s5s": "Vous restez à un message, tout du long.",
+        "s6t": "Terminé",
+        "s6s": "Dès que {client} est rentré et que tout va bien, l'engagement se clôture."
+      }
+    },
+    "p": {
+      "backToBookings": "Retour aux réservations",
+      "estPayout": "Versement est. (96,5 %)",
+      "loadFailed": "Impossible de charger cette réservation.",
+      "markDone": "Marquer comme fait",
+      "progressFailed": "Impossible de mettre à jour la progression. Veuillez réessayer.",
+      "progressUpdated": "Progression mise à jour — votre client a été prévenu.",
+      "sellerNote": "Vous êtes le vendeur officiel. Les paiements du voyageur sont prélevés directement sur votre compte Stripe au moment du paiement — acompte comme solde — et vous conservez 96,5 %. Les 3,5 % fixes de Goldsainte s'appliquent de chaque côté.",
+      "tripFallback": "Voyage Goldsainte",
+      "yourClient": "Votre client",
+      "yourNextStep": "Votre prochaine étape",
+      "yourPayout": "Votre versement"
+    }
   },
   "hire": {
     "acceptNote": "Ils acceptent et versent l'acompte — réglé directement sur votre compte Stripe.",
