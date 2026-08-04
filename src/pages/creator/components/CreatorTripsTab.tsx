@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Plus, Pencil, Eye, ImageIcon, EyeOff, Trash2 } from "lucide-react";
@@ -31,16 +32,18 @@ const statusStyles: Record<string, string> = {
   archived: "bg-[#6B7280]/20 text-[#6B7280]",
 };
 
-const statusLabel: Record<string, string> = {
-  draft: "Draft",
-  pending_review: "In review",
-  published: "Live",
-  archived: "Archived",
-};
+type TsT = (key: string, defaultValue: string) => string;
+const statusLabel = (t: TsT): Record<string, string> => ({
+  draft: t("dash.c.tsDraft", "Draft"),
+  pending_review: t("dash.c.psReview", "In review"),
+  published: t("dash.c.tsLive", "Live"),
+  archived: t("dash.c.tsArchived", "Archived"),
+});
 
 export function CreatorTripsTab() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [trips, setTrips] = useState<CreatorTrip[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -78,16 +81,16 @@ export function CreatorTripsTab() {
       .eq("id", trip.id)
       .eq("creator_id", user!.id);
     setBusyId(null);
-    if (error) { toast.error("Couldn't unpublish. Try again."); return; }
+    if (error) { toast.error(t("dash.c.unpublishFailed", "Couldn't unpublish. Try again.")); return; }
     setTrips((prev) => prev.map((t) => (t.id === trip.id ? { ...t, status: "draft" } : t)));
-    toast.success("Tour unpublished — it's now a draft and off the marketplace.");
+    toast.success(t("dash.c.tourUnpublished", "Tour unpublished — it's now a draft and off the marketplace."));
   };
 
   const doDelete = async (trip: CreatorTrip) => {
     // Money-safe: a tour that has ever been booked can never be deleted, only
     // unpublished, so booking history keeps pointing at a real listing.
     if ((trip.booking_count ?? 0) > 0) {
-      toast.error("This tour has bookings and can't be deleted — unpublish it instead.");
+      toast.error(t("dash.c.tourHasBookings", "This tour has bookings and can't be deleted — unpublish it instead."));
       setConfirmDelete(null);
       return;
     }
@@ -99,9 +102,9 @@ export function CreatorTripsTab() {
       .eq("creator_id", user!.id);
     setBusyId(null);
     setConfirmDelete(null);
-    if (error) { toast.error("Couldn't delete. Try again."); return; }
+    if (error) { toast.error(t("dash.c.delTourFailed", "Couldn't delete. Try again.")); return; }
     setTrips((prev) => prev.filter((t) => t.id !== trip.id));
-    toast.success("Tour deleted.");
+    toast.success(t("dash.c.tourDeleted", "Tour deleted."));
   };
 
   return (
@@ -109,10 +112,9 @@ export function CreatorTripsTab() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           {/* Product law: creators sell TOURS — noun-correct copy (item ① polish, Jul 25) */}
-          <h2 className="font-secondary text-2xl text-[#0a2225]">My Tours</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{t("dash.c.myTours", "My Tours")}</h2>
           <p className="mt-1 text-[15px] text-[#6B7280] max-w-md">
-            Create and manage bookable tours. New tours go to review before they're bookable on the
-            marketplace — they appear here straight away.
+            {t("dash.c.toursSub", "Create and manage bookable tours. New tours go to review before they're bookable on the marketplace — they appear here straight away.")}
           </p>
         </div>
         <Button
@@ -120,7 +122,7 @@ export function CreatorTripsTab() {
           className="rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white px-6 self-start sm:self-auto shrink-0"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create Bookable Tour
+          {t("dash.c.createBookableTour", "Create Bookable Tour")}
         </Button>
       </div>
 
@@ -132,13 +134,13 @@ export function CreatorTripsTab() {
 
       {!loading && trips.length === 0 && (
         <div className="rounded-3xl border border-dashed border-[#E5DFC6] bg-white/60 p-12 text-center">
-          <p className="text-[15px] text-[#6B7280]">You haven't created any tours yet.</p>
+          <p className="text-[15px] text-[#6B7280]">{t("dash.c.noToursYet", "You haven't created any tours yet.")}</p>
           <Button
             onClick={() => navigate("/trip-builder")}
             className="mt-4 rounded-full bg-[#0c4d47] hover:bg-[#0a3d38] text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Build your first tour
+            {t("dash.c.buildFirstTour", "Build your first tour")}
           </Button>
         </div>
       )}
@@ -156,7 +158,7 @@ export function CreatorTripsTab() {
                   {trip.cover_image_url ? (
                     <img
                       src={trip.cover_image_url}
-                      alt={trip.title ?? "Trip cover"}
+                      alt={trip.title ?? t("dash.c.tripCoverAlt", "Trip cover")}
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />
@@ -175,7 +177,7 @@ export function CreatorTripsTab() {
                     <Badge
                       className={`${statusStyles[status] ?? statusStyles.draft} rounded-full text-[12px] uppercase tracking-wider px-2.5 py-0.5`}
                     >
-                      {statusLabel[status] ?? status}
+                      {statusLabel(t)[status] ?? status}
                     </Badge>
                   </div>
 
@@ -196,7 +198,7 @@ export function CreatorTripsTab() {
                       className="rounded-full border-[#E5DFC6] hover:bg-[#FDF9F0] text-[#0a2225] flex-1"
                     >
                       <Pencil className="h-3.5 w-3.5 mr-1.5" />
-                      Edit
+                      {t("dash.c.edit", "Edit")}
                     </Button>
                     {status === "published" && (
                       <Link to={`/marketplace/trip/${trip.slug ?? trip.id}`} className="flex-1">
@@ -206,7 +208,7 @@ export function CreatorTripsTab() {
                           className="w-full rounded-full border-[#0c4d47] text-[#0c4d47] hover:bg-[#0c4d47]/5"
                         >
                           <Eye className="h-3.5 w-3.5 mr-1.5" />
-                          View Listing
+                          {t("dash.c.viewListing", "View Listing")}
                         </Button>
                       </Link>
                     )}
@@ -237,7 +239,7 @@ export function CreatorTripsTab() {
                         className="rounded-full text-[#b4453c] hover:bg-[#b4453c]/10 flex-1"
                       >
                         <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                        Delete
+                        {t("dash.c.delete", "Delete")}
                       </Button>
                     )}
                   </div>
@@ -251,18 +253,18 @@ export function CreatorTripsTab() {
       <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this tour?</AlertDialogTitle>
+            <AlertDialogTitle>{t("dash.c.delTourTitle", "Delete this tour?")}</AlertDialogTitle>
             <AlertDialogDescription>
-              "{confirmDelete?.title || "Untitled tour"}" will be permanently removed. This can't be undone.
+              {t("dash.c.delTourDesc", { title: confirmDelete?.title || t("dash.c.untitledTour", "Untitled tour"), defaultValue: "\"{{title}}\" will be permanently removed. This can't be undone." })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogCancel>{t("dash.c.keepIt", "Keep it")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => confirmDelete && doDelete(confirmDelete)}
               className="bg-[#b4453c] hover:bg-[#9a3a32] text-white"
             >
-              Delete tour
+              {t("dash.c.deleteTour", "Delete tour")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
