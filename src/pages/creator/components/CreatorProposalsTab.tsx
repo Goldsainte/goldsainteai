@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -21,18 +22,20 @@ type Row = {
   trip_request: { title: string | null; destination: string | null } | null;
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  sent: "Sent",
-  pending: "Pending",
-  traveler_review: "In review",
-  accepted: "Accepted",
-  declined: "Not selected",
-  withdrawn: "Withdrawn",
-  expired: "Expired",
-};
+type PsT = (key: string, defaultValue: string) => string;
+const statusLabels = (t: PsT): Record<string, string> => ({
+  sent: t("dash.c.psSent", "Sent"),
+  pending: t("dash.c.psPending", "Pending"),
+  traveler_review: t("dash.c.psReview", "In review"),
+  accepted: t("dash.c.psAccepted", "Accepted"),
+  declined: t("dash.c.psDeclined", "Not selected"),
+  withdrawn: t("dash.c.psWithdrawn", "Withdrawn"),
+  expired: t("dash.c.psExpired", "Expired"),
+});
 
 export function CreatorProposalsTab() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -77,8 +80,7 @@ export function CreatorProposalsTab() {
     return (
       <div className="rounded-2xl bg-white ring-1 ring-[#E5DFC6] p-8 text-center">
         <p className="text-[15px] text-[#0a2225]/70">
-          We couldn't load your proposals. Please refresh — and if this
-          persists, contact support.
+          {t("dash.c.loadProposalsFailed", "We couldn't load your proposals. Please refresh — and if this persists, contact support.")}
         </p>
         <p className="mt-2 font-mono text-[12.5px] text-[#0a2225]/40">{loadError}</p>
       </div>
@@ -97,18 +99,17 @@ export function CreatorProposalsTab() {
     return (
       <div className="rounded-2xl bg-white ring-1 ring-[#E5DFC6] p-8 md:p-12 text-center">
         <p className="text-[12px] md:text-[12.5px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-          Your pipeline
+          {t("dash.c.yourPipeline", "Your pipeline")}
         </p>
-        <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">No proposals yet</h2>
+        <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">{t("dash.c.noProposals", "No proposals yet")}</h2>
         <p className="mx-auto mt-3 max-w-md text-[16px] leading-relaxed text-[#0a2225]/60">
-          Browse the trip requests on the marketplace and send your first
-          tailored proposal — travelers are waiting for the right specialist.
+          {t("dash.c.proposalsEmpty", "Browse the trip requests on the marketplace and send your first tailored proposal — travelers are waiting for the right specialist.")}
         </p>
         <Link
           to="/marketplace?tab=trip-requests"
           className="mt-8 inline-flex items-center justify-center rounded-full bg-[#0c4d47] px-7 py-3 text-[12.5px] font-medium uppercase tracking-[0.18em] text-[#E5DFC6] transition-colors hover:bg-[#0a2225]"
         >
-          Browse trip requests
+          {t("dash.c.browseBriefs", "Browse trip requests")}
         </Link>
       </div>
     );
@@ -147,7 +148,7 @@ export function CreatorProposalsTab() {
 
               {/* Status pill on the panel */}
               <span className="absolute right-3.5 top-3.5 rounded-full bg-[#0c4d47]/95 px-3 py-1 text-[12px] font-medium uppercase tracking-[0.16em] text-[#E5DFC6] ring-1 ring-[#E5DFC6]/25">
-                {STATUS_LABELS[r.status ?? ""] ?? r.status ?? "—"}
+                {statusLabels(t)[r.status ?? ""] ?? r.status ?? "—"}
               </span>
 
               {/* Bottom scrim with serif headline */}
@@ -158,7 +159,7 @@ export function CreatorProposalsTab() {
                   </p>
                 )}
                 <p className="mt-1 font-secondary text-[17px] leading-[1.15] text-[#fdfaf2] line-clamp-2">
-                  {r.headline || "Untitled proposal"}
+                  {r.headline || t("dash.c.untitledProposal", "Untitled proposal")}
                 </p>
                 <p className="mt-1.5 text-[14px] text-[#fdfaf2]/80">
                   Submitted {submitted}
