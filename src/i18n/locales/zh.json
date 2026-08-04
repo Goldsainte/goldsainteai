@@ -1974,7 +1974,10 @@
     "requestDeclined": "已拒绝请求",
     "tryAgain": "请重试。",
     "uploadFailed": "上传失败",
-    "userBlocked": "已屏蔽用户"
+    "userBlocked": "已屏蔽用户",
+    "showOriginal": "查看原文",
+    "showTranslation": "查看译文",
+    "translated": "已翻译"
   },
   "sett": {
     "checkoutOpened": "已在新标签页打开支付",
