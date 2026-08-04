@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +19,7 @@ type Product = { id: string; title: string; description?: string | null; destina
 
 export function CreatorContentToolsTab() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -44,10 +46,10 @@ export function CreatorContentToolsTab() {
   return (
     <div className="space-y-10">
       <div className="flex items-center gap-2">
-        <h2 className="font-secondary text-xl text-[#0a2225]">Content tools</h2>
+        <h2 className="font-secondary text-xl text-[#0a2225]">{t("dash.c.contentTools", "Content tools")}</h2>
       </div>
       <p className="text-[16px] text-[#6B7280]">
-        AI-generated copy to help you market your trips. Powered by Goldsainte AI.
+        {t("dash.c.contentToolsSub", "AI-generated copy to help you market your trips. Powered by Goldsainte AI.")}
       </p>
 
       <CaptionGenerator products={products} />
@@ -58,12 +60,13 @@ export function CreatorContentToolsTab() {
 }
 
 function ResultBlock({ items }: { items: string[] }) {
+  const { t: tr } = useTranslation();
   return (
     <div className="mt-4 space-y-2">
       {items.map((t, i) => (
         <div key={i} className="flex items-start justify-between gap-3 rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-3">
           <p className="whitespace-pre-wrap text-[16px] text-[#0a2225]">{t}</p>
-          <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(t).then(() => toast.success("Copied"))}>
+          <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(t).then(() => toast.success(tr("dash.c.copied", "Copied")))}>
             <Copy className="h-3 w-3" />
           </Button>
         </div>
@@ -73,6 +76,7 @@ function ResultBlock({ items }: { items: string[] }) {
 }
 
 function CaptionGenerator({ products }: { products: Product[] }) {
+  const { t } = useTranslation();
   const [productId, setProductId] = useState<string>("");
   const [vibe, setVibe] = useState("Inspirational");
   const [platform, setPlatform] = useState("Instagram");
@@ -81,14 +85,14 @@ function CaptionGenerator({ products }: { products: Product[] }) {
 
   async function run() {
     const p = products.find((x) => x.id === productId);
-    if (!p) return toast.error("Select a trip or guide");
+    if (!p) return toast.error(t("dash.c.selectTripGuide", "Select a trip or guide"));
     setLoading(true);
     setResults([]);
     const { data, error } = await supabase.functions.invoke("ai-content-tools", {
       body: { tool: "caption", title: p.title, destination: p.destination, vibe, platform },
     });
     setLoading(false);
-    if (error || (data as any)?.error) return toast.error("Could not generate captions");
+    if (error || (data as any)?.error) return toast.error(t("dash.c.captionsFailed", "Could not generate captions"));
     setResults(((data as any).captions || []).slice(0, 3));
   }
 
@@ -96,11 +100,11 @@ function CaptionGenerator({ products }: { products: Product[] }) {
     <div className="border-t border-[#0a2225]/15 pt-6">
       <div className="mb-3 flex items-center gap-2">
         <PenLine className="h-4 w-4 text-[#0c4d47]" />
-        <h3 className="font-secondary text-lg text-[#0a2225]">Caption generator</h3>
+        <h3 className="font-secondary text-lg text-[#0a2225]">{t("dash.c.captionGenerator", "Caption generator")}</h3>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <Select value={productId} onValueChange={setProductId}>
-          <SelectTrigger><SelectValue placeholder="Select a trip or guide" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={t("dash.c.selectTripGuide", "Select a trip or guide")} /></SelectTrigger>
           <SelectContent>
             {products.map((p) => (
               <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
@@ -110,7 +114,7 @@ function CaptionGenerator({ products }: { products: Product[] }) {
         <Select value={vibe} onValueChange={setVibe}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
-            {["Funny", "Inspirational", "Direct"].map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+            {["Funny", "Inspirational", "Direct"].map((v) => <SelectItem key={v} value={v}>{t(`dash.c.vibe${v}`, v)}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={platform} onValueChange={setPlatform}>
@@ -121,7 +125,7 @@ function CaptionGenerator({ products }: { products: Product[] }) {
         </Select>
       </div>
       <Button onClick={run} disabled={loading} className="mt-3 bg-[#0c4d47]">
-        {loading ? "Generating…" : "Generate 3 captions"}
+        {loading ? t("dash.c.generating", "Generating…") : t("dash.c.gen3Captions", "Generate 3 captions")}
       </Button>
       {results.length > 0 && <ResultBlock items={results} />}
     </div>
@@ -129,20 +133,21 @@ function CaptionGenerator({ products }: { products: Product[] }) {
 }
 
 function HashtagSuggester() {
+  const { t } = useTranslation();
   const [destination, setDestination] = useState("");
   const [tripType, setTripType] = useState("");
   const [groups, setGroups] = useState<{ broad: string[]; medium: string[]; niche: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function run() {
-    if (!destination.trim()) return toast.error("Add a destination");
+    if (!destination.trim()) return toast.error(t("dash.c.addDestination", "Add a destination"));
     setLoading(true);
     setGroups(null);
     const { data, error } = await supabase.functions.invoke("ai-content-tools", {
       body: { tool: "hashtags", destination, tripType },
     });
     setLoading(false);
-    if (error || (data as any)?.error) return toast.error("Could not generate hashtags");
+    if (error || (data as any)?.error) return toast.error(t("dash.c.hashtagsFailed", "Could not generate hashtags"));
     setGroups(data as any);
   }
 
@@ -150,14 +155,14 @@ function HashtagSuggester() {
     <div className="border-t border-[#0a2225]/15 pt-6">
       <div className="mb-3 flex items-center gap-2">
         <Hash className="h-4 w-4 text-[#0c4d47]" />
-        <h3 className="font-secondary text-lg text-[#0a2225]">Hashtag suggester</h3>
+        <h3 className="font-secondary text-lg text-[#0a2225]">{t("dash.c.hashtagSuggester", "Hashtag suggester")}</h3>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination (e.g. Tokyo)" />
-        <Input value={tripType} onChange={(e) => setTripType(e.target.value)} placeholder="Trip type (food, adventure…)" />
+        <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder={t("dash.c.destPh", "Destination (e.g. Tokyo)")} />
+        <Input value={tripType} onChange={(e) => setTripType(e.target.value)} placeholder={t("dash.c.tripTypePh", "Trip type (food, adventure…)")} />
       </div>
       <Button onClick={run} disabled={loading} className="mt-3 bg-[#0c4d47]">
-        {loading ? "Thinking…" : "Suggest 15 hashtags"}
+        {loading ? t("dash.c.thinking", "Thinking…") : t("dash.c.suggest15", "Suggest 15 hashtags")}
       </Button>
       {groups && (
         <div className="mt-4 space-y-3">
@@ -168,7 +173,7 @@ function HashtagSuggester() {
                 {(groups[g] || []).map((h) => (
                   <button
                     key={h}
-                    onClick={() => navigator.clipboard.writeText(h).then(() => toast.success("Copied"))}
+                    onClick={() => navigator.clipboard.writeText(h).then(() => toast.success(t("dash.c.copied", "Copied")))}
                     className="rounded-full bg-[#FDF9F0] px-3 py-1 text-[15px] text-[#0c4d47] ring-1 ring-[#E5DFC6] hover:bg-white"
                   >
                     {h}
@@ -184,6 +189,7 @@ function HashtagSuggester() {
 }
 
 function DescriptionRewriter({ products }: { products: Product[] }) {
+  const { t } = useTranslation();
   const [productId, setProductId] = useState("");
   const [tone, setTone] = useState("");
   const [results, setResults] = useState<string[]>([]);
@@ -192,25 +198,25 @@ function DescriptionRewriter({ products }: { products: Product[] }) {
   const product = products.find((p) => p.id === productId);
 
   async function run() {
-    if (!product?.description) return toast.error("Select a product with a description");
-    if (!tone.trim()) return toast.error("Describe the desired tone");
+    if (!product?.description) return toast.error(t("dash.c.selectProductDesc", "Select a product with a description"));
+    if (!tone.trim()) return toast.error(t("dash.c.describeTone", "Describe the desired tone"));
     setLoading(true);
     setResults([]);
     const { data, error } = await supabase.functions.invoke("ai-content-tools", {
       body: { tool: "rewrite", description: product.description, tone },
     });
     setLoading(false);
-    if (error || (data as any)?.error) return toast.error("Could not rewrite");
+    if (error || (data as any)?.error) return toast.error(t("dash.c.rewriteFailed", "Could not rewrite"));
     setResults(((data as any).versions || []).slice(0, 3));
   }
 
   return (
     <div className="border-t border-[#0a2225]/15 pt-6">
       <div className="mb-3 flex items-center gap-2">
-        <h3 className="font-secondary text-lg text-[#0a2225]">Description rewriter</h3>
+        <h3 className="font-secondary text-lg text-[#0a2225]">{t("dash.c.descriptionRewriter", "Description rewriter")}</h3>
       </div>
       <Select value={productId} onValueChange={setProductId}>
-        <SelectTrigger><SelectValue placeholder="Select a trip or guide" /></SelectTrigger>
+        <SelectTrigger><SelectValue placeholder={t("dash.c.selectTripGuide", "Select a trip or guide")} /></SelectTrigger>
         <SelectContent>
           {products.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
         </SelectContent>
@@ -221,11 +227,11 @@ function DescriptionRewriter({ products }: { products: Product[] }) {
       <Input
         value={tone}
         onChange={(e) => setTone(e.target.value)}
-        placeholder='Tone (e.g. "luxurious editorial", "punchy & playful")'
+        placeholder={t("dash.c.tonePh", 'Tone (e.g. "luxurious editorial", "punchy & playful")')}
         className="mt-3"
       />
       <Button onClick={run} disabled={loading} className="mt-3 bg-[#0c4d47]">
-        {loading ? "Rewriting…" : "Generate 3 versions"}
+        {loading ? t("dash.c.rewriting", "Rewriting…") : t("dash.c.gen3Versions", "Generate 3 versions")}
       </Button>
       {results.length > 0 && <ResultBlock items={results} />}
     </div>
