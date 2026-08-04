@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -85,6 +86,7 @@ function deriveTier(totalEarnings: number): TierInfo {
 }
 
 export function CreatorSettingsTab() {
+  const { t } = useTranslation();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [loadingStripe, setLoadingStripe] = useState(false);
@@ -117,10 +119,10 @@ export function CreatorSettingsTab() {
         .update({ accepts_tips: next })
         .eq("id", user.id);
       if (error) throw error;
-      toast.success(next ? "Tips enabled" : "Tips turned off");
+      toast.success(next ? t("dash.c.tipsEnabled", "Tips enabled") : t("dash.c.tipsOff", "Tips turned off"));
     } catch (e: any) {
       setAcceptsTips(!next); // revert
-      toast.error(e.message || "Couldn't update tips setting");
+      toast.error(e.message || t("dash.c.tipsUpdateFailed", "Couldn't update tips setting"));
     } finally {
       setSavingTips(false);
     }
@@ -176,7 +178,7 @@ export function CreatorSettingsTab() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        toast.error("Please sign in to manage payments");
+        toast.error(t("dash.c.signInPayments", "Please sign in to manage payments"));
         return;
       }
       const { data, error } = await supabase.functions.invoke(
@@ -187,7 +189,7 @@ export function CreatorSettingsTab() {
       if (data?.url) window.open(data.url, "_blank");
     } catch (error) {
       console.error("Portal error:", error);
-      toast.error("Unable to open payment settings. Please try again.");
+      toast.error(t("dash.c.portalFailed", "Unable to open payment settings. Please try again."));
     } finally {
       setLoadingPortal(false);
     }
@@ -202,7 +204,7 @@ export function CreatorSettingsTab() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        toast.error("Please sign in to connect payouts");
+        toast.error(t("dash.c.signInPayouts", "Please sign in to connect payouts"));
         return;
       }
       const { data, error } = await supabase.functions.invoke("stripe-connect-link", {
@@ -213,7 +215,7 @@ export function CreatorSettingsTab() {
       if (data?.url) window.location.href = data.url;
     } catch (e: any) {
       console.error("Stripe connect error", e);
-      toast.error(e.message || "Failed to start Stripe onboarding");
+      toast.error(e.message || t("dash.c.stripeOnboardFailed", "Failed to start Stripe onboarding"));
     } finally {
       setLoadingStripe(false);
     }
@@ -226,12 +228,11 @@ export function CreatorSettingsTab() {
       {/* Tips */}
       <SettingsSectionCard
         icon={Heart}
-        title="Tips"
-        description="Let travelers send you a tip"
+        title={t("dash.c.tips", "Tips")}
+        description={t("dash.c.tipsDesc", "Let travelers send you a tip")}
       >
         <p className="text-[15px] text-[#6B7280]">
-          A tip button shows on your public profile so travelers can say thanks.
-          Tips go directly to your Stripe account. Turn this off to hide the button.
+          {t("dash.c.tipsBody", "A tip button shows on your public profile so travelers can say thanks. Tips go directly to your Stripe account. Turn this off to hide the button.")}
         </p>
         <label className="mt-3 flex items-center gap-3 cursor-pointer">
           <input
@@ -247,11 +248,11 @@ export function CreatorSettingsTab() {
       {/* Account & Profile */}
       <SettingsSectionCard
         icon={User}
-        title="Account & Profile"
-        description="Manage your username, avatar, and bio"
+        title={t("dash.c.accountProfile", "Account & Profile")}
+        description={t("dash.c.accountProfileDesc", "Manage your username, avatar, and bio")}
       >
         <p className="text-[15px] text-[#6B7280]">
-          Edit your public creator profile, display name, and personal details.
+          {t("dash.c.accountProfileBody", "Edit your public creator profile, display name, and personal details.")}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -261,7 +262,7 @@ export function CreatorSettingsTab() {
           >
             <Link to="/travel-settings">
               <ExternalLink className="h-4 w-4 mr-2" />
-              Edit Profile
+              {t("dash.c.editProfile", "Edit Profile")}
             </Link>
           </Button>
           {userId && (
@@ -272,7 +273,7 @@ export function CreatorSettingsTab() {
             >
               <Link to={`/creators/${userId}`}>
                 <ExternalLink className="h-4 w-4 mr-2" />
-                View Public Profile
+                {t("dash.c.viewPublicProfile", "View Public Profile")}
               </Link>
             </Button>
           )}
@@ -282,8 +283,8 @@ export function CreatorSettingsTab() {
       {/* Payouts & Stripe Connect */}
       <SettingsSectionCard
         icon={CreditCard}
-        title="Payouts & Stripe Connect"
-        description="Manage payouts and connected account"
+        title={t("dash.c.payoutsStripe", "Payouts & Stripe Connect")}
+        description={t("dash.c.payoutsStripeDesc", "Manage payouts and connected account")}
       >
         {stripeStatus?.connected ? (
           <div className="flex flex-col gap-3">
@@ -292,14 +293,14 @@ export function CreatorSettingsTab() {
                 <>
                   <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
                   <span className="text-[#0a2225] font-medium">
-                    Payouts enabled
+                    {t("dash.c.payoutsEnabled", "Payouts enabled")}
                   </span>
                 </>
               ) : (
                 <>
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <span className="text-[#0a2225] font-medium">
-                    Onboarding incomplete
+                    {t("dash.c.onboardingIncomplete", "Onboarding incomplete")}
                   </span>
                 </>
               )}
@@ -314,14 +315,13 @@ export function CreatorSettingsTab() {
               ) : (
                 <ExternalLink className="h-4 w-4 mr-2" />
               )}
-              Open Stripe Dashboard
+              {t("dash.c.openStripeDashboard", "Open Stripe Dashboard")}
             </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
             <p className="text-[15px] text-[#6B7280]">
-              Connect your Stripe account to receive payouts from bookings and
-              sales.
+              {t("dash.c.connectStripeBody", "Connect your Stripe account to receive payouts from bookings and sales.")}
             </p>
             <Button
               onClick={handleConnectStripe}
@@ -331,7 +331,7 @@ export function CreatorSettingsTab() {
               {loadingStripe ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : null}
-              Connect Stripe
+              {t("chk.stripeC", "Connect Stripe")}
             </Button>
           </div>
         )}
@@ -340,15 +340,14 @@ export function CreatorSettingsTab() {
       {/* Platform fee — flat 7% on everything (founder decision, Jul 23 2026) */}
       <SettingsSectionCard
         icon={Award}
-        title="Platform fee"
-        description="One flat rate on everything you earn"
+        title={t("dash.c.platformFee", "Platform fee")}
+        description={t("dash.c.platformFeeDesc", "One flat rate on everything you earn")}
       >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-2xl font-secondary text-[#0a2225]">7% flat</p>
             <p className="text-[15px] text-[#6B7280]">
-              Goldsainte's entire take on bookings, hires, guides, products,
-              and tips. No tiers, no levels — the rest is yours.
+              {t("dash.c.platformFeeBody", "Goldsainte's entire take on bookings, hires, guides, products, and tips. No tiers, no levels — the rest is yours.")}
             </p>
           </div>
           <Badge className="bg-[#F6F0E4] text-[#0a2225] hover:bg-[#E5DFC6]">7%</Badge>
@@ -358,9 +357,9 @@ export function CreatorSettingsTab() {
       {/* Notifications */}
       <NotificationPreferencesSection
         userId={userId}
-        emailLabel="Bookings, proposals, and earnings updates"
-        smsLabel="Text alerts for urgent updates"
-        marketingLabel="Tips, product updates, and creator features"
+        emailLabel={t("dash.c.notifEmail", "Bookings, proposals, and earnings updates")}
+        smsLabel={t("dash.c.notifSms", "Text alerts for urgent updates")}
+        marketingLabel={t("dash.c.notifMkt", "Tips, product updates, and creator features")}
       />
 
       {/* Security */}
@@ -369,8 +368,8 @@ export function CreatorSettingsTab() {
       {/* AI Content Tools */}
       <SettingsSectionCard
         icon={Sparkles}
-        title="AI Content Tools"
-        description="Usage and quota for AI-generated content"
+        title={t("dash.c.aiTools", "AI Content Tools")}
+        description={t("dash.c.aiToolsDesc", "Usage and quota for AI-generated content")}
       >
         {aiUsage ? (
           <div className="space-y-3">
@@ -380,7 +379,7 @@ export function CreatorSettingsTab() {
                   {aiUsage.used}
                 </span>{" "}
                 <span className="text-[15px] text-[#6B7280]">
-                  of {aiUsage.limit} generations this month
+                  {t("dash.c.ofGenerations", { limit: aiUsage.limit, defaultValue: "of {{limit}} generations this month" })}
                 </span>
               </p>
               <Badge className="bg-[#F6F0E4] text-[#0a2225]">
@@ -393,23 +392,23 @@ export function CreatorSettingsTab() {
             />
             {aiUsage.remaining <= 5 && (
               <p className="text-[15px] text-amber-600">
-                You're running low. Consider upgrading for more capacity.
+                {t("dash.c.runningLow", "You're running low. Consider upgrading for more capacity.")}
               </p>
             )}
           </div>
         ) : (
-          <p className="text-[15px] text-[#6B7280]">Loading usage…</p>
+          <p className="text-[15px] text-[#6B7280]">{t("dash.c.loadingUsage", "Loading usage…")}</p>
         )}
       </SettingsSectionCard>
 
       {/* Tax Information */}
       <SettingsSectionCard
         icon={FileText}
-        title="Tax Information"
-        description="Tax forms, thresholds, and reporting"
+        title={t("dash.c.taxInfo", "Tax Information")}
+        description={t("dash.c.taxInfoDesc", "Tax forms, thresholds, and reporting")}
       >
         <p className="text-[15px] text-[#6B7280]">
-          Review tax requirements for creators and submit required forms.
+          {t("dash.c.taxBody", "Review tax requirements for creators and submit required forms.")}
         </p>
         <Button
           asChild
@@ -418,7 +417,7 @@ export function CreatorSettingsTab() {
         >
           <Link to="/help/tax-information">
             <ExternalLink className="h-4 w-4 mr-2" />
-            View Tax Info
+            {t("dash.c.viewTaxInfo", "View Tax Info")}
           </Link>
         </Button>
       </SettingsSectionCard>
@@ -429,12 +428,11 @@ export function CreatorSettingsTab() {
       {/* Content Guidelines */}
       <SettingsSectionCard
         icon={BookOpen}
-        title="Content Guidelines"
-        description="Standards for creator content on Goldsainte"
+        title={t("dash.c.contentGuidelines", "Content Guidelines")}
+        description={t("dash.c.contentGuidelinesDesc", "Standards for creator content on Goldsainte")}
       >
         <p className="text-[15px] text-[#6B7280]">
-          Review our community guidelines to keep your content compliant and
-          discoverable.
+          {t("dash.c.guidelinesBody", "Review our community guidelines to keep your content compliant and discoverable.")}
         </p>
         <Button
           asChild
@@ -443,7 +441,7 @@ export function CreatorSettingsTab() {
         >
           <Link to="/community-guidelines">
             <ExternalLink className="h-4 w-4 mr-2" />
-            View Guidelines
+            {t("dash.c.viewGuidelines", "View Guidelines")}
           </Link>
         </Button>
       </SettingsSectionCard>
