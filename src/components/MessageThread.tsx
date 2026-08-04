@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -254,7 +255,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
                     : "bg-muted"
                 )}
               >
-                <p className="text-sm whitespace-pre-wrap break-words">{message.message_text}</p>
+                <p className="text-sm whitespace-pre-wrap break-words"><TranslatedMessageText text={message.message_text} enabled={!isOwnMessage} /></p>
                 <div
                   className={cn(
                     "flex items-center gap-1 mt-1 text-xs",
