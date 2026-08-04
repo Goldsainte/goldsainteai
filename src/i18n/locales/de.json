@@ -1564,7 +1564,9 @@
       "capturing": "Was {name} festhält",
       "eyebrow": "Ihre Reise, Stück für Stück",
       "fallback": "Ihr Spezialist bereitet alles für Ihre Reise vor",
-      "putting": "Was {name} zusammenstellt"
+      "putting": "Was {name} zusammenstellt",
+      "delivering": "Was Sie liefern",
+      "engagement": "Der Auftrag"
     },
     "j": {
       "creative": {
@@ -1682,7 +1684,86 @@
     "payBalanceFee": "Restbetrag zahlen — {{amount}} + 3,5 % Gebühr",
     "payDepositFee": "Anzahlung zahlen — {{amount}} + 3,5 % Gebühr",
     "selectState": "Wählen Sie oben im Zahlungsbereich Ihren Wohnsitzstaat aus und versuchen Sie es erneut.",
-    "stateUnavailable": "Reisebuchungen sind für Einwohner von Kalifornien, Florida, Hawaii, Iowa und Washington noch nicht verfügbar."
+    "stateUnavailable": "Reisebuchungen sind für Einwohner von Kalifornien, Florida, Hawaii, Iowa und Washington noch nicht verfügbar.",
+    "pj": {
+      "creative": {
+        "eyebrow": "Dieser Auftrag, Schritt für Schritt",
+        "progress": "dieses Auftrags erledigt",
+        "s1t": "Buchung bestätigt",
+        "s1s": "{client}s Session ist bestätigt — jetzt liefern Sie.",
+        "s2t": "Anzahlung eingegangen",
+        "s2s": "Die Anzahlung wurde Ihrem Stripe-Konto gutgeschrieben.",
+        "s3t": "Vollständig bezahlt",
+        "s3s": "Der gesamte Auftrag wurde direkt an Sie gezahlt.",
+        "s4t": "Shooting",
+        "s4s": "Fotografieren Sie die Sessions und teilen Sie laufend Vorschauen in Nachrichten.",
+        "s5t": "Galerie bearbeiten und liefern",
+        "s5s": "Stellen Sie die Bilder fertig und liefern Sie die Galerie.",
+        "s6t": "Abgeschlossen",
+        "s6s": "Sobald {client} die Galerie hat und alles passt, schließt der Auftrag."
+      },
+      "family": {
+        "eyebrow": "Dieser Auftrag, Schritt für Schritt",
+        "progress": "dieses Auftrags erledigt",
+        "s1t": "Buchung bestätigt",
+        "s1s": "{client}s Buchung ist bestätigt — jetzt liefern Sie.",
+        "s2t": "Anzahlung eingegangen",
+        "s2s": "Die Anzahlung wurde Ihrem Stripe-Konto gutgeschrieben.",
+        "s3t": "Vollständig bezahlt",
+        "s3s": "Der gesamte Auftrag wurde direkt an Sie gezahlt.",
+        "s4t": "Reise vorbereiten",
+        "s4s": "Bestätigen Sie die Details und koordinieren Sie sich in Nachrichten.",
+        "s5t": "Die Reise begleiten",
+        "s5s": "Seien Sie durchgehend das Paar Hände mehr.",
+        "s6t": "Abgeschlossen",
+        "s6s": "Sobald {client} zurück ist und alles passt, schließt der Auftrag."
+      },
+      "trip": {
+        "eyebrow": "Dieser Auftrag, Schritt für Schritt",
+        "progress": "dieses Auftrags erledigt",
+        "s1t": "Buchung bestätigt",
+        "s1s": "{client}s Buchung ist bestätigt — jetzt liefern Sie.",
+        "s2t": "Anzahlung eingegangen",
+        "s2s": "Die Anzahlung wurde Ihrem Stripe-Konto gutgeschrieben.",
+        "s3t": "Vollständig bezahlt",
+        "s3s": "Die gesamte Reise wurde direkt an Sie gezahlt.",
+        "s4t": "{client}s Reservierungen vorbereiten und teilen",
+        "s4s": "Bestätigen Sie die Details und teilen Sie sie laufend in Nachrichten.",
+        "s5t": "Die Reise",
+        "s5s": "Sie sind durchgehend nur eine Nachricht entfernt.",
+        "s6t": "Abgeschlossen",
+        "s6s": "Sobald {client} zurück ist und alles passt, schließt der Auftrag."
+      },
+      "generic": {
+        "eyebrow": "Dieser Auftrag, Schritt für Schritt",
+        "progress": "dieses Auftrags erledigt",
+        "s1t": "Buchung bestätigt",
+        "s1s": "{client}s Buchung ist bestätigt — jetzt liefern Sie.",
+        "s2t": "Anzahlung eingegangen",
+        "s2s": "Die Anzahlung wurde Ihrem Stripe-Konto gutgeschrieben.",
+        "s3t": "Vollständig bezahlt",
+        "s3s": "Die gesamte Reise wurde direkt an Sie gezahlt.",
+        "s4t": "Details vorbereiten und teilen",
+        "s4s": "Bestätigen Sie die Details und teilen Sie sie laufend in Nachrichten.",
+        "s5t": "Die Reise",
+        "s5s": "Sie sind durchgehend nur eine Nachricht entfernt.",
+        "s6t": "Abgeschlossen",
+        "s6s": "Sobald {client} zurück ist und alles passt, schließt der Auftrag."
+      }
+    },
+    "p": {
+      "backToBookings": "Zurück zu den Buchungen",
+      "estPayout": "Gesch. Auszahlung (96,5 %)",
+      "loadFailed": "Diese Buchung konnte nicht geladen werden.",
+      "markDone": "Als erledigt markieren",
+      "progressFailed": "Fortschritt konnte nicht aktualisiert werden. Bitte erneut versuchen.",
+      "progressUpdated": "Fortschritt aktualisiert — Ihr Kunde wurde benachrichtigt.",
+      "sellerNote": "Sie sind der eingetragene Verkäufer. Zahlungen der Reisenden werden beim Checkout direkt Ihrem Stripe-Konto belastet — Anzahlung wie Restbetrag — und Sie behalten 96,5 %. Goldsaintes fixe 3,5 % gelten auf beiden Seiten.",
+      "tripFallback": "Goldsainte-Reise",
+      "yourClient": "Ihr Kunde",
+      "yourNextStep": "Ihr nächster Schritt",
+      "yourPayout": "Ihre Auszahlung"
+    }
   },
   "hire": {
     "acceptNote": "Sie nehmen an und zahlen die Anzahlung — direkt auf Ihr Stripe-Konto.",
