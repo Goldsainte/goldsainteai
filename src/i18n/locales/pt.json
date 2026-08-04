@@ -1564,7 +1564,9 @@
       "capturing": "O que {name} está registrando",
       "eyebrow": "Sua viagem, peça por peça",
       "fallback": "Seu especialista está preparando tudo para a sua viagem",
-      "putting": "O que {name} está montando"
+      "putting": "O que {name} está montando",
+      "delivering": "O que você vai entregar",
+      "engagement": "O trabalho"
     },
     "j": {
       "creative": {
@@ -1682,7 +1684,86 @@
     "payBalanceFee": "Pagar saldo — {{amount}} + taxa de 3,5%",
     "payDepositFee": "Pagar depósito — {{amount}} + taxa de 3,5%",
     "selectState": "Selecione seu estado de residência na seção Pagamento acima e tente novamente.",
-    "stateUnavailable": "Reservas de viagem ainda não estão disponíveis para residentes de Califórnia, Flórida, Havaí, Iowa ou Washington."
+    "stateUnavailable": "Reservas de viagem ainda não estão disponíveis para residentes de Califórnia, Flórida, Havaí, Iowa ou Washington.",
+    "pj": {
+      "creative": {
+        "eyebrow": "Este trabalho, passo a passo",
+        "progress": "deste trabalho concluído",
+        "s1t": "Reserva confirmada",
+        "s1s": "A sessão de {client} está confirmada; agora é com você.",
+        "s2t": "Depósito recebido",
+        "s2s": "O depósito foi creditado na sua conta Stripe.",
+        "s3t": "Pago integralmente",
+        "s3s": "O trabalho completo foi pago diretamente a você.",
+        "s4t": "Fotografar e capturar",
+        "s4s": "Realize as sessões e compartilhe prévias em Mensagens ao longo do caminho.",
+        "s5t": "Editar e entregar a galeria",
+        "s5s": "Finalize as imagens e entregue a galeria.",
+        "s6t": "Concluído",
+        "s6s": "Quando {client} tiver a galeria e estiver tudo bem, o trabalho se encerra."
+      },
+      "family": {
+        "eyebrow": "Este trabalho, passo a passo",
+        "progress": "deste trabalho concluído",
+        "s1t": "Reserva confirmada",
+        "s1s": "A reserva de {client} está confirmada; agora é com você.",
+        "s2t": "Depósito recebido",
+        "s2s": "O depósito foi creditado na sua conta Stripe.",
+        "s3t": "Pago integralmente",
+        "s3s": "O trabalho completo foi pago diretamente a você.",
+        "s4t": "Preparar a viagem",
+        "s4s": "Confirme os detalhes e coordene por Mensagens.",
+        "s5t": "Acompanhar a viagem",
+        "s5s": "Seja aquele par de mãos a mais, o tempo todo.",
+        "s6t": "Concluído",
+        "s6s": "Quando {client} voltar e estiver tudo bem, o trabalho se encerra."
+      },
+      "trip": {
+        "eyebrow": "Este trabalho, passo a passo",
+        "progress": "deste trabalho concluído",
+        "s1t": "Reserva confirmada",
+        "s1s": "A reserva de {client} está confirmada; agora é com você.",
+        "s2t": "Depósito recebido",
+        "s2s": "O depósito foi creditado na sua conta Stripe.",
+        "s3t": "Pago integralmente",
+        "s3s": "A viagem completa foi paga diretamente a você.",
+        "s4t": "Preparar e compartilhar as reservas de {client}",
+        "s4s": "Confirme os detalhes e compartilhe em Mensagens ao longo do caminho.",
+        "s5t": "A viagem",
+        "s5s": "Você está a uma mensagem, o tempo todo.",
+        "s6t": "Concluído",
+        "s6s": "Quando {client} voltar e estiver tudo bem, o trabalho se encerra."
+      },
+      "generic": {
+        "eyebrow": "Este trabalho, passo a passo",
+        "progress": "deste trabalho concluído",
+        "s1t": "Reserva confirmada",
+        "s1s": "A reserva de {client} está confirmada; agora é com você.",
+        "s2t": "Depósito recebido",
+        "s2s": "O depósito foi creditado na sua conta Stripe.",
+        "s3t": "Pago integralmente",
+        "s3s": "A viagem completa foi paga diretamente a você.",
+        "s4t": "Preparar e compartilhar os detalhes",
+        "s4s": "Confirme os detalhes e compartilhe em Mensagens ao longo do caminho.",
+        "s5t": "A viagem",
+        "s5s": "Você está a uma mensagem, o tempo todo.",
+        "s6t": "Concluído",
+        "s6s": "Quando {client} voltar e estiver tudo bem, o trabalho se encerra."
+      }
+    },
+    "p": {
+      "backToBookings": "Voltar às reservas",
+      "estPayout": "Repasse est. (96,5%)",
+      "loadFailed": "Não foi possível carregar esta reserva.",
+      "markDone": "Marcar como feito",
+      "progressFailed": "Não foi possível atualizar o progresso. Tente novamente.",
+      "progressUpdated": "Progresso atualizado — seu cliente foi avisado.",
+      "sellerNote": "Você é o vendedor registrado. Os pagamentos do viajante são cobrados diretamente na sua conta Stripe no checkout — depósito e saldo igualmente — e você fica com 96,5%. Os 3,5% fixos da Goldsainte se aplicam a cada lado.",
+      "tripFallback": "Viagem Goldsainte",
+      "yourClient": "Seu cliente",
+      "yourNextStep": "Seu próximo passo",
+      "yourPayout": "Seu repasse"
+    }
   },
   "hire": {
     "acceptNote": "Eles aceitam e pagam o depósito — direto na sua conta Stripe.",
