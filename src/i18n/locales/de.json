@@ -2153,6 +2153,33 @@
       "threeWays": "Drei Wege zum Start — wählen Sie, was sich richtig anfühlt.",
       "welcomeGs": "Willkommen bei Goldsainte",
       "yourJourneys": "Ihre Reisen"
+    },
+    "c": {
+      "affiliate": "Affiliate",
+      "browseRequests": "Offene Reiseanfragen ansehen",
+      "buildSell": "Erstellen Sie etwas zum Verkaufen",
+      "catalog": "Katalog",
+      "completeSetup": "Einrichtung abschließen",
+      "content": "Content",
+      "creator": "Creator",
+      "earnings": "Einnahmen",
+      "eyebrow": "Das Atelier",
+      "findWork": "Aufträge finden",
+      "findWorkSub": "Sehen Sie, wovon Reisende träumen, und senden Sie ein maßgeschneidertes Angebot, um den Auftrag zu gewinnen.",
+      "growth": "Wachstum",
+      "guides": "Guides",
+      "howEarn": "So verdienen Creator auf Goldsainte",
+      "howEarnSub": "Ein kurzer Leitfaden zu Angeboten, Auszahlungen, Gebühren und der Aufteilung im Marktplatz.",
+      "packageSub": "Machen Sie aus Ihrem Geschmack buchbare Touren und digitale Guides — in Minuten veröffentlicht, auf der Plattform verkauft.",
+      "packageTrip": "Reise schnüren",
+      "performance": "Performance",
+      "pipeline": "Pipeline",
+      "proposals": "Angebote",
+      "services": "Services",
+      "settings": "Einstellungen",
+      "subtitle": "Ihr Studio, um Angebote zu formen, Reisen zu schnüren und Ihre Einnahmen auf der Plattform zu steigern.",
+      "trips": "Reisen",
+      "viewProfile": "Öffentliches Profil ansehen"
     }
   },
   "chk": {
