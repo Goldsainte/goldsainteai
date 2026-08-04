@@ -1564,7 +1564,9 @@
       "capturing": "Cosa sta immortalando {name}",
       "eyebrow": "Il tuo viaggio, pezzo per pezzo",
       "fallback": "Il tuo specialista sta preparando tutto per il tuo viaggio",
-      "putting": "Cosa sta mettendo insieme {name}"
+      "putting": "Cosa sta mettendo insieme {name}",
+      "delivering": "Cosa consegnerai",
+      "engagement": "L'incarico"
     },
     "j": {
       "creative": {
@@ -1682,7 +1684,86 @@
     "payBalanceFee": "Paga saldo — {{amount}} + 3,5% di commissione",
     "payDepositFee": "Paga acconto — {{amount}} + 3,5% di commissione",
     "selectState": "Seleziona il tuo stato di residenza nella sezione Pagamento qui sopra e riprova.",
-    "stateUnavailable": "Le prenotazioni non sono ancora disponibili per i residenti di California, Florida, Hawaii, Iowa e Washington."
+    "stateUnavailable": "Le prenotazioni non sono ancora disponibili per i residenti di California, Florida, Hawaii, Iowa e Washington.",
+    "pj": {
+      "creative": {
+        "eyebrow": "Questo incarico, passo dopo passo",
+        "progress": "di questo incarico completato",
+        "s1t": "Prenotazione confermata",
+        "s1s": "La sessione di {client} è confermata; sta a te realizzarla.",
+        "s2t": "Acconto incassato",
+        "s2s": "L'acconto è stato accreditato sul tuo conto Stripe.",
+        "s3t": "Pagato per intero",
+        "s3s": "L'intero incarico ti è stato versato direttamente.",
+        "s4t": "Scatto e ripresa",
+        "s4s": "Realizza le sessioni e condividi anteprime in Messaggi man mano.",
+        "s5t": "Modifica e consegna della galleria",
+        "s5s": "Rifinisci le immagini e consegna la galleria.",
+        "s6t": "Completato",
+        "s6s": "Quando {client} ha la sua galleria e tutto va bene, l'incarico si chiude."
+      },
+      "family": {
+        "eyebrow": "Questo incarico, passo dopo passo",
+        "progress": "di questo incarico completato",
+        "s1t": "Prenotazione confermata",
+        "s1s": "La prenotazione di {client} è confermata; sta a te realizzarla.",
+        "s2t": "Acconto incassato",
+        "s2s": "L'acconto è stato accreditato sul tuo conto Stripe.",
+        "s3t": "Pagato per intero",
+        "s3s": "L'intero incarico ti è stato versato direttamente.",
+        "s4t": "Preparare il viaggio",
+        "s4s": "Conferma i dettagli e coordinati in Messaggi.",
+        "s5t": "Accompagnare il viaggio",
+        "s5s": "Sii quel paio di mani in più, per tutto il tempo.",
+        "s6t": "Completato",
+        "s6s": "Quando {client} è rientrato e tutto va bene, l'incarico si chiude."
+      },
+      "trip": {
+        "eyebrow": "Questo incarico, passo dopo passo",
+        "progress": "di questo incarico completato",
+        "s1t": "Prenotazione confermata",
+        "s1s": "La prenotazione di {client} è confermata; sta a te realizzarla.",
+        "s2t": "Acconto incassato",
+        "s2s": "L'acconto è stato accreditato sul tuo conto Stripe.",
+        "s3t": "Pagato per intero",
+        "s3s": "L'intero viaggio ti è stato versato direttamente.",
+        "s4t": "Preparare e condividere le prenotazioni di {client}",
+        "s4s": "Conferma i dettagli e condividili in Messaggi man mano.",
+        "s5t": "Il viaggio",
+        "s5s": "Sei a un messaggio di distanza, per tutto il tempo.",
+        "s6t": "Completato",
+        "s6s": "Quando {client} è rientrato e tutto va bene, l'incarico si chiude."
+      },
+      "generic": {
+        "eyebrow": "Questo incarico, passo dopo passo",
+        "progress": "di questo incarico completato",
+        "s1t": "Prenotazione confermata",
+        "s1s": "La prenotazione di {client} è confermata; sta a te realizzarla.",
+        "s2t": "Acconto incassato",
+        "s2s": "L'acconto è stato accreditato sul tuo conto Stripe.",
+        "s3t": "Pagato per intero",
+        "s3s": "L'intero viaggio ti è stato versato direttamente.",
+        "s4t": "Preparare e condividere i dettagli",
+        "s4s": "Conferma i dettagli e condividili in Messaggi man mano.",
+        "s5t": "Il viaggio",
+        "s5s": "Sei a un messaggio di distanza, per tutto il tempo.",
+        "s6t": "Completato",
+        "s6s": "Quando {client} è rientrato e tutto va bene, l'incarico si chiude."
+      }
+    },
+    "p": {
+      "backToBookings": "Torna alle prenotazioni",
+      "estPayout": "Incasso stim. (96,5%)",
+      "loadFailed": "Impossibile caricare questa prenotazione.",
+      "markDone": "Segna come fatto",
+      "progressFailed": "Impossibile aggiornare l'avanzamento. Riprova.",
+      "progressUpdated": "Avanzamento aggiornato — il tuo cliente è stato avvisato.",
+      "sellerNote": "Sei il venditore registrato. I pagamenti del viaggiatore vengono addebitati direttamente sul tuo conto Stripe al checkout — acconto e saldo allo stesso modo — e trattieni il 96,5%. Il 3,5% fisso di Goldsainte si applica su entrambi i lati.",
+      "tripFallback": "Viaggio Goldsainte",
+      "yourClient": "Il tuo cliente",
+      "yourNextStep": "Il tuo prossimo passo",
+      "yourPayout": "Il tuo incasso"
+    }
   },
   "hire": {
     "acceptNote": "Loro accettano e versano l'acconto — pagato direttamente sul tuo conto Stripe.",
