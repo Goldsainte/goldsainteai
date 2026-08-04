@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +10,7 @@ import { CreatorSocialAccountsEditor, type SocialAccount } from "@/components/cr
 
 export function CreatorPortfolioTab() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [media, setMedia] = useState<MediaEntry[]>([]);
   const [socials, setSocials] = useState<SocialAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,11 +145,11 @@ export function CreatorPortfolioTab() {
       setOriginalMediaIds((mediaRefresh.data || []).map((r: any) => r.id));
       setOriginalSocialIds((socialRefresh.data || []).map((r: any) => r.id));
 
-      toast.success("Portfolio saved");
+      toast.success(t("dash.c.portfolioSaved", "Portfolio saved"));
       setDirty(false);
     } catch (err) {
       console.error("Save error:", err);
-      toast.error("Failed to save portfolio");
+      toast.error(t("dash.c.portfolioSaveFailed", "Failed to save portfolio"));
     } finally {
       setSaving(false);
     }
@@ -165,9 +167,9 @@ export function CreatorPortfolioTab() {
     <div className="space-y-8">
       {/* Media Gallery */}
       <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
-        <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">Trip Highlights</h3>
+        <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">{t("dash.c.tripHighlights", "Trip Highlights")}</h3>
         <p className="text-[15px] text-[#6B7280] mb-2">
-          Featured content shown at the top of your public profile — photos, videos, and Instagram or TikTok reels. Set any photo as your cover image.
+          {t("dash.c.highlightsSub", "Featured content shown at the top of your public profile — photos, videos, and Instagram or TikTok reels. Set any photo as your cover image.")}
         </p>
         <button
           type="button"
@@ -186,9 +188,9 @@ export function CreatorPortfolioTab() {
 
       {/* Social Accounts */}
       <div className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
-        <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">Social Accounts</h3>
+        <h3 className="font-secondary text-lg md:text-xl text-[#0a2225] mb-1">{t("dash.c.socialAccounts", "Social Accounts")}</h3>
         <p className="text-[15px] text-[#6B7280] mb-4">
-          Add your social profiles and follower counts. This builds credibility and helps travelers trust your expertise.
+          {t("dash.c.socialsSub", "Add your social profiles and follower counts. This builds credibility and helps travelers trust your expertise.")}
         </p>
         <CreatorSocialAccountsEditor accounts={socials} onChange={(s) => { setSocials(s); setDirty(true); }} />
       </div>
@@ -197,7 +199,7 @@ export function CreatorPortfolioTab() {
       <div className="flex items-center justify-end gap-3">
         {dirty && (
           <p className="text-[13px] text-[#C7A962] font-medium">
-            Unsaved changes — click Save Portfolio or they'll be lost
+            {t("dash.c.unsavedWarning", "Unsaved changes — click Save Portfolio or they'll be lost")}
           </p>
         )}
         <Button
@@ -210,7 +212,7 @@ export function CreatorPortfolioTab() {
           ) : (
             <Save className="h-4 w-4 mr-2" />
           )}
-          Save Portfolio
+          {t("dash.c.savePortfolio", "Save Portfolio")}
         </Button>
       </div>
     </div>
