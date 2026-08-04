@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,6 +46,7 @@ function buildShareUrl(p: Product, code: string): string {
 
 export function CreatorAffiliateTab() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [links, setLinks] = useState<LinkRow[]>([]);
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -109,7 +111,7 @@ export function CreatorAffiliateTab() {
   const productBreakdown = useMemo(() => {
     const map = new Map<string, { product: string; clicks: number; conversions: number; earnings: number }>();
     for (const l of links) {
-      const key = l.product_name || "Untitled";
+      const key = l.product_name || t("dash.c.untitled", "Untitled");
       const cur = map.get(key) || { product: key, clicks: 0, conversions: 0, earnings: 0 };
       cur.clicks += l.clicks || 0;
       cur.conversions += l.conversions || 0;
@@ -142,12 +144,12 @@ export function CreatorAffiliateTab() {
       .select()
       .single();
     if (error) {
-      toast.error("Could not create link");
+      toast.error(t("dash.c.linkCreateFailed", "Could not create link"));
       return;
     }
     setLinks((prev) => [data as any, ...prev]);
     setSelectedProduct(null);
-    toast.success("Affiliate link created");
+    toast.success(t("dash.c.linkCreated", "Affiliate link created"));
   }
 
   async function copy(linkId: string, url: string) {
@@ -156,7 +158,7 @@ export function CreatorAffiliateTab() {
       setCopiedId(linkId);
       setTimeout(() => setCopiedId(null), 1500);
     } catch {
-      toast.error("Copy failed");
+      toast.error(t("dash.c.copyFailed", "Copy failed"));
     }
   }
 
@@ -169,15 +171,15 @@ export function CreatorAffiliateTab() {
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-1 font-secondary text-lg text-[#0a2225]">Generate referral link</h3>
+        <h3 className="mb-1 font-secondary text-lg text-[#0a2225]">{t("dash.c.genReferralLink", "Generate referral link")}</h3>
         <p className="mb-3 text-[13px] leading-relaxed text-[#0a2225]/60">
-          How it works: pick a trip or guide, copy your link, and share it anywhere your audience lives — link in bio, stories, captions, newsletters, DMs. Anyone who clicks is credited to you for 30 days, whatever they browse before booking. Your links live here, not on your public profile — you are the channel.
+          {t("dash.c.affHowItWorks", "How it works: pick a trip or guide, copy your link, and share it anywhere your audience lives — link in bio, stories, captions, newsletters, DMs. Anyone who clicks is credited to you for 30 days, whatever they browse before booking. Your links live here, not on your public profile — you are the channel.")}
         </p>
         <p className="mb-3 text-[16px] text-[#6B7280]">
-          Earn 2% of the booking value on every booking driven through your link — paid by Goldsainte, never charged to the traveler or the specialist. Links stay credited for 30 days after a click.
+          {t("dash.c.affEarn2", "Earn 2% of the booking value on every booking driven through your link — paid by Goldsainte, never charged to the traveler or the specialist. Links stay credited for 30 days after a click.")}
         </p>
         <Input
-          placeholder="Search any trip or guide…"
+          placeholder={t("dash.c.searchTripGuide", "Search any trip or guide…")}
           value={productQuery}
           onChange={(e) => setProductQuery(e.target.value)}
           className="mb-3"
@@ -197,17 +199,17 @@ export function CreatorAffiliateTab() {
             </button>
           ))}
           {filtered.length === 0 && (
-            <p className="col-span-full text-[16px] text-[#6B7280]">No products match.</p>
+            <p className="col-span-full text-[16px] text-[#6B7280]">{t("dash.c.noProductsMatch", "No products match.")}</p>
           )}
         </div>
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your referral links</h3>
+        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("dash.c.yourReferralLinks", "Your referral links")}</h3>
         {loading ? (
-          <p className="text-[16px] text-[#7A7151]">Loading…</p>
+          <p className="text-[16px] text-[#7A7151]">{t("dash.c.loading", "Loading…")}</p>
         ) : links.length === 0 ? (
-          <p className="text-[16px] text-[#6B7280]">You haven't created any links yet.</p>
+          <p className="text-[16px] text-[#6B7280]">{t("dash.c.noLinksYet", "You haven't created any links yet.")}</p>
         ) : (
           <ul className="divide-y divide-[#E5DFC6]/60">
             {links.map((l) => (
@@ -217,7 +219,7 @@ export function CreatorAffiliateTab() {
                   <p className="truncate font-mono text-[14px] text-[#6B7280]">{l.product_url}</p>
                 </div>
                 <div className="flex items-center gap-3 text-[15px] text-[#7A7151]">
-                  <span>{l.clicks ?? 0} clicks</span>
+                  <span>{t("dash.c.nClicks", { count: l.clicks ?? 0, defaultValue: "{{count}} clicks" })}</span>
                   <span>·</span>
                   <span>{l.conversions ?? 0} sales</span>
                   <span>·</span>
@@ -238,9 +240,9 @@ export function CreatorAffiliateTab() {
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent commissions</h3>
+        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("dash.c.recentCommissions", "Recent commissions")}</h3>
         {commissions.length === 0 ? (
-          <p className="text-[16px] text-[#6B7280]">No commissions yet.</p>
+          <p className="text-[16px] text-[#6B7280]">{t("dash.c.noCommissions", "No commissions yet.")}</p>
         ) : (
           <ul className="divide-y divide-[#E5DFC6]/60">
             {commissions.map((c) => (
@@ -259,18 +261,18 @@ export function CreatorAffiliateTab() {
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Earnings by product</h3>
+        <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("dash.c.earningsByProduct", "Earnings by product")}</h3>
         {productBreakdown.length === 0 ? (
-          <p className="text-[16px] text-[#6B7280]">No referral activity yet.</p>
+          <p className="text-[16px] text-[#6B7280]">{t("dash.c.noReferralActivity", "No referral activity yet.")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[16px]">
               <thead>
                 <tr className="text-left text-[14px] uppercase tracking-wider text-[#7A7151]">
-                  <th className="py-2 pr-3 font-normal">Product</th>
-                  <th className="py-2 pr-3 text-right font-normal">Clicks</th>
-                  <th className="py-2 pr-3 text-right font-normal">Conversions</th>
-                  <th className="py-2 text-right font-normal">Earnings</th>
+                  <th className="py-2 pr-3 font-normal">{t("dash.c.thProduct", "Product")}</th>
+                  <th className="py-2 pr-3 text-right font-normal">{t("dash.c.thClicks", "Clicks")}</th>
+                  <th className="py-2 pr-3 text-right font-normal">{t("dash.c.thConversions", "Conversions")}</th>
+                  <th className="py-2 text-right font-normal">{t("dash.c.earnings")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5DFC6]/60">
