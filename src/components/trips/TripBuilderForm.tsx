@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -112,6 +113,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   { initialData, onSave, saving, isEditing, listingKind, allowListingChoice },
   ref
 ) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [suggestingCover, setSuggestingCover] = useState(false);
@@ -186,9 +188,9 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
       if (!formData.activity_level && typeof data?.activity_level === "string" && ACTIVITY_LEVELS.includes(data.activity_level)) {
         updateField("activity_level", data.activity_level);
       }
-      toast.success("Draft filled in — review every section, and replace [bracketed placeholders] with your real hotels and venues before publishing.");
+      toast.success(t("tb.draftFilled", "Draft filled in — review every section, and replace [bracketed placeholders] with your real hotels and venues before publishing."));
     } catch (e: any) {
-      toast.error(e.message || "Couldn't draft the listing — try again.");
+      toast.error(e.message || t("tb.draftFailed", "Couldn't draft the listing — try again."));
     } finally {
       setEnriching(false);
     }
@@ -335,7 +337,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
       if (data?.url) {
         updateField("cover_image_url", data.url);
         setCoverSuggested(true);
-        toast.success("Cover image suggested — click Shuffle for alternatives");
+        toast.success(t("tb.coverSuggested", "Cover image suggested — click Shuffle for alternatives"));
       }
     } catch (err: any) {
       console.error("[suggestCover]", err);
@@ -389,7 +391,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
 
   const handleAIItinerary = async () => {
     if (!formData.title || !formData.destination) {
-      toast.info("Add a title and destination first.");
+      toast.info(t("tb.addTitleDest", "Add a title and destination first."));
       return;
     }
     const days = parseInt(formData.duration_days) || itineraryDays.length;
@@ -408,7 +410,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
       if (error) throw error;
       const suggested = (data?.days || []) as Array<any>;
       if (suggested.length === 0) {
-        toast.error("No itinerary returned. Try again.");
+        toast.error(t("tb.noItinerary", "No itinerary returned. Try again."));
         return;
       }
       setItineraryDays((prev) => prev.map((d, idx) => {
@@ -422,10 +424,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
           accommodation: s.accommodation || d.accommodation,
         };
       }));
-      toast.success("Itinerary draft generated. Review and edit each day.");
+      toast.success(t("tb.itinGenerated", "Itinerary draft generated. Review and edit each day."));
     } catch (err: any) {
       console.error("AI itinerary error:", err);
-      toast.error("Failed to generate itinerary. Please try again.");
+      toast.error(t("tb.itinFailed", "Failed to generate itinerary. Please try again."));
     } finally {
       setAiLoading(false);
     }
@@ -456,18 +458,18 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         return;
       }
       if (!formData.destination?.trim()) {
-        toast.error("Please add a destination before continuing.");
+        toast.error(t("tb.addDestination", "Please add a destination before continuing."));
         return;
       }
       if (!formData.price_per_person) {
-        toast.error("Please add a price per person before continuing.");
+        toast.error(t("tb.addPrice", "Please add a price per person before continuing."));
         return;
       }
     }
     if (currentStep === 2) {
       const hasContent = itineraryDays.some((d) => d.title?.trim());
       if (!hasContent) {
-        toast.error("Please add at least one day to your itinerary, or use the AI suggestion button.");
+        toast.error(t("tb.addDay", "Please add at least one day to your itinerary, or use the AI suggestion button."));
         return;
       }
     }
