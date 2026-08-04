@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,6 +31,7 @@ interface SaleRow {
 
 export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" | "agent" }) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [range, setRange] = useState<Range>(30);
   const [trips, setTrips] = useState<ProductRow[]>([]);
   const [guides, setGuides] = useState<ProductRow[]>([]);
@@ -135,7 +137,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
   return (
     <div className="space-y-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="font-secondary text-xl text-[#0a2225]">Performance</h2>
+        <h2 className="font-secondary text-xl text-[#0a2225]">{t("dash.c.performance")}</h2>
         <div className="flex gap-1 rounded-full bg-[#FDF9F0] p-1 ring-1 ring-[#E5DFC6] self-start sm:self-auto">
           {([7, 30, 90] as Range[]).map((r) => (
             <button
@@ -152,24 +154,24 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat icon={<Eye className="h-4 w-4" />} label="Total views" value={totalViews.toLocaleString()} />
-        <Stat icon={<MousePointerClick className="h-4 w-4" />} label="Sales" value={totalSales.toLocaleString()} />
+        <Stat icon={<Eye className="h-4 w-4" />} label={t("dash.c.statViews", "Total views")} value={totalViews.toLocaleString()} />
+        <Stat icon={<MousePointerClick className="h-4 w-4" />} label={t("dash.c.statSalesLabel", "Sales")} value={totalSales.toLocaleString()} />
         <Stat
           icon={<TrendingUp className="h-4 w-4" />}
-          label="Conversion"
+          label={t("dash.c.statConversion", "Conversion")}
           value={`${conversionRate.toFixed(2)}%`}
-          subtitle="Industry average: 1.2%"
+          subtitle={t("dash.c.convIndustryAvg", "Industry average: 1.2%")}
         />
         <Stat
           icon={<Trophy className="h-4 w-4" />}
-          label="Top product"
+          label={t("dash.c.statTopProduct", "Top product")}
           value={topPerformer?.title || "—"}
           truncate
         />
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <p className="mb-3 text-[15px] uppercase tracking-wider text-[#7A7151]">Sales by day</p>
+        <p className="mb-3 text-[15px] uppercase tracking-wider text-[#7A7151]">{t("dash.c.salesByDay", "Sales by day")}</p>
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
@@ -189,7 +191,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
       </div>
 
       <div className="border-t border-[#0a2225]/15 pt-6">
-        <p className="mb-3 text-[15px] uppercase tracking-wider text-[#7A7151]">Traffic sources (UTM)</p>
+        <p className="mb-3 text-[15px] uppercase tracking-wider text-[#7A7151]">{t("dash.c.trafficSources", "Traffic sources (UTM)")}</p>
         {sources.length === 0 ? (
           <p className="text-[16px] text-[#6B7280]">
             No traffic data yet. Share links with <code>?utm_source=...</code> to track.
@@ -206,7 +208,7 @@ export function CreatorPerformanceTab({ role = "creator" }: { role?: "creator" |
         )}
       </div>
 
-      {loading && <p className="text-[14.5px] text-[#7A7151]">Loading…</p>}
+      {loading && <p className="text-[14.5px] text-[#7A7151]">{t("dash.c.loading", "Loading…")}</p>}
     </div>
   );
 }
