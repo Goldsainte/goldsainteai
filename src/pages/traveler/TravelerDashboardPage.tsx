@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ export default function TravelerDashboardPage() {
   const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<DashboardStats>({ tripRequests: 0, bookings: 0 });
   const [loading, setLoading] = useState(true);
@@ -112,12 +114,12 @@ export default function TravelerDashboardPage() {
     );
   }
 
-  const displayName = profile?.display_name || profile?.first_name || profile?.full_name || "Traveler";
+  const displayName = profile?.display_name || profile?.first_name || profile?.full_name || t("dash.t.traveler", "Traveler");
   const TAB_LABELS: Record<string, string> = {
-    overview: "Studio",
-    journeys: "Journeys",
-    profile: "Profile",
-    settings: "Settings",
+    overview: t("dash.t.tabStudio", "Studio"),
+    journeys: t("dash.t.tabJourneys", "Journeys"),
+    profile: t("dash.t.tabProfile", "Profile"),
+    settings: t("dash.t.tabSettings", "Settings"),
   };
 
   return (
@@ -126,13 +128,13 @@ export default function TravelerDashboardPage() {
         {/* Editorial header */}
         <header className="mb-8 md:mb-10">
           <p className="text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-            The Studio
+            {t("dash.t.eyebrow", "The Studio")}
           </p>
           <h1 className="mt-2 md:mt-3 font-secondary text-[28px] leading-tight md:text-4xl text-[#0a2225]">
-            {loading ? "Welcome" : `Welcome, ${displayName.split(" ")[0]}`}
+            {loading ? t("dash.t.welcome", "Welcome") : `${t("dash.t.welcome", "Welcome")}, ${displayName.split(" ")[0]}`}
           </h1>
           <p className="mt-2 text-sm text-[#0a2225]/60 max-w-md">
-            Your private space to dream up trips and review proposals from our network.
+            {t("dash.t.subtitle", "Your private space to dream up trips and review proposals from our network.")}
           </p>
         </header>
 
@@ -152,10 +154,10 @@ export default function TravelerDashboardPage() {
                     <SelectValue>{TAB_LABELS[activeTab]}</SelectValue>
                   </SelectTrigger>
                   <SelectContent className="bg-[#f7f3ea] border-[#0a2225]/15 rounded-xl">
-                    <SelectItem value="overview">Studio</SelectItem>
-                    <SelectItem value="journeys">Journeys</SelectItem>
-                    <SelectItem value="profile">Profile</SelectItem>
-                    <SelectItem value="settings">Settings</SelectItem>
+                    <SelectItem value="overview">{t("dash.t.tabStudio", "Studio")}</SelectItem>
+                    <SelectItem value="journeys">{t("dash.t.tabJourneys", "Journeys")}</SelectItem>
+                    <SelectItem value="profile">{t("dash.t.tabProfile", "Profile")}</SelectItem>
+                    <SelectItem value="settings">{t("dash.t.tabSettings", "Settings")}</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
@@ -206,13 +208,13 @@ export default function TravelerDashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                    Need a hand?
+                    {t("dash.t.needHand", "Need a hand?")}
                   </p>
                   <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                    Speak with the concierge
+                    {t("dash.t.speakConcierge", "Speak with the concierge")}
                   </h3>
                   <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
-                    Our team is available to help shape your trip or answer questions about a proposal.
+                    {t("dash.t.conciergeSub", "Our team is available to help shape your trip or answer questions about a proposal.")}
                   </p>
                   <Link
                     to="/messages"
@@ -223,13 +225,13 @@ export default function TravelerDashboardPage() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                    Get inspired
+                    {t("dash.t.getInspired", "Get inspired")}
                   </p>
                   <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                    Browse the Marketplace
+                    {t("dash.t.browseMarketplace", "Browse the Marketplace")}
                   </h3>
                   <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
-                    Editorial trips curated by our creators and agents — find the journey that inspires you.
+                    {t("dash.t.marketplaceSub", "Editorial trips curated by our creators and agents — find the journey that inspires you.")}
                   </p>
                   <Link
                     to="/marketplace"
@@ -240,13 +242,13 @@ export default function TravelerDashboardPage() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                    New here?
+                    {t("dash.t.newHere", "New here?")}
                   </p>
                   <h3 className="mt-3 font-secondary text-xl text-[#0a2225]">
-                    How Goldsainte works
+                    {t("dash.t.howWorks", "How Goldsainte works")}
                   </h3>
                   <p className="mt-2 text-sm text-[#0a2225]/65 leading-relaxed">
-                    A short guide to requesting trips, reviewing proposals and booking on-platform.
+                    {t("dash.t.howWorksSub", "A short guide to requesting trips, reviewing proposals and booking on-platform.")}
                   </p>
                   <Link
                     to="/how-it-works/traveler"
