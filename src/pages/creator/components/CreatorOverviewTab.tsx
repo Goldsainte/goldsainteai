@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -34,42 +35,43 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
   const fmt = (n: number) =>
     `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
+  const { t } = useTranslation();
   const earningPaths = [
     {
       n: "01",
-      title: "Answer a brief",
+      title: t("dash.c.ep1", "Answer a brief"),
       steps: [
-        "Travelers post the journeys they want. Pick a brief that fits your taste.",
-        "Send a tailored proposal — your itinerary, price, and timeline — right in the chat.",
-        "The traveler accepts and pays their deposit without ever leaving the thread.",
+        t("dash.c.ep1s1", "Travelers post the journeys they want. Pick a brief that fits your taste."),
+        t("dash.c.ep1s2", "Send a tailored proposal — your itinerary, price, and timeline — right in the chat."),
+        t("dash.c.ep1s3", "The traveler accepts and pays their deposit without ever leaving the thread."),
       ],
     },
     {
       n: "02",
-      title: "Publish your own",
+      title: t("dash.c.ep2", "Publish your own"),
       steps: [
-        "Package a trip you know by heart — or a digital guide — in the trip builder.",
-        "It lists on the marketplace with your name and your price.",
-        "Travelers book it directly — no proposal needed, you wake up to bookings.",
+        t("dash.c.ep2s1", "Package a trip you know by heart — or a digital guide — in the trip builder."),
+        t("dash.c.ep2s2", "It lists on the marketplace with your name and your price."),
+        t("dash.c.ep2s3", "Travelers book it directly — no proposal needed, you wake up to bookings."),
       ],
     },
     {
       n: "03",
-      title: "Get hired on-trip",
+      title: t("dash.c.ep3", "Get hired on-trip"),
       steps: [
-        "Declare what you can do — content, guiding, hosting — and set your day rate.",
-        "Travelers hire you onto their own trip: their dates, your named scope.",
-        "You confirm the total; payment is charged straight to your Stripe account.",
+        t("dash.c.ep3s1", "Declare what you can do — content, guiding, hosting — and set your day rate."),
+        t("dash.c.ep3s2", "Travelers hire you onto their own trip: their dates, your named scope."),
+        t("dash.c.ep3s3", "You confirm the total; payment is charged straight to your Stripe account."),
       ],
     },
   ];
   const romans = ["i.", "ii.", "iii."];
 
   const statItems = [
-    { label: "Active proposals", value: loading ? "—" : stats.activeProposals.toString() },
-    { label: "Accepted", value: loading ? "—" : stats.acceptedProposals.toString() },
-    { label: "Response rate", value: loading ? "—" : `${stats.responseRate}%` },
-    { label: "Total earnings", value: loading ? "—" : fmt(stats.totalEarnings) },
+    { label: t("dash.c.statActive", "Active proposals"), value: loading ? "—" : stats.activeProposals.toString() },
+    { label: t("dash.c.statAccepted", "Accepted"), value: loading ? "—" : stats.acceptedProposals.toString() },
+    { label: t("dash.c.statResponse", "Response rate"), value: loading ? "—" : `${stats.responseRate}%` },
+    { label: t("dash.c.statEarnings", "Total earnings"), value: loading ? "—" : fmt(stats.totalEarnings) },
   ];
 
   const hasActivity =
@@ -83,14 +85,13 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
       {/* Editorial hero */}
       <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
         <p className="text-[12px] md:text-[12.5px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-          Start here
+          {t("dash.t.startHere", "Start here")}
         </p>
         <h2 className="mt-3 md:mt-4 font-secondary text-[28px] md:text-5xl leading-[1.15] text-[#0a2225] max-w-2xl">
-          Find a brief, design the trip, get paid.
+          {t("dash.c.heroTitle", "Find a brief, design the trip, get paid.")}
         </h2>
         <p className="mt-4 md:mt-5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/65">
-          The marketplace is full of travelers waiting for the right specialist. Send a proposal or
-          publish a bookable tour ready to book.
+          {t("dash.c.heroSub", "The marketplace is full of travelers waiting for the right specialist. Send a proposal or publish a bookable tour ready to book.")}
         </p>
 
         <div className="mt-7 md:mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-x-8">
@@ -98,13 +99,13 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
             asChild
             className="rounded-full bg-[#0c4d47] hover:bg-[#0a2225] text-[#f7f3ea] px-7 h-12 text-[15px] tracking-wide w-full sm:w-auto"
           >
-            <Link to="/marketplace?tab=trip-requests">Browse trip requests</Link>
+            <Link to="/marketplace?tab=trip-requests">{t("dash.c.browseBriefs", "Browse trip requests")}</Link>
           </Button>
           <Link
             to="/trip-builder"
             className="group inline-flex items-center justify-center sm:justify-start text-[15px] text-[#0a2225]/70 hover:text-[#0a2225] transition-colors h-11 sm:h-auto"
           >
-            Or create a bookable tour
+            {t("dash.c.orCreate", "Or create a bookable tour")}
             <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
@@ -113,10 +114,10 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
       {/* How it works — two earning paths, editorial */}
       <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
         <p className="text-[12px] md:text-[12.5px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-          How Goldsainte works for creators
+          {t("dash.c.hwCreators", "How Goldsainte works for creators")}
         </p>
         <h2 className="mt-3 font-secondary text-3xl md:text-4xl text-[#0a2225]">
-          Three ways to earn
+          {t("dash.c.threeWaysEarn", "Three ways to earn")}
         </h2>
 
         <div className="mt-7 grid grid-cols-1 gap-y-10 gap-x-12 md:grid-cols-3">
@@ -146,16 +147,10 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         <div className="mt-9 flex flex-col gap-6 border-t border-[#0a2225]/10 pt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
           <div>
             <p className="text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-              How you get paid
+              {t("dash.c.howPaid", "How you get paid")}
             </p>
             <p className="mt-2.5 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/65">
-              You set your price — your costs and your margin are yours to
-              build in. Goldsainte&apos;s entire take is 7%, flat, on
-              everything you earn here: bookings, hires, guides, products,
-              and tips. On bookings it&apos;s a 3.5% traveler service fee
-              plus a matching 3.5% from your payout; on everything else,
-              a simple 7% platform fee. Every payment is charged directly
-              on your own Stripe account.
+              {t("dash.c.howPaidBody", "You set your price — your costs and your margin are yours to build in. Goldsainte's entire take is 7%, flat, on everything you earn here: bookings, hires, guides, products, and tips. On bookings it's a 3.5% traveler service fee plus a matching 3.5% from your payout; on everything else, a simple 7% platform fee. Every payment is charged directly on your own Stripe account.")}
             </p>
           </div>
           <div className="shrink-0 text-center">
@@ -172,9 +167,9 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
         <div className="mt-7 flex flex-col gap-3 border-t border-[#0a2225]/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-[16px] text-[#0a2225]/60">
             <span className="mr-3.5 text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-              New here?
+              {t("dash.t.newHere", "New here?")}
             </span>
-            The full guide to proposals, payouts, and fees.
+            {t("dash.c.fullGuide", "The full guide to proposals, payouts, and fees.")}
           </span>
           <Link
             to="/how-it-works/creator"
@@ -203,7 +198,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
       {hasActivity && (
         <section className="border-t border-[#0a2225]/10 pt-8 md:pt-10">
           <p className="text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70 mb-5">
-            Your studio, at a glance
+            {t("dash.c.atGlance", "Your studio, at a glance")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-8">
             {statItems.map((item) => (
@@ -224,7 +219,7 @@ export function CreatorOverviewTab({ stats, loading }: CreatorOverviewTabProps) 
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-[12px] uppercase tracking-[0.32em] text-[#0c4d47]/70">
-                Latest activity
+                {t("dash.c.latestActivity", "Latest activity")}
               </p>
               <h2 className="mt-2 font-secondary text-2xl text-[#0a2225]">Recent proposals</h2>
             </div>
