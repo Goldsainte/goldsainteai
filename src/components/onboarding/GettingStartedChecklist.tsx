@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Check, ChevronRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -37,36 +38,37 @@ interface Props {
   role: Role;
 }
 
-const TRAVELER_ITEMS: ChecklistItem[] = [
+type ChkT = (key: string, defaultValue: string) => string;
+const travelerItems = (t: ChkT): ChecklistItem[] => [
   {
     id: "complete-profile",
-    label: "Complete your profile",
-    description: "Add a photo and bio so specialists know who they're planning for.",
-    cta: { label: "Edit profile", to: "/travel-profile" },
+    label: t("chk.t1", "Complete your profile"),
+    description: t("chk.t1d", "Add a photo and bio so specialists know who they're planning for."),
+    cta: { label: t("chk.t1c", "Edit profile"), to: "/travel-profile" },
     isComplete: (d) => !!d.profile?.avatar_url && !!d.profile?.bio,
   },
   {
     id: "browse-marketplace",
-    label: "Explore the marketplace",
-    description: "Browse curated trips and itinerary guides from verified specialists.",
-    cta: { label: "Browse trips", to: "/marketplace" },
+    label: t("chk.t2", "Explore the marketplace"),
+    description: t("chk.t2d", "Browse curated trips and itinerary guides from verified specialists."),
+    cta: { label: t("chk.t2c", "Browse trips"), to: "/marketplace" },
     isComplete: (d) => !!d.activity?.has_browsed_marketplace,
   },
   {
     id: "post-request",
-    label: "Post your first trip request",
-    description: "Tell us your dream trip and AI matches you with the right specialists.",
-    cta: { label: "Post a trip", to: "/post-trip" },
+    label: t("chk.t3", "Post your first trip request"),
+    description: t("chk.t3d", "Tell us your dream trip and AI matches you with the right specialists."),
+    cta: { label: t("chk.t3c", "Post a trip"), to: "/post-trip" },
     isComplete: (d) => (d.tripRequests || 0) > 0,
   },
 ];
 
-const CREATOR_ITEMS: ChecklistItem[] = [
+const creatorItems = (t: ChkT): ChecklistItem[] => [
   {
     id: "complete-onboarding",
-    label: "Complete your creator profile",
-    description: "Add a photo, bio, and your niches so travelers can discover you.",
-    cta: { label: "Complete profile", to: "/onboarding/creator" },
+    label: t("chk.c1", "Complete your creator profile"),
+    description: t("chk.c1d", "Add a photo, bio, and your niches so travelers can discover you."),
+    cta: { label: t("chk.c1c", "Complete profile"), to: "/onboarding/creator" },
     // Reflect the actual profile content the copy promises (photo + bio + niches),
     // not just the "finished the wizard" flag — so a filled profile ticks even if
     // the creator hit "Skip" on the last onboarding step.
@@ -77,16 +79,16 @@ const CREATOR_ITEMS: ChecklistItem[] = [
   },
   {
     id: "add-media",
-    label: "Add photos & video to your profile",
-    description: "Show travelers who you are — imagery is what gets you chosen.",
-    cta: { label: "Add media", to: "/profile/media" },
+    label: t("chk.media", "Add photos & video to your profile"),
+    description: t("chk.mediaD", "Show travelers who you are — imagery is what gets you chosen."),
+    cta: { label: t("chk.mediaC", "Add media"), to: "/profile/media" },
     isComplete: (d) => (d.partnerMediaCount || 0) > 0,
   },
   {
     id: "connect-stripe",
-    label: "Connect your payout account",
-    description: "Set up Stripe so you can get paid — bookings, tips, and guide sales all pay out through your own account.",
-    cta: { label: "Connect Stripe", to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
+    label: t("chk.stripe", "Connect your payout account"),
+    description: t("chk.cStripeD", "Set up Stripe so you can get paid — bookings, tips, and guide sales all pay out through your own account."),
+    cta: { label: t("chk.stripeC", "Connect Stripe"), to: "/creator-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
       // Also accept onboarding-completed/account-active (Jul 26): right after
       // Stripe onboarding, details_submitted is true while charges/payouts
@@ -104,48 +106,48 @@ const CREATOR_ITEMS: ChecklistItem[] = [
   },
   {
     id: "create-content",
-    label: "Publish your first product",
-    description: "Create a bookable tour or sell a digital itinerary guide.",
+    label: t("chk.c4", "Publish your first product"),
+    description: t("chk.c4d", "Create a bookable tour or sell a digital itinerary guide."),
     cta: {
       // Resume the creator's existing draft if they have one, else start fresh.
-      label: (d) => (d.draftTripId ? "Resume draft" : "Get started"),
+      label: (d) => (d.draftTripId ? t("chk.resumeDraft", "Resume draft") : t("chk.getStartedCta", "Get started")),
       to: (d) => (d.draftTripId ? `/trip-builder?edit=${d.draftTripId}` : "/trip-builder"),
     },
     isComplete: (d) => (d.trips || 0) > 0 || (d.guides || 0) > 0,
   },
   {
     id: "share-profile",
-    label: "View & share your profile",
-    description: "Open your public profile, then share the link on TikTok and Instagram.",
-    cta: { label: "View my profile", to: (d) => `/creators/${d.profile?.id || ""}` },
+    label: t("chk.c5", "View & share your profile"),
+    description: t("chk.c5d", "Open your public profile, then share the link on TikTok and Instagram."),
+    cta: { label: t("chk.c5c", "View my profile"), to: (d) => `/creators/${d.profile?.id || ""}` },
     // "creator_avg_views > 10" was an imported TikTok metric unrelated to sharing.
     // Complete when the creator opens their public profile (the share/preview action).
     isComplete: (d) => !!d.activity?.has_shared_profile,
   },
 ];
 
-const AGENT_ITEMS: ChecklistItem[] = [
+const agentItems = (t: ChkT): ChecklistItem[] => [
   {
     id: "verify-identity",
-    label: "Verify your identity",
-    description: "Complete Stripe Identity verification to publish trips.",
-    cta: { label: "Start verification", to: "/apply/agent" },
+    label: t("chk.a1", "Verify your identity"),
+    description: t("chk.a1d", "Complete Stripe Identity verification to publish trips."),
+    cta: { label: t("chk.a1c", "Start verification"), to: "/apply/agent" },
     isComplete: (d) =>
       d.profile?.agent_verification_status === "verified" ||
       d.profile?.identity_verified === true,
   },
   {
     id: "add-media",
-    label: "Add photos & video to your profile",
-    description: "Show travelers who you are — imagery is what gets you chosen.",
-    cta: { label: "Add media", to: "/profile/media" },
+    label: t("chk.media", "Add photos & video to your profile"),
+    description: t("chk.mediaD", "Show travelers who you are — imagery is what gets you chosen."),
+    cta: { label: t("chk.mediaC", "Add media"), to: "/profile/media" },
     isComplete: (d) => (d.partnerMediaCount || 0) > 0,
   },
   {
     id: "connect-stripe",
-    label: "Connect your payout account",
-    description: "Set up Stripe so you can get paid — deposits and balances land directly in your account.",
-    cta: { label: "Connect Stripe", to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
+    label: t("chk.stripe", "Connect your payout account"),
+    description: t("chk.aStripeD", "Set up Stripe so you can get paid — deposits and balances land directly in your account."),
+    cta: { label: t("chk.stripeC", "Connect Stripe"), to: "/agent-dashboard?tab=earnings", event: "start-stripe-onboarding" },
     isComplete: (d) =>
       !!(
         d.agent?.stripe_charges_enabled ||
@@ -158,16 +160,16 @@ const AGENT_ITEMS: ChecklistItem[] = [
   },
   {
     id: "upload-agreement",
-    label: "Upload your client agreement",
-    description: "Your own engagement agreement — travelers e-accept it before any deposit unlocks. Required to receive payments.",
-    cta: { label: "Upload agreement", to: "/agent-settings" },
+    label: t("chk.a4", "Upload your client agreement"),
+    description: t("chk.a4d", "Your own engagement agreement — travelers e-accept it before any deposit unlocks. Required to receive payments."),
+    cta: { label: t("chk.a4c", "Upload agreement"), to: "/agent-settings" },
     isComplete: (d) => !!(d.agent as any)?.client_agreement_url,
   },
   {
     id: "respond-request",
-    label: "Send your first proposal",
-    description: "Browse open trip requests and submit a custom proposal.",
-    cta: { label: "View requests", to: "/marketplace?tab=trip-requests" },
+    label: t("chk.a5", "Send your first proposal"),
+    description: t("chk.a5d", "Browse open trip requests and submit a custom proposal."),
+    cta: { label: t("chk.a5c", "View requests"), to: "/marketplace?tab=trip-requests" },
     isComplete: (d) => (d.proposalsSent || 0) > 0,
   },
 ];
@@ -281,7 +283,8 @@ export function GettingStartedChecklist({ userId, role }: Props) {
 
   if (dismissed || !data) return null;
 
-  const items = role === "traveler" ? TRAVELER_ITEMS : role === "creator" ? CREATOR_ITEMS : AGENT_ITEMS;
+  const { t } = useTranslation();
+  const items = role === "traveler" ? travelerItems(t) : role === "creator" ? creatorItems(t) : agentItems(t);
   const completed = items.filter((item) => item.isComplete(data)).length;
   const percent = Math.round((completed / items.length) * 100);
 
@@ -291,13 +294,13 @@ export function GettingStartedChecklist({ userId, role }: Props) {
     <div className="mb-6 rounded-2xl border border-[#E5DFC6] bg-white shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[#E5DFC6]">
         <div>
-          <h3 className="font-secondary text-lg sm:text-xl text-[#0a2225]">Getting Started</h3>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">{completed} of {items.length} steps complete</p>
+          <h3 className="font-secondary text-lg sm:text-xl text-[#0a2225]">{t("chk.title", "Getting Started")}</h3>
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">{t("chk.progress", { done: completed, total: items.length, defaultValue: "{{done}} of {{total}} steps complete" })}</p>
         </div>
         <button
           onClick={handleDismiss}
           className="text-[#9A9079] hover:text-[#0a2225] transition-colors"
-          aria-label="Dismiss checklist"
+          aria-label={t("chk.dismiss", "Dismiss checklist")}
         >
           <X className="h-4 w-4" />
         </button>
@@ -362,7 +365,7 @@ export function GettingStartedChecklist({ userId, role }: Props) {
                     }}
                     className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#0c4d47] hover:underline whitespace-nowrap disabled:opacity-60"
                   >
-                    {stripeCtaBusy ? "Opening Stripe…" : ctaLabel}
+                    {stripeCtaBusy ? t("chk.openingStripe", "Opening Stripe…") : ctaLabel}
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 ) : (
