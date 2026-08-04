@@ -1974,7 +1974,10 @@
     "requestDeclined": "رُفض الطلب",
     "tryAgain": "حاول مرة أخرى.",
     "uploadFailed": "فشل الرفع",
-    "userBlocked": "حُظر المستخدم"
+    "userBlocked": "حُظر المستخدم",
+    "showOriginal": "اعرض الأصل",
+    "showTranslation": "اعرض الترجمة",
+    "translated": "مُترجم"
   },
   "sett": {
     "checkoutOpened": "فُتح الدفع في تبويب جديد",
