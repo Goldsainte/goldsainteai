@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -65,6 +66,7 @@ export function ManagePaymentsSection({
   userId?: string;
   description?: string;
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const handleManagePayments = async () => {
@@ -74,7 +76,7 @@ export function ManagePaymentsSection({
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        toast.error("Please sign in to manage payments");
+        toast.error(t("sett.signInPayments", "Please sign in to manage payments"));
         return;
       }
       const { data, error } = await supabase.functions.invoke(
@@ -88,7 +90,7 @@ export function ManagePaymentsSection({
       if (data?.url) window.open(data.url, "_blank");
     } catch (error) {
       console.error("Portal error:", error);
-      toast.error("Unable to open payment settings. Please try again.");
+      toast.error(t("sett.openPaymentsFailed", "Unable to open payment settings. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -182,10 +184,10 @@ export function NotificationPreferencesSection({
         })
         .eq("id", userId);
       if (error) throw error;
-      toast.success("Notification preferences saved");
+      toast.success(t("sett.notifSaved", "Notification preferences saved"));
     } catch (error: any) {
       console.error("Save notifications error:", error);
-      toast.error(error.message || "Failed to save preferences");
+      toast.error(error.message || t("sett.notifFailed", "Failed to save preferences"));
     } finally {
       setSaving(false);
     }
@@ -260,14 +262,14 @@ export function SecuritySection() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user?.email) {
-        toast.error("Email not found. Unable to send password reset email.");
+        toast.error(t("sett.emailNotFound", "Email not found. Unable to send password reset email."));
         return;
       }
-      toast.loading("Sending password reset email...");
+      toast.loading(t("sett.sendingReset", "Sending password reset email..."));
       const result = await requestPasswordReset(user.email);
       if (!result.ok) throw new Error(result.error || "Failed to send reset email.");
       toast.dismiss();
-      toast.success("Password reset email sent! Check your inbox.");
+      toast.success(t("sett.resetSent", "Password reset email sent! Check your inbox."));
     } catch (error: any) {
       console.error("Error sending password reset:", error);
       toast.dismiss();
@@ -315,10 +317,10 @@ export function PrivacyDataSection() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        toast.error("Please sign in to download your data");
+        toast.error(t("sett.signInDownload", "Please sign in to download your data"));
         return;
       }
-      toast.loading("Preparing your data export...");
+      toast.loading(t("sett.preparingExport", "Preparing your data export..."));
       const { data, error } = await supabase.functions.invoke(
         "export-user-data",
         { method: "POST" },
@@ -336,11 +338,11 @@ export function PrivacyDataSection() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast.dismiss();
-      toast.success("Your data has been downloaded");
+      toast.success(t("sett.dataDownloaded", "Your data has been downloaded"));
     } catch (error: any) {
       toast.dismiss();
       console.error("Error downloading data:", error);
-      toast.error(error.message || "Failed to download data");
+      toast.error(error.message || t("sett.downloadFailed", "Failed to download data"));
     }
   };
 
