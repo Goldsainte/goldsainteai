@@ -1,4 +1,5 @@
 // src/pages/TripChatPage.tsx
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -299,7 +300,7 @@ export default function TripChatPage() {
                             : "bg-black/40 text-[#E5DFC6] rounded-bl-sm"
                         }`}
                       >
-                        <p>{m.body}</p>
+                        <p><TranslatedMessageText text={m.body} enabled={!isMine} /></p>
                         <p
                           className={`mt-1 text-[9px] ${
                             isMine
