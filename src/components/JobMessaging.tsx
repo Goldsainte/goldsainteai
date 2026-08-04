@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -159,7 +160,7 @@ export function JobMessaging({ jobId, receiverId }: JobMessagingProps) {
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm">{message.message_text}</p>
+                  <p className="text-sm"><TranslatedMessageText text={message.message_text} enabled={message.sender_id !== user?.id} /></p>
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">
                   {format(new Date(message.created_at), "MMM d, h:mm a")}
