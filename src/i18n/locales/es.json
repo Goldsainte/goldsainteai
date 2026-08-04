@@ -1974,7 +1974,10 @@
     "requestDeclined": "Solicitud rechazada",
     "tryAgain": "Inténtalo de nuevo.",
     "uploadFailed": "Error al subir",
-    "userBlocked": "Usuario bloqueado"
+    "userBlocked": "Usuario bloqueado",
+    "showOriginal": "Ver original",
+    "showTranslation": "Ver traducción",
+    "translated": "Traducido"
   },
   "sett": {
     "checkoutOpened": "Pago abierto en una pestaña nueva",
