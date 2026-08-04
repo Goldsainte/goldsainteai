@@ -1974,7 +1974,10 @@
     "requestDeclined": "요청을 거절했습니다",
     "tryAgain": "다시 시도해 주세요.",
     "uploadFailed": "업로드 실패",
-    "userBlocked": "사용자를 차단했습니다"
+    "userBlocked": "사용자를 차단했습니다",
+    "showOriginal": "원문 보기",
+    "showTranslation": "번역 보기",
+    "translated": "번역됨"
   },
   "sett": {
     "checkoutOpened": "새 탭에서 결제가 열렸습니다",
