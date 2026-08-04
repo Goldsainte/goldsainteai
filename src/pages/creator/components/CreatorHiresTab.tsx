@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -25,6 +26,7 @@ interface HireRow {
 
 export function CreatorHiresTab() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [rows, setRows] = useState<HireRow[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,10 +51,10 @@ export function CreatorHiresTab() {
   if (rows.length === 0) {
     return (
       <div className="border-t border-[#E5DFC6] pt-8">
-        <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Direct requests</p>
-        <h3 className="mt-2 font-secondary text-xl text-[#0a2225] md:text-2xl">No one has requested you yet</h3>
+        <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">{t("dash.c.directRequests", "Direct requests")}</p>
+        <h3 className="mt-2 font-secondary text-xl text-[#0a2225] md:text-2xl">{t("dash.c.noRequestsYet", "No one has requested you yet")}</h3>
         <p className="mt-1.5 max-w-xl text-[15px] leading-relaxed text-[#0a2225]/70">
-          When a traveler hires you from your profile — or sends you a trip directly — it lands here, newest first.
+          {t("dash.c.hiresEmpty", "When a traveler hires you from your profile — or sends you a trip directly — it lands here, newest first.")}
         </p>
       </div>
     );
@@ -85,13 +87,13 @@ export function CreatorHiresTab() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2225]/85 via-[#0a2225]/20 to-transparent" />
               {isHire && (
                 <span className="absolute right-3 top-3 rounded-lg bg-[#C7A962] px-2 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#0a2225]">
-                  On-trip hire
+                  {t("dash.c.onTripHire", "On-trip hire")}
                 </span>
               )}
               <div className="absolute inset-x-0 bottom-0 p-4">
-                <p className="text-[12px] uppercase tracking-[0.22em] text-[#E5DFC6]/80">Received {received}</p>
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#E5DFC6]/80">{t("dash.c.receivedOn", { date: received, defaultValue: "Received {{date}}" })}</p>
                 <p className="mt-1 font-secondary text-[17px] leading-[1.15] text-[#fdfaf2] line-clamp-2">
-                  {r.title || `Trip to ${r.destination ?? "\u2026"}`}
+                  {r.title || t("dash.c.tripTo", { dest: r.destination ?? "\u2026", defaultValue: "Trip to {{dest}}" })}
                 </p>
               </div>
             </div>
