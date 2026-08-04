@@ -2153,6 +2153,33 @@
       "threeWays": "始め方は3つ — しっくりくるものをどうぞ。",
       "welcomeGs": "Goldsainte へようこそ",
       "yourJourneys": "あなたの旅"
+    },
+    "c": {
+      "affiliate": "アフィリエイト",
+      "browseRequests": "公開中の旅のリクエストを見る",
+      "buildSell": "売れるものをつくる",
+      "catalog": "カタログ",
+      "completeSetup": "セットアップを完了",
+      "content": "コンテンツ",
+      "creator": "クリエイター",
+      "earnings": "収益",
+      "eyebrow": "アトリエ",
+      "findWork": "仕事を探す",
+      "findWorkSub": "旅行者が夢見ていることを見て、案件を勝ち取るオーダーメイドの提案を送りましょう。",
+      "growth": "グロース",
+      "guides": "ガイド",
+      "howEarn": "クリエイターが Goldsainte で稼ぐ方法",
+      "howEarnSub": "提案・入金・手数料、マーケットプレイスの分配の簡単ガイド。",
+      "packageSub": "あなたのセンスを予約可能なツアーやデジタルガイドに — 数分で公開、プラットフォームで販売。",
+      "packageTrip": "旅をパッケージ化",
+      "performance": "パフォーマンス",
+      "pipeline": "パイプライン",
+      "proposals": "提案",
+      "services": "サービス",
+      "settings": "設定",
+      "subtitle": "提案を磨き、旅をパッケージし、プラットフォームでの収益を育てるあなたのスタジオ。",
+      "trips": "旅",
+      "viewProfile": "公開プロフィールを見る"
     }
   },
   "chk": {
