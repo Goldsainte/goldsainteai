@@ -1974,7 +1974,10 @@
     "requestDeclined": "Request declined",
     "tryAgain": "Please try again.",
     "uploadFailed": "Upload failed",
-    "userBlocked": "User blocked"
+    "userBlocked": "User blocked",
+    "showOriginal": "Show original",
+    "showTranslation": "Show translation",
+    "translated": "Translated"
   },
   "sett": {
     "checkoutOpened": "Checkout opened in new tab",
