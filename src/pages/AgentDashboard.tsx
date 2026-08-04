@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,6 +43,7 @@ export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+  const { t: tr } = useTranslation();
   const [searchParams] = useSearchParams();
   // Deep-linkable tabs (?tab=guides etc.) — the guide builder's Stripe popup
   // and Stripe Connect returns (?stripe=success) both need to land on Guides,
@@ -104,7 +106,7 @@ export default function AgentDashboard() {
       return;
     }
     if (!isAdmin && !isAgent) {
-      toast.error('Agent access required');
+      toast.error(tr('dash.a.accessRequired', 'Agent access required'));
       navigate('/');
       return;
     }
@@ -153,7 +155,7 @@ export default function AgentDashboard() {
           // pass auth hasn't hydrated yet and user?.id is undefined, which
           // used to fire a spurious "No agent profiles found" on every load.
           if (user?.id) {
-            toast.error('No agent profiles found in system');
+            toast.error(tr('dash.a.noAgentProfiles', 'No agent profiles found in system'));
           }
           setLoading(false);
           return;
@@ -183,7 +185,7 @@ export default function AgentDashboard() {
         if (agentError) throw agentError;
         
         if (!agentData) {
-          toast.error('Please complete agent onboarding first');
+          toast.error(tr('dash.a.completeOnboarding', 'Please complete agent onboarding first'));
           navigate('/apply/agent');
           return;
         }
@@ -288,7 +290,7 @@ export default function AgentDashboard() {
 
     } catch (error: any) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load dashboard');
+      toast.error(tr('dash.a.loadFailed', 'Failed to load dashboard'));
     } finally {
       setLoading(false);
     }
@@ -352,12 +354,12 @@ export default function AgentDashboard() {
         }).catch(err => console.error('Notification error:', err));
       }
 
-      toast.success('Bid placed successfully!');
+      toast.success(tr('dash.a.bidPlaced', 'Bid placed successfully!'));
       setIsBidDialogOpen(false);
       fetchData();
     } catch (error: any) {
       console.error('Error placing bid:', error);
-      toast.error('Failed to place bid');
+      toast.error(tr('dash.a.bidFailed', 'Failed to place bid'));
     }
   };
 
@@ -380,7 +382,7 @@ export default function AgentDashboard() {
               <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">Agent Profile Not Found</h3>
               <p className="text-muted-foreground text-center mb-4">
-                You need to create an agent profile first
+                {tr("dash.a.needProfile", "You need to create an agent profile first")}
               </p>
               <Button onClick={() => navigate('/apply/agent')}>Create Agent Profile</Button>
             </CardContent>
@@ -391,11 +393,11 @@ export default function AgentDashboard() {
   }
 
   const MORE_TABS = [
-    { key: "earnings", label: "Payouts" },
-    { key: "analytics", label: "Analytics" },
-    { key: "availability", label: "Availability" },
-    { key: "verification", label: "Verification" },
-    { key: "settings", label: "Settings" },
+    { key: "earnings", label: tr("dash.a.payouts", "Payouts") },
+    { key: "analytics", label: tr("dash.a.analytics", "Analytics") },
+    { key: "availability", label: tr("dash.a.availability", "Availability") },
+    { key: "verification", label: tr("dash.a.verification", "Verification") },
+    { key: "settings", label: tr("dash.c.settings", "Settings") },
   ];
   const activeMore = MORE_TABS.find((t) => t.key === activeTab);
   const tabBtn = (val: string, label: string) => (
@@ -430,24 +432,23 @@ export default function AgentDashboard() {
     <div className="min-h-screen bg-[#f7f3ea] flex flex-col pb-20 lg:pb-0">
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
         {/* ── The Bureau ── */}
-        <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">The Bureau</p>
+        <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">{tr("dash.a.eyebrow", "The Bureau")}</p>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
             <h1 className="font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[54px]">
-              Welcome, {profile?.display_name || profile?.full_name?.split(" ")[0] || agent.agency_name}
+              {tr("dash.t.welcome", "Welcome")}, {profile?.display_name || profile?.full_name?.split(" ")[0] || agent.agency_name}
             </h1>
             <p className="mt-3 text-[16px] leading-relaxed text-[#0a2225]/55">
-              Your desk for winning briefs, designing journeys, and growing a book of clients
-              on-platform.
+              {tr("dash.a.subtitle", "Your desk for winning briefs, designing journeys, and growing a book of clients on-platform.")}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-2.5">
               {agent.is_verified ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C7A962] px-4 py-2 text-[12.5px] uppercase tracking-[0.18em] text-[#8D6B2F]">
-                  ◈ Verified agent
+                  ◈ {tr("dash.a.verifiedAgent", "Verified agent")}
                 </span>
               ) : (
                 <span className="inline-flex items-center rounded-full border border-[#0a2225]/20 px-4 py-2 text-[12.5px] uppercase tracking-[0.18em] text-[#0a2225]/50">
-                  Pending verification
+                  {tr("dash.a.pendingVerification", "Pending verification")}
                 </span>
               )}
               {Number(agent.rating) > 0 && (
@@ -469,11 +470,11 @@ export default function AgentDashboard() {
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="gap-1">
                   <Shield className="h-3 w-3" />
-                  Admin View
+                  {tr("dash.a.adminView", "Admin View")}
                 </Badge>
                 <Select value={selectedAgentId || ''} onValueChange={handleAgentChange}>
                   <SelectTrigger className="w-[250px] rounded-full border-[#0a2225]/20 bg-white">
-                    <SelectValue placeholder="Select agent" />
+                    <SelectValue placeholder={tr("dash.a.selectAgent", "Select agent")} />
                   </SelectTrigger>
                   <SelectContent>
                     {allAgents.map((a) => (
@@ -490,10 +491,10 @@ export default function AgentDashboard() {
 
         {/* ── Your desk today ── */}
         <div className="mt-10 grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-          {stat("Open briefs", jobs.length, () => setActiveTab("available"))}
-          {stat("Active bids", myBids.length, () => setActiveTab("my-bids"))}
-          {stat("Active bookings", bookingCount, () => navigate("/partner-bookings"))}
-          {stat("Awaiting signature", contractPendingCount, () => navigate("/partner-bookings"))}
+          {stat(tr("dash.a.openBriefs", "Open briefs"), jobs.length, () => setActiveTab("available"))}
+          {stat(tr("dash.a.activeBids", "Active bids"), myBids.length, () => setActiveTab("my-bids"))}
+          {stat(tr("dash.a.activeBookings", "Active bookings"), bookingCount, () => navigate("/partner-bookings"))}
+          {stat(tr("dash.a.awaitingSignature", "Awaiting signature"), contractPendingCount, () => navigate("/partner-bookings"))}
         </div>
 
         <div className="mt-8">
@@ -512,10 +513,9 @@ export default function AgentDashboard() {
           <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#C7A962]/40 bg-white px-6 py-5">
             <Clock className="mt-1 h-6 w-6 shrink-0 text-[#C7A962]" />
             <div>
-              <h3 className="font-secondary text-[19px] text-[#0a2225]">Application under review</h3>
+              <h3 className="font-secondary text-[19px] text-[#0a2225]">{tr("dash.a.appUnderReview", "Application under review")}</h3>
               <p className="mt-1 text-[14px] leading-relaxed text-[#0a2225]/55">
-                Your agent application is being reviewed by our team. You'll be able to bid on
-                briefs once it's approved — typically 2–3 business days.
+                {tr("dash.a.appReviewBody", "Your agent application is being reviewed by our team. You'll be able to bid on briefs once it's approved — typically 2–3 business days.")}
               </p>
             </div>
           </div>
@@ -533,10 +533,9 @@ export default function AgentDashboard() {
               <Hourglass className="h-5 w-5 text-[#C7A962]" />
             </div>
             <div>
-              <h3 className="font-secondary text-[19px] text-[#0a2225]">Your listing is under review</h3>
+              <h3 className="font-secondary text-[19px] text-[#0a2225]">{tr("dash.a.listingUnderReview", "Your listing is under review")}</h3>
               <p className="mt-1 text-[14px] text-[#0a2225]/55">
-                We typically approve new listings within 24–48 hours. You'll receive an email when
-                it's live.
+                {tr("dash.a.listingReviewBody", "We typically approve new listings within 24–48 hours. You'll receive an email when it's live.")}
               </p>
             </div>
           </div>
@@ -544,15 +543,15 @@ export default function AgentDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-12 space-y-10">
           <div className="flex items-center gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {tabBtn("desk", "Desk")}
+            {tabBtn("desk", tr("dash.a.desk", "Desk"))}
             {tabBtn("available", `Briefs (${jobs.length})`)}
             {/* Direct requests were invisible to agents entirely — the Briefs
                 tab reads marketplace_jobs, a different table (Jul 26). */}
-            {tabBtn("direct", "Direct requests")}
+            {tabBtn("direct", tr("dash.c.directRequests", "Direct requests"))}
             {tabBtn("my-bids", `Pipeline (${myBids.length})`)}
             {/* creator-collabs tab hidden for launch — unfinished feature, undecided economics (see handoff) */}
-            {tabBtn("guides", "Catalog")}
-            {tabBtn("performance", "Performance")}
+            {tabBtn("guides", tr("dash.c.catalog", "Catalog"))}
+            {tabBtn("performance", tr("dash.c.performance", "Performance"))}
             <div className="ml-auto pb-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -585,11 +584,10 @@ export default function AgentDashboard() {
             <div className="border-b border-[#0a2225]/10 pb-16 pt-6">
               <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
               <h2 className="mt-4 max-w-3xl font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[58px]">
-                Find a brief, design the trip, get&nbsp;paid.
+                {tr("dash.a.heroTitle", "Find a brief, design the trip, get paid.")}
               </h2>
               <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-[#0a2225]/55">
-                The marketplace is full of travelers waiting for the right specialist. Send a
-                proposal — or publish a packaged trip ready to book.
+                {tr("dash.a.heroSub", "The marketplace is full of travelers waiting for the right specialist. Send a proposal — or publish a packaged trip ready to book.")}
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-6">
                 <button
@@ -597,7 +595,7 @@ export default function AgentDashboard() {
                   onClick={() => navigate("/marketplace")}
                   className="rounded-full bg-[#0c4d47] px-9 py-4 text-[15px] text-white transition-colors hover:bg-[#0a2225]"
                 >
-                  Browse trip requests
+                  {tr("dash.c.browseBriefs", "Browse trip requests")}
                 </button>
                 <button
                   type="button"
@@ -611,7 +609,7 @@ export default function AgentDashboard() {
 
             <div className="border-b border-[#0a2225]/10 py-16">
               <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">
-                How Goldsainte works for agents
+                {tr("dash.a.hwAgents", "How Goldsainte works for agents")}
               </p>
               <h2 className="mt-3 font-secondary text-[38px] text-[#0a2225]">Two ways to earn</h2>
               <div className="mt-10 grid gap-14 md:grid-cols-2">
@@ -640,11 +638,7 @@ export default function AgentDashboard() {
               <div>
                 <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
                 <p className="mt-4 max-w-2xl text-[16px] leading-[1.7] text-[#0a2225]/80">
-                  You set your price — your costs and your margin are yours to build in. Travelers
-                  pay a 3.5% service fee on top; a matching 3.5% platform fee comes out of your
-                  payout. That is Goldsainte's entire take: 7% total, flat, on every booking. Every
-                  payment is charged directly to your own Stripe account at booking — you're
-                  the merchant of record on every trip you sell.
+                  {tr("dash.a.feeBody", "You set your price — your costs and your margin are yours to build in. Travelers pay a 3.5% service fee on top; a matching 3.5% platform fee comes out of your payout. That is Goldsainte's entire take: 7% total, flat, on every booking. Every payment is charged directly to your own Stripe account at booking — you're the merchant of record on every trip you sell.")}
                 </p>
               </div>
               <div className="text-right">
