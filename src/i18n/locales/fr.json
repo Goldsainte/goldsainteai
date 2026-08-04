@@ -2153,6 +2153,33 @@
       "threeWays": "Trois façons de démarrer — choisissez celle qui vous ressemble.",
       "welcomeGs": "Bienvenue chez Goldsainte",
       "yourJourneys": "Vos voyages"
+    },
+    "c": {
+      "affiliate": "Affiliation",
+      "browseRequests": "Parcourir les demandes de voyage",
+      "buildSell": "Créez quelque chose à vendre",
+      "catalog": "Catalogue",
+      "completeSetup": "Terminer la configuration",
+      "content": "Contenu",
+      "creator": "Créateur",
+      "earnings": "Revenus",
+      "eyebrow": "L'Atelier",
+      "findWork": "Trouver des missions",
+      "findWorkSub": "Découvrez les rêves des voyageurs et envoyez une proposition sur mesure pour remporter le brief.",
+      "growth": "Croissance",
+      "guides": "Guides",
+      "howEarn": "Comment les créateurs gagnent sur Goldsainte",
+      "howEarnSub": "Un petit guide des propositions, versements, frais et du partage des revenus sur la place de marché.",
+      "packageSub": "Transformez votre goût en circuits réservables et guides numériques — publiés en quelques minutes, vendus sur la plateforme.",
+      "packageTrip": "Composer un voyage",
+      "performance": "Performance",
+      "pipeline": "Pipeline",
+      "proposals": "Propositions",
+      "services": "Services",
+      "settings": "Réglages",
+      "subtitle": "Votre atelier pour façonner des propositions, composer des voyages et faire grandir vos revenus sur la plateforme.",
+      "trips": "Voyages",
+      "viewProfile": "Voir le profil public"
     }
   },
   "chk": {
