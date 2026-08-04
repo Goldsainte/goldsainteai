@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -156,7 +157,7 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
                 )}
               </div>
             )}
-            <p className="text-sm">{message.message}</p>
+            <p className="text-sm"><TranslatedMessageText text={message.message} enabled={!isOwnMessage} /></p>
           </div>
           
           <div className="flex gap-2">
