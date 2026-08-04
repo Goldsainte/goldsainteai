@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,7 @@ type RecentPurchase = {
 export function CreatorGuidesTab() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
   const [salesCount, setSalesCount] = useState(0);
@@ -66,11 +68,11 @@ export function CreatorGuidesTab() {
           .select("id, full_name, first_name")
           .in("id", buyerIds);
         for (const p of (profiles as any[]) || []) {
-          buyerMap[p.id] = p.first_name || (p.full_name?.split(" ")[0] ?? "Traveler");
+          buyerMap[p.id] = p.first_name || (p.full_name?.split(" ")[0] ?? t("dash.t.traveler", "Traveler"));
         }
       }
       const guideMap: Record<string, string> = {};
-      for (const g of guideList) guideMap[g.id] = g.title || "Untitled";
+      for (const g of guideList) guideMap[g.id] = g.title || t("dash.c.untitled", "Untitled");
 
       setRecentPurchases(
         list.slice(0, 10).map((p) => ({
@@ -78,8 +80,8 @@ export function CreatorGuidesTab() {
           amount_paid: Number(p.amount_paid) || 0,
           currency: p.currency || "USD",
           created_at: p.created_at,
-          buyerName: buyerMap[p.buyer_id] || "Traveler",
-          guideTitle: guideMap[p.product_id] || "Guide",
+          buyerName: buyerMap[p.buyer_id] || t("dash.t.traveler", "Traveler"),
+          guideTitle: guideMap[p.product_id] || t("dash.c.guideFallback", "Guide"),
         }))
       );
     } else {
@@ -98,18 +100,18 @@ export function CreatorGuidesTab() {
 
   const handleDelete = async (id: string) => {
     const ok = await confirmDialog({
-      title: "Delete this guide?",
-      description: "This cannot be undone.",
-      confirmText: "Delete",
+      title: t("dash.c.delGuideTitle", "Delete this guide?"),
+      description: t("dash.c.delGuideDesc", "This cannot be undone."),
+      confirmText: t("dash.c.delete", "Delete"),
       destructive: true,
     });
     if (!ok) return;
     const { error } = await supabase.from("itinerary_products").delete().eq("id", id);
     if (error) {
-      toast.error("Could not delete: " + error.message);
+      toast.error(t("dash.c.delFailed", "Could not delete:") + " " + error.message);
       return;
     }
-    toast.success("Guide deleted");
+    toast.success(t("dash.c.guideDeleted", "Guide deleted"));
     setGuides((g) => g.filter((x) => x.id !== id));
   };
 
@@ -118,25 +120,25 @@ export function CreatorGuidesTab() {
       {/* Sales analytics */}
       <div className="grid grid-cols-2 gap-x-10 mb-8">
         <div className="border-t border-[#0a2225]/15 pt-3">
-          <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Sales</p>
+          <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">{t("dash.c.guideSalesLabel", "Guide Sales")}</p>
           <p className="font-secondary text-[34px] leading-tight text-[#0a2225] mt-1.5">{salesCount}</p>
         </div>
         <div className="border-t border-[#0a2225]/15 pt-3">
-          <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">Guide Revenue</p>
+          <p className="text-[14px] uppercase tracking-[0.18em] text-[#8D6B2F]">{t("dash.c.guideRevenueLabel", "Guide Revenue")}</p>
           <p className="font-secondary text-[34px] leading-tight text-[#0a2225] mt-1.5">${revenue.toLocaleString()}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-3 mb-6">
-        <h2 className="font-secondary text-xl text-[#0a2225] min-w-0 truncate">Your Guides</h2>
+        <h2 className="font-secondary text-xl text-[#0a2225] min-w-0 truncate">{t("dash.c.yourGuides", "Your Guides")}</h2>
         <Button
           onClick={() => navigate("/itinerary-builder")}
           size="sm"
           className="rounded-full bg-[#0c4d47] hover:bg-[#0c4d47]/90 text-white shrink-0 h-9 px-4 text-[14.5px] sm:text-[16px] sm:h-10 sm:px-5"
         >
           <Plus className="h-4 w-4 sm:mr-1.5" />
-          <span className="hidden sm:inline">Create New Guide</span>
-          <span className="sm:hidden ml-1">New</span>
+          <span className="hidden sm:inline">{t("dash.c.createNewGuide", "Create New Guide")}</span>
+          <span className="sm:hidden ml-1">{t("dash.c.newShort", "New")}</span>
         </Button>
       </div>
 
@@ -147,9 +149,9 @@ export function CreatorGuidesTab() {
       ) : guides.length === 0 ? (
         <div className="border-t border-[#0a2225]/15 pt-6">
           <BookOpen className="h-6 w-6 text-[#C7A962]" />
-          <p className="mt-3 font-secondary text-[20px] text-[#0a2225]">No guides yet</p>
+          <p className="mt-3 font-secondary text-[20px] text-[#0a2225]">{t("dash.c.noGuides", "No guides yet")}</p>
           <p className="mt-1 max-w-md text-[16px] leading-relaxed text-[#0a2225]/60">
-            Package your travel knowledge into a sellable digital guide.
+            {t("dash.c.packageKnowledge", "Package your travel knowledge into a sellable digital guide.")}
           </p>
         </div>
       ) : (
@@ -200,7 +202,7 @@ export function CreatorGuidesTab() {
                   size="sm"
                   onClick={() => handleDelete(g.id)}
                   className="rounded-full text-[#9A9384] hover:text-[#0a2225]"
-                  aria-label="Delete"
+                  aria-label={t("dash.c.delete", "Delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -212,14 +214,14 @@ export function CreatorGuidesTab() {
 
       {recentPurchases.length > 0 && (
         <div className="mt-10">
-          <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">Recent Purchases</h3>
+          <h3 className="mb-4 text-[14px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("dash.c.recentPurchases", "Recent Purchases")}</h3>
           <div className="divide-y divide-[#0a2225]/10 border-t border-[#0a2225]/15">
             {recentPurchases.map((p) => (
               <div key={p.id} className="flex items-center justify-between gap-4 py-4">
                 <div className="min-w-0">
                   <p className="text-[16px] text-[#0a2225] truncate">
                     <span className="font-medium">{p.buyerName}</span>{" "}
-                    <span className="text-[#6B7280]">purchased</span>{" "}
+                    <span className="text-[#6B7280]">{t("dash.c.purchased", "purchased")}</span>{" "}
                     <span className="italic">{p.guideTitle}</span>
                   </p>
                   <p className="text-[14.5px] text-[#9A9384] mt-0.5">
