@@ -28,7 +28,7 @@ export function deliverablesHeading(
 ): string {
   const caps = capabilities ?? [];
   const has = (c: string) => caps.includes(c);
-  if (perspective === "partner") return "What you're delivering";
+  if (perspective === "partner") return t("bk.deliv.delivering", "What you're delivering");
   // Traveler perspective — verb matches the work. {name} is a stable token
   // translators must keep; it's filled manually below.
   const fill = (s: string) => s.split("{name}").join(firstName);
@@ -39,7 +39,7 @@ export function deliverablesHeading(
 
 /** The eyebrow above the deliverables section. */
 export function deliverablesEyebrow(perspective: "traveler" | "partner", t: TFn = idT): string {
-  return perspective === "partner" ? "The engagement" : t("bk.deliv.eyebrow", "Your trip, assembled");
+  return perspective === "partner" ? t("bk.deliv.engagement", "The engagement") : t("bk.deliv.eyebrow", "Your trip, assembled");
 }
 
 /**
@@ -163,56 +163,56 @@ const travelerJourneys = (t: TFn): Record<Persona, JourneyCopy> => ({
 
 // Partner-facing journeys, by persona. {client} is replaced with the client's
 // first name. Same six-step lifecycle from the partner's side of the work.
-const PARTNER_JOURNEYS: Record<Persona, JourneyCopy> = {
+const partnerJourneys = (t: TFn): Record<Persona, JourneyCopy> => ({
   creative: {
-    trackerEyebrow: "This engagement, step by step",
-    progressLabel: "of this engagement complete",
+    trackerEyebrow: t("bk.pj.creative.eyebrow", "This engagement, step by step"),
+    progressLabel: t("bk.pj.creative.progress", "of this engagement complete"),
     steps: [
-      { title: "Booking confirmed", sub: "{client}'s session is confirmed and yours to deliver." },
-      { title: "Deposit secured", sub: "The deposit has been charged to your Stripe account." },
-      { title: "Paid in full", sub: "The full engagement has been charged directly to you." },
-      { title: "Shoot & capture", sub: "Capture the sessions and share previews in Messages as you go." },
-      { title: "Edit & deliver the gallery", sub: "Finish the images and deliver the gallery." },
-      { title: "Complete", sub: "Once {client} has their gallery and all is well, the engagement closes." },
+      { title: t("bk.pj.creative.s1t", "Booking confirmed"), sub: t("bk.pj.creative.s1s", "{client}'s session is confirmed and yours to deliver.") },
+      { title: t("bk.pj.creative.s2t", "Deposit secured"), sub: t("bk.pj.creative.s2s", "The deposit has been charged to your Stripe account.") },
+      { title: t("bk.pj.creative.s3t", "Paid in full"), sub: t("bk.pj.creative.s3s", "The full engagement has been charged directly to you.") },
+      { title: t("bk.pj.creative.s4t", "Shoot & capture"), sub: t("bk.pj.creative.s4s", "Capture the sessions and share previews in Messages as you go.") },
+      { title: t("bk.pj.creative.s5t", "Edit & deliver the gallery"), sub: t("bk.pj.creative.s5s", "Finish the images and deliver the gallery.") },
+      { title: t("bk.pj.creative.s6t", "Complete"), sub: t("bk.pj.creative.s6s", "Once {client} has their gallery and all is well, the engagement closes.") },
     ],
   },
   family: {
-    trackerEyebrow: "This engagement, step by step",
-    progressLabel: "of this engagement complete",
+    trackerEyebrow: t("bk.pj.family.eyebrow", "This engagement, step by step"),
+    progressLabel: t("bk.pj.family.progress", "of this engagement complete"),
     steps: [
-      { title: "Booking confirmed", sub: "{client}'s booking is confirmed and yours to deliver." },
-      { title: "Deposit secured", sub: "The deposit has been charged to your Stripe account." },
-      { title: "Paid in full", sub: "The full engagement has been charged directly to you." },
-      { title: "Prepare for the trip", sub: "Confirm the details and coordinate in Messages." },
-      { title: "Support the trip", sub: "Be the extra set of hands, throughout." },
-      { title: "Complete", sub: "Once {client} has returned and all is well, the engagement closes." },
+      { title: t("bk.pj.family.s1t", "Booking confirmed"), sub: t("bk.pj.family.s1s", "{client}'s booking is confirmed and yours to deliver.") },
+      { title: t("bk.pj.family.s2t", "Deposit secured"), sub: t("bk.pj.family.s2s", "The deposit has been charged to your Stripe account.") },
+      { title: t("bk.pj.family.s3t", "Paid in full"), sub: t("bk.pj.family.s3s", "The full engagement has been charged directly to you.") },
+      { title: t("bk.pj.family.s4t", "Prepare for the trip"), sub: t("bk.pj.family.s4s", "Confirm the details and coordinate in Messages.") },
+      { title: t("bk.pj.family.s5t", "Support the trip"), sub: t("bk.pj.family.s5s", "Be the extra set of hands, throughout.") },
+      { title: t("bk.pj.family.s6t", "Complete"), sub: t("bk.pj.family.s6s", "Once {client} has returned and all is well, the engagement closes.") },
     ],
   },
   trip: {
-    trackerEyebrow: "This engagement, step by step",
-    progressLabel: "of this engagement complete",
+    trackerEyebrow: t("bk.pj.trip.eyebrow", "This engagement, step by step"),
+    progressLabel: t("bk.pj.trip.progress", "of this engagement complete"),
     steps: [
-      { title: "Booking confirmed", sub: "{client}'s booking is confirmed and yours to deliver." },
-      { title: "Deposit secured", sub: "The deposit has been charged to your Stripe account." },
-      { title: "Paid in full", sub: "The full trip has been charged directly to you." },
-      { title: "Prepare & share {client}'s reservations", sub: "Confirm the details and share them in Messages as you go." },
-      { title: "The trip", sub: "You're a message away throughout." },
-      { title: "Complete", sub: "Once {client} has returned and all is well, the engagement closes." },
+      { title: t("bk.pj.trip.s1t", "Booking confirmed"), sub: t("bk.pj.trip.s1s", "{client}'s booking is confirmed and yours to deliver.") },
+      { title: t("bk.pj.trip.s2t", "Deposit secured"), sub: t("bk.pj.trip.s2s", "The deposit has been charged to your Stripe account.") },
+      { title: t("bk.pj.trip.s3t", "Paid in full"), sub: t("bk.pj.trip.s3s", "The full trip has been charged directly to you.") },
+      { title: t("bk.pj.trip.s4t", "Prepare & share {client}'s reservations"), sub: t("bk.pj.trip.s4s", "Confirm the details and share them in Messages as you go.") },
+      { title: t("bk.pj.trip.s5t", "The trip"), sub: t("bk.pj.trip.s5s", "You're a message away throughout.") },
+      { title: t("bk.pj.trip.s6t", "Complete"), sub: t("bk.pj.trip.s6s", "Once {client} has returned and all is well, the engagement closes.") },
     ],
   },
   generic: {
-    trackerEyebrow: "This engagement, step by step",
-    progressLabel: "of this engagement complete",
+    trackerEyebrow: t("bk.pj.generic.eyebrow", "This engagement, step by step"),
+    progressLabel: t("bk.pj.generic.progress", "of this engagement complete"),
     steps: [
-      { title: "Booking confirmed", sub: "{client}'s booking is confirmed and yours to deliver." },
-      { title: "Deposit secured", sub: "The deposit has been charged to your Stripe account." },
-      { title: "Paid in full", sub: "The full trip has been charged directly to you." },
-      { title: "Prepare & share the details", sub: "Confirm the details and share them in Messages as you go." },
-      { title: "The trip", sub: "You're a message away throughout." },
-      { title: "Complete", sub: "Once {client} has returned and all is well, the engagement closes." },
+      { title: t("bk.pj.generic.s1t", "Booking confirmed"), sub: t("bk.pj.generic.s1s", "{client}'s booking is confirmed and yours to deliver.") },
+      { title: t("bk.pj.generic.s2t", "Deposit secured"), sub: t("bk.pj.generic.s2s", "The deposit has been charged to your Stripe account.") },
+      { title: t("bk.pj.generic.s3t", "Paid in full"), sub: t("bk.pj.generic.s3s", "The full trip has been charged directly to you.") },
+      { title: t("bk.pj.generic.s4t", "Prepare & share the details"), sub: t("bk.pj.generic.s4s", "Confirm the details and share them in Messages as you go.") },
+      { title: t("bk.pj.generic.s5t", "The trip"), sub: t("bk.pj.generic.s5s", "You're a message away throughout.") },
+      { title: t("bk.pj.generic.s6t", "Complete"), sub: t("bk.pj.generic.s6s", "Once {client} has returned and all is well, the engagement closes.") },
     ],
   },
-};
+});
 
 /** Get the persona-appropriate journey copy for a booking, with {name}/{client}
  *  interpolated. `who` is the other party's first name (specialist name on the
@@ -224,7 +224,7 @@ export function buildJourneyCopy(
   t: TFn = idT
 ): JourneyCopy {
   const persona = personaFromCapabilities(capabilities);
-  const table = perspective === "partner" ? PARTNER_JOURNEYS : travelerJourneys(t);
+  const table = perspective === "partner" ? partnerJourneys(t) : travelerJourneys(t);
   const src = table[persona];
   const token = perspective === "partner" ? "{client}" : "{name}";
   const fill = (s: string) => s.split(token).join(who);
