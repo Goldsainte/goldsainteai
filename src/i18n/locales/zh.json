@@ -46,7 +46,22 @@
     "menuPostTripD": "获取专家量身定制的提案",
     "menuAgent": "成为代理",
     "menuAgentD": "以正式卖方身份设计并销售旅程",
-    "agentPromoD": "发挥你的专长，从每一趟经手的旅程中获得收入。"
+    "agentPromoD": "发挥你的专长，从每一趟经手的旅程中获得收入。",
+    "menuMyBookings": "我的预订",
+    "menuMyRequests": "我的请求",
+    "menuSaved": "收藏与关注",
+    "menuRequestTrip": "发起旅行请求",
+    "menuMyGuides": "我的指南",
+    "menuCreatorDash": "创作者面板",
+    "menuAgentDash": "代理面板",
+    "menuClientBookings": "客户预订",
+    "menuAvailableTrips": "可接的旅程",
+    "menuMyProfile": "我的主页",
+    "menuAccountSettings": "账户设置",
+    "menuHelpCenter": "帮助中心",
+    "menuTravelMarketplace": "旅行市场",
+    "menuCreatePackage": "创建旅行套餐",
+    "menuCreateTour": "创建行程团"
   },
   "common": {
     "loading": "加载中...",
@@ -2675,5 +2690,19 @@
       "engagement": "互动分数",
       "highestTier": "你已达到最高等级！"
     }
+  },
+  "sideNav": {
+    "home": "首页",
+    "marketplace": "市场",
+    "messages": "消息",
+    "myJourneys": "我的旅程",
+    "myProposals": "我的提案",
+    "dashboard": "面板",
+    "profile": "主页",
+    "theCollection": "精选集",
+    "postTrip": "发布旅程",
+    "myCollections": "我的合集",
+    "search": "搜索",
+    "notifications": "通知"
   }
 }
