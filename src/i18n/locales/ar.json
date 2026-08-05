@@ -46,7 +46,22 @@
     "menuPostTripD": "احصل على عروض مفصّلة من مختصّين",
     "menuAgent": "كن وكيلاً",
     "menuAgentD": "صمّم الرحلات وبِعها بصفتك البائع الرسمي",
-    "agentPromoD": "وظّف خبرتك واكسب من كل رحلة تنفّذها."
+    "agentPromoD": "وظّف خبرتك واكسب من كل رحلة تنفّذها.",
+    "menuMyBookings": "حجوزاتي",
+    "menuMyRequests": "طلباتي",
+    "menuSaved": "المحفوظات والمتابعات",
+    "menuRequestTrip": "اطلب رحلة",
+    "menuMyGuides": "أدلتي",
+    "menuCreatorDash": "لوحة المبدع",
+    "menuAgentDash": "لوحة الوكيل",
+    "menuClientBookings": "حجوزات العملاء",
+    "menuAvailableTrips": "رحلات متاحة",
+    "menuMyProfile": "ملفي",
+    "menuAccountSettings": "إعدادات الحساب",
+    "menuHelpCenter": "مركز المساعدة",
+    "menuTravelMarketplace": "سوق السفر",
+    "menuCreatePackage": "أنشئ باقة رحلة",
+    "menuCreateTour": "أنشئ جولة"
   },
   "common": {
     "loading": "جاري التحميل...",
@@ -2675,5 +2690,19 @@
       "engagement": "درجة التفاعل",
       "highestTier": "وصلت إلى أعلى مستوى!"
     }
+  },
+  "sideNav": {
+    "home": "الرئيسية",
+    "marketplace": "السوق",
+    "messages": "الرسائل",
+    "myJourneys": "رحلاتي",
+    "myProposals": "عروضي",
+    "dashboard": "اللوحة",
+    "profile": "الملف",
+    "theCollection": "المجموعة",
+    "postTrip": "انشر رحلة",
+    "myCollections": "مجموعاتي",
+    "search": "بحث",
+    "notifications": "الإشعارات"
   }
 }
