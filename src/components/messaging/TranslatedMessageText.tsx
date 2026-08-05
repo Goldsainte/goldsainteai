@@ -15,18 +15,25 @@ export function TranslatedMessageText({
   text,
   enabled = true,
   toggleClassName,
+  showToggle = true,
 }: {
   text: string | null | undefined;
   /** Pass false for the viewer's own messages: renders plain text, zero calls. */
   enabled?: boolean;
   /** Optional override for the toggle's styling (defaults to subtle, color-inherit). */
   toggleClassName?: string;
+  /** Pass false for one-line surfaces (inbox previews) where a toggle can't fit. */
+  showToggle?: boolean;
 }) {
   const { t } = useTranslation();
   const translated = useTranslatedContent(text, { enabled });
 
   if (!translated.isTranslated) {
     return <>{text ?? ""}</>;
+  }
+
+  if (!showToggle) {
+    return <>{translated.text}</>;
   }
 
   return (
