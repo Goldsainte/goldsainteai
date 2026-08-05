@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -112,16 +113,16 @@ const DEFAULT_SECTIONS: ContractSection[] = [
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
 
 const PROTECTS: Record<string, string> = {
-  parties: "Names exactly who is bound by this agreement.",
-  services: "Defines the scope you're accountable for — nothing more.",
-  payment: "Locks in the price and payment schedule you're owed.",
-  cancellation: "Sets exactly what you keep if plans change.",
-  liability: "Caps your exposure and puts insurance on the record.",
-  modifications: "Shields you from unpaid change requests.",
-  force_majeure: "Protects both parties when events beyond control intervene.",
-  dispute_resolution: "Keeps disagreements in mediation before court.",
-  data_privacy: "Commits both parties to lawful handling of personal data.",
-  responsibilities: "Places key obligations squarely on the traveler.",
+  parties: "dash.a.cbRatParties",
+  services: "dash.a.cbRatServices",
+  payment: "dash.a.cbRatPayment",
+  cancellation: "dash.a.cbRatCancellation",
+  liability: "dash.a.cbRatLiability",
+  modifications: "dash.a.cbRatModifications",
+  force_majeure: "dash.a.cbRatForceMajeure",
+  dispute_resolution: "dash.a.cbRatDispute",
+  data_privacy: "dash.a.cbRatPrivacy",
+  responsibilities: "dash.a.cbRatResponsibilities",
 };
 
 const labelCls = "text-sm font-medium text-[#0a2225]";
@@ -137,6 +138,7 @@ const fieldLabel = (name: string) =>
 
 export default function AgentContractBuilder() {
   const { tripId } = useParams<{ tripId: string }>();
+  const { t: tr } = useTranslation();
   const [searchParams] = useSearchParams();
   const linkedBookingId = searchParams.get("bookingId");
   const navigate = useNavigate();
@@ -260,8 +262,8 @@ export default function AgentContractBuilder() {
       console.error("Contract load failed:", e);
       toast({
         variant: "destructive",
-        title: "Couldn't load trip details",
-        description: e.message || "Please go back and try again.",
+        title: tr("dash.a.cbLoadFailed", "Couldn't load trip details"),
+        description: e.message || tr("dash.a.cbGoBack", "Please go back and try again."),
       });
     } finally {
       setLoading(false);
@@ -307,15 +309,15 @@ export default function AgentContractBuilder() {
         ...(data.liability_limit ? { liabilityLimit: data.liability_limit } : {}),
       }));
       toast({
-        title: "Contract drafted",
-        description: "Every clause is editable — review each section before sending.",
+        title: tr("dash.a.cbDrafted", "Contract drafted"),
+        description: tr("dash.a.cbDraftedDesc", "Every clause is editable — review each section before sending."),
       });
     } catch (e: any) {
       console.error("AI contract draft failed:", e);
       toast({
         variant: "destructive",
-        title: "Couldn't draft right now",
-        description: "Your fields are untouched — try again in a moment.",
+        title: tr("dash.a.cbDraftFailed", "Couldn't draft right now"),
+        description: tr("dash.a.cbDraftFailedDesc", "Your fields are untouched — try again in a moment."),
       });
     } finally {
       setAiDrafting(false);
@@ -328,11 +330,11 @@ export default function AgentContractBuilder() {
     e.target.value = "";
     if (!file) return;
     if (file.type !== "application/pdf") {
-      toast({ variant: "destructive", title: "PDF only", description: "Upload your contract as a PDF file." });
+      toast({ variant: "destructive", title: tr("dash.a.cbPdfOnly", "PDF only"), description: tr("dash.a.cbPdfOnlyDesc", "Upload your contract as a PDF file.") });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast({ variant: "destructive", title: "File too large", description: "Keep contract PDFs under 10 MB." });
+      toast({ variant: "destructive", title: tr("dash.a.cbTooLarge", "File too large"), description: tr("dash.a.cbTooLargeDesc", "Keep contract PDFs under 10 MB.") });
       return;
     }
     setUploading(true);
@@ -347,10 +349,10 @@ export default function AgentContractBuilder() {
       if (error) throw error;
       setUploadedPdfPath(path);
       setUploadedFileName(file.name);
-      toast({ title: "Contract uploaded", description: "Sign below, then send it to your traveler." });
+      toast({ title: tr("dash.a.cbUploaded", "Contract uploaded"), description: tr("dash.a.cbUploadedDesc", "Sign below, then send it to your traveler.") });
     } catch (err: any) {
       console.error("Upload failed:", err);
-      toast({ variant: "destructive", title: "Upload failed", description: err.message || "Try again." });
+      toast({ variant: "destructive", title: tr("dash.a.cbUploadFailed", "Upload failed"), description: err.message || tr("dash.a.cbTryAgain", "Try again.") });
     } finally {
       setUploading(false);
     }
@@ -361,18 +363,18 @@ export default function AgentContractBuilder() {
     if (!tripId || !tripData || !travelerData) {
       toast({
         variant: "destructive",
-        title: "Trip details incomplete",
+        title: tr("dash.a.cbTripIncomplete", "Trip details incomplete"),
         description: !travelerData
-          ? "Couldn't find this trip's traveler — go back to the booking and open the contract again."
-          : "The page is still loading — give it a second and try again.",
+          ? tr("dash.a.cbNoTraveler", "Couldn't find this trip's traveler — go back to the booking and open the contract again.")
+          : tr("dash.a.cbStillLoading", "The page is still loading — give it a second and try again."),
       });
       return null;
     }
     if (sourceType === "uploaded" && !uploadedPdfPath) {
       toast({
         variant: "destructive",
-        title: "No contract file yet",
-        description: "Upload your contract PDF before saving.",
+        title: tr("dash.a.cbNoFile", "No contract file yet"),
+        description: tr("dash.a.cbNoFileDesc", "Upload your contract PDF before saving."),
       });
       return null;
     }
@@ -424,14 +426,14 @@ export default function AgentContractBuilder() {
         if (data) setContractId(data.id);
       }
 
-      toast({ title: "Draft saved", description: "Your contract draft has been saved." });
+      toast({ title: tr("dash.a.cbDraftSaved", "Draft saved"), description: tr("dash.a.cbDraftSavedDesc", "Your contract draft has been saved.") });
       return savedId;
     } catch (error: any) {
       console.error("Error saving draft:", error);
       toast({
         variant: "destructive",
-        title: "Save failed",
-        description: error.message || "Failed to save draft",
+        title: tr("dash.a.cbSaveFailed", "Save failed"),
+        description: error.message || tr("dash.a.cbSaveFailedDesc", "Failed to save draft"),
       });
       return null;
     } finally {
@@ -444,8 +446,8 @@ export default function AgentContractBuilder() {
     if (!agentSignature) {
       toast({
         variant: "destructive",
-        title: "Signature required",
-        description: "Sign at the bottom of the page before sending.",
+        title: tr("dash.a.cbSigRequired", "Signature required"),
+        description: tr("dash.a.cbSigRequiredDesc", "Sign at the bottom of the page before sending."),
       });
       return;
     }
@@ -454,8 +456,8 @@ export default function AgentContractBuilder() {
     if (!travelerData?.email) {
       toast({
         variant: "destructive",
-        title: "Traveler email missing",
-        description: "This traveler's profile has no email on file, so the contract can't be sent.",
+        title: tr("dash.a.cbEmailMissing", "Traveler email missing"),
+        description: tr("dash.a.cbEmailMissingDesc", "This traveler's profile has no email on file, so the contract can't be sent."),
       });
       return;
     }
@@ -514,18 +516,21 @@ export default function AgentContractBuilder() {
       }
 
       toast({
-        title: "Contract sent",
-        description: `Signing link delivered${
-          emailOk && dmOk ? " by email and message" : emailOk ? " by email" : " by message"
-        }.`,
+        title: tr("dash.a.cbSent", "Contract sent"),
+        description:
+          emailOk && dmOk
+            ? tr("dash.a.cbSentBoth", "Signing link delivered by email and message.")
+            : emailOk
+              ? tr("dash.a.cbSentEmail", "Signing link delivered by email.")
+              : tr("dash.a.cbSentMessage", "Signing link delivered by message."),
       });
       navigate("/partner-bookings");
     } catch (error: any) {
       console.error("Error sending contract:", error);
       toast({
         variant: "destructive",
-        title: "Send failed",
-        description: error.message || "Failed to send contract",
+        title: tr("dash.a.cbSendFailed", "Send failed"),
+        description: error.message || tr("dash.a.cbSendFailedDesc", "Failed to send contract"),
       });
     }
   }
@@ -550,11 +555,11 @@ export default function AgentContractBuilder() {
     (sourceType === "template" && missingCount > 0);
   const sendHint =
     sourceType === "template" && missingCount > 0
-      ? `${incompleteSections} section${incompleteSections === 1 ? "" : "s"} to finish`
+      ? tr("dash.a.cbSectionsToFinish", { count: incompleteSections, defaultValue: "{{count}} sections to finish" })
       : !agentSignature
-        ? "Sign at the bottom to enable sending"
+        ? tr("dash.a.cbSignToSend", "Sign at the bottom to enable sending")
         : sourceType === "uploaded" && !uploadedPdfPath
-          ? "Upload your contract PDF first"
+          ? tr("dash.a.cbUploadFirst", "Upload your contract PDF first")
           : "";
 
   if (loading) {
@@ -587,10 +592,10 @@ export default function AgentContractBuilder() {
             </button>
             <div className="min-w-0 flex-1">
               <p className="text-[10.5px] uppercase tracking-[0.3em] text-[#C7A962]">
-                Trip Service Agreement
+                {tr("dash.a.cbTitle", "Trip Service Agreement")}
               </p>
               <h1 className="truncate font-secondary text-[23px] leading-tight text-[#fdfaf2]">
-                {tripData?.title || tripData?.destination || "Contract"}
+                {tripData?.title || tripData?.destination || tr("dash.a.cbContractFallback", "Contract")}
               </h1>
             </div>
             <div className="flex shrink-0 items-center gap-3">
@@ -601,7 +606,7 @@ export default function AgentContractBuilder() {
                 className="inline-flex items-center gap-2 rounded-full border border-[#E5DFC6]/45 px-6 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#E5DFC6] transition-colors hover:bg-white/10 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Save
+                {tr("dash.a.cbSave", "Save")}
               </button>
               <button
                 type="button"
@@ -610,8 +615,8 @@ export default function AgentContractBuilder() {
                 className="inline-flex items-center gap-2 rounded-full border border-transparent bg-[#C7A962] px-7 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-[#0a2225] transition-colors hover:bg-[#d9bd7d] disabled:cursor-not-allowed disabled:border-[#E5DFC6]/35 disabled:bg-transparent disabled:text-[#E5DFC6]/55"
               >
                 <Send className="h-4 w-4" />
-                <span className="hidden sm:inline">Send to traveler</span>
-                <span className="sm:hidden">Send</span>
+                <span className="hidden sm:inline">{tr("dash.a.cbSendToTraveler", "Send to traveler")}</span>
+                <span className="sm:hidden">{tr("dash.a.cbSendShort", "Send")}</span>
               </button>
             </div>
           </div>
@@ -622,7 +627,7 @@ export default function AgentContractBuilder() {
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#C7A962] text-[12.5px] font-semibold text-[#0a2225]">
                 {(travelerData?.full_name || "T").trim().charAt(0).toUpperCase()}
               </span>
-              {travelerData?.full_name || "Traveler"}
+              {travelerData?.full_name || tr("dash.t.traveler", "Traveler")}
             </span>
             {dates && (
               <span className="hidden text-[13px] text-[#E5DFC6]/60 sm:inline">{dates}</span>
@@ -666,7 +671,7 @@ export default function AgentContractBuilder() {
                   : "text-[#0a2225]/60 hover:bg-[#f7f3ea]"
               }`}
             >
-              Goldsainte template
+              {tr("dash.a.cbTemplateTab", "Goldsainte template")}
             </button>
             <button
               type="button"
@@ -677,13 +682,13 @@ export default function AgentContractBuilder() {
                   : "text-[#0a2225]/60 hover:bg-[#f7f3ea]"
               }`}
             >
-              Upload your own
+              {tr("dash.a.cbUploadTab", "Upload your own")}
             </button>
           </div>
           <p className="px-3 pb-2 pt-2.5 text-[13.5px] leading-relaxed text-[#0a2225]/50">
             {sourceType === "template"
-              ? "A structured agreement your traveler signs online — draft it with AI or fill it by hand."
-              : "Already have a contract your business uses? Upload the PDF — your traveler reviews and signs that exact document."}
+              ? tr("dash.a.cbTemplateDesc", "A structured agreement your traveler signs online — draft it with AI or fill it by hand.")
+              : tr("dash.a.cbUploadDesc", "Already have a contract your business uses? Upload the PDF — your traveler reviews and signs that exact document.")}
           </p>
         </div>
 
@@ -702,20 +707,19 @@ export default function AgentContractBuilder() {
                 ) : (
                   <Sparkles className="h-4 w-4 text-[#C7A962]" />
                 )}
-                {aiDrafting ? "Drafting your contract…" : "Draft contract with Goldsainte AI"}
+                {aiDrafting ? tr("dash.a.cbDrafting", "Drafting your contract…") : tr("dash.a.cbDraftWithAi", "Draft contract with Goldsainte AI")}
               </button>
               <p className="mt-2 text-[13.5px] leading-relaxed text-[#0a2225]/55">
-                Fills every clause from this trip and booking — names, real amounts, dates, and
-                plain-language terms. You review and edit each section before anything is sent.
+                {tr("dash.a.cbAiExplainer", "Fills every clause from this trip and booking — names, real amounts, dates, and plain-language terms. You review and edit each section before anything is sent.")}
               </p>
             </div>
 
             {/* Why this protects you */}
             <div className="grid gap-2 sm:grid-cols-3">
               {[
-                { icon: ShieldCheck, text: "Timestamped e-signatures from both parties" },
-                { icon: Lock, text: "Payments charged directly to your Stripe account" },
-                { icon: FileText, text: "Executed PDF delivered to both parties" },
+                { icon: ShieldCheck, text: tr("dash.a.cbAssure1", "Timestamped e-signatures from both parties") },
+                { icon: Lock, text: tr("dash.a.cbAssure2", "Payments charged directly to your Stripe account") },
+                { icon: FileText, text: tr("dash.a.cbAssure3", "Executed PDF delivered to both parties") },
               ].map(({ icon: Icon, text }) => (
                 <div
                   key={text}
@@ -757,7 +761,7 @@ export default function AgentContractBuilder() {
                 {PROTECTS[section.id] && (
                   <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47]/[0.06] px-3 py-1.5 text-[12px] text-[#0c4d47]">
                     <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
-                    {PROTECTS[section.id]}
+                    {tr(PROTECTS[section.id])}
                   </p>
                 )}
                 {section.fields && section.fields.length > 0 && (
@@ -791,7 +795,7 @@ export default function AgentContractBuilder() {
                           )}
                           {isPlaceholder && (
                             <p className="text-[12px] text-[#8D6B2F]">
-                              Replace the placeholder with your governing state or country — this can't be sent until it's real.
+                              {tr("dash.a.cbGoverningWarning", "Replace the placeholder with your governing state or country — this can't be sent until it's real.")}
                             </p>
                           )}
                         </div>
@@ -807,11 +811,10 @@ export default function AgentContractBuilder() {
           <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
             <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Your document</p>
             <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
-              Upload your contract
+              {tr("dash.a.cbUploadHeader", "Upload your contract")}
             </h2>
             <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]/55">
-              Your traveler reviews this exact document and signs it electronically. The final
-              download includes a Goldsainte signature certificate appended to your PDF.
+              {tr("dash.a.cbUploadBody", "Your traveler reviews this exact document and signs it electronically. The final download includes a Goldsainte signature certificate appended to your PDF.")}
             </p>
 
             {uploadedPdfPath ? (
@@ -819,12 +822,12 @@ export default function AgentContractBuilder() {
                 <span className="flex min-w-0 items-center gap-2.5">
                   <FileText className="h-5 w-5 shrink-0 text-[#0c4d47]" />
                   <span className="truncate text-[15px] font-medium text-[#0a2225]">
-                    {uploadedFileName || "Contract.pdf"}
+                    {uploadedFileName || tr("dash.a.cbPdfFallback", "Contract.pdf")}
                   </span>
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-[#0c4d47]" />
                 </span>
                 <label className="cursor-pointer rounded-full border border-[#C7A962]/60 bg-[#C7A962]/10 px-4 py-1.5 text-[12.5px] font-medium uppercase tracking-[0.1em] text-[#8D6B2F] transition-colors hover:bg-[#C7A962]/20">
-                  Replace
+                  {tr("dash.a.cbReplace", "Replace")}
                   <input type="file" accept="application/pdf" className="hidden" onChange={handleUpload} />
                 </label>
               </div>
@@ -836,7 +839,7 @@ export default function AgentContractBuilder() {
                   <Upload className="h-7 w-7 text-[#C7A962]" />
                 )}
                 <span className="text-[15px] font-medium text-[#0a2225]">
-                  {uploading ? "Uploading…" : "Choose your contract PDF"}
+                  {uploading ? tr("dash.a.cbUploading", "Uploading…") : tr("dash.a.cbChoosePdf", "Choose your contract PDF")}
                 </span>
                 <span className="text-[12px] text-[#0a2225]/45">PDF only · up to 10 MB</span>
                 <input
@@ -855,10 +858,10 @@ export default function AgentContractBuilder() {
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.07)] md:p-7">
           <p className="text-[12px] uppercase tracking-[0.28em] text-[#8D6B2F]">Execution</p>
           <h2 className="mt-1.5 font-secondary text-[24px] leading-snug text-[#0a2225]">
-            Agent signature
+            {tr("dash.a.cbAgentSignature", "Agent signature")}
           </h2>
           <p className="mt-1.5 text-[15px] leading-relaxed text-[#0a2225]/55">
-            By signing, you confirm the information is accurate and you agree to the terms.
+            {tr("dash.a.cbSignConfirm", "By signing, you confirm the information is accurate and you agree to the terms.")}
           </p>
           <div className="mt-5 rounded-xl border-2 border-dashed border-[#E5DFC6] p-4">
             {agentSignature ? (
@@ -873,7 +876,7 @@ export default function AgentContractBuilder() {
                     onClick={() => setAgentSignature("")}
                     className="rounded-full border border-[#0a2225]/20 px-4 py-1.5 text-[12.5px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/60 transition-colors hover:bg-[#f7f3ea]"
                   >
-                    Clear
+                    {tr("dash.a.cbClear", "Clear")}
                   </button>
                 </div>
               </div>
@@ -891,8 +894,7 @@ export default function AgentContractBuilder() {
         </div>
 
         <p className="pb-6 text-center text-[12.5px] leading-relaxed text-[#0a2225]/40">
-          Templates and AI-drafted language are provided for convenience and do not constitute
-          legal advice.
+          {tr("dash.a.cbLegalDisclaimer", "Templates and AI-drafted language are provided for convenience and do not constitute legal advice.")}
         </p>
       </div>
     </div>
