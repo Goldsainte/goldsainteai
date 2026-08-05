@@ -2058,7 +2058,8 @@
     "userBlocked": "已屏蔽用户",
     "showOriginal": "查看原文",
     "showTranslation": "查看译文",
-    "translated": "已翻译"
+    "translated": "已翻译",
+    "noMessagesYet": "暂无消息"
   },
   "sett": {
     "checkoutOpened": "已在新标签页打开支付",
