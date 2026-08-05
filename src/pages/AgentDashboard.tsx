@@ -661,35 +661,35 @@ export default function AgentDashboard() {
                 capping the measure just left a dead column of white space. */}
             <div className="mt-2 rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-6 sm:p-8">
               <p className="text-[12px] uppercase tracking-[0.24em] text-[#8D6B2F]">
-                Send a proposal — step by step
+                {tr("dash.a.sendProposalSteps", "Send a proposal — step by step")}
               </p>
               <ol className="mt-7 space-y-7 border-l border-[#E5DFC6] text-[15px] leading-relaxed text-[#0a2225]">
                 <li className="relative pl-9">
                   <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">i</span>
-                  Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.
+                  {tr("dash.a.step1", "Open a conversation with the traveler — reply to a trip request from the marketplace, or answer any traveler who messages you from your profile or one of your trips.")}
                 </li>
                 <li className="relative pl-9">
                   <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">ii</span>
-                  Use the <strong className="font-medium">Send a Proposal</strong> panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.
+                  {tr("dash.a.step2a", "Use the")} <strong className="font-medium">{tr("dash.a.step2strong", "Send a Proposal")}</strong> {tr("dash.a.step2b", "panel inside the thread — total price, deposit percentage, and a brief note. It arrives as a card the traveler can act on.")}
                 </li>
                 <li className="relative pl-9">
                   <span aria-hidden="true" className="absolute left-0 top-0 -translate-x-1/2 bg-[#FDF9F0] px-1.5 font-secondary text-[13px] italic leading-[1.7] text-[#8D6B2F]">iii</span>
-                  They tap <strong className="font-medium">Accept and Pay Deposit</strong> — charged directly on your Stripe — and the booking appears in Bookings with you.
+                  {tr("dash.a.step3a", "They tap")} <strong className="font-medium">{tr("dash.a.step3strong", "Accept and Pay Deposit")}</strong> {tr("dash.a.step3b", "— charged directly on your Stripe — and the booking appears in Bookings with you.")}
                 </li>
               </ol>
               <div className="mt-8 flex flex-wrap gap-3 pl-9">
-                <Link to="/marketplace?tab=trip-requests" className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-[13.5px] text-[#FDF9F0] transition-colors hover:bg-[#0a2225]">Browse trip requests</Link>
-                <Link to="/messages" className="rounded-full border border-[#0c4d47]/30 px-5 py-2.5 text-[13.5px] text-[#0a2225] transition-colors hover:bg-[#0c4d47]/5">Open messages</Link>
+                <Link to="/marketplace?tab=trip-requests" className="rounded-full bg-[#0c4d47] px-5 py-2.5 text-[13.5px] text-[#FDF9F0] transition-colors hover:bg-[#0a2225]">{tr("dash.c.browseBriefs", "Browse trip requests")}</Link>
+                <Link to="/messages" className="rounded-full border border-[#0c4d47]/30 px-5 py-2.5 text-[13.5px] text-[#0a2225] transition-colors hover:bg-[#0c4d47]/5">{tr("dash.a.openMessages", "Open messages")}</Link>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 py-9 text-[15px]">
               <span>
-                <span className="text-[12.5px] uppercase tracking-[0.24em] text-[#8D6B2F]">New here?</span>
-                &nbsp;&nbsp;The full guide to proposals, payouts, and fees.
+                <span className="text-[12.5px] uppercase tracking-[0.24em] text-[#8D6B2F]">{tr("dash.t.newHere", "New here?")}</span>
+                &nbsp;&nbsp;{tr("dash.c.fullGuide", "The full guide to proposals, payouts, and fees.")}
               </span>
               <Link to="/how-it-works/agent" className="text-[#0a2225] hover:text-[#8D6B2F]">
-                Read the guide →
+                {tr("dash.a.readGuide", "Read the guide")} →
               </Link>
             </div>
           </TabsContent>
@@ -778,22 +778,21 @@ export default function AgentDashboard() {
         <Dialog open={isBidDialogOpen} onOpenChange={setIsBidDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Place Your Bid</DialogTitle>
+              <DialogTitle>{tr("dash.a.placeYourBid", "Place Your Bid")}</DialogTitle>
               <DialogDescription>
-                Submit your proposal for this travel job
+                {tr("dash.a.bidDialogDesc", "Submit your proposal for this travel job")}
               </DialogDescription>
             </DialogHeader>
             
             <form onSubmit={handlePlaceBid} className="space-y-4">
               <Alert className="mb-4">
                 <AlertDescription className="text-xs">
-                  Enter your base service price. Customer will see your price + 3.5% platform service fee. 
-                  You'll receive your quoted price minus a 3.5% platform fee after job completion.
+                  {tr("dash.a.bidFeeNote", "Enter your base service price. Customer will see your price + 3.5% platform service fee. You'll receive your quoted price minus a 3.5% platform fee after job completion.")}
                 </AlertDescription>
               </Alert>
               
               <div>
-                <Label htmlFor="proposed_price">Your Service Price ({selectedJob?.currency || 'USD'})</Label>
+                <Label htmlFor="proposed_price">{tr("dash.a.yourServicePrice", "Your Service Price")} ({selectedJob?.currency || 'USD'})</Label>
                 <Input 
                   id="proposed_price" 
                   name="proposed_price" 
@@ -801,30 +800,30 @@ export default function AgentDashboard() {
                   required 
                   step="0.01"
                   min="1"
-                  placeholder="Enter your price (e.g., 1000)"
+                  placeholder={tr("dash.a.pricePh", "Enter your price (e.g., 1000)")}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Customer will be charged your price + 3.5% service fee
+                  {tr("dash.a.customerCharged", "Customer will be charged your price + 3.5% service fee")}
                 </p>
               </div>
               
               <div>
-                <Label htmlFor="estimated_days">Estimated Completion (days)</Label>
+                <Label htmlFor="estimated_days">{tr("dash.a.estCompletion", "Estimated Completion (days)")}</Label>
                 <Input id="estimated_days" name="estimated_days" type="number" required />
               </div>
               
               <div>
-                <Label htmlFor="proposal_details">Proposal Details</Label>
+                <Label htmlFor="proposal_details">{tr("dash.a.proposalDetails", "Proposal Details")}</Label>
                 <Textarea 
                   id="proposal_details" 
                   name="proposal_details" 
                   required 
-                  placeholder="Explain your approach and what you'll deliver..."
+                  placeholder={tr("dash.a.approachPh", "Explain your approach and what you'll deliver...")}
                   rows={4}
                 />
               </div>
               
-              <Button type="submit" className="w-full">Submit Bid</Button>
+              <Button type="submit" className="w-full">{tr("dash.a.submitBid", "Submit Bid")}</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -836,7 +835,7 @@ export default function AgentDashboard() {
                 Messaging: {selectedJobForMessaging?.title}
               </DialogTitle>
               <DialogDescription>
-                Communicate with the customer about this job
+                {tr("dash.a.messagingDesc", "Communicate with the customer about this job")}
               </DialogDescription>
             </DialogHeader>
 
@@ -872,7 +871,7 @@ export default function AgentDashboard() {
                 Payment Management: {selectedBidForDetails?.marketplace_jobs?.title}
               </DialogTitle>
               <DialogDescription>
-                Manage milestones and invoices for this job
+                {tr("dash.a.milestonesDesc", "Manage milestones and invoices for this job")}
               </DialogDescription>
             </DialogHeader>
 
@@ -882,21 +881,21 @@ export default function AgentDashboard() {
                   {/* Job Summary */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Job Summary</CardTitle>
+                      <CardTitle className="text-lg">{tr("dash.a.jobSummary", "Job Summary")}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Status:</span>
+                        <span className="text-muted-foreground">{tr("dash.a.statusLabel", "Status:")}</span>
                         <Badge>{selectedBidForDetails.marketplace_jobs.status}</Badge>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Your Bid:</span>
+                        <span className="text-muted-foreground">{tr("dash.a.yourBid", "Your Bid:")}</span>
                         <span className="font-semibold">
                           {selectedBidForDetails.currency} {selectedBidForDetails.proposed_price}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Your Payout:</span>
+                        <span className="text-muted-foreground">{tr("dash.a.yourPayoutLabel", "Your Payout:")}</span>
                         <span className="font-semibold text-green-600">
                           {selectedBidForDetails.currency} {selectedBidForDetails.agent_payout_amount?.toFixed(2)}
                         </span>
