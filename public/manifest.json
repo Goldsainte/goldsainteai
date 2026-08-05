@@ -1,7 +1,7 @@
 {
   "name": "Goldsainte",
   "short_name": "Goldsainte",
-  "description": "The smarter travel marketplace",
+  "description": "The Social Marketplace for Travel",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0c4d47",
