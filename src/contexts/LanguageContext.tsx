@@ -1,5 +1,25 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import i18n from '@/i18n/config';
+import { supabase } from '@/integrations/supabase/client';
+
+const SUPPORTED = ['en', 'fr', 'es', 'de', 'it', 'pt', 'ar', 'ja', 'ko', 'zh'];
+
+// Persist the user's language to their profile so backend emails and
+// notifications can be sent in the right language. Fire-and-forget: the UI
+// never waits on it, and signed-out users simply skip it.
+async function syncPreferredLanguage(lng: string) {
+  try {
+    if (!SUPPORTED.includes(lng)) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data?.user) return;
+    await supabase
+      .from('profiles')
+      .update({ preferred_language: lng })
+      .eq('id', data.user.id);
+  } catch {
+    /* non-fatal: email language falls back to English */
+  }
+}
 
 interface LanguageContextType {
   language: string;
@@ -29,6 +49,20 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  // On load (and on sign-in), persist the current choice so profiles created
+  // before this column existed pick up the user's language on their next visit.
+  useEffect(() => {
+    syncPreferredLanguage((i18n.language || 'en').split('-')[0]);
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        syncPreferredLanguage((i18n.language || 'en').split('-')[0]);
+      }
+    });
+    return () => {
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
   const setLanguage = (newLanguage: string) => {
     i18n.changeLanguage(newLanguage);
     try {
@@ -38,6 +72,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     }
     document.documentElement.dir = newLanguage === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = newLanguage;
+    syncPreferredLanguage(newLanguage);
   };
 
   return (
