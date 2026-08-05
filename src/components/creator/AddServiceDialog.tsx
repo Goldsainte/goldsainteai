@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -43,11 +44,12 @@ const PRESET_REQUIREMENTS = [
 const FIELD_CLASS = "bg-[#FDF9F0] border-[#E5DFC6] rounded-[10px] focus-visible:ring-[#0c4d47]/30";
 
 export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, editService, initialTier, initialStep }: Props) {
+  const { t } = useTranslation();
   const isEdit = !!editService;
   const [tier, setTier] = useState<ServiceTier | null>(editService?.service_tier || initialTier || null);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(initialStep ?? 0);
-  const STEPS = ["Overview", "Pricing", "Requirements", "Description"];
+  const STEPS = [t("creatorTools.service.stepOverview", "Overview"), t("creatorTools.service.stepPricing", "Pricing"), t("creatorTools.service.stepRequirements", "Requirements"), t("creatorTools.service.stepDescription", "Description")];
 
   useEffect(() => {
     if (open && !isEdit) {
@@ -229,7 +231,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
   const aiPanel = (target: string) =>
     aiTarget === target && aiVersions.length > 0 ? (
       <div className="mt-2 space-y-1.5">
-        <p className="text-[12.5px] uppercase tracking-[0.14em] text-[#8D6B2F]">Tap one to use it</p>
+        <p className="text-[12.5px] uppercase tracking-[0.14em] text-[#8D6B2F]">{t("creatorTools.service.tapToUse", "Tap one to use it")}</p>
         {aiVersions.map((v, i) => (
           <button key={i} type="button" onClick={() => applySuggestion(v)}
             className="block w-full rounded-lg border border-[#E5DFC6] bg-white px-3 py-2 text-left text-sm leading-snug text-[#0a2225] transition-colors hover:border-[#C7A962] !min-h-0">
@@ -303,7 +305,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                 understanding. */}
             {!isEdit && (
               <div className="rounded-xl border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 py-3 text-[13px] leading-relaxed text-[#5c5340]">
-                <span className="font-semibold">A quick note on what you're selling:</span>{" "}
+                <span className="font-semibold">{t("creatorTools.service.quickNote", "A quick note on what you're selling:")}</span>{" "}
                 creators sell trip design services, not travel arrangements. You deliver the plan, the expertise, or your time — travelers book flights, hotels, and suppliers themselves, or through a licensed travel specialist. Don't collect payment for bookings through this service.
               </div>
             )}
@@ -359,10 +361,10 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   </div>
                   <div>
                     <div className="mb-1 flex items-center justify-between">
-                      <label className="text-xs font-medium text-[#6B7280] block">Description</label>
-                      {aiLink("Write it with AI", suggestDescription, !title.trim())}
+                      <label className="text-xs font-medium text-[#6B7280] block">{t("creatorTools.service.description", "Description")}</label>
+                      {aiLink(t("creatorTools.service.writeWithAi", "Write it with AI"), suggestDescription, !title.trim())}
                     </div>
-                    <Textarea className={FIELD_CLASS} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of this service" rows={3} />
+                    <Textarea className={FIELD_CLASS} value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("creatorTools.service.briefDesc", "Brief description of this service")} rows={3} />
                     {aiPanel("description")}
                   </div>
                   <div>
@@ -382,7 +384,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     <>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="text-xs font-medium text-[#6B7280] mb-1 block">Delivery Time</label>
+                          <label className="text-xs font-medium text-[#6B7280] mb-1 block">{t("creatorTools.service.deliveryTime", "Delivery Time")}</label>
                           <select
                             value={deliveryOption}
                             onChange={(e) => setDeliveryOption(e.target.value)}
@@ -394,12 +396,12 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                           </select>
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-[#6B7280] mb-1 block">Trip Days</label>
+                          <label className="text-xs font-medium text-[#6B7280] mb-1 block">{t("creatorTools.service.tripDays", "Trip Days")}</label>
                           <Input className={FIELD_CLASS} type="number" min="1" value={tripDays} onChange={(e) => setTripDays(e.target.value)} placeholder="7" />
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-[#6B7280] mb-1 block">Revisions Included</label>
+                        <label className="text-xs font-medium text-[#6B7280] mb-1 block">{t("creatorTools.service.revisions", "Revisions Included")}</label>
                         <Input className={FIELD_CLASS} type="number" min="0" value={revisions} onChange={(e) => setRevisions(e.target.value)} placeholder="2" />
                       </div>
                     </>
@@ -413,7 +415,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                         onChange={(e) => setHasPriority(e.target.checked)}
                         className="rounded border-[#E5DFC6] accent-[#0c4d47]"
                       />
-                      <span className="text-[#0a2225]">Priority Support included</span>
+                      <span className="text-[#0a2225]">{t("creatorTools.service.prioritySupport", "Priority Support included")}</span>
                     </label>
                   )}
 
@@ -455,12 +457,12 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   )}
                   {tier === "on_trip" && (
                     <div className="rounded-xl border border-[#E5DFC6] bg-[#FDF9F0] p-4 space-y-2">
-                      <p className="text-sm text-[#0a2225] font-medium">How On-Trip pricing works</p>
+                      <p className="text-sm text-[#0a2225] font-medium">{t("creatorTools.service.onTripPricing", "How On-Trip pricing works")}</p>
                       <p className="text-xs text-[#6B7280]">Travelers hire you at your listed day rate. When a hire request arrives, you reply in Messages and send a proposal with the final total — day rate × trip days, and whether the traveler covers your travel and lodging (say so in your description). Payment runs through Goldsainte's Stripe checkout, charged straight to your own Stripe account: deposit at booking, balance before departure.</p>
                     </div>
                   )}
                   {!isItineraryTier && tier !== "add_on" && tier !== "on_trip" && (
-                    <p className="text-sm text-[#9CA3AF]">No additional pricing details needed for this tier.</p>
+                    <p className="text-sm text-[#9CA3AF]">{t("creatorTools.service.noPricingDetails", "No additional pricing details needed for this tier.")}</p>
                   )}
                 </>
               )}
@@ -508,7 +510,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                       value={customRequirement}
                       onChange={(e) => setCustomRequirement(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomRequirement())}
-                      placeholder="Add a custom question…"
+                      placeholder={t("creatorTools.service.addCustomQ", "Add a custom question\u2026")}
                     />
                     <Button type="button" variant="outline" size="sm" onClick={addCustomRequirement} className="shrink-0 border-[#E5DFC6] rounded-[10px]">
                       <Plus className="h-4 w-4" />
@@ -522,7 +524,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                 <>
                   {tier === "on_trip" ? (
                     <div>
-                      <label className="text-xs font-medium text-[#6B7280] mb-1 block">What can travelers hire you for?</label>
+                      <label className="text-xs font-medium text-[#6B7280] mb-1 block">{t("creatorTools.service.hireYouFor", "What can travelers hire you for?")}</label>
                       <p className="text-xs text-[#9CA3AF] mb-2">Pick everything you can genuinely do on their trip — travelers choose from exactly this list when they hire you.</p>
                       <div className="flex flex-wrap gap-1.5">
                         {ON_TRIP_CAPABILITIES.map((c) => (
@@ -543,7 +545,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                     </div>
                   ) : (
                   <div>
-                    <label className="text-xs font-medium text-[#6B7280] mb-1 block">What's Included</label>
+                    <label className="text-xs font-medium text-[#6B7280] mb-1 block">{t("creatorTools.service.whatsIncluded", "What's Included")}</label>
                     <div className="space-y-1.5 mb-2">
                       {includes.map((item, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-[#0a2225]">
@@ -572,7 +574,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                   )}
                   <div>
                     <label className="text-xs font-medium text-[#6B7280] mb-1 block">FAQ</label>
-                    <p className="text-xs text-[#9CA3AF] mb-2">Answer common questions before they're asked.</p>
+                    <p className="text-xs text-[#9CA3AF] mb-2">{t("creatorTools.service.faqHint", "Answer common questions before they're asked.")}</p>
                     <div className="space-y-3 mb-2">
                       {faq.map((item, i) => (
                         <div key={i} className="rounded-[10px] border border-[#E5DFC6] bg-[#FDF9F0] p-3 space-y-2">
@@ -580,7 +582,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                             className="bg-white border-[#E5DFC6] rounded-[10px]"
                             value={item.question}
                             onChange={(e) => updateFaqItem(i, "question", e.target.value)}
-                            placeholder="Question"
+                            placeholder={t("creatorTools.service.question", "Question")}
                           />
                           <div className="flex justify-end">
                             {aiLink("Answer with AI", () => suggestFaqAnswer(i), !item.question.trim() || !title.trim())}
@@ -589,7 +591,7 @@ export function AddServiceDialog({ open, onOpenChange, creatorId, onCreated, edi
                             className="bg-white border-[#E5DFC6] rounded-[10px]"
                             value={item.answer}
                             onChange={(e) => updateFaqItem(i, "answer", e.target.value)}
-                            placeholder="Answer"
+                            placeholder={t("creatorTools.service.answer", "Answer")}
                             rows={2}
                           />
                           {aiPanel(`faq-${i}`)}
