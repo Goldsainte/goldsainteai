@@ -13,13 +13,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import { pickLang, resolveRecipientLanguage, type EmailLang } from '../_shared/email-i18n.ts'
+
+const EMAIL_SUBJECTS: { en: Record<string, string> } & Partial<Record<EmailLang, Record<string, string>>> = {
+  en: { signup: 'Confirm your email', invite: "You've been invited", magiclink: 'Your login link', recovery: 'Reset your password', email_change: 'Confirm your new email', reauthentication: 'Your verification code' },
+  fr: { signup: 'Confirmez votre e-mail', invite: 'Vous êtes invité', magiclink: 'Votre lien de connexion', recovery: 'Réinitialisez votre mot de passe', email_change: 'Confirmez votre nouvel e-mail', reauthentication: 'Votre code de vérification' },
+  es: { signup: 'Confirma tu correo', invite: 'Te han invitado', magiclink: 'Tu enlace de acceso', recovery: 'Restablece tu contraseña', email_change: 'Confirma tu nuevo correo', reauthentication: 'Tu código de verificación' },
+  de: { signup: 'Bestätigen Sie Ihre E-Mail', invite: 'Sie sind eingeladen', magiclink: 'Ihr Anmeldelink', recovery: 'Passwort zurücksetzen', email_change: 'Bestätigen Sie Ihre neue E-Mail', reauthentication: 'Ihr Bestätigungscode' },
+  it: { signup: 'Conferma la tua email', invite: 'Sei stato invitato', magiclink: 'Il tuo link di accesso', recovery: 'Reimposta la tua password', email_change: 'Conferma la tua nuova email', reauthentication: 'Il tuo codice di verifica' },
+  pt: { signup: 'Confirme seu e-mail', invite: 'Você foi convidado', magiclink: 'Seu link de acesso', recovery: 'Redefina sua senha', email_change: 'Confirme seu novo e-mail', reauthentication: 'Seu código de verificação' },
+  ar: { signup: 'أكّد بريدك الإلكتروني', invite: 'تمت دعوتك', magiclink: 'رابط تسجيل دخولك', recovery: 'أعد تعيين كلمة مرورك', email_change: 'أكّد بريدك الجديد', reauthentication: 'رمز التحقق' },
+  ja: { signup: 'メールを確認', invite: '招待が届いています', magiclink: 'サインインリンク', recovery: 'パスワードをリセット', email_change: '新しいメールを確認', reauthentication: '確認コード' },
+  ko: { signup: '이메일 확인', invite: '초대장이 도착했습니다', magiclink: '로그인 링크', recovery: '비밀번호 재설정', email_change: '새 이메일 확인', reauthentication: '인증 코드' },
+  zh: { signup: '确认你的邮箱', invite: '你收到一份邀请', magiclink: '你的登录链接', recovery: '重置你的密码', email_change: '确认你的新邮箱', reauthentication: '你的验证码' },
 }
 
 // Template mapping
@@ -240,7 +247,17 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
     (user?.raw_user_meta_data?.account_type as string | undefined) ??
     undefined
 
+  // Resolve the recipient's language (best-effort; falls back to English).
+  let recipientLang: EmailLang = 'en'
+  try {
+    const sbUrl = Deno.env.get('SUPABASE_URL')
+    const sbKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    const sb = sbUrl && sbKey ? createClient(sbUrl, sbKey) : null
+    recipientLang = await resolveRecipientLanguage(sb, null, recipientEmail)
+  } catch (_e) { /* fail-open */ }
+
   const templateProps = {
+    lang: recipientLang,
     siteName: SITE_NAME,
     accountType,
     siteUrl: `https://${ROOT_DOMAIN}`,
@@ -285,7 +302,7 @@ async function handleSupabaseHook(req: Request): Promise<Response> {
         body: JSON.stringify({
           from: `Goldsainte <support@${FROM_DOMAIN}>`,
           to: [recipientEmail],
-          subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+          subject: pickLang(EMAIL_SUBJECTS, recipientLang)[emailType] || EMAIL_SUBJECTS.en[emailType] || 'Notification',
           html,
           text,
         }),
