@@ -3,6 +3,29 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { TripInquiryEmail } from "../_shared/email-templates/trip-inquiry.tsx";
+import { pickLang, resolveRecipientLanguage, type EmailLang } from "../_shared/email-i18n.ts";
+
+interface FnS {
+  subject: (host: string) => string;
+  yourSpecialist: string;
+  thisTrip: string;
+  notifTitle: string;
+  notifMsg: (trip: string, q: string) => string;
+  oneOfYourTrips: string;
+}
+
+const FN_STRINGS: { en: FnS } & Partial<Record<EmailLang, FnS>> = {
+  en: { subject: (h) => `Your question is on its way to ${h}`, yourSpecialist: 'your specialist', thisTrip: 'this trip', notifTitle: 'New question about your trip', notifMsg: (t, q) => `A traveller asked about ${t}: "${q}"`, oneOfYourTrips: 'one of your trips' },
+  fr: { subject: (h) => `Votre question est en route vers ${h}`, yourSpecialist: 'votre spécialiste', thisTrip: 'ce voyage', notifTitle: 'Nouvelle question sur votre voyage', notifMsg: (t, q) => `Un voyageur a posé une question sur ${t} : « ${q} »`, oneOfYourTrips: 'un de vos voyages' },
+  es: { subject: (h) => `Tu pregunta va de camino a ${h}`, yourSpecialist: 'tu especialista', thisTrip: 'este viaje', notifTitle: 'Nueva pregunta sobre tu viaje', notifMsg: (t, q) => `Un viajero preguntó sobre ${t}: "${q}"`, oneOfYourTrips: 'uno de tus viajes' },
+  de: { subject: (h) => `Ihre Frage ist unterwegs zu ${h}`, yourSpecialist: 'Ihren Spezialisten', thisTrip: 'diese Reise', notifTitle: 'Neue Frage zu Ihrer Reise', notifMsg: (t, q) => `Ein Reisender hat zu ${t} gefragt: „${q}“`, oneOfYourTrips: 'eine Ihrer Reisen' },
+  it: { subject: (h) => `La tua domanda è in viaggio verso ${h}`, yourSpecialist: 'il tuo specialista', thisTrip: 'questo viaggio', notifTitle: 'Nuova domanda sul tuo viaggio', notifMsg: (t, q) => `Un viaggiatore ha chiesto di ${t}: "${q}"`, oneOfYourTrips: 'uno dei tuoi viaggi' },
+  pt: { subject: (h) => `Sua pergunta está a caminho de ${h}`, yourSpecialist: 'seu especialista', thisTrip: 'esta viagem', notifTitle: 'Nova pergunta sobre sua viagem', notifMsg: (t, q) => `Um viajante perguntou sobre ${t}: "${q}"`, oneOfYourTrips: 'uma de suas viagens' },
+  ar: { subject: (h) => `سؤالك في طريقه إلى ${h}`, yourSpecialist: 'مختصك', thisTrip: 'هذه الرحلة', notifTitle: 'سؤال جديد عن رحلتك', notifMsg: (t, q) => `سأل مسافر عن ${t}: "${q}"`, oneOfYourTrips: 'إحدى رحلاتك' },
+  ja: { subject: (h) => `質問が ${h} に向かっています`, yourSpecialist: 'スペシャリスト', thisTrip: 'この旅', notifTitle: '旅への新しい質問', notifMsg: (t, q) => `旅行者が ${t} について質問しました：「${q}」`, oneOfYourTrips: 'あなたの旅のひとつ' },
+  ko: { subject: (h) => `질문이 ${h}에게 전달 중입니다`, yourSpecialist: '전문가', thisTrip: '이 여행', notifTitle: '여행에 대한 새 질문', notifMsg: (t, q) => `한 여행자가 ${t}에 대해 질문했습니다: "${q}"`, oneOfYourTrips: '내 여행 중 하나' },
+  zh: { subject: (h) => `你的问题正在送达 ${h}`, yourSpecialist: '你的专家', thisTrip: '此旅程', notifTitle: '关于你旅程的新提问', notifMsg: (t, q) => `一位旅行者询问了 ${t}：「${q}」`, oneOfYourTrips: '你的一段旅程' },
+};
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "../_shared/rateLimiter.ts";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
@@ -397,11 +420,21 @@ serve(async (req) => {
     // ── Notify the responder ───────────────────────────────────────────────
     // Best-effort. Links straight to the conversation when we have one.
     if (responderId) {
+      let hostLang: EmailLang = 'en';
+      try {
+        const { data: hostProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('email')
+          .eq('id', responderId)
+          .maybeSingle();
+        hostLang = await resolveRecipientLanguage(supabaseAdmin, null, hostProfile?.email ?? null);
+      } catch (_e) { /* fail-open */ }
+      const hostS = pickLang(FN_STRINGS, hostLang);
       const { error: notifyError } = await supabaseAdmin.from('notifications').insert({
         user_id: responderId,
         type: 'message_received',
-        title: 'New question about your trip',
-        message: `A traveller asked about ${resolvedTripTitle ?? 'one of your trips'}: "${question.slice(0, 140)}"`,
+        title: hostS.notifTitle,
+        message: hostS.notifMsg(resolvedTripTitle ?? hostS.oneOfYourTrips, question.slice(0, 140)),
         entity_type: conversationId ? 'conversation' : 'trip',
         entity_id: conversationId ?? tripId,
         action_url: conversationId ? `/messages?conversation=${conversationId}` : '/messages',
@@ -411,26 +444,19 @@ serve(async (req) => {
       }
     }
 
-    // ── Render and send email ─────────────────────────────────────────────
-    const html = await renderAsync(
-      React.createElement(TripInquiryEmail, {
-        siteName: 'Goldsainte',
-        confirmationUrl: magicLinkUrl,
-        hostName: resolvedHostName ?? 'your specialist',
-        tripTitle: resolvedTripTitle ?? 'this trip',
-        question,
-      })
-    );
-    const text = await renderAsync(
-      React.createElement(TripInquiryEmail, {
-        siteName: 'Goldsainte',
-        confirmationUrl: magicLinkUrl,
-        hostName: resolvedHostName ?? 'your specialist',
-        tripTitle: resolvedTripTitle ?? 'this trip',
-        question,
-      }),
-      { plainText: true }
-    );
+    // ── Render and send email (in the traveller's language) ───────────────
+    const travelerLang = await resolveRecipientLanguage(supabaseAdmin, null, email ?? null);
+    const fnS = pickLang(FN_STRINGS, travelerLang);
+    const emailProps = {
+      siteName: 'Goldsainte',
+      confirmationUrl: magicLinkUrl,
+      hostName: resolvedHostName ?? fnS.yourSpecialist,
+      tripTitle: resolvedTripTitle ?? fnS.thisTrip,
+      question,
+      lang: travelerLang,
+    };
+    const html = await renderAsync(React.createElement(TripInquiryEmail, emailProps));
+    const text = await renderAsync(React.createElement(TripInquiryEmail, emailProps), { plainText: true });
 
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -441,7 +467,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: `Goldsainte <support@${FROM_DOMAIN}>`,
         to: [email],
-        subject: `Your question is on its way to ${resolvedHostName ?? 'your specialist'}`,
+        subject: fnS.subject(resolvedHostName ?? fnS.yourSpecialist),
         html,
         text,
       }),
