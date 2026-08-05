@@ -46,7 +46,22 @@
     "menuPostTripD": "Recevez des propositions sur mesure de spécialistes",
     "menuAgent": "Devenir agent",
     "menuAgentD": "Concevez et vendez des voyages en tant que vendeur officiel",
-    "agentPromoD": "Mettez votre expertise à profit et gagnez sur chaque voyage que vous réalisez."
+    "agentPromoD": "Mettez votre expertise à profit et gagnez sur chaque voyage que vous réalisez.",
+    "menuMyBookings": "Mes réservations",
+    "menuMyRequests": "Mes demandes",
+    "menuSaved": "Enregistrés & abonnements",
+    "menuRequestTrip": "Demander un voyage",
+    "menuMyGuides": "Mes guides",
+    "menuCreatorDash": "Tableau de bord créateur",
+    "menuAgentDash": "Tableau de bord agent",
+    "menuClientBookings": "Réservations clients",
+    "menuAvailableTrips": "Voyages disponibles",
+    "menuMyProfile": "Mon profil",
+    "menuAccountSettings": "Paramètres du compte",
+    "menuHelpCenter": "Centre d'aide",
+    "menuTravelMarketplace": "Marketplace voyage",
+    "menuCreatePackage": "Créer un pack voyage",
+    "menuCreateTour": "Créer un circuit"
   },
   "common": {
     "loading": "Chargement...",
@@ -2675,5 +2690,19 @@
       "engagement": "Score d'engagement",
       "highestTier": "Vous avez atteint le niveau le plus élevé !"
     }
+  },
+  "sideNav": {
+    "home": "Accueil",
+    "marketplace": "Marketplace",
+    "messages": "Messages",
+    "myJourneys": "Mes voyages",
+    "myProposals": "Mes propositions",
+    "dashboard": "Tableau de bord",
+    "profile": "Profil",
+    "theCollection": "La Collection",
+    "postTrip": "Publier un voyage",
+    "myCollections": "Mes collections",
+    "search": "Rechercher",
+    "notifications": "Notifications"
   }
 }
