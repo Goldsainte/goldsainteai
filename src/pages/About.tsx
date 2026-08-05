@@ -102,7 +102,7 @@ const About = () => {
             About Goldsainte
           </p>
           <h1 className="font-secondary text-3xl sm:text-4xl md:text-6xl leading-[1.08] tracking-tight text-[#0a2225] mb-6">
-            The Smarter Travel Marketplace
+            The Social Marketplace for Travel
           </h1>
           <p className="text-base md:text-lg text-[#0a2225]/80 leading-relaxed max-w-2xl mb-4">
             Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents &mdash; combining bookable travel inspiration with a custom-trip proposal marketplace.
