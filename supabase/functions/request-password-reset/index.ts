@@ -4,6 +4,20 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 import { RecoveryEmail } from "../_shared/email-templates/recovery.tsx";
+import { pickLang, resolveRecipientLanguage, type EmailLang } from "../_shared/email-i18n.ts";
+
+const RESET_SUBJECTS: { en: string } & Partial<Record<EmailLang, string>> = {
+  en: 'Reset your Goldsainte password',
+  fr: 'Réinitialisez votre mot de passe Goldsainte',
+  es: 'Restablece tu contraseña de Goldsainte',
+  de: 'Setzen Sie Ihr Goldsainte-Passwort zurück',
+  it: 'Reimposta la tua password Goldsainte',
+  pt: 'Redefina sua senha da Goldsainte',
+  ar: 'أعد تعيين كلمة مرورك في Goldsainte',
+  ja: 'Goldsainte のパスワードをリセット',
+  ko: 'Goldsainte 비밀번호를 재설정하세요',
+  zh: '重置你的 Goldsainte 密码',
+};
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -115,19 +129,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Recovery link generated successfully");
 
-    const emailHtml = await renderAsync(
-      React.createElement(RecoveryEmail, {
-        siteName: SITE_NAME,
-        confirmationUrl: appResetUrl.toString(),
-      })
-    );
-    const emailText = await renderAsync(
-      React.createElement(RecoveryEmail, {
-        siteName: SITE_NAME,
-        confirmationUrl: appResetUrl.toString(),
-      }),
-      { plainText: true }
-    );
+    const recipientLang = await resolveRecipientLanguage(supabase, null, email ?? null);
+    const recoveryProps = {
+      siteName: SITE_NAME,
+      confirmationUrl: appResetUrl.toString(),
+      lang: recipientLang,
+    };
+    const emailHtml = await renderAsync(React.createElement(RecoveryEmail, recoveryProps));
+    const emailText = await renderAsync(React.createElement(RecoveryEmail, recoveryProps), { plainText: true });
 
     const messageId = crypto.randomUUID();
     const idempotencyKey = `password-reset-${messageId}`;
@@ -170,7 +179,7 @@ const handler = async (req: Request): Promise<Response> => {
         to: email,
         from: PASSWORD_RESET_SENDER,
         sender_domain: SENDER_DOMAIN,
-        subject: 'Reset your Goldsainte password',
+        subject: pickLang(RESET_SUBJECTS, recipientLang),
         html: emailHtml,
         text: emailText,
         purpose: 'transactional',
