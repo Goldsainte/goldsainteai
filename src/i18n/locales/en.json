@@ -46,7 +46,22 @@
     "menuPostTripD": "Get tailored proposals from specialists",
     "menuAgent": "Become an Agent",
     "menuAgentD": "Design and sell trips as the seller of record",
-    "agentPromoD": "Plug in your expertise and earn on every journey you deliver."
+    "agentPromoD": "Plug in your expertise and earn on every journey you deliver.",
+    "menuMyBookings": "My Bookings",
+    "menuMyRequests": "My Requests",
+    "menuSaved": "Saved & Following",
+    "menuRequestTrip": "Request a Trip",
+    "menuMyGuides": "My Guides",
+    "menuCreatorDash": "Creator Dashboard",
+    "menuAgentDash": "Agent Dashboard",
+    "menuClientBookings": "Client Bookings",
+    "menuAvailableTrips": "Available Trips",
+    "menuMyProfile": "My Profile",
+    "menuAccountSettings": "Account Settings",
+    "menuHelpCenter": "Help Center",
+    "menuTravelMarketplace": "Travel Marketplace",
+    "menuCreatePackage": "Create Trip Package",
+    "menuCreateTour": "Create Tour"
   },
   "common": {
     "loading": "Loading...",
@@ -2675,5 +2690,19 @@
       "engagement": "Engagement Score",
       "highestTier": "You’ve reached the highest tier!"
     }
+  },
+  "sideNav": {
+    "home": "Home",
+    "marketplace": "Marketplace",
+    "messages": "Messages",
+    "myJourneys": "My Journeys",
+    "myProposals": "My Proposals",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "theCollection": "The Collection",
+    "postTrip": "Post a Trip",
+    "myCollections": "My Collections",
+    "search": "Search",
+    "notifications": "Notifications"
   }
 }
