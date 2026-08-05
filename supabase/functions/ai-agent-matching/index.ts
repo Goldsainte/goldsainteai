@@ -1,6 +1,29 @@
 import "../_shared/resend-guard.ts";
 import { emailShell } from "../_shared/brandEmail.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { pickLang, resolveRecipientLanguage, type EmailLang } from "../_shared/email-i18n.ts";
+
+interface S {
+  notifTitle: string;
+  notifMsg: (score: string, title: string) => string;
+  subject: (title: string) => string;
+  tagline: string;
+  body: (titleHtml: string) => string;
+  btnView: string;
+}
+
+const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
+  en: { notifTitle: '\u{1F3AF} Priority Job Match', notifMsg: (sc, t) => `You're a ${sc}% match for ${t}`, subject: (t) => `Priority match: ${t}`, tagline: 'A trip matched your specialty.', body: (t) => `${t} matches your profile and expertise. Review the traveler's brief on your dashboard and place your bid \u2014 priority matches move quickly.`, btnView: 'View the match' },
+  fr: { notifTitle: '\u{1F3AF} Correspondance prioritaire', notifMsg: (sc, t) => `Vous correspondez à ${sc}% à ${t}`, subject: (t) => `Correspondance prioritaire : ${t}`, tagline: 'Un voyage correspond à votre spécialité.', body: (t) => `${t} correspond à votre profil et votre expertise. Consultez le brief du voyageur sur votre tableau de bord et faites votre offre \u2014 les correspondances prioritaires partent vite.`, btnView: 'Voir la correspondance' },
+  es: { notifTitle: '\u{1F3AF} Coincidencia prioritaria', notifMsg: (sc, t) => `Coincides al ${sc}% con ${t}`, subject: (t) => `Coincidencia prioritaria: ${t}`, tagline: 'Un viaje coincide con tu especialidad.', body: (t) => `${t} coincide con tu perfil y experiencia. Revisa el brief del viajero en tu panel y haz tu oferta \u2014 las coincidencias prioritarias vuelan.`, btnView: 'Ver la coincidencia' },
+  de: { notifTitle: '\u{1F3AF} Prioritäts-Match', notifMsg: (sc, t) => `Sie passen zu ${sc}% auf ${t}`, subject: (t) => `Prioritäts-Match: ${t}`, tagline: 'Eine Reise passt zu Ihrer Spezialität.', body: (t) => `${t} passt zu Ihrem Profil und Ihrer Expertise. Prüfen Sie den Brief des Reisenden in Ihrem Dashboard und bieten Sie \u2014 Prioritäts-Matches sind schnell vergeben.`, btnView: 'Match ansehen' },
+  it: { notifTitle: '\u{1F3AF} Match prioritario', notifMsg: (sc, t) => `Sei compatibile al ${sc}% con ${t}`, subject: (t) => `Match prioritario: ${t}`, tagline: 'Un viaggio corrisponde alla tua specialità.', body: (t) => `${t} corrisponde al tuo profilo e alla tua esperienza. Esamina il brief del viaggiatore nella dashboard e fai la tua offerta \u2014 i match prioritari si muovono in fretta.`, btnView: 'Vedi il match' },
+  pt: { notifTitle: '\u{1F3AF} Match prioritário', notifMsg: (sc, t) => `Você tem ${sc}% de compatibilidade com ${t}`, subject: (t) => `Match prioritário: ${t}`, tagline: 'Uma viagem combinou com sua especialidade.', body: (t) => `${t} combina com seu perfil e experiência. Revise o briefing do viajante no seu painel e dê seu lance \u2014 matches prioritários voam.`, btnView: 'Ver o match' },
+  ar: { notifTitle: '\u{1F3AF} مطابقة ذات أولوية', notifMsg: (sc, t) => `تطابقك ${sc}% مع ${t}`, subject: (t) => `مطابقة ذات أولوية: ${t}`, tagline: 'رحلة تطابق تخصصك.', body: (t) => `${t} تطابق ملفك وخبرتك. راجع موجز المسافر في لوحتك وقدّم عرضك \u2014 المطابقات ذات الأولوية تُحسم سريعاً.`, btnView: 'اعرض المطابقة' },
+  ja: { notifTitle: '\u{1F3AF} 優先マッチ', notifMsg: (sc, t) => `${t} と ${sc}% マッチしています`, subject: (t) => `優先マッチ：${t}`, tagline: '旅があなたの専門にマッチしました。', body: (t) => `${t} はあなたのプロフィールと専門性にマッチしています。ダッシュボードで旅行者のブリーフを確認して入札しましょう \u2014 優先マッチはすぐ動きます。`, btnView: 'マッチを見る' },
+  ko: { notifTitle: '\u{1F3AF} 우선 매칭', notifMsg: (sc, t) => `${t}와(과) ${sc}% 일치합니다`, subject: (t) => `우선 매칭: ${t}`, tagline: '여행이 당신의 전문 분야와 매칭되었습니다.', body: (t) => `${t}이(가) 당신의 프로필 및 전문성과 일치합니다. 대시보드에서 여행자 브리프를 검토하고 입찰하세요 \u2014 우선 매칭은 빠르게 마감됩니다.`, btnView: '매칭 보기' },
+  zh: { notifTitle: '\u{1F3AF} 优先匹配', notifMsg: (sc, t) => `你与「${t}」匹配度 ${sc}%`, subject: (t) => `优先匹配：${t}`, tagline: '一段旅程匹配了你的专长。', body: (t) => `「${t}」与你的资料和专长相符。在工作台查看旅行者需求并出价 \u2014 优先匹配转瞬即逝。`, btnView: '查看匹配' },
+};
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
 function corsHeaders(req?: Request): Record<string, string> {
@@ -161,14 +184,16 @@ Deno.serve(async (req) => {
           .single();
 
         if (agent?.profiles?.email) {
+          const lang = await resolveRecipientLanguage(supabaseClient, null, agent.profiles.email);
+          const s = pickLang(STRINGS, lang);
           // Create in-app notification
           await supabaseClient
             .from('notifications')
             .insert({
               user_id: agent.user_id,
               type: 'system_announcement',
-              title: '🎯 Priority Job Match',
-              message: `You're a ${match.match_score}% match for ${job.title}`,
+              title: s.notifTitle,
+              message: s.notifMsg(String(match.match_score), job.title),
               entity_type: 'marketplace_job',
               entity_id: jobId,
               action_url: `/marketplace?job=${jobId}`
@@ -232,11 +257,11 @@ Deno.serve(async (req) => {
               body: JSON.stringify({
                 from: 'Goldsainte Marketplace <hello@goldsainte.com>',
                 to: [agent.profiles.email],
-                subject: `Priority match: ${job.title}`,
+                subject: s.subject(job.title),
                 html: emailShell(
-                  "A trip matched your specialty.",
-                  `<strong>${job.title}</strong> matches your profile and expertise. Review the traveler's brief on your dashboard and place your bid — priority matches move quickly.`,
-                  "View the match",
+                  s.tagline,
+                  s.body(`<strong>${job.title}</strong>`),
+                  s.btnView,
                   "https://goldsainte.ai/agent-dashboard"
                 ),
               }),
