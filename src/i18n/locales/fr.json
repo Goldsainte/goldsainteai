@@ -2589,5 +2589,91 @@
     "t3c": "Publier un voyage",
     "t3d": "Décrivez le voyage de vos rêves et l'IA vous met en relation avec les bons spécialistes.",
     "title": "Premiers pas"
+  },
+  "creatorTools": {
+    "commission": {
+      "pkgBookings": "Réservations de packs",
+      "virtualGifts": "Cadeaux virtuels",
+      "affiliate": "Revenus d'affiliation",
+      "shopSales2": "Ventes boutique",
+      "partnerships": "Partenariats",
+      "totalEarnings": "Gains totaux",
+      "allTime": "Revenus cumulés",
+      "available": "Solde disponible",
+      "readyWithdraw": "Prêt à retirer",
+      "pending": "Solde en attente",
+      "inHold": "En période de retenue",
+      "revenueBySource": "Revenus par source",
+      "noSources": "Aucune source de revenus pour l'instant",
+      "startEarning": "Créez du contenu et des packs pour gagner des commissions !",
+      "structure": "Structure des commissions",
+      "howCalculated": "Comment vos gains sont calculés",
+      "shopSales": "Ventes de produits boutique",
+      "variablePartner": "Variable selon le partenaire",
+      "tierMultiplier": "Votre multiplicateur de niveau",
+      "platformFee": "Frais de plateforme",
+      "holdPeriod": "Période de retenue"
+    },
+    "service": {
+      "stepOverview": "Aperçu",
+      "stepPricing": "Tarifs",
+      "stepRequirements": "Prérequis",
+      "stepDescription": "Description",
+      "tapToUse": "Touchez-en un pour l'utiliser",
+      "quickNote": "Un mot sur ce que vous vendez :",
+      "description": "Description",
+      "writeWithAi": "Rédiger avec l'IA",
+      "briefDesc": "Brève description de ce service",
+      "deliveryTime": "Délai de livraison",
+      "tripDays": "Jours de voyage",
+      "revisions": "Révisions incluses",
+      "prioritySupport": "Support prioritaire inclus",
+      "onTripPricing": "Fonctionnement des tarifs en voyage",
+      "noPricingDetails": "Aucun détail tarifaire supplémentaire pour ce niveau.",
+      "addCustomQ": "Ajouter une question personnalisée…",
+      "hireYouFor": "Pour quoi les voyageurs peuvent-ils vous engager ?",
+      "whatsIncluded": "Ce qui est inclus",
+      "faqHint": "Répondez aux questions courantes avant qu'on vous les pose.",
+      "question": "Question",
+      "answer": "Réponse"
+    },
+    "services": {
+      "finishSetup": "Terminez votre configuration",
+      "declareHire": "Indiquez pour quoi les voyageurs peuvent vous engager",
+      "travelHosted": "Le voyage, accompagné",
+      "guideQ": "Vous préférez vendre un guide téléchargeable ?",
+      "useItinBuilder": "Utilisez le créateur d'itinéraires",
+      "tourQ": ". Vous vendez un circuit programmé ?",
+      "useTripBuilder": "Créez-le dans le créateur de voyages",
+      "chooseBookable": "et choisissez « Circuit réservable ».",
+      "youKeep": "Vous gardez sur chaque réservation",
+      "paidDelivery": "Payé à la livraison",
+      "notOnRequest": "Pas seulement sur demande",
+      "youSetPrice": "Vous fixez le prix",
+      "fullControl": "Contrôle total, pas de tarifs imposés"
+    },
+    "feed": {
+      "browse": "Parcourir",
+      "save": "Enregistrer",
+      "buildTrip": "Composer votre voyage"
+    },
+    "media": {
+      "tiktokAuto": "Les couvertures TikTok sont récupérées automatiquement.",
+      "topHighlights": "Mes meilleurs moments de voyage",
+      "addHighlights": "Ajouter des moments forts"
+    },
+    "social": {
+      "platform": "Plateforme",
+      "handle": "Identifiant",
+      "profileUrl": "URL du profil",
+      "followers": "Abonnés",
+      "cancel": "Annuler"
+    },
+    "tier": {
+      "followers": "Abonnés",
+      "totalBookings": "Réservations totales",
+      "engagement": "Score d'engagement",
+      "highestTier": "Vous avez atteint le niveau le plus élevé !"
+    }
   }
 }
