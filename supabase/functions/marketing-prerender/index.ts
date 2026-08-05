@@ -32,10 +32,10 @@ type PageMeta = {
 
 const PAGES: Record<string, PageMeta> = {
   "/": {
-    title: "Goldsainte — The Smarter Travel Marketplace",
+    title: "Goldsainte — The Social Marketplace for Travel",
     description:
       "Goldsainte is a three-sided travel marketplace connecting travelers, creators, and verified travel agents — combining bookable travel inspiration with a custom-trip proposal marketplace. Powered by AI, built around you.",
-    h1: "The Smarter Travel Marketplace",
+    h1: "The Social Marketplace for Travel",
     intro:
       "Goldsainte connects discerning travelers with certified specialists and travel creators across more than 50 countries. Plan, discover, and book extraordinary journeys on one intelligent platform — with on-platform payments, vetted experts, and transparent pricing.",
     sections: [
