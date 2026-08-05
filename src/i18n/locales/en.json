@@ -2589,5 +2589,91 @@
     "t3c": "Post a trip",
     "t3d": "Tell us your dream trip and AI matches you with the right specialists.",
     "title": "Getting Started"
+  },
+  "creatorTools": {
+    "commission": {
+      "pkgBookings": "Package Bookings",
+      "virtualGifts": "Virtual Gifts",
+      "affiliate": "Affiliate Revenue",
+      "shopSales2": "Shop Sales",
+      "partnerships": "Partnerships",
+      "totalEarnings": "Total Earnings",
+      "allTime": "All-time revenue",
+      "available": "Available Balance",
+      "readyWithdraw": "Ready to withdraw",
+      "pending": "Pending Balance",
+      "inHold": "In hold period",
+      "revenueBySource": "Revenue by Source",
+      "noSources": "No revenue sources yet",
+      "startEarning": "Start creating content and packages to earn commissions!",
+      "structure": "Commission Structure",
+      "howCalculated": "How your earnings are calculated",
+      "shopSales": "Shop Product Sales",
+      "variablePartner": "Variable by partner",
+      "tierMultiplier": "Your Tier Multiplier",
+      "platformFee": "Platform Fee",
+      "holdPeriod": "Hold Period"
+    },
+    "service": {
+      "stepOverview": "Overview",
+      "stepPricing": "Pricing",
+      "stepRequirements": "Requirements",
+      "stepDescription": "Description",
+      "tapToUse": "Tap one to use it",
+      "quickNote": "A quick note on what you're selling:",
+      "description": "Description",
+      "writeWithAi": "Write it with AI",
+      "briefDesc": "Brief description of this service",
+      "deliveryTime": "Delivery Time",
+      "tripDays": "Trip Days",
+      "revisions": "Revisions Included",
+      "prioritySupport": "Priority Support included",
+      "onTripPricing": "How On-Trip pricing works",
+      "noPricingDetails": "No additional pricing details needed for this tier.",
+      "addCustomQ": "Add a custom question…",
+      "hireYouFor": "What can travelers hire you for?",
+      "whatsIncluded": "What's Included",
+      "faqHint": "Answer common questions before they're asked.",
+      "question": "Question",
+      "answer": "Answer"
+    },
+    "services": {
+      "finishSetup": "Finish your setup",
+      "declareHire": "Declare what travelers can hire you for",
+      "travelHosted": "Travel, hosted",
+      "guideQ": "Looking to sell a downloadable guide instead?",
+      "useItinBuilder": "Use the Itinerary Builder",
+      "tourQ": ". Selling a scheduled tour?",
+      "useTripBuilder": "Create it in the Trip Builder",
+      "chooseBookable": "and choose “Bookable Tour”.",
+      "youKeep": "You keep on every booking",
+      "paidDelivery": "Paid on delivery",
+      "notOnRequest": "Not just on request",
+      "youSetPrice": "You set the price",
+      "fullControl": "Full control, no fixed rates"
+    },
+    "feed": {
+      "browse": "Browse",
+      "save": "Save",
+      "buildTrip": "Build your trip"
+    },
+    "media": {
+      "tiktokAuto": "TikTok covers are fetched automatically.",
+      "topHighlights": "My Top Trip Highlights",
+      "addHighlights": "Add trip highlights"
+    },
+    "social": {
+      "platform": "Platform",
+      "handle": "Handle",
+      "profileUrl": "Profile URL",
+      "followers": "Followers",
+      "cancel": "Cancel"
+    },
+    "tier": {
+      "followers": "Followers",
+      "totalBookings": "Total Bookings",
+      "engagement": "Engagement Score",
+      "highestTier": "You’ve reached the highest tier!"
+    }
   }
 }
