@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -44,6 +45,7 @@ interface AgencyInfo {
 type DisputePref = "platform_mediation" | "direct_first" | "auto_refund";
 
 export function AgentSettingsTab() {
+  const { t } = useTranslation();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingStripe, setLoadingStripe] = useState(false);
   const [savingDispute, setSavingDispute] = useState(false);
@@ -102,7 +104,7 @@ export function AgentSettingsTab() {
       if (data?.url) window.location.href = data.url;
     } catch (e: any) {
       console.error("Stripe connect error", e);
-      toast.error(e.message || "Failed to start Stripe onboarding");
+      toast.error(e.message || t("dash.c.stripeOnboardFailed", "Failed to start Stripe onboarding"));
     } finally {
       setLoadingStripe(false);
     }
@@ -117,10 +119,10 @@ export function AgentSettingsTab() {
         .update({ dispute_preference: disputePref } as any)
         .eq("id", userId);
       if (error) throw error;
-      toast.success("Dispute preferences saved");
+      toast.success(t("dash.a.disputeSaved", "Dispute preferences saved"));
     } catch (error: any) {
       console.error("Save dispute error:", error);
-      toast.error(error.message || "Failed to save dispute preferences");
+      toast.error(error.message || t("dash.a.disputeSaveFailed", "Failed to save dispute preferences"));
     } finally {
       setSavingDispute(false);
     }
@@ -133,11 +135,11 @@ export function AgentSettingsTab() {
       {/* Account & Profile */}
       <SettingsSectionCard
         icon={User}
-        title="Account & Profile"
-        description="Manage your username, avatar, and bio"
+        title={t("dash.c.accountProfile", "Account & Profile")}
+        description={t("dash.c.accountProfileDesc", "Manage your username, avatar, and bio")}
       >
         <p className="text-sm text-[#6B7280]">
-          Edit your display name, profile photo, and personal details.
+          {t("dash.a.editProfileBody", "Edit your display name, profile photo, and personal details.")}
         </p>
         <Button
           asChild
@@ -146,7 +148,7 @@ export function AgentSettingsTab() {
         >
           <Link to="/travel-settings">
             <ExternalLink className="h-4 w-4 mr-2" />
-            Edit Profile
+            {t("dash.c.editProfile", "Edit Profile")}
           </Link>
         </Button>
       </SettingsSectionCard>
@@ -154,43 +156,43 @@ export function AgentSettingsTab() {
       {/* Agency Information */}
       <SettingsSectionCard
         icon={Building2}
-        title="Agency Information"
-        description="Business details from your travel agent application"
+        title={t("dash.a.agencyInfo", "Agency Information")}
+        description={t("dash.a.agencyInfoDesc", "Business details from your travel agent application")}
       >
         {agency ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-[#6B7280]">Agency Name</p>
+              <p className="text-[#6B7280]">{t("dash.a.agencyName", "Agency Name")}</p>
               <p className="text-[#0a2225] font-medium">
                 {agency.agency_name || "—"}
               </p>
             </div>
             <div>
-              <p className="text-[#6B7280]">Business Type</p>
+              <p className="text-[#6B7280]">{t("dash.a.businessType", "Business Type")}</p>
               <p className="text-[#0a2225] font-medium capitalize">
                 {agency.business_type || "—"}
               </p>
             </div>
             <div>
-              <p className="text-[#6B7280]">License Number</p>
+              <p className="text-[#6B7280]">{t("dash.a.licenseNumber", "License Number")}</p>
               <p className="text-[#0a2225] font-medium">
                 {agency.license_number || "—"}
               </p>
             </div>
             <div>
-              <p className="text-[#6B7280]">Accreditations</p>
+              <p className="text-[#6B7280]">{t("dash.a.accreditations", "Accreditations")}</p>
               <p className="text-[#0a2225] font-medium">
                 {agency.accreditations || "—"}
               </p>
             </div>
             <div>
-              <p className="text-[#6B7280]">Years of Experience</p>
+              <p className="text-[#6B7280]">{t("dash.a.yearsExperience", "Years of Experience")}</p>
               <p className="text-[#0a2225] font-medium">
                 {agency.years_experience ?? "—"}
               </p>
             </div>
             <div>
-              <p className="text-[#6B7280]">Application Status</p>
+              <p className="text-[#6B7280]">{t("dash.a.applicationStatus", "Application Status")}</p>
               <Badge className="bg-[#F6F0E4] text-[#0a2225] capitalize">
                 {agency.status || "—"}
               </Badge>
@@ -198,7 +200,7 @@ export function AgentSettingsTab() {
           </div>
         ) : (
           <p className="text-sm text-[#6B7280]">
-            No agent application found on file.
+            {t("dash.a.noApplication", "No agent application found on file.")}
           </p>
         )}
         <Button
@@ -208,7 +210,7 @@ export function AgentSettingsTab() {
         >
           <Link to="/apply/agent">
             <ExternalLink className="h-4 w-4 mr-2" />
-            Update Agency Details
+            {t("dash.a.updateAgencyDetails", "Update Agency Details")}
           </Link>
         </Button>
       </SettingsSectionCard>
@@ -216,8 +218,8 @@ export function AgentSettingsTab() {
       {/* Payouts & Stripe Connect */}
       <SettingsSectionCard
         icon={CreditCard}
-        title="Payouts & Stripe Connect"
-        description="Manage payouts and connected account"
+        title={t("dash.c.payoutsStripe", "Payouts & Stripe Connect")}
+        description={t("dash.c.payoutsStripeDesc", "Manage payouts and connected account")}
       >
         {stripeStatus?.connected ? (
           <div className="flex items-center gap-2 text-sm">
@@ -225,14 +227,14 @@ export function AgentSettingsTab() {
               <>
                 <CheckCircle2 className="h-4 w-4 text-[#0c4d47]" />
                 <span className="text-[#0a2225] font-medium">
-                  Payouts enabled
+                  {t("dash.c.payoutsEnabled", "Payouts enabled")}
                 </span>
               </>
             ) : (
               <>
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <span className="text-[#0a2225] font-medium">
-                  Onboarding incomplete
+                  {t("dash.c.onboardingIncomplete", "Onboarding incomplete")}
                 </span>
               </>
             )}
@@ -240,8 +242,7 @@ export function AgentSettingsTab() {
         ) : (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-[#6B7280]">
-              Connect your Stripe account to receive payouts from confirmed
-              bookings.
+              {t("dash.a.connectStripeBookings", "Connect your Stripe account to receive payouts from confirmed bookings.")}
             </p>
             <Button
               onClick={handleConnectStripe}
@@ -251,7 +252,7 @@ export function AgentSettingsTab() {
               {loadingStripe ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : null}
-              Connect Stripe
+              {t("chk.stripeC", "Connect Stripe")}
             </Button>
           </div>
         )}
@@ -260,9 +261,9 @@ export function AgentSettingsTab() {
       {/* Notifications */}
       <NotificationPreferencesSection
         userId={userId}
-        emailLabel="New jobs, bids, bookings, and payout updates"
-        smsLabel="Text alerts for urgent traveler messages"
-        marketingLabel="Product updates and agent program news"
+        emailLabel={t("dash.a.notifEmail", "New jobs, bids, bookings, and payout updates")}
+        smsLabel={t("dash.a.notifSms", "Text alerts for urgent traveler messages")}
+        marketingLabel={t("dash.a.notifMkt", "Product updates and agent program news")}
       />
 
       {/* Security */}
@@ -271,12 +272,11 @@ export function AgentSettingsTab() {
       {/* Tax & Credentials */}
       <SettingsSectionCard
         icon={FileText}
-        title="Tax & Credentials"
-        description="Tax forms and agent requirements"
+        title={t("dash.a.taxCredentials", "Tax & Credentials")}
+        description={t("dash.a.taxCredentialsDesc", "Tax forms and agent requirements")}
       >
         <p className="text-sm text-[#6B7280]">
-          Review tax obligations and credential requirements for agents on
-          Goldsainte.
+          {t("dash.a.taxCredBody", "Review tax obligations and credential requirements for agents on Goldsainte.")}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -286,7 +286,7 @@ export function AgentSettingsTab() {
           >
             <Link to="/help/agent-requirements">
               <ExternalLink className="h-4 w-4 mr-2" />
-              Agent Requirements
+              {t("dash.a.agentRequirements", "Agent Requirements")}
             </Link>
           </Button>
           <Button
@@ -296,7 +296,7 @@ export function AgentSettingsTab() {
           >
             <Link to="/help/tax-information">
               <ExternalLink className="h-4 w-4 mr-2" />
-              Tax Information
+              {t("dash.c.taxInfo", "Tax Information")}
             </Link>
           </Button>
         </div>
@@ -308,8 +308,8 @@ export function AgentSettingsTab() {
       {/* Dispute Settings */}
       <SettingsSectionCard
         icon={Scale}
-        title="Dispute Settings"
-        description="How traveler disputes should be handled"
+        title={t("dash.a.disputeSettings", "Dispute Settings")}
+        description={t("dash.a.disputeSettingsDesc", "How traveler disputes should be handled")}
       >
         <RadioGroup
           value={disputePref}
@@ -326,9 +326,9 @@ export function AgentSettingsTab() {
               htmlFor="dispute-platform"
               className="cursor-pointer space-y-0.5"
             >
-              <p className="text-[#0a2225] font-medium">Platform mediation</p>
+              <p className="text-[#0a2225] font-medium">{t("dash.a.platformMediation", "Platform mediation")}</p>
               <p className="text-sm text-[#6B7280]">
-                Goldsainte mediates from the start (recommended)
+                {t("dash.a.mediationRec", "Goldsainte mediates from the start (recommended)")}
               </p>
             </Label>
           </div>
@@ -343,10 +343,10 @@ export function AgentSettingsTab() {
               className="cursor-pointer space-y-0.5"
             >
               <p className="text-[#0a2225] font-medium">
-                Attempt direct resolution first
+                {t("dash.a.directFirst", "Attempt direct resolution first")}
               </p>
               <p className="text-sm text-[#6B7280]">
-                Try to resolve directly with the traveler before escalating
+                {t("dash.a.directFirstDesc", "Try to resolve directly with the traveler before escalating")}
               </p>
             </Label>
           </div>
@@ -361,11 +361,10 @@ export function AgentSettingsTab() {
               className="cursor-pointer space-y-0.5"
             >
               <p className="text-[#0a2225] font-medium">
-                Auto-approve refunds under threshold
+                {t("dash.a.autoApprove", "Auto-approve refunds under threshold")}
               </p>
               <p className="text-sm text-[#6B7280]">
-                Automatically approve refund requests below your minimum
-                booking value
+                {t("dash.a.autoApproveDesc", "Automatically approve refund requests below your minimum booking value")}
               </p>
             </Label>
           </div>
@@ -378,12 +377,12 @@ export function AgentSettingsTab() {
           {savingDispute ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
+              {t("dash.a.savingEllipsis", "Saving...")}
             </>
           ) : (
             <>
               <Save className="h-4 w-4 mr-2" />
-              Save Dispute Preferences
+              {t("dash.a.saveDispute", "Save Dispute Preferences")}
             </>
           )}
         </Button>
