@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { MapPin, DollarSign, Clock } from "lucide-react";
 import { toast } from "sonner";
 
@@ -9,10 +10,11 @@ interface AgentAvailableJobsTabProps {
 
 export function AgentAvailableJobsTab({ jobs, isVerified, onSelectJob }: AgentAvailableJobsTabProps) {
   if (jobs.length === 0) {
+    const { t } = useTranslation();
     return (
       <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
-        <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">No trip requests available</h3>
-        <p className="text-sm text-[#6B7280]">Check back later for new opportunities.</p>
+        <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">{t("dash.a.noTripRequests", "No trip requests available")}</h3>
+        <p className="text-sm text-[#6B7280]">{t("dash.a.checkBackLater", "Check back later for new opportunities.")}</p>
       </div>
     );
   }
@@ -47,7 +49,7 @@ export function AgentAvailableJobsTab({ jobs, isVerified, onSelectJob }: AgentAv
           <button
             onClick={() => {
               if (!isVerified) {
-                toast.error("Your application must be approved before you can place bids");
+                toast.error(t("dash.a.mustBeApproved", "Your application must be approved before you can place bids"));
                 return;
               }
               onSelectJob(job);
@@ -55,7 +57,7 @@ export function AgentAvailableJobsTab({ jobs, isVerified, onSelectJob }: AgentAv
             disabled={!isVerified}
             className="w-full rounded-full bg-[#0c4d47] px-6 py-3 text-sm font-medium text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isVerified ? "Submit Proposal" : "Awaiting Approval"}
+            {isVerified ? t("dash.a.submitProposal", "Submit Proposal") : t("dash.a.awaitingApproval", "Awaiting Approval")}
           </button>
         </div>
       ))}
