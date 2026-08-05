@@ -2058,7 +2058,8 @@
     "userBlocked": "Nutzer blockiert",
     "showOriginal": "Original anzeigen",
     "showTranslation": "Übersetzung anzeigen",
-    "translated": "Übersetzt"
+    "translated": "Übersetzt",
+    "noMessagesYet": "Noch keine Nachrichten"
   },
   "sett": {
     "checkoutOpened": "Checkout in neuem Tab geöffnet",
