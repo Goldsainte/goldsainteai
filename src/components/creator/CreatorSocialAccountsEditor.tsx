@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Plus, Trash2, Instagram, Linkedin, Youtube, Twitter, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ interface Props {
 }
 
 export function CreatorSocialAccountsEditor({ accounts, onChange }: Props) {
+  const { t } = useTranslation();
   const [adding, setAdding] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [form, setForm] = useState<Omit<SocialAccount, "id">>({
@@ -129,7 +131,7 @@ export function CreatorSocialAccountsEditor({ accounts, onChange }: Props) {
         <div className="rounded-xl border border-[#E5DFC6] bg-white p-4 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-[#6B7280]">Platform</Label>
+              <Label className="text-xs text-[#6B7280]">{t("creatorTools.social.platform", "Platform")}</Label>
               <Select value={form.platform} onValueChange={(v) => setForm({ ...form, platform: v })}>
                 <SelectTrigger className="mt-1 border-[#E5DFC6]">
                   <SelectValue />
@@ -142,7 +144,7 @@ export function CreatorSocialAccountsEditor({ accounts, onChange }: Props) {
               </Select>
             </div>
             <div>
-              <Label className="text-xs text-[#6B7280]">Handle</Label>
+              <Label className="text-xs text-[#6B7280]">{t("creatorTools.social.handle", "Handle")}</Label>
               <Input
                 className="mt-1 border-[#E5DFC6]"
                 placeholder="@yourhandle"
@@ -153,7 +155,7 @@ export function CreatorSocialAccountsEditor({ accounts, onChange }: Props) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-[#6B7280]">Profile URL</Label>
+              <Label className="text-xs text-[#6B7280]">{t("creatorTools.social.profileUrl", "Profile URL")}</Label>
               <Input
                 className="mt-1 border-[#E5DFC6]"
                 placeholder="https://instagram.com/yourhandle"
@@ -162,7 +164,7 @@ export function CreatorSocialAccountsEditor({ accounts, onChange }: Props) {
               />
             </div>
             <div>
-              <Label className="text-xs text-[#6B7280]">Followers</Label>
+              <Label className="text-xs text-[#6B7280]">{t("creatorTools.social.followers", "Followers")}</Label>
               <Input
                 className="mt-1 border-[#E5DFC6]"
                 type="number"
@@ -174,7 +176,7 @@ export function CreatorSocialAccountsEditor({ accounts, onChange }: Props) {
             </div>
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="ghost" size="sm" onClick={resetForm}>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={resetForm}>{t("creatorTools.social.cancel", "Cancel")}</Button>
             <Button
               size="sm"
               onClick={handleSaveEntry}
