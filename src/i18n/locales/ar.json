@@ -2589,5 +2589,91 @@
     "t3c": "انشر رحلة",
     "t3d": "أخبرنا برحلة أحلامك وسيوصلك الذكاء الاصطناعي بالمختصين المناسبين.",
     "title": "البداية"
+  },
+  "creatorTools": {
+    "commission": {
+      "pkgBookings": "حجوزات الباقات",
+      "virtualGifts": "هدايا افتراضية",
+      "affiliate": "إيرادات الإحالة",
+      "shopSales2": "مبيعات المتجر",
+      "partnerships": "شراكات",
+      "totalEarnings": "إجمالي الأرباح",
+      "allTime": "إيرادات منذ البداية",
+      "available": "الرصيد المتاح",
+      "readyWithdraw": "جاهز للسحب",
+      "pending": "رصيد معلق",
+      "inHold": "في فترة الحجز",
+      "revenueBySource": "الإيرادات حسب المصدر",
+      "noSources": "لا مصادر إيرادات بعد",
+      "startEarning": "ابدأ بإنشاء محتوى وباقات لكسب العمولات!",
+      "structure": "هيكل العمولات",
+      "howCalculated": "كيف تُحسب أرباحك",
+      "shopSales": "مبيعات منتجات المتجر",
+      "variablePartner": "متغير حسب الشريك",
+      "tierMultiplier": "مضاعف مستواك",
+      "platformFee": "رسوم المنصة",
+      "holdPeriod": "فترة الحجز"
+    },
+    "service": {
+      "stepOverview": "نظرة عامة",
+      "stepPricing": "التسعير",
+      "stepRequirements": "المتطلبات",
+      "stepDescription": "الوصف",
+      "tapToUse": "انقر واحداً لاستخدامه",
+      "quickNote": "ملاحظة سريعة عمّا تبيعه:",
+      "description": "الوصف",
+      "writeWithAi": "اكتبه بالذكاء الاصطناعي",
+      "briefDesc": "وصف موجز لهذه الخدمة",
+      "deliveryTime": "مدة التسليم",
+      "tripDays": "أيام الرحلة",
+      "revisions": "مراجعات مشمولة",
+      "prioritySupport": "دعم أولوية مشمول",
+      "onTripPricing": "كيف يعمل تسعير أثناء الرحلة",
+      "noPricingDetails": "لا حاجة لتفاصيل تسعير إضافية لهذا المستوى.",
+      "addCustomQ": "أضف سؤالاً مخصصاً…",
+      "hireYouFor": "فيمَ يمكن للمسافرين توظيفك؟",
+      "whatsIncluded": "ما المشمول",
+      "faqHint": "أجب عن الأسئلة الشائعة قبل أن تُطرح.",
+      "question": "سؤال",
+      "answer": "إجابة"
+    },
+    "services": {
+      "finishSetup": "أكمل إعدادك",
+      "declareHire": "حدد فيمَ يمكن للمسافرين توظيفك",
+      "travelHosted": "سفر بمرافقة",
+      "guideQ": "تفضل بيع دليل قابل للتنزيل؟",
+      "useItinBuilder": "استخدم منشئ المسارات",
+      "tourQ": ". تبيع جولة مجدولة؟",
+      "useTripBuilder": "أنشئها في منشئ الرحلات",
+      "chooseBookable": "واختر «جولة قابلة للحجز».",
+      "youKeep": "تحتفظ بها في كل حجز",
+      "paidDelivery": "الدفع عند التسليم",
+      "notOnRequest": "ليس عند الطلب فقط",
+      "youSetPrice": "أنت تحدد السعر",
+      "fullControl": "تحكم كامل، بلا أسعار ثابتة"
+    },
+    "feed": {
+      "browse": "تصفح",
+      "save": "احفظ",
+      "buildTrip": "ابنِ رحلتك"
+    },
+    "media": {
+      "tiktokAuto": "تُجلب أغلفة TikTok تلقائياً.",
+      "topHighlights": "أبرز لحظات رحلاتي",
+      "addHighlights": "أضف لحظات مميزة"
+    },
+    "social": {
+      "platform": "المنصة",
+      "handle": "المعرف",
+      "profileUrl": "رابط الملف",
+      "followers": "المتابعون",
+      "cancel": "إلغاء"
+    },
+    "tier": {
+      "followers": "المتابعون",
+      "totalBookings": "إجمالي الحجوزات",
+      "engagement": "درجة التفاعل",
+      "highestTier": "وصلت إلى أعلى مستوى!"
+    }
   }
 }
