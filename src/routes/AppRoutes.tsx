@@ -197,6 +197,7 @@ export const AppRoutes = () => (
     <Route element={<MarketingLayout />}>
       <Route index element={<HomePage />} />
       <Route path="/about" element={<About />} />
+      <Route path="/about-us" element={<Navigate to="/about" replace />} />
       <Route path="/@:username" element={<UsernameRedirect />} />
       <Route path="/@:username/shop" element={<ShopPage />} />
       <Route path="/bundle/:id" element={<BundleDetailPage />} />
