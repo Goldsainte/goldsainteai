@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { NavLink, useNavigate } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
 import { Home, Search, MessageCircle, Bell, BarChart3, User2, Store, PlaneTakeoff, Sparkles, FileText } from "lucide-react";
@@ -24,6 +25,7 @@ function NavItemBtn({ onClick, children }: { onClick: () => void; children: Reac
 }
 
 export default function LeftNav() {
+  const { t } = useTranslation();
   const { openType } = usePanelStore();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -35,21 +37,21 @@ export default function LeftNav() {
     <div className="h-screen flex flex-col py-4">
       <div className="px-3 pb-4 text-2xl font-extrabold">GOLDSAINTE</div>
       <nav className="space-y-1">
-        <NavItemLink to="/"><Home className="w-6 h-6" /> Home</NavItemLink>
-        <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> The Collection</NavItemLink>
-        <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> Post a Trip</NavItemLink>
+        <NavItemLink to="/"><Home className="w-6 h-6" /> {t("sideNav.home", "Home")}</NavItemLink>
+        <NavItemLink to="/marketplace"><Store className="w-6 h-6" /> {t("sideNav.theCollection", "The Collection")}</NavItemLink>
+        <NavItemLink to="/post-trip"><PlaneTakeoff className="w-6 h-6" /> {t("sideNav.postTrip", "Post a Trip")}</NavItemLink>
         
         {/* My Proposals - Agents and Creators */}
         {(isAgentAccount || isCreator) && (
-          <NavItemLink to="/my-proposals"><FileText className="w-6 h-6" /> My Proposals</NavItemLink>
+          <NavItemLink to="/my-proposals"><FileText className="w-6 h-6" /> {t("sideNav.myProposals", "My Proposals")}</NavItemLink>
         )}
         
         {/* My Collections - Authenticated users only */}
         {user && (
-          <NavItemLink to="/collections"><Sparkles className="w-6 h-6" /> My Collections</NavItemLink>
+          <NavItemLink to="/collections"><Sparkles className="w-6 h-6" /> {t("sideNav.myCollections", "My Collections")}</NavItemLink>
         )}
         
-        <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> Search</NavItemBtn>
+        <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> {t("sideNav.search", "Search")}</NavItemBtn>
         
         {/* Messages - Navigate to full page instead of panel */}
         <NavItemLink to="/messages">
@@ -61,14 +63,14 @@ export default function LeftNav() {
               </span>
             )}
           </div>
-          Messages
+          {t("sideNav.messages", "Messages")}
         </NavItemLink>
         
-        <NavItemBtn onClick={() => openType("notifications")}><Bell className="w-6 h-6" /> Notifications</NavItemBtn>
+        <NavItemBtn onClick={() => openType("notifications")}><Bell className="w-6 h-6" /> {t("sideNav.notifications", "Notifications")}</NavItemBtn>
         
         {/* Dashboard - Creators only */}
         {isCreator && (
-          <NavItemLink to="/creator-dashboard"><BarChart3 className="w-6 h-6" /> Dashboard</NavItemLink>
+          <NavItemLink to="/creator-dashboard"><BarChart3 className="w-6 h-6" /> {t("sideNav.dashboard", "Dashboard")}</NavItemLink>
         )}
         
         <NavItemBtn onClick={() => {
@@ -76,7 +78,7 @@ export default function LeftNav() {
           if (isCreator) navigate(`/creators/${user.id}`);
           else if (isAgentAccount) navigate('/agent-dashboard');
           else navigate('/traveler');
-        }}><User2 className="w-6 h-6" /> Profile</NavItemBtn>
+        }}><User2 className="w-6 h-6" /> {t("sideNav.profile", "Profile")}</NavItemBtn>
       </nav>
     </div>
   );
