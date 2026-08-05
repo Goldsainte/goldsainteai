@@ -3,6 +3,7 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import { resolveRecipientLanguage } from '../_shared/email-i18n.ts'
  
 // Email sender configuration. Emails are sent via Resend — the domain used in
 // FROM_DOMAIN MUST be a verified sending domain in your Resend account.
@@ -184,6 +185,15 @@ Deno.serve(async (req) => {
   }
  
   // Render React Email template to HTML and plain text
+  // Localize: resolve the recipient's language once and expose it to both the
+  // component (as the `lang` prop) and the subject resolver. Templates that
+  // haven't been localized yet simply ignore it.
+  templateData.lang = await resolveRecipientLanguage(
+    supabase,
+    templateData.lang,
+    template.to ? null : normalizedEmail,
+  )
+
   const html = await renderAsync(
     React.createElement(template.component, templateData)
   )
