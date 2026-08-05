@@ -2589,5 +2589,91 @@
     "t3c": "旅を投稿",
     "t3d": "理想の旅を教えてください。AI が最適なスペシャリストとつなぎます。",
     "title": "はじめに"
+  },
+  "creatorTools": {
+    "commission": {
+      "pkgBookings": "パッケージ予約",
+      "virtualGifts": "バーチャルギフト",
+      "affiliate": "アフィリエイト収益",
+      "shopSales2": "ショップ販売",
+      "partnerships": "パートナーシップ",
+      "totalEarnings": "総収益",
+      "allTime": "累計収益",
+      "available": "出金可能残高",
+      "readyWithdraw": "出金できます",
+      "pending": "保留中の残高",
+      "inHold": "保留期間中",
+      "revenueBySource": "収益の内訳",
+      "noSources": "収益源はまだありません",
+      "startEarning": "コンテンツやパッケージを作ってコミッションを獲得しましょう！",
+      "structure": "コミッションの仕組み",
+      "howCalculated": "収益の計算方法",
+      "shopSales": "ショップ商品の販売",
+      "variablePartner": "パートナーにより変動",
+      "tierMultiplier": "あなたのティア倍率",
+      "platformFee": "プラットフォーム手数料",
+      "holdPeriod": "保留期間"
+    },
+    "service": {
+      "stepOverview": "概要",
+      "stepPricing": "価格",
+      "stepRequirements": "要件",
+      "stepDescription": "説明",
+      "tapToUse": "タップして使用",
+      "quickNote": "販売内容のメモ：",
+      "description": "説明",
+      "writeWithAi": "AI で書く",
+      "briefDesc": "このサービスの簡単な説明",
+      "deliveryTime": "納品までの期間",
+      "tripDays": "旅行日数",
+      "revisions": "修正回数（込み）",
+      "prioritySupport": "優先サポート込み",
+      "onTripPricing": "オントリップ価格の仕組み",
+      "noPricingDetails": "このティアでは追加の価格設定は不要です。",
+      "addCustomQ": "カスタム質問を追加…",
+      "hireYouFor": "旅行者は何を依頼できますか？",
+      "whatsIncluded": "含まれるもの",
+      "faqHint": "よくある質問に先回りして答えましょう。",
+      "question": "質問",
+      "answer": "回答"
+    },
+    "services": {
+      "finishSetup": "設定を完了しましょう",
+      "declareHire": "旅行者が依頼できる内容を宣言",
+      "travelHosted": "ホストと旅する",
+      "guideQ": "ダウンロード型ガイドを売りたい？",
+      "useItinBuilder": "旅程ビルダーを使う",
+      "tourQ": "。スケジュール型ツアーを売る？",
+      "useTripBuilder": "旅ビルダーで作成",
+      "chooseBookable": "して「予約可能ツアー」を選択。",
+      "youKeep": "毎回の予約であなたの取り分",
+      "paidDelivery": "納品時に支払い",
+      "notOnRequest": "リクエスト時だけではありません",
+      "youSetPrice": "価格はあなたが決める",
+      "fullControl": "完全な自由、固定料金なし"
+    },
+    "feed": {
+      "browse": "見る",
+      "save": "保存",
+      "buildTrip": "旅を組み立てる"
+    },
+    "media": {
+      "tiktokAuto": "TikTok のカバーは自動取得されます。",
+      "topHighlights": "わたしの旅ハイライト",
+      "addHighlights": "ハイライトを追加"
+    },
+    "social": {
+      "platform": "プラットフォーム",
+      "handle": "ハンドル",
+      "profileUrl": "プロフィールURL",
+      "followers": "フォロワー",
+      "cancel": "キャンセル"
+    },
+    "tier": {
+      "followers": "フォロワー",
+      "totalBookings": "総予約数",
+      "engagement": "エンゲージメントスコア",
+      "highestTier": "最高ティアに到達しました！"
+    }
   }
 }
