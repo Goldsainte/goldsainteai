@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { MessageSquare, DollarSign, CheckCircle } from "lucide-react";
 
 interface AgentMyBidsTabProps {
@@ -9,10 +10,11 @@ interface AgentMyBidsTabProps {
 
 export function AgentMyBidsTab({ myBids, onMessage, onPaymentDetails, onSubmitCompletion }: AgentMyBidsTabProps) {
   if (myBids.length === 0) {
+    const { t } = useTranslation();
     return (
       <div className="bg-white border border-[#E5DFC6] rounded-2xl p-12 text-center">
-        <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">No proposals yet</h3>
-        <p className="text-sm text-[#6B7280]">Submit your first proposal from the Available Jobs tab.</p>
+        <h3 className="font-secondary text-2xl text-[#0a2225] mb-2">{t("dash.c.noProposals", "No proposals yet")}</h3>
+        <p className="text-sm text-[#6B7280]">{t("dash.a.submitFirstProposal", "Submit your first proposal from the Available Jobs tab.")}</p>
       </div>
     );
   }
@@ -47,11 +49,11 @@ export function AgentMyBidsTab({ myBids, onMessage, onPaymentDetails, onSubmitCo
           </div>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-[#6B7280]">Your proposal:</span>
+              <span className="text-[#6B7280]">{t("dash.a.yourProposal", "Your proposal:")}</span>
               <span className="font-medium text-[#0a2225]">{bid.currency} {bid.proposed_price}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#6B7280]">Completion time:</span>
+              <span className="text-[#6B7280]">{t("dash.a.completionTime", "Completion time:")}</span>
               <span className="text-[#0a2225]">{bid.estimated_completion_days} days</span>
             </div>
             <p className="text-sm text-[#0a2225] mt-3 leading-relaxed">{bid.proposal_details}</p>
@@ -63,14 +65,14 @@ export function AgentMyBidsTab({ myBids, onMessage, onPaymentDetails, onSubmitCo
                   className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-5 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
                 >
                   <MessageSquare className="h-4 w-4" />
-                  Message traveler
+                  {t("dash.a.messageTraveler", "Message traveler")}
                 </button>
                 <button
                   onClick={() => onPaymentDetails(bid)}
                   className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full border border-[#0a2225] px-5 py-2.5 text-sm text-[#0a2225] hover:bg-[#0a2225] hover:text-white transition-colors"
                 >
                   <DollarSign className="h-4 w-4" />
-                  Payment details
+                  {t("dash.a.paymentDetails", "Payment details")}
                 </button>
                 {bid.marketplace_jobs?.status === "in_progress" && (
                   <button
@@ -78,7 +80,7 @@ export function AgentMyBidsTab({ myBids, onMessage, onPaymentDetails, onSubmitCo
                     className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 rounded-full bg-[#0c4d47] px-5 py-2.5 text-sm text-[#E5DFC6] hover:bg-[#0a3d39] transition-colors"
                   >
                     <CheckCircle className="h-4 w-4" />
-                    Submit completion
+                    {t("dash.a.submitCompletion", "Submit completion")}
                   </button>
                 )}
               </div>
