@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, X, ArrowRight, Layers, MoreVertical, Edit2, Trash2, Sparkles } from "lucide-react";
@@ -54,6 +55,7 @@ export function CreatorPinterestFeed({
   onDeleteItem,
   onBoardDeleted,
 }: Props) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeBoard, setActiveBoard] = useState<string | null>(null);
   const [refinementPath, setRefinementPath] = useState<string[]>([]);
@@ -132,11 +134,11 @@ export function CreatorPinterestFeed({
         {!instructionDismissed && (
           <div className="flex items-center justify-between bg-accent/50 rounded-full px-4 py-2 mb-4">
             <p className="text-xs text-muted-foreground flex items-center gap-2">
-              <span className="font-medium text-foreground">Browse</span>
+              <span className="font-medium text-foreground">{t("creatorTools.feed.browse", "Browse")}</span>
               <ArrowRight className="h-3 w-3" />
-              <span className="font-medium text-foreground">Save</span>
+              <span className="font-medium text-foreground">{t("creatorTools.feed.save", "Save")}</span>
               <ArrowRight className="h-3 w-3" />
-              <span className="font-medium text-foreground">Build your trip</span>
+              <span className="font-medium text-foreground">{t("creatorTools.feed.buildTrip", "Build your trip")}</span>
             </p>
             <button onClick={handleDismissInstruction} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="h-3.5 w-3.5" />
@@ -195,11 +197,11 @@ export function CreatorPinterestFeed({
       {!instructionDismissed && (
         <div className="flex items-center justify-between bg-accent/50 rounded-full px-4 py-2 mb-4">
           <p className="text-sm text-muted-foreground flex items-center gap-2">
-            <span className="font-medium text-foreground">Browse</span>
+            <span className="font-medium text-foreground">{t("creatorTools.feed.browse", "Browse")}</span>
             <ArrowRight className="h-3.5 w-3.5" />
-            <span className="font-medium text-foreground">Save</span>
+            <span className="font-medium text-foreground">{t("creatorTools.feed.save", "Save")}</span>
             <ArrowRight className="h-3.5 w-3.5" />
-            <span className="font-medium text-foreground">Build your trip</span>
+            <span className="font-medium text-foreground">{t("creatorTools.feed.buildTrip", "Build your trip")}</span>
           </p>
           <button onClick={handleDismissInstruction} className="text-muted-foreground hover:text-foreground transition-colors">
             <X className="h-3.5 w-3.5" />
