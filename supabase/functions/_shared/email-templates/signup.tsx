@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
 import { AuthEmailLayout } from './_layout.tsx'
+import { pickLang, type EmailLang } from '../email-i18n.ts'
 
 interface SignupEmailProps {
   siteName: string
@@ -14,48 +15,49 @@ interface SignupEmailProps {
    * signups (founder report, Jul 26: a creator received traveler steps).
    */
   accountType?: 'traveler' | 'creator' | 'agent' | 'brand'
+  lang?: EmailLang
 }
 
-// What genuinely happens next, per role. Order mirrors the real flow.
-const STEPS_BY_ROLE: Record<string, string[]> = {
-  traveler: [
-    'Confirm your email to activate your account and secure your profile.',
-    "You'll be signed in automatically and taken to your traveler dashboard.",
-    'Complete your traveler profile so specialists can tailor recommendations to your taste.',
-    'Browse curated trips, or post a trip request and receive proposals from specialists.',
-    'Book and pay on-platform — every reservation is protected from inquiry to return.',
-  ],
-  creator: [
-    'Confirm your email to activate your account and secure your profile.',
-    "You'll be signed in automatically and taken to your creator studio.",
-    'Complete your creator profile and add photos and video — this is your storefront.',
-    'Publish your first tour or digital itinerary guide.',
-    'Connect Stripe so bookings, guide sales, and tips pay out to your own account.',
-  ],
-  agent: [
-    'Confirm your email to activate your account and secure your profile.',
-    "You'll be returned to your travel-agent application to finish the remaining steps.",
-    'Complete Stripe Identity verification — this confirms who you are, and takes 2–3 minutes.',
-    'Our team then reviews your credentials and insurance, typically within one to two business days.',
-    "We'll email you the moment a decision is made — your dashboard unlocks on approval.",
-  ],
+interface S {
+  title: string
+  headline: string
+  tagline: string
+  ledeAgent: string
+  ledeCreator: string
+  ledeDefault: string
+  cta: string
+  stepsTraveler: string[]
+  stepsCreator: string[]
+  stepsAgent: string[]
 }
 
-export const SignupEmail = ({ confirmationUrl, accountType }: SignupEmailProps) => (
-  <AuthEmailLayout
-    title="Confirm your email — Goldsainte"
-    headline="Welcome to Goldsainte."
-    tagline="A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands."
-    lede={
-      accountType === 'agent'
-        ? 'Confirm your email address to activate your account and return to your application.'
-        : accountType === 'creator'
-        ? 'Confirm your email address to activate your account and open your creator studio.'
-        : 'Confirm your email address to activate your account and begin curating your journey.'
-    }
-    cta={{ label: 'Confirm my email', url: confirmationUrl }}
-    steps={STEPS_BY_ROLE[accountType ?? 'traveler'] ?? STEPS_BY_ROLE.traveler}
-  />
-)
+const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
+  en: { title: 'Confirm your email \u2014 Goldsainte', headline: 'Welcome to Goldsainte.', tagline: "A curated marketplace connecting discerning travelers with the world's most trusted specialists, creators, and brands.", ledeAgent: 'Confirm your email address to activate your account and return to your application.', ledeCreator: 'Confirm your email address to activate your account and open your creator studio.', ledeDefault: 'Confirm your email address to activate your account and begin curating your journey.', cta: 'Confirm my email', stepsTraveler: ['Confirm your email to activate your account and secure your profile.', "You'll be signed in automatically and taken to your traveler dashboard.", 'Complete your traveler profile so specialists can tailor recommendations to your taste.', 'Browse curated trips, or post a trip request and receive proposals from specialists.', 'Book and pay on-platform \u2014 every reservation is protected from inquiry to return.'], stepsCreator: ['Confirm your email to activate your account and secure your profile.', "You'll be signed in automatically and taken to your creator studio.", 'Complete your creator profile and add photos and video \u2014 this is your storefront.', 'Publish your first tour or digital itinerary guide.', 'Connect Stripe so bookings, guide sales, and tips pay out to your own account.'], stepsAgent: ['Confirm your email to activate your account and secure your profile.', "You'll be returned to your travel-agent application to finish the remaining steps.", 'Complete Stripe Identity verification \u2014 this confirms who you are, and takes 2\u20133 minutes.', 'Our team then reviews your credentials and insurance, typically within one to two business days.', "We'll email you the moment a decision is made \u2014 your dashboard unlocks on approval."] },
+  fr: { title: 'Confirmez votre e-mail \u2014 Goldsainte', headline: 'Bienvenue chez Goldsainte.', tagline: 'Une place de marché choisie qui relie les voyageurs exigeants aux spécialistes, créateurs et marques les plus fiables au monde.', ledeAgent: 'Confirmez votre adresse e-mail pour activer votre compte et reprendre votre candidature.', ledeCreator: 'Confirmez votre adresse e-mail pour activer votre compte et ouvrir votre studio de créateur.', ledeDefault: 'Confirmez votre adresse e-mail pour activer votre compte et commencer à composer votre voyage.', cta: 'Confirmer mon e-mail', stepsTraveler: ['Confirmez votre e-mail pour activer votre compte et sécuriser votre profil.', 'Vous serez connecté automatiquement et dirigé vers votre tableau de bord voyageur.', 'Complétez votre profil voyageur pour que les spécialistes adaptent leurs recommandations à vos goûts.', 'Parcourez des voyages choisis, ou publiez une demande et recevez des propositions de spécialistes.', 'Réservez et payez sur la plateforme \u2014 chaque réservation est protégée de la demande au retour.'], stepsCreator: ['Confirmez votre e-mail pour activer votre compte et sécuriser votre profil.', 'Vous serez connecté automatiquement et dirigé vers votre studio de créateur.', 'Complétez votre profil créateur et ajoutez photos et vidéos \u2014 c\'est votre vitrine.', 'Publiez votre premier circuit ou guide d\'itinéraire numérique.', 'Connectez Stripe pour que réservations, ventes de guides et pourboires soient versés sur votre compte.'], stepsAgent: ['Confirmez votre e-mail pour activer votre compte et sécuriser votre profil.', 'Vous reviendrez à votre candidature d\'agent de voyage pour terminer les étapes restantes.', 'Effectuez la vérification Stripe Identity \u2014 elle confirme votre identité en 2 à 3 minutes.', 'Notre équipe examine ensuite vos références et votre assurance, en un à deux jours ouvrés en général.', 'Nous vous écrirons dès la décision prise \u2014 votre tableau de bord s\'ouvre à l\'approbation.'] },
+  es: { title: 'Confirma tu correo \u2014 Goldsainte', headline: 'Bienvenido a Goldsainte.', tagline: 'Un marketplace selecto que conecta a viajeros exigentes con los especialistas, creadores y marcas más fiables del mundo.', ledeAgent: 'Confirma tu dirección de correo para activar tu cuenta y volver a tu solicitud.', ledeCreator: 'Confirma tu dirección de correo para activar tu cuenta y abrir tu estudio de creador.', ledeDefault: 'Confirma tu dirección de correo para activar tu cuenta y empezar a diseñar tu viaje.', cta: 'Confirmar mi correo', stepsTraveler: ['Confirma tu correo para activar tu cuenta y proteger tu perfil.', 'Entrarás automáticamente y llegarás a tu panel de viajero.', 'Completa tu perfil de viajero para que los especialistas adapten sus recomendaciones a tu gusto.', 'Explora viajes seleccionados o publica una solicitud y recibe propuestas de especialistas.', 'Reserva y paga en la plataforma \u2014 cada reserva está protegida de la consulta al regreso.'], stepsCreator: ['Confirma tu correo para activar tu cuenta y proteger tu perfil.', 'Entrarás automáticamente y llegarás a tu estudio de creador.', 'Completa tu perfil de creador y añade fotos y vídeo \u2014 es tu escaparate.', 'Publica tu primer tour o guía de itinerario digital.', 'Conecta Stripe para que reservas, ventas de guías y propinas se paguen en tu propia cuenta.'], stepsAgent: ['Confirma tu correo para activar tu cuenta y proteger tu perfil.', 'Volverás a tu solicitud de agente de viajes para terminar los pasos restantes.', 'Completa la verificación de Stripe Identity \u2014 confirma quién eres y toma 2\u20133 minutos.', 'Nuestro equipo revisa después tus credenciales y seguro, normalmente en uno o dos días laborables.', 'Te escribiremos en cuanto haya una decisión \u2014 tu panel se desbloquea con la aprobación.'] },
+  de: { title: 'Bestätigen Sie Ihre E-Mail \u2014 Goldsainte', headline: 'Willkommen bei Goldsainte.', tagline: 'Ein kuratierter Marktplatz, der anspruchsvolle Reisende mit den vertrauenswürdigsten Spezialisten, Creators und Marken der Welt verbindet.', ledeAgent: 'Bestätigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu aktivieren und zu Ihrer Bewerbung zurückzukehren.', ledeCreator: 'Bestätigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu aktivieren und Ihr Creator-Studio zu öffnen.', ledeDefault: 'Bestätigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu aktivieren und Ihre Reise zu gestalten.', cta: 'E-Mail bestätigen', stepsTraveler: ['Bestätigen Sie Ihre E-Mail, um Ihr Konto zu aktivieren und Ihr Profil zu sichern.', 'Sie werden automatisch angemeldet und zu Ihrem Reisenden-Dashboard geführt.', 'Vervollständigen Sie Ihr Reiseprofil, damit Spezialisten Empfehlungen auf Ihren Geschmack zuschneiden.', 'Stöbern Sie in kuratierten Reisen oder stellen Sie eine Anfrage ein und erhalten Sie Angebote von Spezialisten.', 'Buchen und zahlen Sie auf der Plattform \u2014 jede Reservierung ist von der Anfrage bis zur Rückkehr geschützt.'], stepsCreator: ['Bestätigen Sie Ihre E-Mail, um Ihr Konto zu aktivieren und Ihr Profil zu sichern.', 'Sie werden automatisch angemeldet und zu Ihrem Creator-Studio geführt.', 'Vervollständigen Sie Ihr Creator-Profil mit Fotos und Video \u2014 das ist Ihr Schaufenster.', 'Veröffentlichen Sie Ihre erste Tour oder Ihren digitalen Reiseführer.', 'Verbinden Sie Stripe, damit Buchungen, Guide-Verkäufe und Trinkgelder auf Ihr eigenes Konto fließen.'], stepsAgent: ['Bestätigen Sie Ihre E-Mail, um Ihr Konto zu aktivieren und Ihr Profil zu sichern.', 'Sie kehren zu Ihrer Reiseagenten-Bewerbung zurück, um die restlichen Schritte abzuschließen.', 'Schließen Sie die Stripe-Identity-Verifizierung ab \u2014 sie bestätigt Ihre Identität in 2\u20133 Minuten.', 'Unser Team prüft dann Ihre Referenzen und Versicherung, in der Regel innerhalb von ein bis zwei Werktagen.', 'Wir schreiben Ihnen, sobald entschieden ist \u2014 Ihr Dashboard öffnet sich mit der Freigabe.'] },
+  it: { title: 'Conferma la tua email \u2014 Goldsainte', headline: 'Benvenuto su Goldsainte.', tagline: 'Un marketplace curato che collega viaggiatori esigenti con gli specialisti, i creator e i brand più affidabili al mondo.', ledeAgent: 'Conferma il tuo indirizzo email per attivare il tuo account e tornare alla tua candidatura.', ledeCreator: 'Conferma il tuo indirizzo email per attivare il tuo account e aprire il tuo studio da creator.', ledeDefault: 'Conferma il tuo indirizzo email per attivare il tuo account e iniziare a comporre il tuo viaggio.', cta: 'Conferma la mia email', stepsTraveler: ['Conferma la tua email per attivare il tuo account e proteggere il tuo profilo.', 'Accederai automaticamente e arriverai alla tua dashboard da viaggiatore.', 'Completa il profilo da viaggiatore così gli specialisti potranno tarare i consigli sui tuoi gusti.', 'Sfoglia viaggi curati o pubblica una richiesta e ricevi proposte dagli specialisti.', 'Prenota e paga sulla piattaforma \u2014 ogni prenotazione è protetta dalla richiesta al ritorno.'], stepsCreator: ['Conferma la tua email per attivare il tuo account e proteggere il tuo profilo.', 'Accederai automaticamente e arriverai al tuo studio da creator.', 'Completa il profilo da creator e aggiungi foto e video \u2014 è la tua vetrina.', 'Pubblica il tuo primo tour o guida di itinerario digitale.', 'Collega Stripe così prenotazioni, vendite di guide e mance arrivano sul tuo conto.'], stepsAgent: ['Conferma la tua email per attivare il tuo account e proteggere il tuo profilo.', 'Tornerai alla tua candidatura da agente di viaggio per completare i passaggi rimanenti.', 'Completa la verifica Stripe Identity \u2014 conferma chi sei e richiede 2\u20133 minuti.', 'Il nostro team esamina poi credenziali e assicurazione, di norma entro uno o due giorni lavorativi.', 'Ti scriveremo appena presa la decisione \u2014 la dashboard si sblocca all\'approvazione.'] },
+  pt: { title: 'Confirme seu e-mail \u2014 Goldsainte', headline: 'Bem-vindo à Goldsainte.', tagline: 'Um marketplace selecionado que conecta viajantes exigentes aos especialistas, criadores e marcas mais confiáveis do mundo.', ledeAgent: 'Confirme seu endereço de e-mail para ativar sua conta e voltar à sua candidatura.', ledeCreator: 'Confirme seu endereço de e-mail para ativar sua conta e abrir seu estúdio de criador.', ledeDefault: 'Confirme seu endereço de e-mail para ativar sua conta e começar a desenhar sua viagem.', cta: 'Confirmar meu e-mail', stepsTraveler: ['Confirme seu e-mail para ativar sua conta e proteger seu perfil.', 'Você entrará automaticamente e será levado ao seu painel de viajante.', 'Complete seu perfil de viajante para que especialistas ajustem recomendações ao seu gosto.', 'Explore viagens selecionadas ou publique um pedido e receba propostas de especialistas.', 'Reserve e pague na plataforma \u2014 cada reserva é protegida da consulta ao retorno.'], stepsCreator: ['Confirme seu e-mail para ativar sua conta e proteger seu perfil.', 'Você entrará automaticamente e será levado ao seu estúdio de criador.', 'Complete seu perfil de criador e adicione fotos e vídeo \u2014 esta é sua vitrine.', 'Publique seu primeiro tour ou guia de roteiro digital.', 'Conecte o Stripe para que reservas, vendas de guias e gorjetas caiam na sua própria conta.'], stepsAgent: ['Confirme seu e-mail para ativar sua conta e proteger seu perfil.', 'Você voltará à sua candidatura de agente de viagens para concluir as etapas restantes.', 'Conclua a verificação Stripe Identity \u2014 ela confirma quem você é e leva 2\u20133 minutos.', 'Nossa equipe então analisa suas credenciais e seguro, normalmente em um a dois dias úteis.', 'Escreveremos assim que houver decisão \u2014 seu painel abre com a aprovação.'] },
+  ar: { title: 'أكّد بريدك الإلكتروني \u2014 Goldsainte', headline: 'مرحباً بك في Goldsainte.', tagline: 'سوق منتقى يصل المسافرين المميزين بأكثر المختصين والمبدعين والعلامات موثوقية في العالم.', ledeAgent: 'أكّد بريدك الإلكتروني لتفعيل حسابك والعودة إلى طلبك.', ledeCreator: 'أكّد بريدك الإلكتروني لتفعيل حسابك وفتح استوديو المبدع الخاص بك.', ledeDefault: 'أكّد بريدك الإلكتروني لتفعيل حسابك والبدء في تنسيق رحلتك.', cta: 'أكّد بريدي', stepsTraveler: ['أكّد بريدك لتفعيل حسابك وتأمين ملفك.', 'ستسجل الدخول تلقائياً وتنتقل إلى لوحة المسافر.', 'أكمل ملف المسافر ليقدم المختصون توصيات على ذوقك.', 'تصفح رحلات منتقاة، أو انشر طلب رحلة واستلم عروضاً من المختصين.', 'احجز وادفع عبر المنصة \u2014 كل حجز محمي من الاستفسار حتى العودة.'], stepsCreator: ['أكّد بريدك لتفعيل حسابك وتأمين ملفك.', 'ستسجل الدخول تلقائياً وتنتقل إلى استوديو المبدع.', 'أكمل ملف المبدع وأضف صوراً وفيديو \u2014 فهذه واجهتك.', 'انشر جولتك الأولى أو دليل مسارك الرقمي.', 'اربط Stripe لتُدفع الحجوزات ومبيعات الأدلة والإكراميات إلى حسابك.'], stepsAgent: ['أكّد بريدك لتفعيل حسابك وتأمين ملفك.', 'ستعود إلى طلب وكيل السفر لإكمال الخطوات المتبقية.', 'أكمل توثيق Stripe Identity \u2014 يؤكد هويتك ويستغرق دقيقتين إلى ثلاث.', 'يراجع فريقنا بعدها اعتماداتك وتأمينك، عادة خلال يوم إلى يومي عمل.', 'سنراسلك فور اتخاذ القرار \u2014 وتُفتح لوحتك عند الاعتماد.'] },
+  ja: { title: 'メールを確認 \u2014 Goldsainte', headline: 'Goldsainte へようこそ。', tagline: '目の肥えた旅行者と、世界で最も信頼されるスペシャリスト、クリエイター、ブランドをつなぐ厳選マーケットプレイス。', ledeAgent: 'メールアドレスを確認してアカウントを有効化し、応募に戻りましょう。', ledeCreator: 'メールアドレスを確認してアカウントを有効化し、クリエイタースタジオを開きましょう。', ledeDefault: 'メールアドレスを確認してアカウントを有効化し、旅の編集を始めましょう。', cta: 'メールを確認する', stepsTraveler: ['メールを確認してアカウントを有効化し、プロフィールを保護しましょう。', '自動的にサインインし、旅行者ダッシュボードへ移動します。', '旅行者プロフィールを完成させると、スペシャリストが好みに合わせた提案をしてくれます。', '厳選された旅を眺めるか、旅のリクエストを投稿してスペシャリストの提案を受け取りましょう。', 'プラットフォーム上で予約・決済 \u2014 すべての予約は問い合わせから帰着まで保護されます。'], stepsCreator: ['メールを確認してアカウントを有効化し、プロフィールを保護しましょう。', '自動的にサインインし、クリエイタースタジオへ移動します。', 'クリエイタープロフィールを完成させ、写真と動画を追加 \u2014 ここがあなたの店先です。', '最初のツアーまたはデジタル旅程ガイドを公開しましょう。', 'Stripe を接続すると、予約・ガイド販売・チップがあなたの口座に入ります。'], stepsAgent: ['メールを確認してアカウントを有効化し、プロフィールを保護しましょう。', '旅行エージェント応募に戻り、残りのステップを完了します。', 'Stripe Identity 認証を完了 \u2014 本人確認で、2〜3分で終わります。', 'その後チームが資格と保険を審査します。通常1〜2営業日です。', '決定次第メールします \u2014 承認と同時にダッシュボードが開きます。'] },
+  ko: { title: '이메일 확인 \u2014 Goldsainte', headline: 'Goldsainte에 오신 것을 환영합니다.', tagline: '안목 있는 여행자와 세계에서 가장 신뢰받는 전문가, 크리에이터, 브랜드를 잇는 큐레이션 마켓플레이스.', ledeAgent: '이메일 주소를 확인해 계정을 활성화하고 지원서로 돌아가세요.', ledeCreator: '이메일 주소를 확인해 계정을 활성화하고 크리에이터 스튜디오를 여세요.', ledeDefault: '이메일 주소를 확인해 계정을 활성화하고 여행 큐레이션을 시작하세요.', cta: '이메일 확인하기', stepsTraveler: ['이메일을 확인해 계정을 활성화하고 프로필을 보호하세요.', '자동으로 로그인되어 여행자 대시보드로 이동합니다.', '여행자 프로필을 완성하면 전문가가 취향에 맞춘 추천을 제공합니다.', '큐레이션된 여행을 둘러보거나 여행 요청을 올려 전문가 제안을 받아보세요.', '플랫폼에서 예약하고 결제하세요 \u2014 모든 예약은 문의부터 귀국까지 보호됩니다.'], stepsCreator: ['이메일을 확인해 계정을 활성화하고 프로필을 보호하세요.', '자동으로 로그인되어 크리에이터 스튜디오로 이동합니다.', '크리에이터 프로필을 완성하고 사진과 영상을 추가하세요 \u2014 이것이 당신의 매장입니다.', '첫 투어 또는 디지털 일정 가이드를 게시하세요.', 'Stripe를 연결하면 예약, 가이드 판매, 팁이 본인 계좌로 지급됩니다.'], stepsAgent: ['이메일을 확인해 계정을 활성화하고 프로필을 보호하세요.', '여행 에이전트 지원서로 돌아가 남은 단계를 마무리합니다.', 'Stripe Identity 인증을 완료하세요 \u2014 본인 확인이며 2\u20133분 걸립니다.', '이후 팀이 자격과 보험을 검토합니다. 보통 1\u20132영업일입니다.', '결정되는 즉시 메일드립니다 \u2014 승인과 함께 대시보드가 열립니다.'] },
+  zh: { title: '确认你的邮箱 \u2014 Goldsainte', headline: '欢迎来到 Goldsainte。', tagline: '一个精选市场，连接品味独到的旅行者与全球最值得信赖的专家、创作者和品牌。', ledeAgent: '确认邮箱地址以激活账户并返回你的申请。', ledeCreator: '确认邮箱地址以激活账户并打开你的创作者工作室。', ledeDefault: '确认邮箱地址以激活账户，开始策划你的旅程。', cta: '确认我的邮箱', stepsTraveler: ['确认邮箱以激活账户并保护你的资料。', '你将自动登录并进入旅行者面板。', '完善旅行者资料，让专家按你的品味定制推荐。', '浏览精选旅程，或发布旅行需求并接收专家提案。', '在平台上预订和付款 \u2014 每笔预订从咨询到归程全程受保护。'], stepsCreator: ['确认邮箱以激活账户并保护你的资料。', '你将自动登录并进入创作者工作室。', '完善创作者资料并添加照片和视频 \u2014 这是你的门面。', '发布你的第一个行程或数字路线指南。', '连接 Stripe，让预订、指南销售和小费直接进入你自己的账户。'], stepsAgent: ['确认邮箱以激活账户并保护你的资料。', '你将返回旅行代理申请，完成剩余步骤。', '完成 Stripe Identity 验证 \u2014 确认你的身份，约需 2\u20133 分钟。', '随后团队将审核你的资质与保险，通常需一到两个工作日。', '一有决定我们会立即邮件通知 \u2014 审核通过后你的工作台即刻开启。'] },
+}
+
+export const SignupEmail = ({ confirmationUrl, accountType, lang }: SignupEmailProps) => {
+  const s = pickLang(STRINGS, lang ?? 'en')
+  const steps =
+    accountType === 'agent' ? s.stepsAgent : accountType === 'creator' ? s.stepsCreator : s.stepsTraveler
+  return (
+    <AuthEmailLayout
+      title={s.title}
+      headline={s.headline}
+      tagline={s.tagline}
+      lede={accountType === 'agent' ? s.ledeAgent : accountType === 'creator' ? s.ledeCreator : s.ledeDefault}
+      cta={{ label: s.cta, url: confirmationUrl }}
+      steps={steps}
+    />
+  )
+}
 
 export default SignupEmail
