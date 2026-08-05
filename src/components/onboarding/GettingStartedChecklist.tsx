@@ -176,6 +176,7 @@ const agentItems = (t: ChkT): ChecklistItem[] => [
 
 export function GettingStartedChecklist({ userId, role }: Props) {
   const [data, setData] = useState<ChecklistData | null>(null);
+  const { t } = useTranslation();
   const [stripeCtaBusy, setStripeCtaBusy] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -282,8 +283,6 @@ export function GettingStartedChecklist({ userId, role }: Props) {
   };
 
   if (dismissed || !data) return null;
-
-  const { t } = useTranslation();
   const items = role === "traveler" ? travelerItems(t) : role === "creator" ? creatorItems(t) : agentItems(t);
   const completed = items.filter((item) => item.isComplete(data)).length;
   const percent = Math.round((completed / items.length) * 100);
