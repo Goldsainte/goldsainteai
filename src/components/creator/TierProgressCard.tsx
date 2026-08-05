@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -28,6 +29,7 @@ export function TierProgressCard({
   commissionRate,
   onViewBenefits,
 }: TierProgressCardProps) {
+  const { t } = useTranslation();
   const getTierColor = (tier: string) => {
     switch (tier) {
       case "platinum":
@@ -105,7 +107,7 @@ export function TierProgressCard({
             {/* Followers Progress */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-foreground">Followers</span>
+                <span className="text-foreground">{t("creatorTools.tier.followers", "Followers")}</span>
                 <span className="text-muted-foreground">
                   {currentMetrics.followers.toLocaleString()} / {nextTierRequirements.followers.toLocaleString()}
                 </span>
@@ -116,7 +118,7 @@ export function TierProgressCard({
             {/* Bookings Progress */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-foreground">Total Bookings</span>
+                <span className="text-foreground">{t("creatorTools.tier.totalBookings", "Total Bookings")}</span>
                 <span className="text-muted-foreground">
                   {currentMetrics.bookings} / {nextTierRequirements.bookings}
                 </span>
@@ -127,7 +129,7 @@ export function TierProgressCard({
             {/* Engagement Progress */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-foreground">Engagement Score</span>
+                <span className="text-foreground">{t("creatorTools.tier.engagement", "Engagement Score")}</span>
                 <span className="text-muted-foreground">
                   {currentMetrics.engagement} / {nextTierRequirements.engagement}
                 </span>
@@ -147,7 +149,7 @@ export function TierProgressCard({
             <div className={`w-16 h-16 rounded-full ${getTierColor(currentTier)} flex items-center justify-center mx-auto mb-4`}>
               <Award className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">You've reached the highest tier!</h3>
+            <h3 className="font-semibold text-lg mb-2">{t("creatorTools.tier.highestTier", "You\u2019ve reached the highest tier!")}</h3>
             <p className="text-sm text-muted-foreground">
               Congratulations on achieving Platinum status. You're earning the maximum {commissionRate}% commission
               rate on all your bookings.
