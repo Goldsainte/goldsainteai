@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Clock, ChevronRight, Plus, PenLine, Star, CirclePlus, MoreVertical, Pencil, Trash2, Shield, Wallet, CalendarCheck, Tag, Check, ArrowRight, Plane } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -87,6 +88,7 @@ function formatPrice(cents: number, currency: string) {
 }
 
 export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, hideLabel, requestBaseParams, firstName }: Props) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -193,8 +195,8 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         <>
         {undeclaredOnTrip && (
           <div className="mb-8 border-t border-[#E5DFC6] pt-6">
-            <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Finish your setup</p>
-            <h3 className="mt-2 font-secondary text-xl leading-snug text-[#0a2225] md:text-2xl">Declare what travelers can hire you for</h3>
+            <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">{t("creatorTools.services.finishSetup", "Finish your setup")}</p>
+            <h3 className="mt-2 font-secondary text-xl leading-snug text-[#0a2225] md:text-2xl">{t("creatorTools.services.declareHire", "Declare what travelers can hire you for")}</h3>
             <p className="mt-1.5 max-w-xl text-[14px] leading-relaxed text-[#0a2225]/70">
               Your On-Trip offer doesn't list capabilities yet, so travelers see a generic hire form. Pick from the list once {"\u2014"} your profile, the hire form, and proposals all update together.
             </p>
@@ -209,7 +211,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
         )}
         {hostedService && (
           <div className="mb-8 rounded-3xl border border-[#E5DFC6] bg-white p-5 md:p-7">
-            <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">Travel, hosted</p>
+            <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F]">{t("creatorTools.services.travelHosted", "Travel, hosted")}</p>
             {hostedServices.length > 1 && (
               <div className="mt-3 inline-flex max-w-full flex-wrap gap-0.5 rounded-lg border border-[#E5DFC6] bg-[#FDF9F0] p-0.5">
                 {hostedServices.map((s, i) => (
@@ -466,7 +468,7 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
               Beyond selling fixed itinerary guides, you can offer personalised services that travelers request directly from your profile. You get paid when work is delivered — choose a tier below to get started.
             </p>
             <p className="text-xs text-[#9A9384]">
-              Looking to sell a downloadable guide instead? <a href="/itinerary-builder" className="underline text-[#0c4d47]">Use the Itinerary Builder</a>. Selling a scheduled tour? <a href="/trip-builder" className="underline text-[#0c4d47]">Create it in the Trip Builder</a> and choose "Bookable Tour".
+              {t("creatorTools.services.guideQ", "Looking to sell a downloadable guide instead?")} <a href="/itinerary-builder" className="underline text-[#0c4d47]">{t("creatorTools.services.useItinBuilder", "Use the Itinerary Builder")}</a>{t("creatorTools.services.tourQ", ". Selling a scheduled tour?")} <a href="/trip-builder" className="underline text-[#0c4d47]">{t("creatorTools.services.useTripBuilder", "Create it in the Trip Builder")}</a> {t("creatorTools.services.chooseBookable", "and choose \u201CBookable Tour\u201D.")}
             </p>
           </div>
 
@@ -477,21 +479,21 @@ export function CreatorServicesSection({ creatorId, isOwnProfile, creatorTier, h
                 <Wallet className="h-4 w-4 text-[#0c4d47]" />
                 <p className="text-2xl font-bold text-[#0c4d47]">{youKeepPct}%</p>
               </div>
-              <p className="text-xs text-[#6B7280]">You keep on every booking</p>
+              <p className="text-xs text-[#6B7280]">{t("creatorTools.services.youKeep", "You keep on every booking")}</p>
             </div>
             <div className="bg-white px-6 py-5">
               <div className="flex items-center gap-2 mb-1.5">
                 <CalendarCheck className="h-4 w-4 text-[#0c4d47]" />
-                <p className="text-base font-semibold text-[#0a2225]">Paid on delivery</p>
+                <p className="text-base font-semibold text-[#0a2225]">{t("creatorTools.services.paidDelivery", "Paid on delivery")}</p>
               </div>
-              <p className="text-xs text-[#6B7280]">Not just on request</p>
+              <p className="text-xs text-[#6B7280]">{t("creatorTools.services.notOnRequest", "Not just on request")}</p>
             </div>
             <div className="bg-white px-6 py-5">
               <div className="flex items-center gap-2 mb-1.5">
                 <Tag className="h-4 w-4 text-[#0c4d47]" />
-                <p className="text-base font-semibold text-[#0a2225]">You set the price</p>
+                <p className="text-base font-semibold text-[#0a2225]">{t("creatorTools.services.youSetPrice", "You set the price")}</p>
               </div>
-              <p className="text-xs text-[#6B7280]">Full control, no fixed rates</p>
+              <p className="text-xs text-[#6B7280]">{t("creatorTools.services.fullControl", "Full control, no fixed rates")}</p>
             </div>
           </div>
 
