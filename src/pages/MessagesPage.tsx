@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -15,19 +16,20 @@ function MessagesRail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isCreator, isAgent, isAdmin, isBrand } = useUserRole();
+  const { t } = useTranslation();
   const isPro = isCreator || isAgent || isAdmin || isBrand;
   const [expanded, setExpanded] = useState(false);
   const items: { icon: any; label: string; to: string; active?: boolean }[] = [
-    { icon: Home, label: "Home", to: "/" },
-    { icon: Compass, label: "Marketplace", to: "/marketplace" },
-    { icon: MessageCircle, label: "Messages", to: "/messages", active: true },
-    { icon: Luggage, label: "My Journeys", to: "/my-bookings" },
+    { icon: Home, label: t("sideNav.home", "Home"), to: "/" },
+    { icon: Compass, label: t("sideNav.marketplace", "Marketplace"), to: "/marketplace" },
+    { icon: MessageCircle, label: t("sideNav.messages", "Messages"), to: "/messages", active: true },
+    { icon: Luggage, label: t("sideNav.myJourneys", "My Journeys"), to: "/my-bookings" },
     ...(isPro
       ? [
-          { icon: FileText, label: "My Proposals", to: "/my-proposals" },
+          { icon: FileText, label: t("sideNav.myProposals", "My Proposals"), to: "/my-proposals" },
           {
             icon: LayoutDashboard,
-            label: "Dashboard",
+            label: t("sideNav.dashboard", "Dashboard"),
             to: isCreator ? "/creator-dashboard" : "/agent-dashboard",
           },
         ]
@@ -75,7 +77,7 @@ function MessagesRail() {
         ))}
         <button
           onClick={() => navigate("/profile")}
-          title="Profile"
+          title={t("sideNav.profile", "Profile")}
           className={`flex items-center gap-4 rounded-xl py-3 text-left text-[16px] text-[#0a2225]/85 transition-colors hover:bg-white/80 ${
             expanded ? "px-3" : "justify-center px-0"
           }`}
@@ -87,7 +89,7 @@ function MessagesRail() {
               {initial}
             </span>
           )}
-          {expanded && <span className="whitespace-nowrap">Profile</span>}
+          {expanded && <span className="whitespace-nowrap">{t("sideNav.profile", "Profile")}</span>}
         </button>
       </nav>
       </aside>
