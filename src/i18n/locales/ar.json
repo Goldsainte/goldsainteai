@@ -2058,7 +2058,8 @@
     "userBlocked": "حُظر المستخدم",
     "showOriginal": "اعرض الأصل",
     "showTranslation": "اعرض الترجمة",
-    "translated": "مُترجم"
+    "translated": "مُترجم",
+    "noMessagesYet": "لا رسائل بعد"
   },
   "sett": {
     "checkoutOpened": "فُتح الدفع في تبويب جديد",
