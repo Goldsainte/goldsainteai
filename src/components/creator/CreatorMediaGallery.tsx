@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ export function CreatorMediaGallery({
   isOwnProfile,
   hideTitle,
 }: CreatorMediaGalleryProps) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
@@ -240,7 +242,7 @@ export function CreatorMediaGallery({
             className="text-xs font-medium text-[#0c4d47] underline underline-offset-4">
             {coverFile ? `Cover: ${coverFile.name}` : "Add a cover photo (recommended for Instagram)"}
           </button>
-          <span className="text-[12.5px] text-[#6B7280]">TikTok covers are fetched automatically.</span>
+          <span className="text-[12.5px] text-[#6B7280]">{t("creatorTools.media.tiktokAuto", "TikTok covers are fetched automatically.")}</span>
         </div>
       )}
     </div>
@@ -264,7 +266,7 @@ export function CreatorMediaGallery({
   if (items.length === 0 && fallbackPhotos && fallbackPhotos.length > 0) {
     return (
       <section>
-        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
+        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">{t("creatorTools.media.topHighlights", "My Top Trip Highlights")}</h2>}
         <ScrollCarousel>
           {fallbackPhotos.map((src) => (
             <img key={src} src={src} alt="Content" className="h-80 md:h-96 w-auto object-cover rounded-2xl flex-shrink-0" loading="lazy" />
@@ -280,10 +282,10 @@ export function CreatorMediaGallery({
     if (isOwnProfile) {
       return (
         <section>
-          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
+          {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">{t("creatorTools.media.topHighlights", "My Top Trip Highlights")}</h2>}
           <div className="rounded-xl border border-dashed border-[#E5DFC6] bg-white/50 p-8 text-center">
             <Instagram className="h-6 w-6 text-[#C7A962] mx-auto mb-3" />
-            <p className="text-sm text-[#0a2225] mb-1">Add trip highlights</p>
+            <p className="text-sm text-[#0a2225] mb-1">{t("creatorTools.media.addHighlights", "Add trip highlights")}</p>
             <p className="text-xs text-[#6B7280] mb-4">
               The photos and short reels travelers see first on your profile. Upload from your device, or paste a link to one of your TikTok or Instagram reels.
             </p>
@@ -297,7 +299,7 @@ export function CreatorMediaGallery({
 
     return (
       <section>
-        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
+        {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">{t("creatorTools.media.topHighlights", "My Top Trip Highlights")}</h2>}
         <div className="rounded-xl border border-[#E5DFC6] bg-white p-6 text-center">
           <p className="text-sm text-[#6B7280]">
             Follow{" "}
@@ -319,7 +321,7 @@ export function CreatorMediaGallery({
   // Horizontal auto-scroll carousel
   return (
     <section>
-      {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">My Top Trip Highlights</h2>}
+      {!hideTitle && <h2 className="font-secondary text-xl text-[#0a2225] mb-5">{t("creatorTools.media.topHighlights", "My Top Trip Highlights")}</h2>}
       <ScrollCarousel>
         {items.map((item) => (
           <div
