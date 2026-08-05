@@ -2058,7 +2058,8 @@
     "userBlocked": "ユーザーをブロックしました",
     "showOriginal": "原文を表示",
     "showTranslation": "翻訳を表示",
-    "translated": "翻訳済み"
+    "translated": "翻訳済み",
+    "noMessagesYet": "まだメッセージはありません"
   },
   "sett": {
     "checkoutOpened": "新しいタブで決済を開きました",
