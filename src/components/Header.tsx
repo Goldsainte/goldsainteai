@@ -267,21 +267,21 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyBookings", "My Bookings")}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/my-trip-requests')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">My Requests</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyRequests", "My Requests")}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/following')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Users className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Saved & Following</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuSaved", "Saved & Following")}</span>
                             </DropdownMenuItem>
                             {showRequestTrip && (
                               <DropdownMenuItem
@@ -289,7 +289,7 @@ export const Header = () => {
                                 className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                               >
                                 <PlaneTakeoff className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Request a Trip</span>
+                                <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuRequestTrip", "Request a Trip")}</span>
                               </DropdownMenuItem>
                             )}
                             {!isAgentAccount && !isCreator && (
@@ -298,7 +298,7 @@ export const Header = () => {
                                 className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                               >
                                 <BookOpen className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">My Guides</span>
+                                <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyGuides", "My Guides")}</span>
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
@@ -326,7 +326,7 @@ export const Header = () => {
                                 className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                               >
                                 <BarChart3 className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Creator Dashboard</span>
+                                <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuCreatorDash", "Creator Dashboard")}</span>
                               </DropdownMenuItem>
                             )}
                             {isAgentAccount && (
@@ -335,7 +335,7 @@ export const Header = () => {
                                 className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                               >
                                 <LayoutDashboard className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
+                                <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuAgentDash", "Agent Dashboard")}</span>
                               </DropdownMenuItem>
                             )}
                           {(isAgentAccount || isCreator || isAdmin || isBrand) && (
@@ -351,7 +351,7 @@ export const Header = () => {
                                       className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                                     >
                                       <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                      <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                                      <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuClientBookings", "Client Bookings")}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                       onClick={() => navigate('/my-proposals')}
@@ -366,7 +366,7 @@ export const Header = () => {
                                         className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                                       >
                                         <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                        <span className="text-[15px] font-medium text-[#0a2225]">Available Trips</span>
+                                        <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuAvailableTrips", "Available Trips")}</span>
                                       </DropdownMenuItem>
                                     )}
                                     {(isCreator || isAgentAccount) && (
@@ -375,7 +375,7 @@ export const Header = () => {
                                         className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                                       >
                                         <Plus className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                                        <span className="text-[15px] font-medium text-[#0a2225]">{isAgentAccount ? "Create Trip Package" : "Create Tour"}</span>
+                                        <span className="text-[15px] font-medium text-[#0a2225]">{isAgentAccount ? t("header.menuCreatePackage", "Create Trip Package") : t("header.menuCreateTour", "Create Tour")}</span>
                                       </DropdownMenuItem>
                                     )}
                                   </div>
@@ -394,7 +394,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <User className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">My Profile</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyProfile", "My Profile")}</span>
                             </DropdownMenuItem>
 
 
@@ -403,14 +403,14 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Settings className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Account Settings</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuAccountSettings", "Account Settings")}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/help')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <HelpCircle className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Help Center</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuHelpCenter", "Help Center")}</span>
                             </DropdownMenuItem>
                           </div>
 
@@ -506,7 +506,7 @@ export const Header = () => {
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                           >
                             <ShoppingCart className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                            <span className="text-[15px] font-medium text-[#0a2225]">Travel Marketplace</span>
+                            <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuTravelMarketplace", "Travel Marketplace")}</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="mx-5 my-2 bg-[#0a2225]/10" />
                           <DropdownMenuItem 
@@ -675,7 +675,7 @@ export const Header = () => {
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                           >
                             <ShoppingCart className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                            <span className="text-[15px] font-medium text-[#0a2225]">Travel Marketplace</span>
+                            <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuTravelMarketplace", "Travel Marketplace")}</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate('/following')}
@@ -690,14 +690,14 @@ export const Header = () => {
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                           >
                             <Luggage className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                            <span className="text-[15px] font-medium text-[#0a2225]">My Bookings</span>
+                            <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyBookings", "My Bookings")}</span>
                           </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/my-trip-requests')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Send className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">My Requests</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyRequests", "My Requests")}</span>
                             </DropdownMenuItem>
                         {(isAgentAccount || isCreator || isAdmin || isBrand) && (
                           <div className="mx-2 px-4 pt-3 pb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8D6B2F] border-t border-[#E5DFC6] mt-2">Your work</div>
@@ -708,7 +708,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <BarChart3 className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Creator Dashboard</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuCreatorDash", "Creator Dashboard")}</span>
                             </DropdownMenuItem>
                           )}
                           {isAgentAccount && (
@@ -717,7 +717,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <LayoutDashboard className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Agent Dashboard</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuAgentDash", "Agent Dashboard")}</span>
                             </DropdownMenuItem>
                           )}
                           {(isAgentAccount || isCreator || isAdmin || isBrand) && (
@@ -726,7 +726,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Client Bookings</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuClientBookings", "Client Bookings")}</span>
                             </DropdownMenuItem>
                           )}
                           {showRequestTrip && (
@@ -735,7 +735,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <PlaneTakeoff className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Request a Trip</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuRequestTrip", "Request a Trip")}</span>
                             </DropdownMenuItem>
                           )}
                           {!isAgentAccount && !isCreator && (
@@ -744,7 +744,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <BookOpen className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">My Guides</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyGuides", "My Guides")}</span>
                             </DropdownMenuItem>
                           )}
                           {isAgentAccount && (
@@ -753,7 +753,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <Briefcase className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Available Trips</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuAvailableTrips", "Available Trips")}</span>
                             </DropdownMenuItem>
                           )}
                           {(isCreator || isAgentAccount) && (
@@ -762,7 +762,7 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                             >
                               <Plus className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">{isAgentAccount ? "Create Trip Package" : "Create Tour"}</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{isAgentAccount ? t("header.menuCreatePackage", "Create Trip Package") : t("header.menuCreateTour", "Create Tour")}</span>
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem 
@@ -791,7 +791,7 @@ export const Header = () => {
                             className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] group touch-manipulation"
                           >
                             <User className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                            <span className="text-[15px] font-medium text-[#0a2225]">My Profile</span>
+                            <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuMyProfile", "My Profile")}</span>
                           </DropdownMenuItem>
 
 
@@ -800,14 +800,14 @@ export const Header = () => {
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Settings className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Account Settings</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuAccountSettings", "Account Settings")}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate('/help')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <HelpCircle className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
-                              <span className="text-[15px] font-medium text-[#0a2225]">Help Center</span>
+                              <span className="text-[15px] font-medium text-[#0a2225]">{t("header.menuHelpCenter", "Help Center")}</span>
                             </DropdownMenuItem>
                         </div>
 
