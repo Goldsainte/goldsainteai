@@ -46,7 +46,22 @@
     "menuPostTripD": "スペシャリストからオーダーメイドの提案が届きます",
     "menuAgent": "エージェントになる",
     "menuAgentD": "販売主体として旅を設計・販売",
-    "agentPromoD": "あなたの知見を活かして、手がけた旅ごとに収入を。"
+    "agentPromoD": "あなたの知見を活かして、手がけた旅ごとに収入を。",
+    "menuMyBookings": "予約一覧",
+    "menuMyRequests": "リクエスト一覧",
+    "menuSaved": "保存とフォロー",
+    "menuRequestTrip": "旅をリクエスト",
+    "menuMyGuides": "マイガイド",
+    "menuCreatorDash": "クリエイターダッシュボード",
+    "menuAgentDash": "エージェントダッシュボード",
+    "menuClientBookings": "クライアント予約",
+    "menuAvailableTrips": "募集中の旅",
+    "menuMyProfile": "マイプロフィール",
+    "menuAccountSettings": "アカウント設定",
+    "menuHelpCenter": "ヘルプセンター",
+    "menuTravelMarketplace": "旅のマーケットプレイス",
+    "menuCreatePackage": "旅行パッケージを作成",
+    "menuCreateTour": "ツアーを作成"
   },
   "common": {
     "loading": "読み込み中...",
@@ -2675,5 +2690,19 @@
       "engagement": "エンゲージメントスコア",
       "highestTier": "最高ティアに到達しました！"
     }
+  },
+  "sideNav": {
+    "home": "ホーム",
+    "marketplace": "マーケットプレイス",
+    "messages": "メッセージ",
+    "myJourneys": "わたしの旅",
+    "myProposals": "提案一覧",
+    "dashboard": "ダッシュボード",
+    "profile": "プロフィール",
+    "theCollection": "コレクション",
+    "postTrip": "旅を投稿",
+    "myCollections": "マイコレクション",
+    "search": "検索",
+    "notifications": "通知"
   }
 }
