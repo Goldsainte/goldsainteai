@@ -4,6 +4,70 @@
 import "../_shared/resend-guard.ts";
 import { accumulateCollected, isFullyPaid, stripTravelerFee } from '../_shared/payoutMath.ts';
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { pickLang, resolveRecipientLanguage, type EmailLang } from "../_shared/email-i18n.ts";
+
+interface GS {
+  subject: (title: string) => string;
+  h1: string;
+  hi: (name: string) => string;
+  thereFallback: string;
+  access: (titleEm: string, days: string, dest: string) => string;
+  btn: string;
+  anytime: string;
+  footer: string;
+}
+interface BS {
+  subject: (title: string) => string;
+  h1: string;
+  hi: (name: string) => string;
+  thereFallback: string;
+  tripReserved: (titleEm: string) => string;
+  bundleReady: (titleEm: string) => string;
+  guides: (count: number) => string;
+  btn: string;
+  protection: string;
+  footer: string;
+}
+
+const FOOTERS: { en: string } & Partial<Record<EmailLang, string>> = {
+  en: '\u00A9 2026 Goldsainte. The Social Marketplace for Travel.',
+  fr: '\u00A9 2026 Goldsainte. La marketplace sociale du voyage.',
+  es: '\u00A9 2026 Goldsainte. El marketplace social de los viajes.',
+  de: '\u00A9 2026 Goldsainte. Der soziale Marktplatz fürs Reisen.',
+  it: '\u00A9 2026 Goldsainte. Il marketplace sociale del viaggio.',
+  pt: '\u00A9 2026 Goldsainte. O marketplace social de viagens.',
+  ar: '\u00A9 2026 Goldsainte. سوق السفر الاجتماعي.',
+  ja: '\u00A9 2026 Goldsainte. 旅のソーシャルマーケットプレイス。',
+  ko: '\u00A9 2026 Goldsainte. 여행을 위한 소셜 마켓플레이스.',
+  zh: '\u00A9 2026 Goldsainte. 旅行的社交市场。',
+};
+
+const GUIDE_STRINGS: { en: GS } & Partial<Record<EmailLang, GS>> = {
+  en: { subject: (t) => `Your itinerary guide is ready \u2014 ${t}`, h1: 'Your guide is ready', hi: (n) => `Hi ${n},`, thereFallback: 'there', access: (t, d, de) => `You now have full access to ${t} \u2014 a ${d}-day itinerary for ${de}.`, btn: 'View My Guides', anytime: 'You can access this guide anytime from your My Purchases page.', footer: FOOTERS.en },
+  fr: { subject: (t) => `Votre guide d'itinéraire est prêt \u2014 ${t}`, h1: 'Votre guide est prêt', hi: (n) => `Bonjour ${n},`, thereFallback: '', access: (t, d, de) => `Vous avez désormais un accès complet à ${t} \u2014 un itinéraire de ${d} jours pour ${de}.`, btn: 'Voir mes guides', anytime: 'Vous pouvez consulter ce guide à tout moment depuis votre page Mes achats.', footer: FOOTERS.fr! },
+  es: { subject: (t) => `Tu guía de itinerario está lista \u2014 ${t}`, h1: 'Tu guía está lista', hi: (n) => `Hola ${n}:`, thereFallback: '', access: (t, d, de) => `Ya tienes acceso completo a ${t} \u2014 un itinerario de ${d} días para ${de}.`, btn: 'Ver mis guías', anytime: 'Puedes acceder a esta guía cuando quieras desde tu página Mis compras.', footer: FOOTERS.es! },
+  de: { subject: (t) => `Ihr Reiseführer ist bereit \u2014 ${t}`, h1: 'Ihr Guide ist bereit', hi: (n) => `Hallo ${n},`, thereFallback: '', access: (t, d, de) => `Sie haben jetzt vollen Zugriff auf ${t} \u2014 einen ${d}-Tage-Reiseplan für ${de}.`, btn: 'Meine Guides ansehen', anytime: 'Sie können diesen Guide jederzeit über Ihre Seite Meine Käufe öffnen.', footer: FOOTERS.de! },
+  it: { subject: (t) => `La tua guida di itinerario è pronta \u2014 ${t}`, h1: 'La tua guida è pronta', hi: (n) => `Ciao ${n},`, thereFallback: '', access: (t, d, de) => `Hai ora pieno accesso a ${t} \u2014 un itinerario di ${d} giorni per ${de}.`, btn: 'Vedi le mie guide', anytime: 'Puoi aprire questa guida in qualsiasi momento dalla pagina I miei acquisti.', footer: FOOTERS.it! },
+  pt: { subject: (t) => `Seu guia de roteiro está pronto \u2014 ${t}`, h1: 'Seu guia está pronto', hi: (n) => `Olá ${n},`, thereFallback: '', access: (t, d, de) => `Você agora tem acesso completo a ${t} \u2014 um roteiro de ${d} dias para ${de}.`, btn: 'Ver meus guias', anytime: 'Você pode acessar este guia a qualquer momento na página Minhas compras.', footer: FOOTERS.pt! },
+  ar: { subject: (t) => `دليل مسارك جاهز \u2014 ${t}`, h1: 'دليلك جاهز', hi: (n) => `مرحباً ${n}،`, thereFallback: '', access: (t, d, de) => `أصبح لديك وصول كامل إلى ${t} \u2014 مسار من ${d} أيام إلى ${de}.`, btn: 'اعرض أدلتي', anytime: 'يمكنك فتح هذا الدليل في أي وقت من صفحة مشترياتي.', footer: FOOTERS.ar! },
+  ja: { subject: (t) => `旅程ガイドの準備ができました \u2014 ${t}`, h1: 'ガイドの準備ができました', hi: (n) => `${n} さん、こんにちは。`, thereFallback: '', access: (t, d, de) => `${t} へのフルアクセスが可能になりました \u2014 ${de} の ${d} 日間旅程です。`, btn: 'マイガイドを見る', anytime: 'このガイドは「購入履歴」ページからいつでも開けます。', footer: FOOTERS.ja! },
+  ko: { subject: (t) => `일정 가이드가 준비되었습니다 \u2014 ${t}`, h1: '가이드가 준비되었습니다', hi: (n) => `안녕하세요 ${n}님,`, thereFallback: '', access: (t, d, de) => `이제 ${t}에 대한 전체 접근 권한이 있습니다 \u2014 ${de} ${d}일 일정입니다.`, btn: '내 가이드 보기', anytime: '이 가이드는 내 구매 페이지에서 언제든 열 수 있습니다.', footer: FOOTERS.ko! },
+  zh: { subject: (t) => `你的行程指南已就绪 \u2014 ${t}`, h1: '你的指南已就绪', hi: (n) => `你好，${n}：`, thereFallback: '', access: (t, d, de) => `你现在拥有 ${t} 的完整访问权限 \u2014 一份为 ${de} 准备的 ${d} 天行程。`, btn: '查看我的指南', anytime: '你可以随时在「我的购买」页面打开此指南。', footer: FOOTERS.zh! },
+};
+
+const BUNDLE_STRINGS: { en: BS } & Partial<Record<EmailLang, BS>> = {
+  en: { subject: (t) => `Your Goldsainte bundle is confirmed \u2014 ${t}`, h1: 'Your bundle is confirmed', hi: (n) => `Hi ${n},`, thereFallback: 'there', tripReserved: (t) => `Your trip ${t} is now reserved \u2014 our concierge team will reach out shortly with next steps and confirmation details.`, bundleReady: (t) => `Your bundle ${t} is ready to explore.`, guides: (c) => `You also have full access to <strong>${c} itinerary guide${c === 1 ? '' : 's'}</strong>, available anytime from your purchases.`, btn: 'View My Purchases', protection: 'All communication and payments stay on Goldsainte for your protection. Reply to this email or message us in-app if you need anything.', footer: FOOTERS.en },
+  fr: { subject: (t) => `Votre pack Goldsainte est confirmé \u2014 ${t}`, h1: 'Votre pack est confirmé', hi: (n) => `Bonjour ${n},`, thereFallback: '', tripReserved: (t) => `Votre voyage ${t} est désormais réservé \u2014 notre équipe concierge vous contactera sous peu avec les prochaines étapes et les détails de confirmation.`, bundleReady: (t) => `Votre pack ${t} est prêt à explorer.`, guides: (c) => `Vous avez aussi un accès complet à <strong>${c} guide${c === 1 ? '' : 's'} d'itinéraire</strong>, disponible${c === 1 ? '' : 's'} à tout moment depuis vos achats.`, btn: 'Voir mes achats', protection: 'Toutes les communications et paiements restent sur Goldsainte pour votre protection. Répondez à cet e-mail ou écrivez-nous dans l\'app au besoin.', footer: FOOTERS.fr! },
+  es: { subject: (t) => `Tu pack de Goldsainte está confirmado \u2014 ${t}`, h1: 'Tu pack está confirmado', hi: (n) => `Hola ${n}:`, thereFallback: '', tripReserved: (t) => `Tu viaje ${t} ya está reservado \u2014 nuestro equipo concierge te contactará en breve con los próximos pasos y detalles de confirmación.`, bundleReady: (t) => `Tu pack ${t} está listo para explorar.`, guides: (c) => `También tienes acceso completo a <strong>${c} guía${c === 1 ? '' : 's'} de itinerario</strong>, disponible${c === 1 ? '' : 's'} en cualquier momento desde tus compras.`, btn: 'Ver mis compras', protection: 'Toda la comunicación y los pagos permanecen en Goldsainte para tu protección. Responde a este correo o escríbenos en la app si necesitas algo.', footer: FOOTERS.es! },
+  de: { subject: (t) => `Ihr Goldsainte-Paket ist bestätigt \u2014 ${t}`, h1: 'Ihr Paket ist bestätigt', hi: (n) => `Hallo ${n},`, thereFallback: '', tripReserved: (t) => `Ihre Reise ${t} ist jetzt reserviert \u2014 unser Concierge-Team meldet sich in Kürze mit den nächsten Schritten und Bestätigungsdetails.`, bundleReady: (t) => `Ihr Paket ${t} ist bereit zum Entdecken.`, guides: (c) => `Sie haben außerdem vollen Zugriff auf <strong>${c} Reiseführer</strong>, jederzeit über Ihre Käufe abrufbar.`, btn: 'Meine Käufe ansehen', protection: 'Alle Kommunikation und Zahlungen bleiben zu Ihrem Schutz auf Goldsainte. Antworten Sie auf diese E-Mail oder schreiben Sie uns in der App.', footer: FOOTERS.de! },
+  it: { subject: (t) => `Il tuo bundle Goldsainte è confermato \u2014 ${t}`, h1: 'Il tuo bundle è confermato', hi: (n) => `Ciao ${n},`, thereFallback: '', tripReserved: (t) => `Il tuo viaggio ${t} è ora riservato \u2014 il nostro team concierge ti contatterà a breve con i prossimi passi e i dettagli di conferma.`, bundleReady: (t) => `Il tuo bundle ${t} è pronto da esplorare.`, guides: (c) => `Hai anche pieno accesso a <strong>${c} guid${c === 1 ? 'a' : 'e'} di itinerario</strong>, disponibil${c === 1 ? 'e' : 'i'} in qualsiasi momento dai tuoi acquisti.`, btn: 'Vedi i miei acquisti', protection: 'Tutte le comunicazioni e i pagamenti restano su Goldsainte per la tua protezione. Rispondi a questa email o scrivici in app se ti serve qualcosa.', footer: FOOTERS.it! },
+  pt: { subject: (t) => `Seu bundle Goldsainte está confirmado \u2014 ${t}`, h1: 'Seu bundle está confirmado', hi: (n) => `Olá ${n},`, thereFallback: '', tripReserved: (t) => `Sua viagem ${t} está reservada \u2014 nossa equipe concierge entrará em contato em breve com os próximos passos e detalhes de confirmação.`, bundleReady: (t) => `Seu bundle ${t} está pronto para explorar.`, guides: (c) => `Você também tem acesso completo a <strong>${c} guia${c === 1 ? '' : 's'} de roteiro</strong>, disponíve${c === 1 ? 'l' : 'is'} a qualquer momento nas suas compras.`, btn: 'Ver minhas compras', protection: 'Toda a comunicação e os pagamentos ficam na Goldsainte para sua proteção. Responda a este e-mail ou fale conosco no app se precisar.', footer: FOOTERS.pt! },
+  ar: { subject: (t) => `تأكدت باقتك من Goldsainte \u2014 ${t}`, h1: 'تأكدت باقتك', hi: (n) => `مرحباً ${n}،`, thereFallback: '', tripReserved: (t) => `حُجزت رحلتك ${t} \u2014 سيتواصل فريق الكونسيرج قريباً بالخطوات التالية وتفاصيل التأكيد.`, bundleReady: (t) => `باقتك ${t} جاهزة للاستكشاف.`, guides: (c) => `لديك أيضاً وصول كامل إلى <strong>${c} من أدلة المسارات</strong>، متاحة في أي وقت من مشترياتك.`, btn: 'اعرض مشترياتي', protection: 'تبقى كل المراسلات والمدفوعات على Goldsainte لحمايتك. رد على هذه الرسالة أو راسلنا داخل التطبيق عند الحاجة.', footer: FOOTERS.ar! },
+  ja: { subject: (t) => `Goldsainte バンドルが確定しました \u2014 ${t}`, h1: 'バンドルが確定しました', hi: (n) => `${n} さん、こんにちは。`, thereFallback: '', tripReserved: (t) => `旅 ${t} の予約が確定しました \u2014 コンシェルジュチームが次のステップと確認の詳細をまもなくご連絡します。`, bundleReady: (t) => `バンドル ${t} の準備ができました。`, guides: (c) => `さらに <strong>${c} 件の旅程ガイド</strong>にフルアクセスでき、購入履歴からいつでも開けます。`, btn: '購入履歴を見る', protection: 'お客様の保護のため、連絡と支払いはすべて Goldsainte 上で行われます。ご用の際はこのメールに返信するか、アプリ内でご連絡ください。', footer: FOOTERS.ja! },
+  ko: { subject: (t) => `Goldsainte 번들이 확정되었습니다 \u2014 ${t}`, h1: '번들이 확정되었습니다', hi: (n) => `안녕하세요 ${n}님,`, thereFallback: '', tripReserved: (t) => `여행 ${t} 예약이 확정되었습니다 \u2014 컨시어지 팀이 곧 다음 단계와 확정 정보를 안내드립니다.`, bundleReady: (t) => `번들 ${t}이(가) 준비되었습니다.`, guides: (c) => `또한 <strong>일정 가이드 ${c}권</strong>에 대한 전체 접근 권한이 있으며, 구매 내역에서 언제든 열 수 있습니다.`, btn: '내 구매 보기', protection: '고객 보호를 위해 모든 연락과 결제는 Goldsainte에서 이루어집니다. 필요하면 이 메일에 회신하거나 앱에서 메시지를 보내주세요.', footer: FOOTERS.ko! },
+  zh: { subject: (t) => `你的 Goldsainte 套餐已确认 \u2014 ${t}`, h1: '你的套餐已确认', hi: (n) => `你好，${n}：`, thereFallback: '', tripReserved: (t) => `你的旅程 ${t} 已预订 \u2014 礼宾团队将很快联系你，告知后续步骤与确认详情。`, bundleReady: (t) => `你的套餐 ${t} 已可开始探索。`, guides: (c) => `你还拥有 <strong>${c} 份行程指南</strong>的完整访问权限，可随时在购买记录中打开。`, btn: '查看我的购买', protection: '为保护你的权益，所有沟通与付款均在 Goldsainte 平台进行。如有需要，回复本邮件或在应用内联系我们。', footer: FOOTERS.zh! },
+};
+
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { checkAndRecordWebhook, updateWebhookStatus } from "../_shared/webhookIdempotency.ts";
@@ -396,7 +460,9 @@ async function handleCheckoutCompleted(session: any) {
 
       const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
       if (RESEND_API_KEY && buyerProfile?.email && guideData) {
-        const firstName = buyerProfile.full_name?.split(' ')[0] || 'there';
+        const gLang = await resolveRecipientLanguage(supabaseClient, null, buyerProfile.email ?? null);
+        const gs = pickLang(GUIDE_STRINGS, gLang);
+        const firstName = buyerProfile.full_name?.split(' ')[0] || gs.thereFallback;
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -406,17 +472,17 @@ async function handleCheckoutCompleted(session: any) {
           body: JSON.stringify({
             from: 'Goldsainte <hello@goldsainte.com>',
             to: buyerProfile.email,
-            subject: `Your itinerary guide is ready — ${guideData.title}`,
+            subject: gs.subject(guideData.title),
             html: `
               <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; background: #f7f3ea; color: #0a2225;">
                 <p style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #C7A962; margin: 0 0 24px;">Goldsainte</p>
-                <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">Your guide is ready</h1>
-                <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">Hi ${firstName},</p>
-                <p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">You now have full access to <em>${guideData.title}</em> — a ${guideData.duration_days}-day itinerary for ${guideData.destination}.</p>
-                <a href="https://goldsainte.ai/my-purchases" style="display: inline-block; background: #0c4d47; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500;">View My Guides</a>
-                <p style="font-size: 13px; color: #6B7280; margin: 32px 0 0; line-height: 1.6;">You can access this guide anytime from your My Purchases page.</p>
+                <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">${gs.h1}</h1>
+                <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">${gs.hi(firstName)}</p>
+                <p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">${gs.access(`<em>${guideData.title}</em>`, String(guideData.duration_days), guideData.destination)}</p>
+                <a href="https://goldsainte.ai/my-purchases" style="display: inline-block; background: #0c4d47; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500;">${gs.btn}</a>
+                <p style="font-size: 13px; color: #6B7280; margin: 32px 0 0; line-height: 1.6;">${gs.anytime}</p>
                 <hr style="border: none; border-top: 1px solid #E5DFC6; margin: 32px 0 16px;" />
-                <p style="font-size: 11px; color: #9A9384; margin: 0;">© 2026 Goldsainte. The smarter travel marketplace.</p>
+                <p style="font-size: 11px; color: #9A9384; margin: 0;">${gs.footer}</p>
               </div>
             `,
           }),
@@ -512,13 +578,15 @@ async function handleBundlePurchase(metadata: any, session: any) {
 
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     if (RESEND_API_KEY && buyerProfile?.email) {
-      const firstName = buyerProfile.full_name?.split(' ')[0] || 'there';
+      const bLang = await resolveRecipientLanguage(supabaseClient, null, buyerProfile.email ?? null);
+      const bs = pickLang(BUNDLE_STRINGS, bLang);
+      const firstName = buyerProfile.full_name?.split(' ')[0] || bs.thereFallback;
       const guideCount = guideIds.length;
       const tripLine = bundle.trip_id
-        ? `Your trip <em>${escapeHtml(bundle.title)}</em> is now reserved — our concierge team will reach out shortly with next steps and confirmation details.`
-        : `Your bundle <em>${escapeHtml(bundle.title)}</em> is ready to explore.`;
+        ? bs.tripReserved(`<em>${escapeHtml(bundle.title)}</em>`)
+        : bs.bundleReady(`<em>${escapeHtml(bundle.title)}</em>`);
       const guidesLine = guideCount > 0
-        ? `<p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">You also have full access to <strong>${guideCount} itinerary guide${guideCount === 1 ? '' : 's'}</strong>, available anytime from your purchases.</p>`
+        ? `<p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px;">${bs.guides(guideCount)}</p>`
         : '';
 
       await fetch('https://api.resend.com/emails', {
@@ -530,18 +598,18 @@ async function handleBundlePurchase(metadata: any, session: any) {
         body: JSON.stringify({
           from: 'Goldsainte <hello@goldsainte.com>',
           to: buyerProfile.email,
-          subject: `Your Goldsainte bundle is confirmed — ${bundle.title}`,
+          subject: bs.subject(bundle.title),
           html: `
             <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; background: #f7f3ea; color: #0a2225;">
               <p style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #C7A962; margin: 0 0 24px;">Goldsainte</p>
-              <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">Your bundle is confirmed</h1>
-              <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">Hi ${escapeHtml(firstName)},</p>
+              <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 16px; color: #0a2225;">${bs.h1}</h1>
+              <p style="font-size: 15px; line-height: 1.6; margin: 0 0 12px;">${bs.hi(escapeHtml(firstName))}</p>
               <p style="font-size: 15px; line-height: 1.6; margin: 0 0 16px;">${tripLine}</p>
               ${guidesLine}
-              <a href="https://goldsainte.ai/my-purchases" style="display: inline-block; background: #0c4d47; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500;">View My Purchases</a>
-              <p style="font-size: 13px; color: #6B7280; margin: 32px 0 0; line-height: 1.6;">All communication and payments stay on Goldsainte for your protection. Reply to this email or message us in-app if you need anything.</p>
+              <a href="https://goldsainte.ai/my-purchases" style="display: inline-block; background: #0c4d47; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500;">${bs.btn}</a>
+              <p style="font-size: 13px; color: #6B7280; margin: 32px 0 0; line-height: 1.6;">${bs.protection}</p>
               <hr style="border: none; border-top: 1px solid #E5DFC6; margin: 32px 0 16px;" />
-              <p style="font-size: 11px; color: #9A9384; margin: 0;">© 2026 Goldsainte. The smarter travel marketplace.</p>
+              <p style="font-size: 11px; color: #9A9384; margin: 0;">${bs.footer}</p>
             </div>
           `,
         }),
