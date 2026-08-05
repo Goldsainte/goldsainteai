@@ -2589,5 +2589,91 @@
     "t3c": "发布旅程",
     "t3d": "告诉我们你的梦想之旅，AI 为你匹配合适的专家。",
     "title": "新手入门"
+  },
+  "creatorTools": {
+    "commission": {
+      "pkgBookings": "套餐预订",
+      "virtualGifts": "虚拟礼物",
+      "affiliate": "联盟收入",
+      "shopSales2": "商店销售",
+      "partnerships": "合作伙伴",
+      "totalEarnings": "总收益",
+      "allTime": "累计收入",
+      "available": "可用余额",
+      "readyWithdraw": "可提现",
+      "pending": "待结算余额",
+      "inHold": "处于冻结期",
+      "revenueBySource": "按来源的收入",
+      "noSources": "暂无收入来源",
+      "startEarning": "创作内容和套餐，开始赚取佣金吧！",
+      "structure": "佣金结构",
+      "howCalculated": "收益如何计算",
+      "shopSales": "商店商品销售",
+      "variablePartner": "因合作方而异",
+      "tierMultiplier": "你的等级倍率",
+      "platformFee": "平台费用",
+      "holdPeriod": "冻结期"
+    },
+    "service": {
+      "stepOverview": "概览",
+      "stepPricing": "定价",
+      "stepRequirements": "要求",
+      "stepDescription": "描述",
+      "tapToUse": "点按即可使用",
+      "quickNote": "关于你所售内容的简短说明：",
+      "description": "描述",
+      "writeWithAi": "用 AI 撰写",
+      "briefDesc": "此服务的简要描述",
+      "deliveryTime": "交付时间",
+      "tripDays": "行程天数",
+      "revisions": "包含修改次数",
+      "prioritySupport": "含优先支持",
+      "onTripPricing": "行程中定价的运作方式",
+      "noPricingDetails": "此等级无需更多定价信息。",
+      "addCustomQ": "添加自定义问题…",
+      "hireYouFor": "旅行者可以雇你做什么？",
+      "whatsIncluded": "包含内容",
+      "faqHint": "提前回答常见问题。",
+      "question": "问题",
+      "answer": "回答"
+    },
+    "services": {
+      "finishSetup": "完成你的设置",
+      "declareHire": "声明旅行者可以雇你做什么",
+      "travelHosted": "有人带的旅行",
+      "guideQ": "想卖可下载的指南？",
+      "useItinBuilder": "使用行程构建器",
+      "tourQ": "。要卖有日程的团？",
+      "useTripBuilder": "在旅程构建器中创建",
+      "chooseBookable": "并选择「可预订团」。",
+      "youKeep": "每笔预订你的分成",
+      "paidDelivery": "交付即结算",
+      "notOnRequest": "不只按需",
+      "youSetPrice": "价格你来定",
+      "fullControl": "完全掌控，无固定费率"
+    },
+    "feed": {
+      "browse": "浏览",
+      "save": "收藏",
+      "buildTrip": "组建旅程"
+    },
+    "media": {
+      "tiktokAuto": "TikTok 封面会自动获取。",
+      "topHighlights": "我的旅行高光",
+      "addHighlights": "添加旅行高光"
+    },
+    "social": {
+      "platform": "平台",
+      "handle": "账号",
+      "profileUrl": "主页链接",
+      "followers": "粉丝",
+      "cancel": "取消"
+    },
+    "tier": {
+      "followers": "粉丝",
+      "totalBookings": "总预订量",
+      "engagement": "互动分数",
+      "highestTier": "你已达到最高等级！"
+    }
   }
 }
