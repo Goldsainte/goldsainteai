@@ -4,6 +4,27 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import * as React from "npm:react@18.3.1";
 import { renderAsync } from "npm:@react-email/components@0.0.22";
+import { pickLang, resolveRecipientLanguage, type EmailLang } from "../_shared/email-i18n.ts";
+
+interface DMS {
+  subject: (sender: string, trip: string) => string;
+  yourSpecialist: string;
+  yourTrip: string;
+}
+
+const DM_STRINGS: { en: DMS } & Partial<Record<EmailLang, DMS>> = {
+  en: { subject: (se, t) => `${se} replied to your question about ${t}`, yourSpecialist: 'Your specialist', yourTrip: 'your trip' },
+  fr: { subject: (se, t) => `${se} a répondu à votre question sur ${t}`, yourSpecialist: 'Votre spécialiste', yourTrip: 'votre voyage' },
+  es: { subject: (se, t) => `${se} respondió a tu pregunta sobre ${t}`, yourSpecialist: 'Tu especialista', yourTrip: 'tu viaje' },
+  de: { subject: (se, t) => `${se} hat auf Ihre Frage zu ${t} geantwortet`, yourSpecialist: 'Ihr Spezialist', yourTrip: 'Ihre Reise' },
+  it: { subject: (se, t) => `${se} ha risposto alla tua domanda su ${t}`, yourSpecialist: 'Il tuo specialista', yourTrip: 'il tuo viaggio' },
+  pt: { subject: (se, t) => `${se} respondeu à sua pergunta sobre ${t}`, yourSpecialist: 'Seu especialista', yourTrip: 'sua viagem' },
+  ar: { subject: (se, t) => `رد ${se} على سؤالك عن ${t}`, yourSpecialist: 'مختصك', yourTrip: 'رحلتك' },
+  ja: { subject: (se, t) => `${se} が ${t} についての質問に返信しました`, yourSpecialist: 'スペシャリスト', yourTrip: 'あなたの旅' },
+  ko: { subject: (se, t) => `${se}님이 ${t}에 대한 질문에 답했습니다`, yourSpecialist: '전문가', yourTrip: '나의 여행' },
+  zh: { subject: (se, t) => `${se} 回复了你关于 ${t} 的提问`, yourSpecialist: '你的专家', yourTrip: '你的旅程' },
+};
+
 import { ReplyNotificationEmail } from "../_shared/email-templates/reply-notification.tsx";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
 
@@ -567,13 +588,16 @@ serve(async (req) => {
               .select("display_name, full_name")
               .eq("id", user.id)
               .maybeSingle();
-            const senderName = senderProfile?.display_name || senderProfile?.full_name || "Your specialist";
-            const tripTitle = conversation?.trip_title || "your trip";
+            const recipientLang = await resolveRecipientLanguage(supabase, null, inq.email ?? null);
+            const dmS = pickLang(DM_STRINGS, recipientLang);
+            const senderName = senderProfile?.display_name || senderProfile?.full_name || dmS.yourSpecialist;
+            const tripTitle = conversation?.trip_title || dmS.yourTrip;
             const emailProps = {
               senderName,
               tripTitle,
               preview: filteredMessage.substring(0, 240),
               confirmationUrl: magicLinkUrl,
+              lang: recipientLang,
             };
 
             const html = await renderAsync(React.createElement(ReplyNotificationEmail, emailProps));
@@ -585,7 +609,7 @@ serve(async (req) => {
               body: JSON.stringify({
                 from: `Goldsainte <support@${FROM_DOMAIN}>`,
                 to: [inq.email],
-                subject: `${senderName} replied to your question about ${tripTitle}`,
+                subject: dmS.subject(senderName, tripTitle),
                 html,
                 text,
               }),
