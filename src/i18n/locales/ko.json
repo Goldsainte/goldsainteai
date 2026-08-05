@@ -46,7 +46,22 @@
     "menuPostTripD": "전문가의 맞춤 제안을 받아보세요",
     "menuAgent": "에이전트 되기",
     "menuAgentD": "공식 판매자로서 여행을 설계하고 판매하세요",
-    "agentPromoD": "당신의 전문성으로, 성사시키는 모든 여행에서 수익을."
+    "agentPromoD": "당신의 전문성으로, 성사시키는 모든 여행에서 수익을.",
+    "menuMyBookings": "내 예약",
+    "menuMyRequests": "내 요청",
+    "menuSaved": "저장 및 팔로잉",
+    "menuRequestTrip": "여행 요청하기",
+    "menuMyGuides": "내 가이드",
+    "menuCreatorDash": "크리에이터 대시보드",
+    "menuAgentDash": "에이전트 대시보드",
+    "menuClientBookings": "고객 예약",
+    "menuAvailableTrips": "참여 가능 여행",
+    "menuMyProfile": "내 프로필",
+    "menuAccountSettings": "계정 설정",
+    "menuHelpCenter": "헬프 센터",
+    "menuTravelMarketplace": "여행 마켓플레이스",
+    "menuCreatePackage": "여행 패키지 만들기",
+    "menuCreateTour": "투어 만들기"
   },
   "common": {
     "loading": "로딩 중...",
@@ -2675,5 +2690,19 @@
       "engagement": "참여 점수",
       "highestTier": "최고 티어에 도달했습니다!"
     }
+  },
+  "sideNav": {
+    "home": "홈",
+    "marketplace": "마켓플레이스",
+    "messages": "메시지",
+    "myJourneys": "내 여정",
+    "myProposals": "내 제안",
+    "dashboard": "대시보드",
+    "profile": "프로필",
+    "theCollection": "컬렉션",
+    "postTrip": "여행 올리기",
+    "myCollections": "내 컬렉션",
+    "search": "검색",
+    "notifications": "알림"
   }
 }
