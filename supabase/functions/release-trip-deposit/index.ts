@@ -56,6 +56,31 @@
 // ============================================================================
 
 import "../_shared/resend-guard.ts";
+import { pickLang, resolveRecipientLanguage, type EmailLang } from "../_shared/email-i18n.ts";
+
+interface RS {
+  subject: (agent: string) => string;
+  h1: (name: string) => string;
+  thereFallback: string;
+  yourSpecialist: string;
+  body: (agentHtml: string) => string;
+  btn: string;
+  signoff: string;
+}
+
+const REVIEW_STRINGS: { en: RS } & Partial<Record<EmailLang, RS>> = {
+  en: { subject: (a) => `How was your trip? Leave a review for ${a}`, h1: (n) => `How was your trip, ${n}?`, thereFallback: 'there', yourSpecialist: 'your travel specialist', body: (a) => `Now that your journey is wrapped, we'd love to hear how it went. Leave a review for ${a} \u2014 it helps other travelers and rewards great specialists.`, btn: 'Leave a review', signoff: '\u2014 The Goldsainte team' },
+  fr: { subject: (a) => `Comment s'est passé votre voyage ? Laissez un avis pour ${a}`, h1: (n) => `Comment s'est passé votre voyage, ${n} ?`, thereFallback: '', yourSpecialist: 'votre spécialiste voyage', body: (a) => `Maintenant que votre voyage est terminé, nous aimerions savoir comment il s'est passé. Laissez un avis pour ${a} \u2014 cela aide les autres voyageurs et récompense les bons spécialistes.`, btn: 'Laisser un avis', signoff: '\u2014 L\'équipe Goldsainte' },
+  es: { subject: (a) => `¿Qué tal tu viaje? Deja una reseña para ${a}`, h1: (n) => `¿Qué tal tu viaje, ${n}?`, thereFallback: '', yourSpecialist: 'tu especialista de viajes', body: (a) => `Ahora que tu viaje ha terminado, nos encantaría saber cómo fue. Deja una reseña para ${a} \u2014 ayuda a otros viajeros y premia a los buenos especialistas.`, btn: 'Dejar una reseña', signoff: '\u2014 El equipo de Goldsainte' },
+  de: { subject: (a) => `Wie war Ihre Reise? Hinterlassen Sie eine Bewertung für ${a}`, h1: (n) => `Wie war Ihre Reise, ${n}?`, thereFallback: '', yourSpecialist: 'Ihren Reisespezialisten', body: (a) => `Nun, da Ihre Reise vorbei ist, würden wir gern hören, wie sie war. Hinterlassen Sie eine Bewertung für ${a} \u2014 das hilft anderen Reisenden und belohnt gute Spezialisten.`, btn: 'Bewertung abgeben', signoff: '\u2014 Das Goldsainte-Team' },
+  it: { subject: (a) => `Com'è andato il viaggio? Lascia una recensione per ${a}`, h1: (n) => `Com'è andato il viaggio, ${n}?`, thereFallback: '', yourSpecialist: 'il tuo specialista di viaggio', body: (a) => `Ora che il viaggio è concluso, ci piacerebbe sapere com'è andato. Lascia una recensione per ${a} \u2014 aiuta altri viaggiatori e premia i grandi specialisti.`, btn: 'Lascia una recensione', signoff: '\u2014 Il team Goldsainte' },
+  pt: { subject: (a) => `Como foi sua viagem? Deixe uma avaliação para ${a}`, h1: (n) => `Como foi sua viagem, ${n}?`, thereFallback: '', yourSpecialist: 'seu especialista de viagens', body: (a) => `Agora que sua jornada terminou, adoraríamos saber como foi. Deixe uma avaliação para ${a} \u2014 isso ajuda outros viajantes e recompensa bons especialistas.`, btn: 'Deixar avaliação', signoff: '\u2014 A equipe Goldsainte' },
+  ar: { subject: (a) => `كيف كانت رحلتك؟ اترك تقييماً لـ ${a}`, h1: (n) => `كيف كانت رحلتك يا ${n}؟`, thereFallback: '', yourSpecialist: 'مختص سفرك', body: (a) => `بعد انتهاء رحلتك، يسعدنا معرفة كيف جرت. اترك تقييماً لـ ${a} \u2014 فهذا يساعد المسافرين الآخرين ويكافئ المختصين المميزين.`, btn: 'اترك تقييماً', signoff: '\u2014 فريق Goldsainte' },
+  ja: { subject: (a) => `旅はいかがでしたか？ ${a} へのレビューを`, h1: (n) => `${n} さん、旅はいかがでしたか？`, thereFallback: '', yourSpecialist: '旅のスペシャリスト', body: (a) => `旅が終わった今、感想をぜひお聞かせください。${a} へのレビューを残しましょう \u2014 他の旅行者の助けになり、優れたスペシャリストの励みになります。`, btn: 'レビューを書く', signoff: '\u2014 Goldsainte チーム' },
+  ko: { subject: (a) => `여행은 어떠셨나요? ${a}에게 리뷰를 남겨주세요`, h1: (n) => `${n}님, 여행은 어떠셨나요?`, thereFallback: '', yourSpecialist: '여행 전문가', body: (a) => `여행이 마무리된 지금, 어땠는지 들려주세요. ${a}에게 리뷰를 남겨주세요 \u2014 다른 여행자에게 도움이 되고 훌륭한 전문가에게 보상이 됩니다.`, btn: '리뷰 남기기', signoff: '\u2014 Goldsainte 팀' },
+  zh: { subject: (a) => `旅程如何？给 ${a} 留个评价吧`, h1: (n) => `${n}，旅程如何？`, thereFallback: '', yourSpecialist: '你的旅行专家', body: (a) => `旅程落幕，我们很想听听你的感受。给 ${a} 留个评价吧 \u2014 既帮助其他旅行者，也是对优秀专家的认可。`, btn: '留下评价', signoff: '\u2014 Goldsainte 团队' },
+};
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import Stripe from "https://esm.sh/stripe@15.11.0?target=deno";
 import { resolveAllowedOrigin } from "../_shared/cors.ts";
@@ -592,13 +617,15 @@ async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bo
   const travelerEmail = travelerAuth?.user?.email;
   if (!travelerEmail) return;
 
-  const travelerName =
+  const travelerNameRaw =
     travelerProfile?.first_name ||
     travelerProfile?.display_name ||
     travelerProfile?.full_name ||
-    "there";
-  const agentName = agentProfile?.display_name || agentProfile?.full_name || "your travel specialist";
+    null;
+  const agentNameRaw = agentProfile?.display_name || agentProfile?.full_name || null;
   const reviewUrl = `https://goldsainte.ai/bookings/${booking.id}`;
+  const lang = await resolveRecipientLanguage(admin, null, travelerEmail);
+  const s = pickLang(REVIEW_STRINGS, lang);
 
   const html = `
     <div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f7f3ea; padding:32px;">
@@ -607,22 +634,21 @@ async function sendReviewRequestEmail(admin: ReturnType<typeof createClient>, bo
           <td align="center" style="padding:8px 0 28px;"><img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/wordmark-green-v2.png" alt="Goldsainte" style="height:22px;width:auto;max-width:240px;display:block;margin:0 auto;"/></td>
         </tr></tbody></table>
         <hr style="border:0;border-top:1px solid rgba(10,34,37,0.15);margin:0 0 28px;"/>
-        <h1 style="font-family:'Playfair Display', Georgia, serif; font-weight:400; color:#0a2225; font-size:30px; margin:0 0 16px; text-align:center;">How was your trip, ${travelerName}?</h1>
+        <h1 style="font-family:'Playfair Display', Georgia, serif; font-weight:400; color:#0a2225; font-size:30px; margin:0 0 16px; text-align:center;">${s.h1(travelerNameRaw ?? s.thereFallback)}</h1>
         <p style="color:#3f3f3f; font-size:15px; line-height:1.6; margin:0 0 20px;">
-          Now that your journey is wrapped, we'd love to hear how it went. Leave a review for
-          <strong>${agentName}</strong> — it helps other travelers and rewards great specialists.
+          ${s.body(`<strong>${agentNameRaw ?? s.yourSpecialist}</strong>`)}
         </p>
         <p style="margin:28px 0;">
           <a href="${reviewUrl}" style="display:inline-block; background:#0c4d47; color:#f7f3ea; text-decoration:none; padding:18px 40px; border-radius:2px; font-weight:500; font-size:13px; letter-spacing:0.18em; text-transform:uppercase;">
-            Leave a review
+            ${s.btn}
           </a>
         </p>
-        <p style="color:#7a7151; font-size:12px; margin:24px 0 0;">— The Goldsainte team</p>
+        <p style="color:#7a7151; font-size:12px; margin:24px 0 0;">${s.signoff}</p>
       </div>
     </div>
   `;
 
-  const subject = `How was your trip? Leave a review for ${agentName}`;
+  const subject = s.subject(agentNameRaw ?? s.yourSpecialist);
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
