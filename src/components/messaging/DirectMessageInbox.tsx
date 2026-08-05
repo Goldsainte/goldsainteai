@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useTranslatedContent } from "@/hooks/useTranslatedContent";
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
@@ -1009,7 +1010,11 @@ function ConversationItem({
             )}
             <div className="mt-0.5 flex items-baseline min-w-0">
               <p className={`truncate text-[15px] leading-5 ${unread ? "font-medium text-[#0a2225]" : "text-[#6B7280]"}`}>
-                {conversation.lastMessagePreview || "No messages yet"}
+                {conversation.lastMessagePreview ? (
+                  <TranslatedMessageText text={conversation.lastMessagePreview} showToggle={false} />
+                ) : (
+                  t("msg.noMessagesYet", "No messages yet")
+                )}
               </p>
               {conversation.lastMessageAt && (
                 <span className="shrink-0 whitespace-pre text-[15px] leading-5 text-[#6B7280]"> · {compactTime(conversation.lastMessageAt)}</span>
