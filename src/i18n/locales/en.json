@@ -2058,7 +2058,8 @@
     "userBlocked": "User blocked",
     "showOriginal": "Show original",
     "showTranslation": "Show translation",
-    "translated": "Translated"
+    "translated": "Translated",
+    "noMessagesYet": "No messages yet"
   },
   "sett": {
     "checkoutOpened": "Checkout opened in new tab",
