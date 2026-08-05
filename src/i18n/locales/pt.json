@@ -2058,7 +2058,8 @@
     "userBlocked": "Usuário bloqueado",
     "showOriginal": "Ver original",
     "showTranslation": "Ver tradução",
-    "translated": "Traduzido"
+    "translated": "Traduzido",
+    "noMessagesYet": "Ainda sem mensagens"
   },
   "sett": {
     "checkoutOpened": "Pagamento aberto em nova aba",
