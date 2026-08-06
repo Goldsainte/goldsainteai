@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -186,7 +187,7 @@ export function ProposalCard({
 
       {proposal.message && (
         <p className="mb-3 whitespace-pre-line text-xs text-[#4a4a4a]">
-          {proposal.message}
+          <TranslatedMessageText text={proposal.message} />
         </p>
       )}
 
