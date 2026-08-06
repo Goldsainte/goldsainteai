@@ -2858,5 +2858,11 @@
     "depositD": "承諾時に25%、予約時に支払い",
     "balance": "残額",
     "balanceD": "出発前に支払い、同じ安全な決済で"
+  },
+  "brandConsole": {
+    "house": "ハウス",
+    "collections": "コレクション",
+    "inquiries": "お問い合わせ",
+    "performance": "パフォーマンス"
   }
 }
