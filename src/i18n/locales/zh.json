@@ -2561,7 +2561,26 @@
       "cbUploadTab": "上传自己的",
       "cbUploaded": "合同已上传",
       "cbUploadedDesc": "在下方签名，然后发送给旅行者。",
-      "cbUploading": "上传中…"
+      "cbUploading": "上传中…",
+      "briefs": "需求单",
+      "pipeline": "进行中",
+      "more": "更多",
+      "viewPublicProfile": "查看公开主页",
+      "view": "查看",
+      "addPhotosVideo": "添加照片与视频",
+      "profileNotFound": "未找到代理资料",
+      "createProfile": "创建代理资料",
+      "startHere": "从这里开始",
+      "twoWays": "两种赚钱方式",
+      "answerBrief": "响应需求单",
+      "ab1": "旅行者发布他们想要的旅程。挑一个契合你专长的需求单。",
+      "ab2": "发送量身定制的提案 — 行程、价格与时间表 — 由 Goldsainte AI 在一分钟内起草。",
+      "ab3": "对方接受并支付订金 — 全程不离开对话。",
+      "publishOwn": "发布你自己的",
+      "po1": "把你烂熟于心的旅程 — 或数字指南 — 在旅程构建器中打包。",
+      "po2": "以你的名字和价格上架市场。",
+      "po3": "旅行者直接预订 — 无需提案，一觉醒来订单已到。",
+      "howPaid": "如何获得报酬"
     }
   },
   "chk": {
