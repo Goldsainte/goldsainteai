@@ -166,7 +166,7 @@ export default function TravelerDashboardPage() {
                     <TabsTrigger
                       key={key}
                       value={key}
-                      className="rounded-none h-11 border-b border-transparent data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#0a2225]/55 text-[11px] uppercase tracking-[0.28em] font-medium px-5 transition-colors"
+                      className="rounded-none h-11 border-b border-transparent data-[state=active]:border-[#0c4d47] data-[state=active]:text-[#0a2225] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#0a2225]/55 text-[11px] uppercase tracking-[0.28em] font-medium px-5 whitespace-nowrap flex-shrink-0 transition-colors"
                     >
                       {TAB_LABELS[key]}
                     </TabsTrigger>
