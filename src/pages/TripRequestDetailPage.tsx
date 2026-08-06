@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useState } from "react";
 import { capLabel } from "@/lib/onTripCapabilities";
@@ -86,6 +88,7 @@ type TravelerProfile = {
 };
 
 export default function TripRequestDetail() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -354,7 +357,7 @@ export default function TripRequestDetail() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f3ea]">
         <div className="text-center px-8 py-12">
-          <h2 className="font-secondary text-2xl text-foreground mb-2">Something went wrong</h2>
+          <h2 className="font-secondary text-2xl text-foreground mb-2">{t("trdp.wentWrong", "Something went wrong")}</h2>
           <p className="text-[16px] text-muted-foreground">{error || "Trip request not found."}</p>
         </div>
       </div>
@@ -485,7 +488,7 @@ export default function TripRequestDetail() {
                 chips beneath. All money lives in the rail — stated once. */}
             {request.hireOnTrip && (
               <div>
-                <h2 className="mb-5 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">The Engagement</h2>
+                <h2 className="mb-5 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.engagement", "The Engagement")}</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
                   {[
                     { label: "Destination", value: request.destination !== "Not specified" ? request.destination : null },
@@ -503,7 +506,7 @@ export default function TripRequestDetail() {
                 </div>
                 {(request.hireCapabilities?.length ?? 0) > 0 && (
                   <div className="mt-7">
-                    <p className="mb-2.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Hired for</p>
+                    <p className="mb-2.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">{t("trdp.hiredFor", "Hired for")}</p>
                     <div className="flex flex-wrap gap-2">
                       {request.hireCapabilities!.map((id: string) => (
                         <span key={id} className="inline-flex h-9 items-center rounded-full border border-[#C7A962]/40 bg-[#C7A962]/10 px-4 text-[15px] font-medium text-[#0a2225]">
@@ -519,14 +522,14 @@ export default function TripRequestDetail() {
             {/* Description */}
             {request.description && (
               <div>
-                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">About This Trip</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.aboutTrip", "About This Trip")}</h2>
                 <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80 whitespace-pre-line">
-                  {request.description}
+                  <TranslatedMessageText text={request.description} />
                 </p>
                 {request.specialRequests && (
                   <div className="mt-4">
-                    <p className="mb-1 text-[13.5px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/45">Special requests</p>
-                    <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80">{request.specialRequests}</p>
+                    <p className="mb-1 text-[13.5px] font-medium uppercase tracking-[0.1em] text-[#0a2225]/45">{t("trdp.specialRequests", "Special requests")}</p>
+                    <p className="max-w-2xl text-[16px] leading-[1.75] text-[#0a2225]/80"><TranslatedMessageText text={request.specialRequests} /></p>
                   </div>
                 )}
               </div>
@@ -535,7 +538,7 @@ export default function TripRequestDetail() {
             {/* Trip Details Grid — clean, no cards */}
             {!request.hireOnTrip && tripDetailsGrid.length > 0 && (
               <div>
-                <h2 className="mb-5 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Trip Details</h2>
+                <h2 className="mb-5 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.tripDetails", "Trip Details")}</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                   {tripDetailsGrid.map((row, i) => (
                     <div key={i} className="border-t border-[#0a2225]/15 pt-3">
@@ -550,7 +553,7 @@ export default function TripRequestDetail() {
             {/* Interests */}
             {request.interests && request.interests.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Interests</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.interests", "Interests")}</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.interests.map(tag => (
                     <span key={tag} className="inline-flex h-8 items-center rounded-full border border-[#0a2225]/15 bg-white px-3.5 text-[14.5px] text-[#0a2225]">
@@ -564,7 +567,7 @@ export default function TripRequestDetail() {
             {/* Must-Haves */}
             {request.mustHaves && request.mustHaves.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Must-Haves</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.mustHaves", "Must-Haves")}</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.mustHaves.map(item => (
                     <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#0c4d47]/25 bg-[#0c4d47]/[0.06] px-3.5 text-[14.5px] text-[#0c4d47]">
@@ -578,7 +581,7 @@ export default function TripRequestDetail() {
             {/* Dealbreakers */}
             {request.dealbreakers && request.dealbreakers.length > 0 && (
               <div>
-                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Dealbreakers</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.dealbreakers", "Dealbreakers")}</h2>
                 <div className="flex flex-wrap gap-2">
                   {request.dealbreakers.map(item => (
                     <span key={item} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#8b3a3a]/25 bg-[#8b3a3a]/[0.05] px-3.5 text-[14.5px] text-[#8b3a3a]">
@@ -592,7 +595,7 @@ export default function TripRequestDetail() {
             {/* Visual Brief — only if content exists */}
             {hasStoryboard && (
               <div>
-                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Visual Brief</h2>
+                <h2 className="mb-3 text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.visualBrief", "Visual Brief")}</h2>
                 <TripStoryboardViewer tripId={request.id} variant="gallery" />
               </div>
             )}
@@ -601,7 +604,7 @@ export default function TripRequestDetail() {
             {isRequestOwner && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">Proposals Received</h2>
+                  <h2 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.proposalsReceived", "Proposals Received")}</h2>
                   <span className="inline-flex items-center rounded-full border border-[#C7A962]/50 bg-[#C7A962]/15 px-2.5 py-0.5 text-[13.5px] font-medium text-[#8D6B2F]">
                     {proposals.length}
                   </span>
@@ -609,7 +612,7 @@ export default function TripRequestDetail() {
 
                 {proposals.length === 0 ? (
                   <div className="border-t border-[#0a2225]/15 pt-6">
-                    <p className="font-secondary text-[20px] text-[#0a2225]">No proposals yet</p>
+                    <p className="font-secondary text-[20px] text-[#0a2225]">{t("trdp.noProposals", "No proposals yet")}</p>
                     <p className="mt-1.5 max-w-md text-[15px] leading-relaxed text-[#0a2225]/55">
                       As agents and creators respond, their proposals will appear here.
                     </p>
@@ -672,7 +675,7 @@ export default function TripRequestDetail() {
                         {proposal.status !== "accepted" && proposal.status !== "declined" && (
                           <div className="mx-1 border-l-2 border-[#C7A962] py-1 pl-4 text-[14.5px] leading-relaxed text-[#0a2225]/70">
                             <p>
-                              <span className="font-semibold">By accepting this proposal</span>, your trip and payments stay protected by Goldsainte.
+                              <span className="font-semibold">{t("trdp.byAccepting", "By accepting this proposal")}</span>{t("trdp.byAcceptingRest", ", your trip and payments stay protected by Goldsainte.")}
                             </p>
                             <p className="mt-1.5">
                               For your safety, please do not send direct bank transfers or share
@@ -878,15 +881,15 @@ export default function TripRequestDetail() {
 
           {/* The money, at a glance */}
           <div className="mt-11 border-t border-[#0a2225]/15 pt-7">
-            <h3 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">The money, at a glance</h3>
+            <h3 className="text-[12.5px] uppercase tracking-[0.28em] text-[#8D6B2F]">{t("trdp.moneyGlance", "The money, at a glance")}</h3>
             <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
               <div className="border-t border-[#0a2225]/15 pt-3">
-                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Deposit</p>
-                <p className="font-secondary text-[17px] text-[#0a2225]">25% at acceptance, paid at booking</p>
+                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">{t("trdp.deposit", "Deposit")}</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">{t("trdp.depositD", "25% at acceptance, paid at booking")}</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
-                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">Balance</p>
-                <p className="font-secondary text-[17px] text-[#0a2225]">Due before departure, same secure checkout</p>
+                <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">{t("trdp.balance", "Balance")}</p>
+                <p className="font-secondary text-[17px] text-[#0a2225]">{t("trdp.balanceD", "Due before departure, same secure checkout")}</p>
               </div>
               <div className="border-t border-[#0a2225]/15 pt-3">
                 <p className="mb-1.5 text-[12.5px] uppercase tracking-[0.14em] text-[#0a2225]/50">
