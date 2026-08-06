@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
@@ -149,7 +150,7 @@ export default function TripDetailPage() {
               <section className="rounded-2xl border border-[#E5DFC6] bg-white p-6">
                 <h2 className="font-secondary text-xl font-semibold text-[#0a2225]">About This Trip</h2>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#4a4a4a]">
-                  {trip.description}
+                  <TranslatedMessageText text={trip.description} />
                 </p>
                 
                 {trip.tags && trip.tags.length > 0 && (
