@@ -144,7 +144,8 @@ serve(async (req: Request) => {
       templateData: {
         disputeId,
         disputeOpenedBy: data.name,
-        tripName: data.bookingReference || "your booking",
+        // Empty → the template supplies a fallback in the recipient's language.
+        tripName: data.bookingReference || "",
       },
     }),
     sendEmail({
