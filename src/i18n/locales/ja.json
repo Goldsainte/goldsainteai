@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "チップ設定を更新できませんでした",
       "viewGuidelines": "ガイドラインを見る",
       "viewPublicProfile": "公開プロフィールを見る",
-      "viewTaxInfo": "税務情報を見る"
+      "viewTaxInfo": "税務情報を見る",
+      "more": "その他",
+      "finishStudio": "スタジオの設定を完了しましょう",
+      "finishStudioSub": "クリエイター規約を含むオンボーディングを完了すると、全機能が解放されコミッションを獲得できます。"
     },
     "a": {
       "accessRequired": "エージェント権限が必要です",
