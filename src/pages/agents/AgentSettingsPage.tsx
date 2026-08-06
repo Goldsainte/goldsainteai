@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { WORLD_COUNTRIES } from "@/lib/residency";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ const input =
   "mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[15px] text-[#0a2225] outline-none focus:border-[#C7A962]";
 
 export default function AgentSettingsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -258,7 +260,7 @@ export default function AgentSettingsPage() {
         <BackButton to="/agent-dashboard" className="mb-4" />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Agent Settings</h1>
+            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">{t("accSettings.agentTitle", "Agent Settings")}</h1>
             <p className="mt-2 text-[15px] text-[#0a2225]/70">
               Everything here appears on your public profile — exactly what travelers see.
             </p>
@@ -284,7 +286,7 @@ export default function AgentSettingsPage() {
 
         {/* Identity */}
         <section className="mt-10 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Identity</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{t("accSettings.identity", "Identity")}</h2>
           <div className="mt-6 flex flex-wrap items-start gap-8">
             <div className="text-center">
               <input ref={avatarInput} type="file" accept="image/*" className="hidden"
@@ -320,41 +322,41 @@ export default function AgentSettingsPage() {
             </div>
             <div className="min-w-[260px] flex-1 space-y-5">
               <div>
-                <label className={label}>Your name</label>
-                <input className={input} value={form.display_name} onChange={set("display_name")} placeholder="Andre Powell" />
-                <p className={hint}>Shown on your card and profile.</p>
+                <label className={label}>{t("accSettings.yourName", "Your name")}</label>
+                <input className={input} value={form.display_name} onChange={set("display_name")} placeholder={t("accSettings.phName", "Andre Powell")} />
+                <p className={hint}>{t("accSettings.shownOnCard", "Shown on your card and profile.")}</p>
               </div>
               <div>
-                <label className={label}>Business name</label>
-                <input className={input} value={form.agency_name} onChange={set("agency_name")} placeholder="Goldsainte Journeys" />
+                <label className={label}>{t("accSettings.businessName", "Business name")}</label>
+                <input className={input} value={form.agency_name} onChange={set("agency_name")} placeholder={t("accSettings.phBusiness", "Goldsainte Journeys")} />
                 <p className={hint}>The big title on your profile — like "Celebrate and Explore."</p>
               </div>
               <div>
-                <label className={label}>Based in</label>
+                <label className={label}>{t("accSettings.basedIn", "Based in")}</label>
                 <div className="mt-2">
                   <GoogleCityAutocomplete
                     value={form.location}
                     onChange={(v) => setForm((f) => ({ ...f, location: v }))}
-                    placeholder="Charlotte, NC, USA"
+                    placeholder={t("accSettings.phCity", "Charlotte, NC, USA")}
                   />
                 </div>
               </div>
               <div>
-                <label className={label}>Country of operation</label>
+                <label className={label}>{t("accSettings.countryOp", "Country of operation")}</label>
                 <select
                   className={input}
                   value={form.country}
                   onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
                 >
-                  <option value="">Select your country</option>
+                  <option value="">{t("accSettings.selectCountry", "Select your country")}</option>
                   {WORLD_COUNTRIES.map((c) => (
                     <option key={c.code} value={c.code}>{c.name}</option>
                   ))}
                 </select>
-                <p className={hint}>Where you're authorized to sell travel — shown on your profile and trip listings.</p>
+                <p className={hint}>{t("accSettings.authSell", "Where you're authorized to sell travel \u2014 shown on your profile and trip listings.")}</p>
               </div>
               <div>
-                <label className={label}>Tips</label>
+                <label className={label}>{t("accSettings.tips", "Tips")}</label>
                 <label className="mt-2 flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -362,19 +364,19 @@ export default function AgentSettingsPage() {
                     onChange={(e) => setForm((f) => ({ ...f, accepts_tips: e.target.checked }))}
                     className="h-4 w-4 accent-[#0C4D47]"
                   />
-                  <span className="text-sm text-[#0a2225]">Allow travelers to tip me</span>
+                  <span className="text-sm text-[#0a2225]">{t("accSettings.allowTips", "Allow travelers to tip me")}</span>
                 </label>
-                <p className={hint}>A tip button shows on your public profile. Turn this off to hide it.</p>
+                <p className={hint}>{t("accSettings.tipsDesc", "A tip button shows on your public profile. Turn this off to hide it.")}</p>
               </div>
               <div>
                 <label className={label}>Trips starting at ($/night)</label>
                 <input className={input} value={form.starting_price_per_night} onChange={set("starting_price_per_night")} placeholder="400" inputMode="numeric" />
-                <p className={hint}>Leave blank to hide this line.</p>
+                <p className={hint}>{t("accSettings.leaveBlank", "Leave blank to hide this line.")}</p>
               </div>
               <div>
-                <label className={label}>Languages spoken</label>
-                <input className={input} value={form.languages} onChange={set("languages")} placeholder="English, Spanish, Portuguese" />
-                <p className={hint}>Separate with commas — shown on your card, like Fora.</p>
+                <label className={label}>{t("accSettings.langsSpoken", "Languages spoken")}</label>
+                <input className={input} value={form.languages} onChange={set("languages")} placeholder={t("accSettings.phLangs", "English, Spanish, Portuguese")} />
+                <p className={hint}>{t("accSettings.commasCard", "Separate with commas \u2014 shown on your card, like Fora.")}</p>
               </div>
             </div>
           </div>
@@ -382,14 +384,14 @@ export default function AgentSettingsPage() {
 
         {/* Client agreement — the deposit gate */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Client agreement</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{t("accSettings.clientAgreement", "Client agreement")}</h2>
           <p className="mt-2 text-[14px] text-[#6B7280]">
             Your own engagement agreement, shown to every traveler and e-accepted
             before they can pay a deposit. Goldsainte never provides, edits, or
             endorses this document — it is yours.
           </p>
           <p className="mt-3 text-[13px] text-[#6B7280]">
-            <span className="font-medium text-[#0a2225]">Don't have one yet?</span>{" "}
+            <span className="font-medium text-[#0a2225]">{t("accSettings.noAgreementYet", "Don't have one yet?")}</span>{" "}
             Industry sources license attorney-drafted client agreements directly
             to advisors:{" "}
             <a href="https://www.asta.org" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">ASTA</a>{" "}
@@ -420,8 +422,8 @@ export default function AgentSettingsPage() {
             </div>
           ) : (
             <div className="mt-5 rounded-xl bg-amber-50 p-4 text-[14px] text-amber-900">
-              <p className="font-medium">Required to receive deposits</p>
-              <p className="mt-1">Travelers can't pay you until your agreement is on file.</p>
+              <p className="font-medium">{t("accSettings.requiredDeposits", "Required to receive deposits")}</p>
+              <p className="mt-1">{t("accSettings.agreementOnFile", "Travelers can't pay you until your agreement is on file.")}</p>
               <button type="button" onClick={() => agreementInput.current?.click()} disabled={uploading === "agreement"}
                 className="mt-3 rounded-full bg-[#0c4d47] px-5 py-2 text-[13.5px] text-white disabled:opacity-60">
                 {uploading === "agreement" ? "Uploading…" : "Upload PDF"}
@@ -434,11 +436,11 @@ export default function AgentSettingsPage() {
 
         {/* Story */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Your story</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{t("accSettings.yourStory", "Your story")}</h2>
           <div className="mt-6 space-y-6">
             <div>
               <div className="flex items-center justify-between gap-3">
-                <label className={label}>Our story</label>
+                <label className={label}>{t("accSettings.ourStory", "Our story")}</label>
                 <AIRewriteButton
                   value={form.story}
                   onRewrite={(text) => setForm((f) => ({ ...f, story: text }))}
@@ -446,11 +448,11 @@ export default function AgentSettingsPage() {
                   persona="travel agent"
                 />
               </div>
-              <textarea className={`${input} min-h-[120px]`} value={form.story} onChange={set("story")} placeholder="Why you do this, in your voice…" />
+              <textarea className={`${input} min-h-[120px]`} value={form.story} onChange={set("story")} placeholder={t("accSettings.phStoryA", "Why you do this, in your voice\u2026")} />
             </div>
             <div>
               <div className="flex items-center justify-between gap-3">
-                <label className={label}>Travel style</label>
+                <label className={label}>{t("accSettings.travelStyle", "Travel style")}</label>
                 <AIRewriteButton
                   value={form.travel_style}
                   onRewrite={(text) => setForm((f) => ({ ...f, travel_style: text }))}
@@ -458,38 +460,38 @@ export default function AgentSettingsPage() {
                   persona="travel agent"
                 />
               </div>
-              <textarea className={`${input} min-h-[120px]`} value={form.travel_style} onChange={set("travel_style")} placeholder="How you like to travel and design trips…" />
+              <textarea className={`${input} min-h-[120px]`} value={form.travel_style} onChange={set("travel_style")} placeholder={t("accSettings.phStyleA", "How you like to travel and design trips\u2026")} />
             </div>
           </div>
         </section>
 
         {/* Expertise */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Ask us about</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{t("accSettings.askUsAbout", "Ask us about")}</h2>
           <div className="mt-6 space-y-6">
             <div>
-              <label className={label}>Destinations</label>
-              <input className={input} value={form.destinations} onChange={set("destinations")} placeholder="Japan, Morocco, Portugal" />
-              <p className={hint}>Separate with commas — these become the tags on your profile.</p>
+              <label className={label}>{t("accSettings.destinations", "Destinations")}</label>
+              <input className={input} value={form.destinations} onChange={set("destinations")} placeholder={t("accSettings.phDest", "Japan, Morocco, Portugal")} />
+              <p className={hint}>{t("accSettings.commasTags", "Separate with commas \u2014 these become the tags on your profile.")}</p>
             </div>
             <div>
-              <label className={label}>Specialties</label>
-              <input className={input} value={form.specializations} onChange={set("specializations")} placeholder="Milestone celebrations, Group travel" />
-              <p className={hint}>Separate with commas.</p>
+              <label className={label}>{t("accSettings.specialties", "Specialties")}</label>
+              <input className={input} value={form.specializations} onChange={set("specializations")} placeholder={t("accSettings.phSpecA", "Milestone celebrations, Group travel")} />
+              <p className={hint}>{t("accSettings.commas", "Separate with commas.")}</p>
             </div>
           </div>
         </section>
 
         {/* Stay connected */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Stay connected</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{t("accSettings.stayConnected", "Stay connected")}</h2>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             <div>
               <label className={label}>Instagram</label>
               <input className={input} value={form.instagram_handle} onChange={set("instagram_handle")} placeholder="@yourhandle" />
             </div>
             <div>
-              <label className={label}>Website</label>
+              <label className={label}>{t("accSettings.website", "Website")}</label>
               <input className={input} value={form.website} onChange={set("website")} placeholder="https://…" />
             </div>
             <div>
