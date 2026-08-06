@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "Não foi possível atualizar a configuração de gorjetas",
       "viewGuidelines": "Ver diretrizes",
       "viewPublicProfile": "Ver perfil público",
-      "viewTaxInfo": "Ver info fiscal"
+      "viewTaxInfo": "Ver info fiscal",
+      "more": "Mais",
+      "finishStudio": "Termine de configurar seu estúdio",
+      "finishStudioSub": "Conclua o onboarding — incluindo os termos de criador — para desbloquear todos os recursos e começar a ganhar comissões."
     },
     "a": {
       "accessRequired": "Acesso de agente necessário",
