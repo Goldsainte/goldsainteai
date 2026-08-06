@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "返金ポリシーを記入...",
     "termsConditions": "利用条件",
     "termsPh": "追加の条件..."
+  },
+  "trdp": {
+    "wentWrong": "問題が発生しました",
+    "engagement": "ご依頼内容",
+    "hiredFor": "依頼内容",
+    "aboutTrip": "この旅について",
+    "specialRequests": "特別なご要望",
+    "tripDetails": "旅の詳細",
+    "interests": "興味・関心",
+    "mustHaves": "必須条件",
+    "dealbreakers": "NG条件",
+    "visualBrief": "ビジュアルブリーフ",
+    "proposalsReceived": "届いた提案",
+    "noProposals": "まだ提案はありません",
+    "byAccepting": "この提案を承諾すると",
+    "byAcceptingRest": "、旅と支払いは Goldsainte によって保護されます。",
+    "moneyGlance": "お金の流れをひと目で",
+    "deposit": "デポジット",
+    "depositD": "承諾時に25%、予約時に支払い",
+    "balance": "残額",
+    "balanceD": "出発前に支払い、同じ安全な決済で"
   }
 }
