@@ -358,8 +358,8 @@ export default function CreatorDashboard() {
             <div className="flex items-start sm:items-center gap-3 min-w-0">
               <AlertCircle className="w-5 h-5 text-[#0c4d47] flex-shrink-0 mt-0.5 sm:mt-0" />
               <div className="min-w-0">
-                <p className="font-secondary text-base text-[#0a2225]">Finish setting up your studio</p>
-                <p className="text-sm text-[#0a2225]/65">Complete onboarding — including the creator terms — to unlock all features and start earning commissions.</p>
+                <p className="font-secondary text-base text-[#0a2225]">{t("dash.c.finishStudio", "Finish setting up your studio")}</p>
+                <p className="text-sm text-[#0a2225]/65">{t("dash.c.finishStudioSub", "Complete onboarding \u2014 including the creator terms \u2014 to unlock all features and start earning commissions.")}</p>
               </div>
             </div>
             <Link
@@ -424,12 +424,12 @@ export default function CreatorDashboard() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.28em] font-medium text-[#0a2225]/55 hover:text-[#0a2225] transition-colors px-5 h-11 shrink-0">
-                      More <ChevronDown className="w-3.5 h-3.5" />
+                      {t("dash.c.more", "More")} <ChevronDown className="w-3.5 h-3.5" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-white border-[#E5DFC6]">
                     <DropdownMenuItem onClick={() => setActiveLeaf("settings")} className="gap-2">
-                      <SettingsIcon className="w-4 h-4" /> Settings
+                      <SettingsIcon className="w-4 h-4" /> {t("dash.c.settings", "Settings")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
