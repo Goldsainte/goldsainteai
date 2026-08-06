@@ -2858,5 +2858,11 @@
     "depositD": "25% at acceptance, paid at booking",
     "balance": "Balance",
     "balanceD": "Due before departure, same secure checkout"
+  },
+  "brandConsole": {
+    "house": "House",
+    "collections": "Collections",
+    "inquiries": "Inquiries",
+    "performance": "Performance"
   }
 }
