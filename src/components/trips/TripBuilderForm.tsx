@@ -87,13 +87,13 @@ const helperClasses = "text-xs text-[#9A9384] mt-1";
 
 // The builder speaks whichever noun the listing actually is — a creator
 // locked to Bookable Tour should never read "trip" (Jul 24 2026).
-const getSteps = (noun: string) => [
-  { id: "basics", label: `About the ${noun}`, subtitle: "Title, destination, type", heading: `Tell us about your ${noun}`, subheading: "This is the first thing travelers will see." },
-  { id: "details", label: "What's included", subtitle: "Highlights & inclusions", heading: `What makes this ${noun} special?`, subheading: "Highlights and inclusions help travelers decide." },
-  { id: "itinerary", label: "Day by day", subtitle: "Build your itinerary", heading: "Build the journey day by day", subheading: "Detailed itineraries convert more bookings." },
-  { id: "media", label: "Photos & video", subtitle: "Cover image, gallery", heading: "Show it off", subheading: "Strong visuals are the single biggest driver of bookings." },
-  { id: "requirements", label: "Requirements", subtitle: "Dates, travel docs", heading: "Practicalities", subheading: "Be upfront so travelers come prepared." },
-  { id: "policies", label: "Terms & pricing", subtitle: "Deposit, cancellation", heading: "Terms & payment", subheading: "Clear terms protect you and build traveler trust." },
+const getSteps = (noun: string, t: (k: string, o?: any) => string) => [
+  { id: "basics", label: t("tripBuilder.stepBasicsLabel", { defaultValue: "About the {{noun}}", noun }), subtitle: t("tripBuilder.stepBasicsSub", "Title, destination, type"), heading: t("tripBuilder.stepBasicsHead", { defaultValue: "Tell us about your {{noun}}", noun }), subheading: t("tripBuilder.stepBasicsSubhead", "This is the first thing travelers will see.") },
+  { id: "details", label: t("tripBuilder.stepDetailsLabel", "What's included"), subtitle: t("tripBuilder.stepDetailsSub", "Highlights & inclusions"), heading: t("tripBuilder.stepDetailsHead", { defaultValue: "What makes this {{noun}} special?", noun }), subheading: t("tripBuilder.stepDetailsSubhead", "Highlights and inclusions help travelers decide.") },
+  { id: "itinerary", label: t("tripBuilder.stepItinLabel", "Day by day"), subtitle: t("tripBuilder.stepItinSub", "Build your itinerary"), heading: t("tripBuilder.stepItinHead", "Build the journey day by day"), subheading: t("tripBuilder.stepItinSubhead", "Detailed itineraries convert more bookings.") },
+  { id: "media", label: t("tripBuilder.stepMediaLabel", "Photos & video"), subtitle: t("tripBuilder.stepMediaSub", "Cover image, gallery"), heading: t("tripBuilder.stepMediaHead", "Show it off"), subheading: t("tripBuilder.stepMediaSubhead", "Strong visuals are the single biggest driver of bookings.") },
+  { id: "requirements", label: t("tripBuilder.stepReqLabel", "Requirements"), subtitle: t("tripBuilder.stepReqSub", "Dates, travel docs"), heading: t("tripBuilder.stepReqHead", "Practicalities"), subheading: t("tripBuilder.stepReqSubhead", "Be upfront so travelers come prepared.") },
+  { id: "policies", label: t("tripBuilder.stepPolLabel", "Terms & pricing"), subtitle: t("tripBuilder.stepPolSub", "Deposit, cancellation"), heading: t("tripBuilder.stepPolHead", "Terms & payment"), subheading: t("tripBuilder.stepPolSubhead", "Clear terms protect you and build traveler trust.") },
 ];
 
 export type TripBuilderFormHandle = {
@@ -214,9 +214,9 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
   // above its declaration threw a ReferenceError that crashed the whole
   // builder page: the "Something went wrong" on /trip-builder, Jul 24 2026).
   const isTour = formData.listing_type === "tour";
-  const noun = isTour ? "tour" : "trip";
+  const noun = isTour ? t("tripBuilder.nounTour", "tour") : t("tripBuilder.nounTrip", "trip");
   const Noun = isTour ? "Tour" : "Trip";
-  const steps = getSteps(noun);
+  const steps = getSteps(noun, t);
 
   useEffect(() => {
     if (initialData) {
@@ -494,7 +494,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         {step.id === "basics" && (
           <div className="space-y-10">
             <div className="space-y-6">
-              <SectionHeader title="Basic information" subtitle="The essentials travelers see first when browsing the marketplace." />
+              <SectionHeader title={t("tripBuilder.basicInfo", "Basic information")} subtitle={t("tripBuilder.basicInfoSub", "The essentials travelers see first when browsing the marketplace.")} />
               <div className="space-y-5">
                 <div className="space-y-2">
                   <Label className={labelClasses}>{Noun} title *</Label>
@@ -506,7 +506,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   <p className={helperClasses}>{isTour ? 'Keep it specific. "Sunset Food Tour of Trastevere" outperforms "Rome Tour".' : 'Keep it specific. "7-Day Jordan Desert & Petra" outperforms "Jordan Trip".'}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Host tagline</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.hostTagline", "Host tagline")}</Label>
                   <Input value={formData.host_tagline} onChange={(e) => updateField("host_tagline", e.target.value)}
                     placeholder="e.g., Curated by a local Italy expert" className={inputClasses} />
                 </div>
@@ -528,7 +528,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-3">
-                    <Label className={labelClasses}>Description</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.description", "Description")}</Label>
                     <AIRewriteButton
                       value={formData.description}
                       onRewrite={(text) => updateField("description", text)}
@@ -544,7 +544,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     (and RLS enforces the same matrix server-side). */}
                 {(allowListingChoice || listingKind === "tour") && (
                   <div className="md:col-span-2 mb-2">
-                    <Label className="text-[#0a2225]">Listing type</Label>
+                    <Label className="text-[#0a2225]">{t("tripBuilder.listingType", "Listing type")}</Label>
                     {allowListingChoice ? (
                       <div className="mt-2 flex gap-2">
                         {(["trip", "tour"] as const).map((k) => (
@@ -576,16 +576,16 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   <div className="space-y-2">
                     <Label className={labelClasses}>{Noun} type</Label>
                     <Select value={formData.trip_type} onValueChange={(v) => updateField("trip_type", v)}>
-                      <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
+                      <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder={t("tripBuilder.selectType", "Select type")} /></SelectTrigger>
                       <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                         {TRIP_TYPES.map((t) => <SelectItem key={t} value={t} className="focus:bg-[#FDF9F0]">{t}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className={labelClasses}>Activity level</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.activityLevel", "Activity level")}</Label>
                     <Select value={formData.activity_level} onValueChange={(v) => updateField("activity_level", v)}>
-                      <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder="Select level" /></SelectTrigger>
+                      <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder={t("tripBuilder.selectLevel", "Select level")} /></SelectTrigger>
                       <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                         {ACTIVITY_LEVELS.map((l) => <SelectItem key={l} value={l} className="focus:bg-[#FDF9F0]">{l}</SelectItem>)}
                       </SelectContent>
@@ -596,7 +596,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
             </div>
 
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Pricing & duration" subtitle="What travelers pay, and how long they're with you." />
+              <SectionHeader title={t("tripBuilder.pricingDuration", "Pricing & duration")} subtitle={t("tripBuilder.pricingDurationSub", "What travelers pay, and how long they're with you.")} />
               <div className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
@@ -610,13 +610,13 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <p className={helperClasses}>This is what travelers pay. Your deposit percentage and commission are calculated from this.</p>
                   </div>
                   <div className="space-y-2">
-                    <Label className={labelClasses}>Original price</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.originalPrice", "Original price")}</Label>
                     <Input type="number" value={formData.original_price}
                       onChange={(e) => updateField("original_price", e.target.value)}
-                      placeholder="For showing discounts" className={inputClasses} />
+                      placeholder={t("tripBuilder.forDiscounts", "For showing discounts")} className={inputClasses} />
                   </div>
                   <div className="space-y-2">
-                    <Label className={labelClasses}>Currency</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.currency", "Currency")}</Label>
                     <Select value={formData.currency} onValueChange={(v) => updateField("currency", v)}>
                       <SelectTrigger className={selectTriggerClasses}><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
@@ -642,27 +642,27 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   {/* Nights imply lodging — trips only. Hidden for tours (Jul 24). */}
                   {!isTour && (
                     <div className="space-y-2">
-                      <Label className={labelClasses}>Duration (nights)</Label>
+                      <Label className={labelClasses}>{t("tripBuilder.durationNights", "Duration (nights)")}</Label>
                       <Input type="number" value={formData.duration_nights}
                         onChange={(e) => updateField("duration_nights", e.target.value)} placeholder="4" className={inputClasses} />
-                      <p className="text-[11px] text-[#6B7280]">Auto-calculated from days (you can adjust if needed)</p>
+                      <p className="text-[11px] text-[#6B7280]">{t("tripBuilder.autoCalc", "Auto-calculated from days (you can adjust if needed)")}</p>
                     </div>
                   )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className={labelClasses}>Min participants</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.minParticipants", "Min participants")}</Label>
                     <Input type="number" value={formData.min_participants}
                       onChange={(e) => updateField("min_participants", e.target.value)} placeholder="1" className={inputClasses} />
                   </div>
                   <div className="space-y-2">
-                    <Label className={labelClasses}>Max participants</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.maxParticipants", "Max participants")}</Label>
                     <Input type="number" value={formData.max_participants}
                       onChange={(e) => updateField("max_participants", e.target.value)} placeholder="12" className={inputClasses} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Group size note</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.groupSizeNote", "Group size note")}</Label>
                   <Input value={formData.group_size_note} onChange={(e) => updateField("group_size_note", e.target.value)}
                     placeholder="e.g., Small intimate group of 6-12 travelers" className={inputClasses} />
                 </div>
@@ -670,10 +670,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
             </div>
 
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Languages & audience" subtitle={`Who this ${noun} is designed for.`} />
+              <SectionHeader title={t("tripBuilder.langAudience", "Languages & audience")} subtitle={`Who this ${noun} is designed for.`} />
               <div className="space-y-5">
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Language of tour</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.tourLanguage", "Language of tour")}</Label>
                   <div className="flex flex-wrap gap-2">
                     {LANGUAGE_OPTIONS.map((lang) => {
                       const active = formData.languages.includes(lang);
@@ -690,16 +690,16 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className={labelClasses}>Minimum age (leave blank if none)</Label>
+                    <Label className={labelClasses}>{t("tripBuilder.minAge", "Minimum age (leave blank if none)")}</Label>
                     <Input type="number" min={0} value={formData.minimum_age}
                       onChange={(e) => updateField("minimum_age", e.target.value)} placeholder="e.g., 18" className={inputClasses} />
                   </div>
                   {/* Tours don't lodge travelers — trips only (founder catch, Jul 24). */}
                   {!isTour && (
                     <div className="space-y-2">
-                      <Label className={labelClasses}>Accommodation type</Label>
+                      <Label className={labelClasses}>{t("tripBuilder.accomType", "Accommodation type")}</Label>
                       <Select value={formData.accommodation_type} onValueChange={(v) => updateField("accommodation_type", v)}>
-                        <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder="Select type" /></SelectTrigger>
+                        <SelectTrigger className={selectTriggerClasses}><SelectValue placeholder={t("tripBuilder.selectType", "Select type")} /></SelectTrigger>
                         <SelectContent className="bg-white border-[#E5DFC6] rounded-xl">
                           {ACCOMMODATION_TYPES.map((t) => <SelectItem key={t} value={t} className="focus:bg-[#FDF9F0]">{t}</SelectItem>)}
                         </SelectContent>
@@ -715,27 +715,27 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         {step.id === "details" && (
           <div className="space-y-10">
             <div className="space-y-6">
-              <SectionHeader title={`${Noun} highlights`} subtitle="The 4–6 moments travelers will remember." />
+              <SectionHeader title={`${Noun} highlights`} subtitle={t("tripBuilder.highlightsTitle", "The 4\u20136 moments travelers will remember.")} />
               <ArrayFieldEditor items={formData.highlights} onChange={(items) => updateField("highlights", items)}
-                placeholder="Add a highlight (e.g., Private boat tour of the coastline)" />
+                placeholder={t("tripBuilder.addHighlight", "Add a highlight (e.g., Private boat tour of the coastline)")} />
             </div>
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="What's included" />
+              <SectionHeader title={t("tripBuilder.whatsIncluded", "What's included")} />
               <ArrayFieldEditor items={formData.included} onChange={(items) => updateField("included", items)}
-                placeholder="Add an inclusion (e.g., 4 nights accommodation)" />
+                placeholder={t("tripBuilder.addInclusion", "Add an inclusion (e.g., 4 nights accommodation)")} />
             </div>
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="What's not included" />
+              <SectionHeader title={t("tripBuilder.whatsNotIncluded", "What's not included")} />
               <ArrayFieldEditor items={formData.not_included} onChange={(items) => updateField("not_included", items)}
-                placeholder="Add an exclusion (e.g., Flights to/from destination)" />
+                placeholder={t("tripBuilder.addExclusion", "Add an exclusion (e.g., Flights to/from destination)")} />
             </div>
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Tags" subtitle={`Help the right travelers find this ${noun}.`} />
+              <SectionHeader title={t("tripBuilder.tags", "Tags")} subtitle={`Help the right travelers find this ${noun}.`} />
               <ArrayFieldEditor items={formData.tags} onChange={(items) => updateField("tags", items)}
-                placeholder="Add a tag (e.g., foodie, couples, photography)" />
+                placeholder={t("tripBuilder.addTag", "Add a tag (e.g., foodie, couples, photography)")} />
             </div>
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Meals included" />
+              <SectionHeader title={t("tripBuilder.mealsIncluded", "Meals included")} />
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {MEAL_OPTIONS.map((meal) => {
                   const active = formData.meals_included.includes(meal);
@@ -781,18 +781,18 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                     <div className="flex-1 space-y-5">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 space-y-2">
-                          <Label className={labelClasses}>Day title</Label>
+                          <Label className={labelClasses}>{t("tripBuilder.dayTitle", "Day title")}</Label>
                           <Input value={day.title} onChange={(e) => updateDay(idx, { title: e.target.value })}
                             placeholder={`e.g., Arrival in ${formData.destination || "destination"}`} className={inputClasses} />
                         </div>
                         <label className="flex items-center gap-2 text-xs text-[#6B7280] mt-8 flex-shrink-0">
-                          <span>Featured day</span>
+                          <span>{t("tripBuilder.featuredDay", "Featured day")}</span>
                           <Checkbox checked={day.is_featured_day} onCheckedChange={(v) => updateDay(idx, { is_featured_day: v})} />
                         </label>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between gap-3">
-                          <Label className={labelClasses}>Description</Label>
+                          <Label className={labelClasses}>{t("tripBuilder.description", "Description")}</Label>
                           <AIRewriteButton
                             value={day.description}
                             onRewrite={(text) => updateDay(idx, { description: text })}
@@ -801,24 +801,24 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                           />
                         </div>
                         <Textarea value={day.description} onChange={(e) => updateDay(idx, { description: e.target.value })}
-                          placeholder="Describe the day's experience..." rows={3} className={textareaClasses} />
+                          placeholder={t("tripBuilder.describeDayExp", "Describe the day's experience...")} rows={3} className={textareaClasses} />
                       </div>
                       <div className="space-y-2">
-                        <Label className={labelClasses}>Activities</Label>
+                        <Label className={labelClasses}>{t("tripBuilder.activities", "Activities")}</Label>
                         <ArrayFieldEditor items={day.activities}
                           onChange={(items) => updateDay(idx, { activities: items })}
-                          placeholder="Add an activity (e.g., Morning game drive)" />
+                          placeholder={t("tripBuilder.addActivity", "Add an activity (e.g., Morning game drive)")} />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {!isTour && (
                           <div className="space-y-2">
-                            <Label className={labelClasses}>Accommodation</Label>
+                            <Label className={labelClasses}>{t("tripBuilder.accommodation", "Accommodation")}</Label>
                             <Input value={day.accommodation} onChange={(e) => updateDay(idx, { accommodation: e.target.value })}
                               placeholder="e.g., Angama Mara Lodge" className={inputClasses} />
                           </div>
                         )}
                         <div className="space-y-2">
-                          <Label className={labelClasses}>Meals included</Label>
+                          <Label className={labelClasses}>{t("tripBuilder.mealsIncluded", "Meals included")}</Label>
                           <div className="flex flex-wrap gap-2 pt-1">
                             {DAY_MEAL_OPTIONS.map((meal) => {
                               const active = day.meals_included.includes(meal);
@@ -845,10 +845,10 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         {step.id === "media" && (
           <div className="space-y-10">
             <div className="space-y-4">
-              <SectionHeader title="Cover image" subtitle="The single image that earns the click." />
+              <SectionHeader title={t("tripBuilder.coverImage", "Cover image")} subtitle={t("tripBuilder.coverImageSub", "The single image that earns the click.")} />
               <TripImageUploader currentUrl={formData.cover_image_url}
                 onUpload={(url) => { updateField("cover_image_url", url); setCoverSuggested(false); }}
-                label="Upload a stunning cover image" />
+                label={t("tripBuilder.uploadCover", "Upload a stunning cover image")} />
               {formData.destination?.trim() && (
                 <Button type="button" variant="outline" size="sm"
                   onClick={() => suggestCoverImage()} disabled={suggestingCover}
@@ -859,7 +859,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               )}
             </div>
             <div className="space-y-4 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Image gallery" subtitle={`6–12 photos showcase the ${noun} best.`} />
+              <SectionHeader title={t("tripBuilder.imageGallery", "Image gallery")} subtitle={`6–12 photos showcase the ${noun} best.`} />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {formData.image_gallery.map((url, idx) => (
                   <div key={idx} className="relative group">
@@ -878,9 +878,9 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               </div>
             </div>
             <div className="space-y-4 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Video" subtitle="Optional — but a 30-second video can double conversion." />
+              <SectionHeader title={t("tripBuilder.video", "Video")} subtitle={t("tripBuilder.videoSub", "Optional \u2014 but a 30-second video can double conversion.")} />
               <div className="space-y-2">
-                <Label className={labelClasses}>Video URL (YouTube or Vimeo)</Label>
+                <Label className={labelClasses}>{t("tripBuilder.videoUrl", "Video URL (YouTube or Vimeo)")}</Label>
                 <Input value={formData.video_url} onChange={(e) => updateField("video_url", e.target.value)}
                   placeholder="https://youtube.com/watch?v=..." className={inputClasses} />
               </div>
@@ -891,12 +891,12 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
         {step.id === "requirements" && (
           <div className="space-y-10">
             <div className="space-y-6">
-              <SectionHeader title="Travel requirements" subtitle={isTour ? "What travelers should know before joining." : "What travelers need to enter the country."} />
+              <SectionHeader title={t("tripBuilder.travelReqs", "Travel requirements")} subtitle={isTour ? "What travelers should know before joining." : "What travelers need to enter the country."} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {([
-                  { field: "passport_required" as const, label: "Passport required", description: "Travelers must hold a valid passport" },
-                  { field: "visa_required" as const, label: "Visa required", description: "A visa may be needed for this destination" },
-                  { field: "vaccination_required" as const, label: "Vaccination required", description: "Proof of vaccination may be required" },
+                  { field: "passport_required" as const, label: t("tripBuilder.passportReq", "Passport required"), description: t("tripBuilder.passportReqD", "Travelers must hold a valid passport") },
+                  { field: "visa_required" as const, label: t("tripBuilder.visaReq", "Visa required"), description: t("tripBuilder.visaReqD", "A visa may be needed for this destination") },
+                  { field: "vaccination_required" as const, label: t("tripBuilder.vaxReq", "Vaccination required"), description: t("tripBuilder.vaxReqD", "Proof of vaccination may be required") },
                 ]).map(({ field, label, description }) => (
                   <button type="button" key={field} onClick={() => updateField(field, !formData[field])}
                     className="flex items-start gap-3 p-4 bg-[#FDF9F0] rounded-xl text-left hover:bg-[#F6F0E4] transition-colors">
@@ -917,7 +917,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                 ))}
               </div>
               <div className="space-y-2">
-                <Label className={labelClasses}>Fitness level required</Label>
+                <Label className={labelClasses}>{t("tripBuilder.fitnessReq", "Fitness level required")}</Label>
                 <Input value={formData.fitness_level_required}
                   onChange={(e) => updateField("fitness_level_required", e.target.value)}
                   placeholder="e.g., Moderate fitness for walking tours" className={inputClasses} />
@@ -925,20 +925,20 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
             </div>
 
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Departure dates" />
+              <SectionHeader title={t("tripBuilder.departureDates", "Departure dates")} />
               <RadioGroup value={departureMode} onValueChange={(v) => setDepartureMode(v as "flexible" | "fixed")} className="space-y-3">
                 <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-[#E5DFC6] p-4 hover:border-[#C7A962]/50">
                   <RadioGroupItem value="flexible" className="mt-1" />
                   <div>
                     <p className="text-sm font-medium text-[#0a2225]">Flexible — travelers contact me for dates</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">Best for bespoke and on-demand trips.</p>
+                    <p className="text-xs text-[#6B7280] mt-0.5">{t("tripBuilder.bestBespoke", "Best for bespoke and on-demand trips.")}</p>
                   </div>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-[#E5DFC6] p-4 hover:border-[#C7A962]/50">
                   <RadioGroupItem value="fixed" className="mt-1" />
                   <div>
-                    <p className="text-sm font-medium text-[#0a2225]">Fixed departure dates</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">Add specific departure dates travelers can book.</p>
+                    <p className="text-sm font-medium text-[#0a2225]">{t("tripBuilder.fixedDepartures", "Fixed departure dates")}</p>
+                    <p className="text-xs text-[#6B7280] mt-0.5">{t("tripBuilder.addSpecificDates", "Add specific departure dates travelers can book.")}</p>
                   </div>
                 </label>
               </RadioGroup>
@@ -969,7 +969,7 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-[#6B7280]">No departure dates added yet.</p>
+                    <p className="text-xs text-[#6B7280]">{t("tripBuilder.noDepartures", "No departure dates added yet.")}</p>
                   )}
                 </div>
               )}
@@ -978,16 +978,16 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
             {/* Flight logistics are trip-scale — hidden for tours (Jul 24). */}
             {!isTour && (
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Airport information" />
+              <SectionHeader title={t("tripBuilder.airportInfo", "Airport information")} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Recommended arrival airport</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.arrivalAirport", "Recommended arrival airport")}</Label>
                   <Input value={formData.recommended_arrival_airport}
                     onChange={(e) => updateField("recommended_arrival_airport", e.target.value)}
                     placeholder="e.g., Naples (NAP)" className={inputClasses} />
                 </div>
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Recommended departure airport</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.departureAirport", "Recommended departure airport")}</Label>
                   <Input value={formData.recommended_departure_airport}
                     onChange={(e) => updateField("recommended_departure_airport", e.target.value)}
                     placeholder="e.g., Rome Fiumicino (FCO)" className={inputClasses} />
@@ -997,15 +997,15 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
             )}
 
             <div className="space-y-6 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Availability window" />
+              <SectionHeader title={t("tripBuilder.availWindow", "Availability window")} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Available from</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.availableFrom", "Available from")}</Label>
                   <Input type="date" value={formData.available_from}
                     onChange={(e) => updateField("available_from", e.target.value)} className={inputClasses} />
                 </div>
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Available until</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.availableUntil", "Available until")}</Label>
                   <Input type="date" value={formData.available_until}
                     onChange={(e) => updateField("available_until", e.target.value)} className={inputClasses} />
                 </div>
@@ -1030,21 +1030,21 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
               )}
             </div>
             <div className="space-y-6">
-              <SectionHeader title="Payment terms" subtitle={`Set your deposit and payment schedule. These appear on your ${noun} listing.`} />
+              <SectionHeader title={t("tripBuilder.paymentTerms", "Payment terms")} subtitle={`Set your deposit and payment schedule. These appear on your ${noun} listing.`} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className={labelClasses}>Deposit required (%)</Label>
                   <Input type="number" value={formData.deposit_percentage}
                     onChange={(e) => updateField("deposit_percentage", e.target.value)}
                     placeholder="25" className={inputClasses} />
-                  <p className={helperClasses}>Charged at booking. Remaining balance collected before departure.</p>
+                  <p className={helperClasses}>{t("tripBuilder.chargedAtBooking", "Charged at booking. Remaining balance collected before departure.")}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className={labelClasses}>Balance due (days before trip)</Label>
+                  <Label className={labelClasses}>{t("tripBuilder.balanceDue", "Balance due (days before trip)")}</Label>
                   <Input type="number" value={formData.balance_due_days}
                     onChange={(e) => updateField("balance_due_days", e.target.value)}
                     placeholder="60" className={inputClasses} />
-                  <p className={helperClasses}>When the remaining balance is collected.</p>
+                  <p className={helperClasses}>{t("tripBuilder.whenBalance", "When the remaining balance is collected.")}</p>
                 </div>
               </div>
               <button
@@ -1056,37 +1056,37 @@ export const TripBuilderForm = forwardRef<TripBuilderFormHandle, TripBuilderForm
                   {formData.instant_booking && <span className="text-white text-xs">✓</span>}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-[#0a2225]">Enable Instant Booking</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">Travelers can book immediately without waiting for your approval.</p>
+                  <p className="text-sm font-medium text-[#0a2225]">{t("tripBuilder.instantBooking", "Enable Instant Booking")}</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">{t("tripBuilder.instantBookingD", "Travelers can book immediately without waiting for your approval.")}</p>
                 </div>
               </button>
             </div>
 
             <div className="space-y-3 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Cancellation policy" />
+              <SectionHeader title={t("tripBuilder.cancelPolicy", "Cancellation policy")} />
               <button type="button"
                 onClick={() => updateField("cancellation_policy",
                   (isTour ? TOUR_CANCELLATION_TEMPLATE : TRIP_CANCELLATION_TEMPLATE).replace(/\{deposit_percentage\}/g, formData.deposit_percentage || "25"))}
-                className="text-xs text-[#0c4d47] underline">Use template</button>
+                className="text-xs text-[#0c4d47] underline">{t("tripBuilder.useTemplate", "Use template")}</button>
               <Textarea value={formData.cancellation_policy}
                 onChange={(e) => updateField("cancellation_policy", e.target.value)}
-                placeholder="Describe your cancellation policy..." rows={5} className={textareaClasses} />
+                placeholder={t("tripBuilder.cancelPolicyPh", "Describe your cancellation policy...")} rows={5} className={textareaClasses} />
             </div>
 
             <div className="space-y-3 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Refund policy" />
+              <SectionHeader title={t("tripBuilder.refundPolicy", "Refund policy")} />
               <button type="button" onClick={() => updateField("refund_policy", isTour ? TOUR_REFUND_TEMPLATE : TRIP_REFUND_TEMPLATE)}
-                className="text-xs text-[#0c4d47] underline">Use template</button>
+                className="text-xs text-[#0c4d47] underline">{t("tripBuilder.useTemplate", "Use template")}</button>
               <Textarea value={formData.refund_policy}
                 onChange={(e) => updateField("refund_policy", e.target.value)}
-                placeholder="Describe your refund policy..." rows={5} className={textareaClasses} />
+                placeholder={t("tripBuilder.refundPolicyPh", "Describe your refund policy...")} rows={5} className={textareaClasses} />
             </div>
 
             <div className="space-y-3 border-t border-[#E5DFC6] pt-10">
-              <SectionHeader title="Terms & conditions" />
+              <SectionHeader title={t("tripBuilder.termsConditions", "Terms & conditions")} />
               <Textarea value={formData.terms_conditions}
                 onChange={(e) => updateField("terms_conditions", e.target.value)}
-                placeholder="Additional terms and conditions..." rows={5} className={textareaClasses} />
+                placeholder={t("tripBuilder.termsPh", "Additional terms and conditions...")} rows={5} className={textareaClasses} />
             </div>
           </div>
         )}
