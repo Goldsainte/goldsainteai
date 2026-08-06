@@ -2858,5 +2858,11 @@
     "depositD": "25% al aceptar, pagado al reservar",
     "balance": "Saldo",
     "balanceD": "Vence antes de la salida, mismo pago seguro"
+  },
+  "brandConsole": {
+    "house": "Casa",
+    "collections": "Colecciones",
+    "inquiries": "Consultas",
+    "performance": "Rendimiento"
   }
 }
