@@ -2074,7 +2074,14 @@
     "showOriginal": "Original anzeigen",
     "showTranslation": "Übersetzung anzeigen",
     "translated": "Übersetzt",
-    "noMessagesYet": "Noch keine Nachrichten"
+    "noMessagesYet": "Noch keine Nachrichten",
+    "translateTo": "Ins {{lang}} übersetzen",
+    "translating": "Übersetze…",
+    "translationPreview": "Vorschau · {{lang}}",
+    "useTranslation": "Diese Übersetzung verwenden",
+    "keepOriginal": "Mein Original behalten",
+    "sendProposal": "Angebot senden",
+    "messagePlaceholder": "Nachricht…"
   },
   "sett": {
     "checkoutOpened": "Checkout in neuem Tab geöffnet",
