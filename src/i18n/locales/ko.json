@@ -2858,5 +2858,11 @@
     "depositD": "수락 시 25%, 예약 시 결제",
     "balance": "잔금",
     "balanceD": "출발 전 지불, 동일한 안전 결제"
+  },
+  "brandConsole": {
+    "house": "하우스",
+    "collections": "컬렉션",
+    "inquiries": "문의",
+    "performance": "성과"
   }
 }
