@@ -2858,5 +2858,11 @@
     "depositD": "25% all'accettazione, pagato alla prenotazione",
     "balance": "Saldo",
     "balanceD": "Dovuto prima della partenza, stesso pagamento sicuro"
+  },
+  "brandConsole": {
+    "house": "Maison",
+    "collections": "Collezioni",
+    "inquiries": "Richieste",
+    "performance": "Performance"
   }
 }
