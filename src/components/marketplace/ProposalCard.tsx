@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useTranslation } from "react-i18next";
 import { UserCircle } from "lucide-react";
 import { MarketplaceDisclaimer } from "@/components/policies/MarketplaceDisclaimer";
@@ -92,7 +93,7 @@ export default function ProposalCard({ proposal, showAdminInsights = false }: Pr
           {t("prop.card.itinerary", "Itinerary Overview")}
         </p>
         <p className="text-xs leading-relaxed text-foreground">
-          {proposal.message || t("prop.card.noItinerary", "No itinerary provided.")}
+          {proposal.message ? <TranslatedMessageText text={proposal.message} /> : t("prop.card.noItinerary", "No itinerary provided.")}
         </p>
       </div>
 
