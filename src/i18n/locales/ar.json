@@ -2074,7 +2074,14 @@
     "showOriginal": "اعرض الأصل",
     "showTranslation": "اعرض الترجمة",
     "translated": "مُترجم",
-    "noMessagesYet": "لا رسائل بعد"
+    "noMessagesYet": "لا رسائل بعد",
+    "translateTo": "ترجم إلى {{lang}}",
+    "translating": "جارٍ الترجمة…",
+    "translationPreview": "معاينة · {{lang}}",
+    "useTranslation": "استخدم هذه الترجمة",
+    "keepOriginal": "أبقِ نصي الأصلي",
+    "sendProposal": "أرسل عرضاً",
+    "messagePlaceholder": "رسالة…"
   },
   "sett": {
     "checkoutOpened": "فُتح الدفع في تبويب جديد",
