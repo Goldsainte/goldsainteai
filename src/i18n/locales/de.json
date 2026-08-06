@@ -2561,7 +2561,26 @@
       "cbUploadTab": "Eigenen hochladen",
       "cbUploaded": "Vertrag hochgeladen",
       "cbUploadedDesc": "Unterschreiben Sie unten und senden Sie ihn dann an Ihren Reisenden.",
-      "cbUploading": "Wird hochgeladen …"
+      "cbUploading": "Wird hochgeladen …",
+      "briefs": "Briefs",
+      "pipeline": "Pipeline",
+      "more": "Mehr",
+      "viewPublicProfile": "Öffentliches Profil ansehen",
+      "view": "Ansehen",
+      "addPhotosVideo": "Fotos & Video hinzufügen",
+      "profileNotFound": "Agentenprofil nicht gefunden",
+      "createProfile": "Agentenprofil erstellen",
+      "startHere": "Hier starten",
+      "twoWays": "Zwei Wege zu verdienen",
+      "answerBrief": "Auf einen Brief antworten",
+      "ab1": "Reisende veröffentlichen ihre Wunschreisen. Wählen Sie einen Brief, der zu Ihrer Expertise passt.",
+      "ab2": "Senden Sie ein maßgeschneidertes Angebot — Reiseplan, Preis und Zeitplan — mit Goldsainte AI in unter einer Minute erstellt.",
+      "ab3": "Sie nehmen an und zahlen die Anzahlung — ohne den Thread zu verlassen.",
+      "publishOwn": "Eigenes veröffentlichen",
+      "po1": "Packen Sie eine Reise, die Sie auswendig kennen — oder einen digitalen Guide — im Trip Builder.",
+      "po2": "Sie erscheint auf dem Marktplatz mit Ihrem Namen und Ihrem Preis.",
+      "po3": "Reisende buchen direkt — ohne Angebot, Sie wachen mit Buchungen auf.",
+      "howPaid": "So werden Sie bezahlt"
     }
   },
   "chk": {
