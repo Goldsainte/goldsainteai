@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "Couldn't update tips setting",
       "viewGuidelines": "View Guidelines",
       "viewPublicProfile": "View Public Profile",
-      "viewTaxInfo": "View Tax Info"
+      "viewTaxInfo": "View Tax Info",
+      "more": "More",
+      "finishStudio": "Finish setting up your studio",
+      "finishStudioSub": "Complete onboarding — including the creator terms — to unlock all features and start earning commissions."
     },
     "a": {
       "accessRequired": "Agent access required",
