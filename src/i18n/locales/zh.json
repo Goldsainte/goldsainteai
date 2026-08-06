@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "无法更新打赏设置",
       "viewGuidelines": "查看准则",
       "viewPublicProfile": "查看公开资料",
-      "viewTaxInfo": "查看税务信息"
+      "viewTaxInfo": "查看税务信息",
+      "more": "更多",
+      "finishStudio": "完成你的工作室设置",
+      "finishStudioSub": "完成入驻流程 — 包括创作者条款 — 以解锁全部功能并开始赚取佣金。"
     },
     "a": {
       "accessRequired": "需要代理权限",
