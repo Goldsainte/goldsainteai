@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "Impossibile aggiornare l'impostazione delle mance",
       "viewGuidelines": "Vedi linee guida",
       "viewPublicProfile": "Vedi profilo pubblico",
-      "viewTaxInfo": "Vedi info fiscali"
+      "viewTaxInfo": "Vedi info fiscali",
+      "more": "Altro",
+      "finishStudio": "Completa la configurazione del tuo studio",
+      "finishStudioSub": "Completa l'onboarding — inclusi i termini creator — per sbloccare tutte le funzioni e iniziare a guadagnare commissioni."
     },
     "a": {
       "accessRequired": "Accesso agente richiesto",
