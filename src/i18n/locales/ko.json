@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "팁 설정을 업데이트하지 못했습니다",
       "viewGuidelines": "가이드라인 보기",
       "viewPublicProfile": "공개 프로필 보기",
-      "viewTaxInfo": "세무 정보 보기"
+      "viewTaxInfo": "세무 정보 보기",
+      "more": "더보기",
+      "finishStudio": "스튜디오 설정을 마무리하세요",
+      "finishStudioSub": "크리에이터 약관을 포함한 온보딩을 완료하면 모든 기능이 열리고 커미션을 벌 수 있습니다."
     },
     "a": {
       "accessRequired": "에이전트 권한이 필요합니다",
