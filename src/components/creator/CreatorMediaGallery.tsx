@@ -436,7 +436,7 @@ function ScrollCarousel({ children }: { children: React.ReactNode }) {
   // swipeable row with no duplication and no auto-scroll.
   const count = React.Children.count(children);
   if (count < 4) {
-    return <div className="flex gap-4 overflow-x-auto pb-2">{children}</div>;
+    return <div className="flex flex-nowrap gap-4 overflow-x-auto pb-2">{children}</div>;
   }
 
   return (
