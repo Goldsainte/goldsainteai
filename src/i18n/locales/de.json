@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "Trinkgeld-Einstellung konnte nicht aktualisiert werden",
       "viewGuidelines": "Richtlinien ansehen",
       "viewPublicProfile": "Öffentliches Profil ansehen",
-      "viewTaxInfo": "Steuerinfos ansehen"
+      "viewTaxInfo": "Steuerinfos ansehen",
+      "more": "Mehr",
+      "finishStudio": "Richten Sie Ihr Studio fertig ein",
+      "finishStudioSub": "Schließen Sie das Onboarding ab — inklusive der Creator-Bedingungen — um alle Funktionen freizuschalten und Provisionen zu verdienen."
     },
     "a": {
       "accessRequired": "Agentenzugang erforderlich",
