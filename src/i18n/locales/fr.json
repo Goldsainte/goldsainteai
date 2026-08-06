@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "Impossible de mettre à jour le réglage des pourboires",
       "viewGuidelines": "Voir les règles",
       "viewPublicProfile": "Voir le profil public",
-      "viewTaxInfo": "Voir les infos fiscales"
+      "viewTaxInfo": "Voir les infos fiscales",
+      "more": "Plus",
+      "finishStudio": "Terminez la configuration de votre studio",
+      "finishStudioSub": "Terminez l'intégration — y compris les conditions créateur — pour débloquer toutes les fonctionnalités et commencer à gagner des commissions."
     },
     "a": {
       "accessRequired": "Accès agent requis",
