@@ -278,7 +278,7 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
               after seeing this one in use. */}
 
           {topCountries.length > 0 && (
-            <div className="mt-6 flex items-end gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="mt-6 flex flex-nowrap items-end gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {topCountries.map((c) => (
                 <CountryTile
                   key={c}
