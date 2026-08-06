@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "환불 정책을 설명하세요...",
     "termsConditions": "이용 약관",
     "termsPh": "추가 약관..."
+  },
+  "trdp": {
+    "wentWrong": "문제가 발생했습니다",
+    "engagement": "의뢰 내용",
+    "hiredFor": "의뢰 분야",
+    "aboutTrip": "이 여행에 대해",
+    "specialRequests": "특별 요청",
+    "tripDetails": "여행 상세",
+    "interests": "관심사",
+    "mustHaves": "필수 조건",
+    "dealbreakers": "제외 조건",
+    "visualBrief": "비주얼 브리프",
+    "proposalsReceived": "받은 제안",
+    "noProposals": "아직 제안이 없습니다",
+    "byAccepting": "이 제안을 수락하면",
+    "byAcceptingRest": " 여행과 결제는 Goldsainte의 보호를 받습니다.",
+    "moneyGlance": "금액 한눈에 보기",
+    "deposit": "계약금",
+    "depositD": "수락 시 25%, 예약 시 결제",
+    "balance": "잔금",
+    "balanceD": "출발 전 지불, 동일한 안전 결제"
   }
 }
