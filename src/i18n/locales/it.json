@@ -2074,7 +2074,14 @@
     "showOriginal": "Mostra originale",
     "showTranslation": "Mostra traduzione",
     "translated": "Tradotto",
-    "noMessagesYet": "Ancora nessun messaggio"
+    "noMessagesYet": "Ancora nessun messaggio",
+    "translateTo": "Traduci in {{lang}}",
+    "translating": "Traduzione…",
+    "translationPreview": "Anteprima · {{lang}}",
+    "useTranslation": "Usa questa traduzione",
+    "keepOriginal": "Tieni il mio originale",
+    "sendProposal": "Invia una proposta",
+    "messagePlaceholder": "Messaggio…"
   },
   "sett": {
     "checkoutOpened": "Pagamento aperto in una nuova scheda",
