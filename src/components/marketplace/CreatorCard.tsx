@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useNavigate } from "react-router-dom";
 import { BadgeCheck } from "lucide-react";
 
@@ -89,7 +90,7 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
       {/* Bio */}
       {creator.bio && (
         <p className="mt-3 line-clamp-2 text-[13px] leading-relaxed text-[#0a2225]/70">
-          {creator.bio}
+          <TranslatedMessageText text={creator.bio} showToggle={false} />
         </p>
       )}
 
