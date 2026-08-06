@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "描述你的退款政策...",
     "termsConditions": "条款与条件",
     "termsPh": "其他条款与条件..."
+  },
+  "trdp": {
+    "wentWrong": "出了点问题",
+    "engagement": "委托详情",
+    "hiredFor": "受雇内容",
+    "aboutTrip": "关于此行",
+    "specialRequests": "特别要求",
+    "tripDetails": "行程详情",
+    "interests": "兴趣",
+    "mustHaves": "必备项",
+    "dealbreakers": "排除项",
+    "visualBrief": "视觉简报",
+    "proposalsReceived": "收到的提案",
+    "noProposals": "暂无提案",
+    "byAccepting": "接受此提案后",
+    "byAcceptingRest": "，你的旅程与付款将持续受 Goldsainte 保护。",
+    "moneyGlance": "费用一览",
+    "deposit": "订金",
+    "depositD": "接受时支付 25%，预订时付款",
+    "balance": "余款",
+    "balanceD": "出发前支付，同样的安全结账"
   }
 }
