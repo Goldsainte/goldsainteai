@@ -2074,7 +2074,14 @@
     "showOriginal": "원문 보기",
     "showTranslation": "번역 보기",
     "translated": "번역됨",
-    "noMessagesYet": "아직 메시지가 없습니다"
+    "noMessagesYet": "아직 메시지가 없습니다",
+    "translateTo": "{{lang}}로 번역",
+    "translating": "번역 중…",
+    "translationPreview": "미리보기 · {{lang}}",
+    "useTranslation": "이 번역 사용",
+    "keepOriginal": "원문 유지",
+    "sendProposal": "제안 보내기",
+    "messagePlaceholder": "메시지…"
   },
   "sett": {
     "checkoutOpened": "새 탭에서 결제가 열렸습니다",
