@@ -2561,7 +2561,26 @@
       "cbUploadTab": "Upload your own",
       "cbUploaded": "Contract uploaded",
       "cbUploadedDesc": "Sign below, then send it to your traveler.",
-      "cbUploading": "Uploading…"
+      "cbUploading": "Uploading…",
+      "briefs": "Briefs",
+      "pipeline": "Pipeline",
+      "more": "More",
+      "viewPublicProfile": "View public profile",
+      "view": "View",
+      "addPhotosVideo": "Add photos & video",
+      "profileNotFound": "Agent Profile Not Found",
+      "createProfile": "Create Agent Profile",
+      "startHere": "Start here",
+      "twoWays": "Two ways to earn",
+      "answerBrief": "Answer a brief",
+      "ab1": "Travelers post the journeys they want. Pick a brief that fits your expertise.",
+      "ab2": "Send a tailored proposal — itinerary, price, and timeline — drafted with Goldsainte AI in under a minute.",
+      "ab3": "They accept and pay the deposit — all without leaving the thread.",
+      "publishOwn": "Publish your own",
+      "po1": "Package a trip you know by heart — or a digital guide — in the trip builder.",
+      "po2": "It lists on the marketplace with your name and your price.",
+      "po3": "Travelers book it directly — no proposal needed, you wake up to bookings.",
+      "howPaid": "How you get paid"
     }
   },
   "chk": {
