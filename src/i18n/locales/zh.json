@@ -2858,5 +2858,11 @@
     "depositD": "接受时支付 25%，预订时付款",
     "balance": "余款",
     "balanceD": "出发前支付，同样的安全结账"
+  },
+  "brandConsole": {
+    "house": "品牌馆",
+    "collections": "精选集",
+    "inquiries": "咨询",
+    "performance": "表现"
   }
 }
