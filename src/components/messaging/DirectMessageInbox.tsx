@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useTranslatedContent } from "@/hooks/useTranslatedContent";
 import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
+import { ComposeTranslateAssist } from "@/components/messaging/ComposeTranslateAssist";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
@@ -852,6 +853,11 @@ export function DirectMessageInbox() {
                     ))}
                   </div>
                 )}
+                <ComposeTranslateAssist
+                  text={newMessage}
+                  recipientId={selectedConversation?.otherParticipant?.id}
+                  onUseTranslation={(v) => handleComposerChange(v)}
+                />
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -898,15 +904,15 @@ export function DirectMessageInbox() {
                       variant="outline"
                       onClick={() => setShowProposalComposer(true)}
                       className="border-[#C7A962]/40 text-[#0c4d47] hover:bg-[#FDF9F0] rounded-full h-11 w-11 p-0 md:w-auto md:px-4"
-                      title="Send a Proposal"
+                      title={t("msg.sendProposal", "Send a Proposal")}
                     >
                       <HandCoins className="h-4 w-4 md:mr-1" />
-                      <span className="hidden md:inline text-[13px]">Send a Proposal</span>
+                      <span className="hidden md:inline text-[13px]">{t("msg.sendProposal", "Send a Proposal")}</span>
                     </Button>
                   )}
                   <Input
                     ref={inputRef}
-                    placeholder="Message…"
+                    placeholder={t("msg.messagePlaceholder", "Message\u2026")}
                     value={newMessage}
                     onChange={(e) => handleComposerChange(e.target.value)}
                     className="flex-1 border-[#E5DFC6] focus:border-[#C7A962] focus:ring-[#C7A962]/20 rounded-full bg-[#FDFBF7] h-11"
