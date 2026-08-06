@@ -12,6 +12,7 @@ interface Props {
 }
 
 interface S {
+  yourBooking: string
   subject: string
   title: string
   headline: string
@@ -27,6 +28,7 @@ interface S {
 
 const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
   en: {
+    yourBooking: 'your booking',
     subject: 'A dispute has been opened',
     title: 'A dispute has been opened',
     headline: 'A dispute has been opened.',
@@ -40,6 +42,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'View dispute',
   },
   fr: {
+    yourBooking: 'votre réservation',
     subject: 'Un litige a été ouvert',
     title: 'Un litige a été ouvert',
     headline: 'Un litige a été ouvert.',
@@ -53,6 +56,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'Voir le litige',
   },
   es: {
+    yourBooking: 'tu reserva',
     subject: 'Se ha abierto una disputa',
     title: 'Se ha abierto una disputa',
     headline: 'Se ha abierto una disputa.',
@@ -66,6 +70,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'Ver disputa',
   },
   de: {
+    yourBooking: 'Ihre Buchung',
     subject: 'Ein Streitfall wurde eröffnet',
     title: 'Ein Streitfall wurde eröffnet',
     headline: 'Ein Streitfall wurde eröffnet.',
@@ -79,6 +84,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'Streitfall ansehen',
   },
   it: {
+    yourBooking: 'la tua prenotazione',
     subject: 'È stata aperta una disputa',
     title: 'È stata aperta una disputa',
     headline: 'È stata aperta una disputa.',
@@ -92,6 +98,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'Vedi disputa',
   },
   pt: {
+    yourBooking: 'sua reserva',
     subject: 'Uma disputa foi aberta',
     title: 'Uma disputa foi aberta',
     headline: 'Uma disputa foi aberta.',
@@ -105,6 +112,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'Ver disputa',
   },
   ar: {
+    yourBooking: 'حجزك',
     subject: 'فُتح نزاع',
     title: 'فُتح نزاع',
     headline: 'فُتح نزاع.',
@@ -118,6 +126,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: 'اعرض النزاع',
   },
   ja: {
+    yourBooking: 'ご予約',
     subject: '紛争が開始されました',
     title: '紛争が開始されました',
     headline: '紛争が開始されました。',
@@ -131,6 +140,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: '紛争を見る',
   },
   ko: {
+    yourBooking: '고객님의 예약',
     subject: '분쟁이 접수되었습니다',
     title: '분쟁이 접수되었습니다',
     headline: '분쟁이 접수되었습니다.',
@@ -144,6 +154,7 @@ const STRINGS: { en: S } & Partial<Record<EmailLang, S>> = {
     cta: '분쟁 보기',
   },
   zh: {
+    yourBooking: '你的预订',
     subject: '一起争议已开启',
     title: '一起争议已开启',
     headline: '一起争议已开启。',
@@ -165,7 +176,7 @@ export const DisputeOpenedEmail = ({ disputeId, disputeOpenedBy, tripName, lang 
       title={s.title}
       headline={s.headline}
       tagline={s.tagline}
-      lede={s.lede(tripName ?? '', disputeOpenedBy ?? '')}
+      lede={s.lede(tripName || s.yourBooking, disputeOpenedBy ?? '')}
       steps={[s.step1, s.step2, s.step3, s.step4, s.step5]}
       cta={{ label: s.cta, url: `https://goldsainte.ai/my-bookings` }}
     />
