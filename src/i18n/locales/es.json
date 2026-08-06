@@ -2386,7 +2386,10 @@
       "tipsUpdateFailed": "No se pudo actualizar el ajuste de propinas",
       "viewGuidelines": "Ver normas",
       "viewPublicProfile": "Ver perfil público",
-      "viewTaxInfo": "Ver info fiscal"
+      "viewTaxInfo": "Ver info fiscal",
+      "more": "Más",
+      "finishStudio": "Termina de configurar tu estudio",
+      "finishStudioSub": "Completa el onboarding — incluidos los términos de creador — para desbloquear todas las funciones y empezar a ganar comisiones."
     },
     "a": {
       "accessRequired": "Se requiere acceso de agente",
