@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useState } from "react";
 import { MapPin, Calendar, Users, Clock, Star } from "lucide-react";
@@ -101,7 +102,7 @@ export function TripHero({ trip, spotsLeft }: TripHeroProps) {
       {/* Trip Title & Info Bar */}
       <div className="mt-6">
         <h1 className="font-secondary text-2xl font-semibold text-[#0a2225] md:text-3xl lg:text-4xl">
-          {trip.title}
+          <TranslatedMessageText text={trip.title} showToggle={false} />
         </h1>
 
         {/* Info Pills */}
