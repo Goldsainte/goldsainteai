@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 
@@ -43,7 +44,7 @@ export function TripHostSection({ host, hostTagline, hostType = 'creator' }: Tri
 
       {host.bio && (
         <p className="mt-4 text-[14px] leading-relaxed text-[#4a4a4a] line-clamp-4">
-          {host.bio}
+          <TranslatedMessageText text={host.bio} />
         </p>
       )}
 
