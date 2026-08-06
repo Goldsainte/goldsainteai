@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Calendar, MapPin, Users, Search, Plane, Hotel, Ticket, ArrowLeftRight, Plus, Minus, X } from "lucide-react";
@@ -37,7 +38,9 @@ interface EnhancedSearchBarProps {
   hideDatePickers?: boolean;
 }
 
-export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = false, hideDatePickers = false }: EnhancedSearchBarProps) => {
+export const EnhancedSearchBar = ({
+  initialSearchType = "hotels", isCompact = false, hideDatePickers = false }: EnhancedSearchBarProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const routeLocation = useLocation();
@@ -257,7 +260,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
           <AirportAutocomplete
             value={origin}
             onChange={setOrigin}
-            placeholder="From (e.g., JFK, New York)"
+            placeholder={t("srch.from_e_g_jfk_new_york", "From (e.g., JFK, New York)")}
           />
         </div>
 
@@ -280,7 +283,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
           <AirportAutocomplete
             value={destination}
             onChange={setDestination}
-            placeholder="To (e.g., LAX, Los Angeles)"
+            placeholder={t("srch.to_e_g_lax_los_angeles", "To (e.g., LAX, Los Angeles)")}
           />
         </div>
       </div>
@@ -349,7 +352,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Adults</p>
+                  <p className="font-medium">{t("pref.adults", "Adults")}</p>
                   <p className="text-sm text-muted-foreground">Age 12+</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -365,8 +368,8 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Children</p>
-                  <p className="text-sm text-muted-foreground">Age 2-11</p>
+                  <p className="font-medium">{t("pref.children", "Children")}</p>
+                  <p className="text-sm text-muted-foreground">{t("srch.age_2_11", "Age 2-11")}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" size="icon" onClick={() => setFlightPassengers({ ...flightPassengers, children: Math.max(0, flightPassengers.children - 1) })}>
@@ -381,8 +384,8 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Infants</p>
-                  <p className="text-sm text-muted-foreground">Under 2</p>
+                  <p className="font-medium">{t("srch.infants", "Infants")}</p>
+                  <p className="text-sm text-muted-foreground">{t("srch.under_2", "Under 2")}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" size="icon" onClick={() => setFlightPassengers({ ...flightPassengers, infants: Math.max(0, flightPassengers.infants - 1) })}>
@@ -402,13 +405,13 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
         {!isCompact && (
           <Select value={cabinClass} onValueChange={setCabinClass}>
             <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
-              <SelectValue placeholder="Class" />
+              <SelectValue placeholder={t("srch.class", "Class")} />
             </SelectTrigger>
             <SelectContent className="bg-background z-[100]">
-              <SelectItem value="ECONOMY">Economy</SelectItem>
-              <SelectItem value="PREMIUM_ECONOMY">Premium Economy</SelectItem>
-              <SelectItem value="BUSINESS">Business</SelectItem>
-              <SelectItem value="FIRST">First Class</SelectItem>
+              <SelectItem value="ECONOMY">{t("pref.economy", "Economy")}</SelectItem>
+              <SelectItem value="PREMIUM_ECONOMY">{t("pref.premium_economy", "Premium Economy")}</SelectItem>
+              <SelectItem value="BUSINESS">{t("pref.business", "Business")}</SelectItem>
+              <SelectItem value="FIRST">{t("pref.first_class", "First Class")}</SelectItem>
             </SelectContent>
           </Select>
         )}
@@ -423,7 +426,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
         <CityAutocomplete
           value={hotelLocation}
           onChange={setHotelLocation}
-          placeholder="Where are you going? (City, hotel name, or landmark)"
+          placeholder={t("srch.where_are_you_going_city_hotel_name_or_l", "Where are you going? (City, hotel name, or landmark)")}
         />
       </div>
 
@@ -480,7 +483,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
           <PopoverContent className="w-full max-w-sm bg-background z-[100]" align="start">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="font-medium">Rooms</p>
+                <p className="font-medium">{t("srch.rooms", "Rooms")}</p>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" size="icon" onClick={() => setRooms(Math.max(1, rooms - 1))}>
                     <Minus className="h-4 w-4" />
@@ -494,7 +497,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Adults</p>
+                  <p className="font-medium">{t("pref.adults", "Adults")}</p>
                   <p className="text-sm text-muted-foreground">Age 18+</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -510,8 +513,8 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Children</p>
-                  <p className="text-sm text-muted-foreground">Age 0-17</p>
+                  <p className="font-medium">{t("pref.children", "Children")}</p>
+                  <p className="text-sm text-muted-foreground">{t("srch.age_0_17", "Age 0-17")}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" size="icon" onClick={() => setHotelGuests({ ...hotelGuests, children: Math.max(0, hotelGuests.children - 1) })}>
@@ -537,7 +540,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
         <CityAutocomplete
           value={eventLocation}
           onChange={setEventLocation}
-          placeholder="City or venue"
+          placeholder={t("srch.city_or_venue", "City or venue")}
         />
       </div>
 
@@ -564,15 +567,15 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
         {!isCompact && (
           <Select value={eventCategory} onValueChange={setEventCategory}>
             <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
-              <SelectValue placeholder="All categories" />
+              <SelectValue placeholder={t("srch.all_categories", "All categories")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              <SelectItem value="music">Music</SelectItem>
-              <SelectItem value="sports">Sports</SelectItem>
-              <SelectItem value="arts">Arts & Theater</SelectItem>
-              <SelectItem value="family">Family</SelectItem>
-              <SelectItem value="festivals">Festivals</SelectItem>
+              <SelectItem value="all">{t("srch.all_categories", "All categories")}</SelectItem>
+              <SelectItem value="music">{t("srch.music", "Music")}</SelectItem>
+              <SelectItem value="sports">{t("pref.sports", "Sports")}</SelectItem>
+              <SelectItem value="arts">{t("srch.arts_theater", "Arts & Theater")}</SelectItem>
+              <SelectItem value="family">{t("pref.family", "Family")}</SelectItem>
+              <SelectItem value="festivals">{t("pref.festivals", "Festivals")}</SelectItem>
             </SelectContent>
           </Select>
         )}
@@ -608,7 +611,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               )}
             >
               <Hotel className={cn("flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
-              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>Hotels</span>
+              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>{t("srch.hotels", "Hotels")}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="flights" 
@@ -618,7 +621,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               )}
             >
               <Plane className={cn("flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
-              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>Flights</span>
+              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>{t("srch.flights", "Flights")}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="events" 
@@ -628,7 +631,7 @@ export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = fa
               )}
             >
               <Ticket className={cn("flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
-              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>Events</span>
+              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>{t("srch.events", "Events")}</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
