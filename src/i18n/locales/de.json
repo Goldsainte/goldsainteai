@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "Beschreiben Sie Ihre Erstattungsrichtlinie...",
     "termsConditions": "AGB",
     "termsPh": "Zusätzliche Bedingungen..."
+  },
+  "trdp": {
+    "wentWrong": "Etwas ist schiefgelaufen",
+    "engagement": "Der Auftrag",
+    "hiredFor": "Beauftragt für",
+    "aboutTrip": "Über diese Reise",
+    "specialRequests": "Besondere Wünsche",
+    "tripDetails": "Reisedetails",
+    "interests": "Interessen",
+    "mustHaves": "Unverzichtbar",
+    "dealbreakers": "No-Gos",
+    "visualBrief": "Visuelles Briefing",
+    "proposalsReceived": "Erhaltene Angebote",
+    "noProposals": "Noch keine Angebote",
+    "byAccepting": "Mit Annahme dieses Angebots",
+    "byAcceptingRest": " bleiben Ihre Reise und Zahlungen durch Goldsainte geschützt.",
+    "moneyGlance": "Das Geld auf einen Blick",
+    "deposit": "Anzahlung",
+    "depositD": "25 % bei Annahme, zahlbar bei Buchung",
+    "balance": "Restbetrag",
+    "balanceD": "Fällig vor Abreise, gleiche sichere Zahlung"
   }
 }
