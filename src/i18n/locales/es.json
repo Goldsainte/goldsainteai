@@ -2561,7 +2561,26 @@
       "cbUploadTab": "Sube el tuyo",
       "cbUploaded": "Contrato subido",
       "cbUploadedDesc": "Firma abajo y luego envíalo a tu viajero.",
-      "cbUploading": "Subiendo…"
+      "cbUploading": "Subiendo…",
+      "briefs": "Briefs",
+      "pipeline": "Pipeline",
+      "more": "Más",
+      "viewPublicProfile": "Ver perfil público",
+      "view": "Ver",
+      "addPhotosVideo": "Añadir fotos y vídeo",
+      "profileNotFound": "Perfil de agente no encontrado",
+      "createProfile": "Crear perfil de agente",
+      "startHere": "Empieza aquí",
+      "twoWays": "Dos formas de ganar",
+      "answerBrief": "Responder a un brief",
+      "ab1": "Los viajeros publican los viajes que quieren. Elige un brief que encaje con tu experiencia.",
+      "ab2": "Envía una propuesta a medida — itinerario, precio y calendario — redactada con Goldsainte AI en menos de un minuto.",
+      "ab3": "Aceptan y pagan el depósito — todo sin salir de la conversación.",
+      "publishOwn": "Publica el tuyo",
+      "po1": "Empaqueta un viaje que conozcas de memoria — o una guía digital — en el creador de viajes.",
+      "po2": "Se publica en el marketplace con tu nombre y tu precio.",
+      "po3": "Los viajeros reservan directamente — sin propuesta, te despiertas con reservas.",
+      "howPaid": "Cómo cobras"
     }
   },
   "chk": {
