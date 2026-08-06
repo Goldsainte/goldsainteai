@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "صف سياسة الاسترداد لديك...",
     "termsConditions": "الشروط والأحكام",
     "termsPh": "شروط وأحكام إضافية..."
+  },
+  "trdp": {
+    "wentWrong": "حدث خطأ ما",
+    "engagement": "المهمة",
+    "hiredFor": "مكلف بـ",
+    "aboutTrip": "عن هذه الرحلة",
+    "specialRequests": "طلبات خاصة",
+    "tripDetails": "تفاصيل الرحلة",
+    "interests": "الاهتمامات",
+    "mustHaves": "لا غنى عنها",
+    "dealbreakers": "خطوط حمراء",
+    "visualBrief": "الموجز البصري",
+    "proposalsReceived": "العروض المستلمة",
+    "noProposals": "لا عروض بعد",
+    "byAccepting": "بقبول هذا العرض",
+    "byAcceptingRest": "، تبقى رحلتك ومدفوعاتك محمية عبر Goldsainte.",
+    "moneyGlance": "المال بلمحة",
+    "deposit": "العربون",
+    "depositD": "25% عند القبول، يدفع عند الحجز",
+    "balance": "الباقي",
+    "balanceD": "يستحق قبل الانطلاق، بنفس الدفع الآمن"
   }
 }
