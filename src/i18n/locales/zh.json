@@ -2074,7 +2074,14 @@
     "showOriginal": "查看原文",
     "showTranslation": "查看译文",
     "translated": "已翻译",
-    "noMessagesYet": "暂无消息"
+    "noMessagesYet": "暂无消息",
+    "translateTo": "翻译成{{lang}}",
+    "translating": "翻译中…",
+    "translationPreview": "预览 · {{lang}}",
+    "useTranslation": "使用此翻译",
+    "keepOriginal": "保留我的原文",
+    "sendProposal": "发送提案",
+    "messagePlaceholder": "消息…"
   },
   "sett": {
     "checkoutOpened": "已在新标签页打开支付",
