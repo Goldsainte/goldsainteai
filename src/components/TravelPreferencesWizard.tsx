@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,19 +40,20 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     updatePreference(category, field, value);
   };
 
+  const { t } = useTranslation();
   const steps = [
     {
-      title: "Let's start simple",
-      subtitle: "How do you like to travel?",
+      title: t("wiz.let_s_start_simple", "Let's start simple"),
+      subtitle: t("wiz.how_do_you_like_to_travel", "How do you like to travel?"),
       icon: Plane,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="What types of trips do you enjoy?" helperText="Pick as many as you like">
+          <LuxuryFormSection title={t("wiz.what_types_of_trips_do_you_enjoy", "What types of trips do you enjoy?")} helperText={t("wiz.pick_as_many_as_you_like", "Pick as many as you like")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Leisure', 'Business', 'Adventure', 'Cultural', 'Nature-focused', 'Relaxation / Wellness'].map(type => (
                 <LuxurySelectionCard
                   key={type}
-                  label={type}
+                  label={t("wizOpt." + type.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), type)}
                   selected={preferences.general?.tripTypes?.includes(type) || false}
                   onSelect={() => toggleArrayValue('general', 'tripTypes', type)}
                   variant="multi"
@@ -60,12 +62,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Who's your usual travel crew?">
+          <LuxuryFormSection title={t("wiz.who_s_your_usual_travel_crew", "Who's your usual travel crew?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Solo', 'Partner', 'Friends', 'Family', 'Group Tours'].map(companion => (
                 <LuxurySelectionCard
                   key={companion}
-                  label={companion}
+                  label={t("wizOpt." + companion.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), companion)}
                   selected={preferences.general?.travelCompanions?.includes(companion) || false}
                   onSelect={() => toggleArrayValue('general', 'travelCompanions', companion)}
                   variant="multi"
@@ -74,12 +76,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="What's your sweet spot for trip length?">
+          <LuxuryFormSection title={t("wiz.what_s_your_sweet_spot_for_trip_length", "What's your sweet spot for trip length?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Weekend (1–3 days)', 'Short (4–7 days)', 'Medium (8–14 days)', 'Long (2+ weeks)'].map(length => (
                 <LuxurySelectionCard
                   key={length}
-                  label={length}
+                  label={t("wizOpt." + length.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), length)}
                   selected={preferences.general?.idealTripLength === length}
                   onSelect={() => setSingleValue('general', 'idealTripLength', length)}
                   variant="single"
@@ -91,17 +93,17 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Where in the world?",
-      subtitle: "Tell us about your dream destinations",
+      title: t("wiz.where_in_the_world", "Where in the world?"),
+      subtitle: t("wiz.tell_us_about_your_dream_destinations", "Tell us about your dream destinations"),
       icon: Globe,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="Do you prefer staying close to home or exploring abroad?">
+          <LuxuryFormSection title={t("wiz.do_you_prefer_staying_close_to_home_or_e", "Do you prefer staying close to home or exploring abroad?")}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {['Domestic travel', 'International travel', 'No preference'].map(pref => (
                 <LuxurySelectionCard
                   key={pref}
-                  label={pref}
+                  label={t("wizOpt." + pref.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), pref)}
                   selected={preferences.destination?.travelScope?.includes(pref) || false}
                   onSelect={() => toggleArrayValue('destination', 'travelScope', pref)}
                   variant="multi"
@@ -110,7 +112,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Where do you dream of traveling?" helperText="We'll prioritize collections and storyboards featuring these places.">
+          <LuxuryFormSection title={t("wiz.where_do_you_dream_of_traveling", "Where do you dream of traveling?")} helperText={t("wiz.we_ll_prioritize_collections_and_storybo", "We'll prioritize collections and storyboards featuring these places.")}>
             <DestinationAutocompleteNominatim
               value={preferences.destination?.preferredDestinations || []}
               onChange={(destinations) => updatePreference('destination', 'preferredDestinations', destinations)}
@@ -118,21 +120,21 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             />
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Places you'd rather skip?" subtitle="Optional — no judgment here">
+          <LuxuryFormSection title={t("wiz.places_you_d_rather_skip", "Places you'd rather skip?")} subtitle={t("wiz.optional_no_judgment_here", "Optional — no judgment here")}>
             <Textarea
-              placeholder="e.g., Overly touristy spots, cold climates..."
+              placeholder={t("wiz.e_g_overly_touristy_spots_cold_climates", "e.g., Overly touristy spots, cold climates...")}
               value={preferences.destination?.avoidRegions || ''}
               onChange={(e) => updatePreference('destination', 'avoidRegions', e.target.value)}
               className="min-h-[80px] rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
             />
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Do you enjoy returning to favorite spots?">
+          <LuxuryFormSection title={t("wiz.do_you_enjoy_returning_to_favorite_spots", "Do you enjoy returning to favorite spots?")}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {['Yes', 'No', 'Occasionally'].map(option => (
                 <LuxurySelectionCard
                   key={option}
-                  label={option}
+                  label={t("wizOpt." + option.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), option)}
                   selected={preferences.destination?.returningPreference === option}
                   onSelect={() => setSingleValue('destination', 'returningPreference', option)}
                   variant="single"
@@ -144,17 +146,17 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Getting there",
-      subtitle: "Your transportation preferences",
+      title: t("wiz.getting_there", "Getting there"),
+      subtitle: t("wiz.your_transportation_preferences", "Your transportation preferences"),
       icon: Train,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="How do you like to travel?">
+          <LuxuryFormSection title={t("wiz.how_do_you_like_to_travel", "How do you like to travel?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Flights', 'Trains', 'Car (road trips)', 'Cruises'].map(method => (
                 <LuxurySelectionCard
                   key={method}
-                  label={method}
+                  label={t("wizOpt." + method.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), method)}
                   selected={preferences.transportation?.methods?.includes(method) || false}
                   onSelect={() => toggleArrayValue('transportation', 'methods', method)}
                   variant="multi"
@@ -163,12 +165,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Preferred flight class">
+          <LuxuryFormSection title={t("wiz.preferred_flight_class", "Preferred flight class")}>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {['Economy', 'Premium Economy', 'Business', 'First Class'].map(flightClass => (
                 <LuxurySelectionCard
                   key={flightClass}
-                  label={flightClass}
+                  label={t("wizOpt." + flightClass.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), flightClass)}
                   selected={preferences.transportation?.flightClass === flightClass}
                   onSelect={() => setSingleValue('transportation', 'flightClass', flightClass)}
                   variant="single"
@@ -177,16 +179,16 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Layovers or direct flights?">
+          <LuxuryFormSection title={t("wiz.layovers_or_direct_flights", "Layovers or direct flights?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <LuxurySelectionCard
-                label="Direct flights only"
+                label={t("wiz.direct_flights_only", "Direct flights only")}
                 selected={preferences.transportation?.layoverPreference === 'direct'}
                 onSelect={() => setSingleValue('transportation', 'layoverPreference', 'direct')}
                 variant="single"
               />
               <LuxurySelectionCard
-                label="Open to layovers for better deals"
+                label={t("wiz.open_to_layovers_for_better_deals", "Open to layovers for better deals")}
                 selected={preferences.transportation?.layoverPreference === 'layovers'}
                 onSelect={() => setSingleValue('transportation', 'layoverPreference', 'layovers')}
                 variant="single"
@@ -194,9 +196,9 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Any loyalty programs?" subtitle="Optional">
+          <LuxuryFormSection title={t("wiz.any_loyalty_programs", "Any loyalty programs?")} subtitle={t("wiz.optional", "Optional")}>
             <Input
-              placeholder="e.g., Delta SkyMiles, Marriott Bonvoy..."
+              placeholder={t("wiz.e_g_delta_skymiles_marriott_bonvoy", "e.g., Delta SkyMiles, Marriott Bonvoy...")}
               value={preferences.transportation?.loyaltyPrograms || ''}
               onChange={(e) => updatePreference('transportation', 'loyaltyPrograms', e.target.value)}
               className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
@@ -206,17 +208,17 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Where you'll stay",
-      subtitle: "Accommodation preferences",
+      title: t("wiz.where_you_ll_stay", "Where you'll stay"),
+      subtitle: t("wiz.accommodation_preferences", "Accommodation preferences"),
       icon: Hotel,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="What type of places do you prefer?">
+          <LuxuryFormSection title={t("wiz.what_type_of_places_do_you_prefer", "What type of places do you prefer?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Hotels', 'Airbnb / Vacation Rentals', 'Hostels', 'Resorts', 'Boutique Hotels'].map(type => (
                 <LuxurySelectionCard
                   key={type}
-                  label={type}
+                  label={t("wizOpt." + type.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), type)}
                   selected={preferences.accommodation?.types?.includes(type) || false}
                   onSelect={() => toggleArrayValue('accommodation', 'types', type)}
                   variant="multi"
@@ -225,12 +227,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Preferred style">
+          <LuxuryFormSection title={t("wiz.preferred_style", "Preferred style")}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {['Budget', 'Mid-range', 'Luxury'].map(accomClass => (
                 <LuxurySelectionCard
                   key={accomClass}
-                  label={accomClass}
+                  label={t("wizOpt." + accomClass.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), accomClass)}
                   selected={preferences.accommodation?.class === accomClass}
                   onSelect={() => setSingleValue('accommodation', 'class', accomClass)}
                   variant="single"
@@ -239,12 +241,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Must-have amenities">
+          <LuxuryFormSection title={t("wiz.must_have_amenities", "Must-have amenities")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Fast Wi-Fi', 'Kitchenette', 'Workspace', 'Pool', 'Gym', 'Pet-friendly', 'Free breakfast'].map(amenity => (
                 <LuxurySelectionCard
                   key={amenity}
-                  label={amenity}
+                  label={t("wizOpt." + amenity.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), amenity)}
                   selected={preferences.accommodation?.amenities?.includes(amenity) || false}
                   onSelect={() => toggleArrayValue('accommodation', 'amenities', amenity)}
                   variant="multi"
@@ -256,26 +258,26 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Food & experiences",
-      subtitle: "Tell us about your taste",
+      title: t("wiz.food_experiences", "Food & experiences"),
+      subtitle: t("wiz.tell_us_about_your_taste", "Tell us about your taste"),
       icon: UtensilsCrossed,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="Any dietary restrictions?" subtitle="Optional">
+          <LuxuryFormSection title={t("wiz.any_dietary_restrictions", "Any dietary restrictions?")} subtitle={t("wiz.optional", "Optional")}>
             <Input
-              placeholder="e.g., Vegetarian, Gluten-free, Halal..."
+              placeholder={t("wiz.e_g_vegetarian_gluten_free_halal", "e.g., Vegetarian, Gluten-free, Halal...")}
               value={preferences.food?.restrictions || ''}
               onChange={(e) => updatePreference('food', 'restrictions', e.target.value)}
               className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
             />
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="What kind of food experiences do you love?">
+          <LuxuryFormSection title={t("wiz.what_kind_of_food_experiences_do_you_lov", "What kind of food experiences do you love?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Local street food', 'Upscale dining', 'Vegetarian/Vegan', 'Halal/Kosher', 'Seafood-focused'].map(pref => (
                 <LuxurySelectionCard
                   key={pref}
-                  label={pref}
+                  label={t("wizOpt." + pref.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), pref)}
                   selected={preferences.food?.preferences?.includes(pref) || false}
                   onSelect={() => toggleArrayValue('food', 'preferences', pref)}
                   variant="multi"
@@ -284,12 +286,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Up for food tours or cooking classes?">
+          <LuxuryFormSection title={t("wiz.up_for_food_tours_or_cooking_classes", "Up for food tours or cooking classes?")}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {['Yes', 'No', 'Sometimes'].map(option => (
                 <LuxurySelectionCard
                   key={option}
-                  label={option}
+                  label={t("wizOpt." + option.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), option)}
                   selected={preferences.food?.foodExperiences === option}
                   onSelect={() => setSingleValue('food', 'foodExperiences', option)}
                   variant="single"
@@ -301,26 +303,26 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Timing & budget",
-      subtitle: "When and how much",
+      title: t("wiz.timing_budget", "Timing & budget"),
+      subtitle: t("wiz.when_and_how_much", "When and how much"),
       icon: Wallet,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="Favorite times to travel?" subtitle="Optional">
+          <LuxuryFormSection title={t("wiz.favorite_times_to_travel", "Favorite times to travel?")} subtitle={t("wiz.optional", "Optional")}>
             <Input
-              placeholder="e.g., Spring, avoid July-August..."
+              placeholder={t("wiz.e_g_spring_avoid_july_august", "e.g., Spring, avoid July-August...")}
               value={preferences.timing?.preferredSeasons || ''}
               onChange={(e) => updatePreference('timing', 'preferredSeasons', e.target.value)}
               className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
             />
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="When do you like to travel?">
+          <LuxuryFormSection title={t("wiz.when_do_you_like_to_travel", "When do you like to travel?")}>
             <div className="grid grid-cols-1 gap-3">
               {['During off-peak times', 'During peak holiday seasons', 'Whenever a good deal comes up'].map(option => (
                 <LuxurySelectionCard
                   key={option}
-                  label={option}
+                  label={t("wizOpt." + option.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), option)}
                   selected={preferences.timing?.peakPreference === option}
                   onSelect={() => setSingleValue('timing', 'peakPreference', option)}
                   variant="single"
@@ -329,12 +331,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="How flexible are your dates?">
+          <LuxuryFormSection title={t("wiz.how_flexible_are_your_dates", "How flexible are your dates?")}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {['Very flexible', 'Somewhat flexible', 'Fixed dates only'].map(option => (
                 <LuxurySelectionCard
                   key={option}
-                  label={option}
+                  label={t("wizOpt." + option.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), option)}
                   selected={preferences.timing?.flexibility === option}
                   onSelect={() => setSingleValue('timing', 'flexibility', option)}
                   variant="single"
@@ -343,12 +345,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Typical trip budget" subtitle="Excluding flights">
+          <LuxuryFormSection title={t("wiz.typical_trip_budget", "Typical trip budget")} subtitle={t("wiz.excluding_flights", "Excluding flights")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Under $500', '$500–$1,000', '$1,000–$3,000', '$3,000–$5,000', '$5,000+'].map(range => (
                 <LuxurySelectionCard
                   key={range}
-                  label={range}
+                  label={t("wizOpt." + range.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), range)}
                   selected={preferences.budget?.range === range}
                   onSelect={() => setSingleValue('budget', 'range', range)}
                   variant="single"
@@ -360,17 +362,17 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Activities & interests",
-      subtitle: "What lights you up when you travel?",
+      title: t("wiz.activities_interests", "Activities & interests"),
+      subtitle: t("wiz.what_lights_you_up_when_you_travel", "What lights you up when you travel?"),
       icon: Target,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="What do you love doing on trips?">
+          <LuxuryFormSection title={t("wiz.what_do_you_love_doing_on_trips", "What do you love doing on trips?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Museums & Art', 'Hiking & Outdoors', 'Beach & Water', 'Nightlife & Bars', 'Shopping', 'Historical sites', 'Wildlife & Safaris', 'Wellness & Spas'].map(activity => (
                 <LuxurySelectionCard
                   key={activity}
-                  label={activity}
+                  label={t("wizOpt." + activity.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), activity)}
                   selected={preferences.activities?.interests?.includes(activity) || false}
                   onSelect={() => toggleArrayValue('activities', 'interests', activity)}
                   variant="multi"
@@ -379,9 +381,9 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Any accessibility needs?" subtitle="Optional — helps us curate better">
+          <LuxuryFormSection title={t("wiz.any_accessibility_needs", "Any accessibility needs?")} subtitle={t("wiz.optional_helps_us_curate_better", "Optional — helps us curate better")}>
             <Input
-              placeholder="e.g., Wheelchair access, mobility aids..."
+              placeholder={t("wiz.e_g_wheelchair_access_mobility_aids", "e.g., Wheelchair access, mobility aids...")}
               value={preferences.accessibility?.needs || ''}
               onChange={(e) => updatePreference('accessibility', 'needs', e.target.value)}
               className="rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
@@ -391,17 +393,17 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Your travel vibe",
-      subtitle: "Are you a planner or a free spirit?",
+      title: t("wiz.your_travel_vibe", "Your travel vibe"),
+      subtitle: t("wiz.are_you_a_planner_or_a_free_spirit", "Are you a planner or a free spirit?"),
       icon: Sparkles,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="How do you prefer to plan?">
+          <LuxuryFormSection title={t("wiz.how_do_you_prefer_to_plan", "How do you prefer to plan?")}>
             <div className="grid grid-cols-1 gap-3">
               {['Every detail mapped out', 'Rough itinerary, room to wander', 'Totally spontaneous'].map(style => (
                 <LuxurySelectionCard
                   key={style}
-                  label={style}
+                  label={t("wizOpt." + style.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), style)}
                   selected={preferences.vibe?.planningStyle === style}
                   onSelect={() => setSingleValue('vibe', 'planningStyle', style)}
                   variant="single"
@@ -410,12 +412,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="How do you like to pace your trips?">
+          <LuxuryFormSection title={t("wiz.how_do_you_like_to_pace_your_trips", "How do you like to pace your trips?")}>
             <div className="grid grid-cols-1 gap-3">
               {['Packed schedule', 'Balanced with downtime', 'Slow & relaxed'].map(pace => (
                 <LuxurySelectionCard
                   key={pace}
-                  label={pace}
+                  label={t("wizOpt." + pace.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), pace)}
                   selected={preferences.vibe?.pace === pace}
                   onSelect={() => setSingleValue('vibe', 'pace', pace)}
                   variant="single"
@@ -424,12 +426,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Prefer touristy highlights or hidden gems?">
+          <LuxuryFormSection title={t("wiz.prefer_touristy_highlights_or_hidden_gem", "Prefer touristy highlights or hidden gems?")}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {['Touristy', 'Hidden gems', 'Mix of both'].map(preference => (
                 <LuxurySelectionCard
                   key={preference}
-                  label={preference}
+                  label={t("wizOpt." + preference.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), preference)}
                   selected={preferences.vibe?.touristPreference === preference}
                   onSelect={() => setSingleValue('vibe', 'touristPreference', preference)}
                   variant="single"
@@ -441,17 +443,17 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       )
     },
     {
-      title: "Almost done!",
-      subtitle: "A few final touches",
+      title: t("wiz.almost_done", "Almost done!"),
+      subtitle: t("wiz.a_few_final_touches", "A few final touches"),
       icon: ClipboardList,
       content: (
         <div className="space-y-8">
-          <LuxuryFormSection title="Would you like help with itinerary planning?">
+          <LuxuryFormSection title={t("wiz.would_you_like_help_with_itinerary_plann", "Would you like help with itinerary planning?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {["Yes, I'd love curated itineraries", "No, just inspiration is fine"].map(option => (
                 <LuxurySelectionCard
                   key={option}
-                  label={option}
+                  label={t("wizOpt." + option.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), option)}
                   selected={preferences.planning?.wantsItineraries === option}
                   onSelect={() => setSingleValue('planning', 'wantsItineraries', option)}
                   variant="single"
@@ -460,12 +462,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Would you use a travel concierge?">
+          <LuxuryFormSection title={t("wiz.would_you_use_a_travel_concierge", "Would you use a travel concierge?")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Yes, for complex trips', 'Maybe, for special occasions', 'No, I prefer DIY'].map(option => (
                 <LuxurySelectionCard
                   key={option}
-                  label={option}
+                  label={t("wizOpt." + option.replace(/[^A-Za-z0-9]+/g, "_").toLowerCase(), option)}
                   selected={preferences.planning?.conciergeInterest === option}
                   onSelect={() => setSingleValue('planning', 'conciergeInterest', option)}
                   variant="single"
@@ -474,9 +476,9 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             </div>
           </LuxuryFormSection>
 
-          <LuxuryFormSection title="Any additional notes?" subtitle="Optional">
+          <LuxuryFormSection title={t("wiz.any_additional_notes", "Any additional notes?")} subtitle={t("wiz.optional", "Optional")}>
             <Textarea
-              placeholder="Anything else that shapes how you travel..."
+              placeholder={t("wiz.anything_else_that_shapes_how_you_travel", "Anything else that shapes how you travel...")}
               value={preferences.planning?.additionalNotes || ''}
               onChange={(e) => updatePreference('planning', 'additionalNotes', e.target.value)}
               className="min-h-[100px] rounded-xl border-[#E5DFC6] bg-white focus:border-[#C7B892] focus:ring-[#C7B892]/20"
