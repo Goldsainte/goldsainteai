@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, PenLine } from "lucide-react";
@@ -166,7 +167,7 @@ export function ReviewsList({
               </div>
               {review.comment && (
                 <p className="mt-2 text-sm text-[#4a4a4a] leading-relaxed">
-                  {review.comment}
+                  <TranslatedMessageText text={review.comment} />
                 </p>
               )}
             </div>
