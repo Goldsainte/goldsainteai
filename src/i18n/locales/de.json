@@ -2858,5 +2858,11 @@
     "depositD": "25 % bei Annahme, zahlbar bei Buchung",
     "balance": "Restbetrag",
     "balanceD": "Fällig vor Abreise, gleiche sichere Zahlung"
+  },
+  "brandConsole": {
+    "house": "Haus",
+    "collections": "Kollektionen",
+    "inquiries": "Anfragen",
+    "performance": "Performance"
   }
 }
