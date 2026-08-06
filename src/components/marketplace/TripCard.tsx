@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -77,7 +78,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
         {/* Title and Rating */}
         <div className="flex items-center justify-between gap-2">
           <h3 className="line-clamp-1 text-sm font-semibold text-foreground">
-            {trip.title}
+            <TranslatedMessageText text={trip.title} showToggle={false} />
           </h3>
           {trip.rating !== undefined && trip.review_count !== undefined && trip.review_count > 0 && (
             <div className="flex items-center gap-0.5 text-xs text-foreground">
