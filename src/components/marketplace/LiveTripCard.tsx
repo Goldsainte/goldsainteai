@@ -1,3 +1,4 @@
+import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -200,7 +201,7 @@ export function LiveTripCard({ trip }: LiveTripCardProps) {
           {trip.destination?.split(",").map((part) => part.trim()).filter(Boolean).join(" · ") || "\u00A0"}
         </p>
         <h3 className="mt-1 line-clamp-1 font-secondary text-[15px] font-medium leading-[1.35] text-[#0a2225]">
-          {trip.title}
+          <TranslatedMessageText text={trip.title} showToggle={false} />
         </h3>
         <div
           className="mt-1 flex h-[22px] items-center gap-2 overflow-hidden text-[12px] text-[#6B7280]"
