@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -27,6 +28,7 @@ const input =
   "mt-2 w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-3 text-[16px] text-[#0a2225] outline-none focus:border-[#C7A962]";
 
 export default function CreatorSettingsPage() {
+  const { t: tr } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -300,7 +302,7 @@ export default function CreatorSettingsPage() {
         <BackButton to="/creator-dashboard" className="mb-4" />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">Creator Settings</h1>
+            <h1 className="font-secondary text-3xl md:text-4xl text-[#0a2225]">{tr("accSettings.creatorTitle", "Creator Settings")}</h1>
             <p className="mt-2 text-[16px] text-[#0a2225]/70">
               Everything here appears on your public profile — exactly what travelers see.
             </p>
@@ -318,10 +320,10 @@ export default function CreatorSettingsPage() {
             </button>
             <span className="mx-1 hidden h-5 w-px bg-[#E5DFC6] sm:block" />
             {[
-              { label: "Travel guides", to: "/creator-guides" },
-              { label: "Sellable guides", to: "/creator-dashboard?tab=guides" },
-              { label: "Services", to: "/creator-dashboard?tab=services" },
-              { label: "Content tools", to: "/creator-dashboard?tab=content" },
+              { label: tr("accSettings.qlGuides", "Travel guides"), to: "/creator-guides" },
+              { label: tr("accSettings.qlSellable", "Sellable guides"), to: "/creator-dashboard?tab=guides" },
+              { label: tr("accSettings.qlServices", "Services"), to: "/creator-dashboard?tab=services" },
+              { label: tr("accSettings.qlContent", "Content tools"), to: "/creator-dashboard?tab=content" },
             ].map((l) => (
               <button key={l.label} type="button" onClick={() => navigate(l.to)}
                 className="inline-flex h-9 items-center whitespace-nowrap rounded-lg border border-transparent px-3 text-[14.5px] text-[#0a2225]/70 transition-colors hover:border-[#E5DFC6] hover:bg-white hover:text-[#0a2225]">
@@ -334,7 +336,7 @@ export default function CreatorSettingsPage() {
         {/* Profile strength */}
         <section className="mt-8 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6">
           <div className="flex items-baseline justify-between gap-4">
-            <p className="text-[16px] font-semibold text-[#0a2225]">Profile strength</p>
+            <p className="text-[16px] font-semibold text-[#0a2225]">{tr("accSettings.profileStrength", "Profile strength")}</p>
             <p className="font-secondary text-2xl text-[#0c4d47]">{strength}%</p>
           </div>
           <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[#EDE5D1]">
@@ -350,7 +352,7 @@ export default function CreatorSettingsPage() {
 
         {/* Identity */}
         <section className="mt-10 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Identity</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.identity", "Identity")}</h2>
           <div className="mt-6 flex flex-wrap items-start gap-8">
             <div className="text-center">
               <input ref={avatarInput} type="file" accept="image/*" className="hidden"
@@ -386,33 +388,33 @@ export default function CreatorSettingsPage() {
             </div>
             <div className="min-w-[260px] flex-1 space-y-5">
               <div>
-                <label className={label}>Your name</label>
-                <input className={input} value={form.display_name} onChange={set("display_name")} placeholder="Tommy Chen" />
+                <label className={label}>{tr("accSettings.yourName", "Your name")}</label>
+                <input className={input} value={form.display_name} onChange={set("display_name")} placeholder={tr("accSettings.phNameC", "Tommy Chen")} />
               </div>
               <div>
-                <label className={label}>Handle</label>
+                <label className={label}>{tr("accSettings.handle", "Handle")}</label>
                 <input className={input} value={form.handle} onChange={set("handle")} placeholder="@tommytravels" />
-                <p className={hint}>Your Goldsainte handle — must be unique.</p>
+                <p className={hint}>{tr("accSettings.handleDesc", "Your Goldsainte handle \u2014 must be unique.")}</p>
               </div>
               <div>
-                <label className={label}>Based in</label>
+                <label className={label}>{tr("accSettings.basedIn", "Based in")}</label>
                 <div className="mt-2">
                   <GoogleCityAutocomplete
                     value={form.location}
                     onChange={(v) => setForm((f) => ({ ...f, location: v }))}
-                    placeholder="Charlotte, NC, USA"
+                    placeholder={tr("accSettings.phCity", "Charlotte, NC, USA")}
                   />
                 </div>
               </div>
               <div>
                 <label className={label}>Trips starting at ($/night)</label>
                 <input className={input} value={form.starting_price_per_night} onChange={set("starting_price_per_night")} placeholder="300" inputMode="numeric" />
-                <p className={hint}>Leave blank to hide this line.</p>
+                <p className={hint}>{tr("accSettings.leaveBlank", "Leave blank to hide this line.")}</p>
               </div>
               <div>
-                <label className={label}>Languages spoken</label>
-                <input className={input} value={form.languages} onChange={set("languages")} placeholder="English, Spanish, Portuguese" />
-                <p className={hint}>Separate with commas — shown on your card, like Fora.</p>
+                <label className={label}>{tr("accSettings.langsSpoken", "Languages spoken")}</label>
+                <input className={input} value={form.languages} onChange={set("languages")} placeholder={tr("accSettings.phLangs", "English, Spanish, Portuguese")} />
+                <p className={hint}>{tr("accSettings.commasCard", "Separate with commas \u2014 shown on your card, like Fora.")}</p>
               </div>
             </div>
           </div>
@@ -421,7 +423,7 @@ export default function CreatorSettingsPage() {
         {/* Content — the exact sections travelers see on your profile */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-secondary text-2xl text-[#0a2225]">Content</h2>
+            <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.content", "Content")}</h2>
             <button type="button" onClick={() => navigate("/profile/media")}
               className="rounded-full border border-[#0a2225]/25 px-5 py-2.5 text-[15px] text-[#0a2225] hover:bg-white">
               Manage photos & video →
@@ -446,7 +448,7 @@ export default function CreatorSettingsPage() {
             profile. The manager previously lived only on the legacy
             /travel-settings/general page, so creators couldn't find it. */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Featured TikToks</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.featuredTiktoks", "Featured TikToks")}</h2>
           <p className={hint}>
             Paste up to 6 TikTok video links — they play in a "From my TikTok" section on your public profile.
           </p>
@@ -457,11 +459,11 @@ export default function CreatorSettingsPage() {
 
         {/* Story */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Your story</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.yourStory", "Your story")}</h2>
           <div className="mt-6 space-y-6">
             <div>
               <div className="flex items-center justify-between gap-3">
-                <label className={label}>Our story</label>
+                <label className={label}>{tr("accSettings.ourStory", "Our story")}</label>
                 <AIRewriteButton
                   value={form.bio}
                   onRewrite={(text) => setForm((f) => ({ ...f, bio: text }))}
@@ -469,11 +471,11 @@ export default function CreatorSettingsPage() {
                   persona="travel creator"
                 />
               </div>
-              <textarea className={`${input} min-h-[120px]`} value={form.bio} onChange={set("bio")} placeholder="Who you are and why you travel, in your voice…" />
+              <textarea className={`${input} min-h-[120px]`} value={form.bio} onChange={set("bio")} placeholder={tr("accSettings.phStoryC", "Who you are and why you travel, in your voice\u2026")} />
             </div>
             <div>
               <div className="flex items-center justify-between gap-3">
-                <label className={label}>Travel style</label>
+                <label className={label}>{tr("accSettings.travelStyle", "Travel style")}</label>
                 <AIRewriteButton
                   value={form.travel_style}
                   onRewrite={(text) => setForm((f) => ({ ...f, travel_style: text }))}
@@ -481,29 +483,29 @@ export default function CreatorSettingsPage() {
                   persona="travel creator"
                 />
               </div>
-              <textarea className={`${input} min-h-[120px]`} value={form.travel_style} onChange={set("travel_style")} placeholder="How you like to travel — this also trains your AI guide writer…" />
+              <textarea className={`${input} min-h-[120px]`} value={form.travel_style} onChange={set("travel_style")} placeholder={tr("accSettings.phStyleC", "How you like to travel \u2014 this also trains your AI guide writer\u2026")} />
             </div>
           </div>
         </section>
 
         {/* Ask us about */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Ask me about</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.askMeAbout", "Ask me about")}</h2>
           <div className="mt-6 space-y-6">
             <div>
-              <label className={label}>Primary niches</label>
-              <input className={input} value={form.primary_niches} onChange={set("primary_niches")} placeholder="Couples, Luxury Europe, Honeymoons" />
-              <p className={hint}>Separate with commas — these become the tags on your profile and card.</p>
+              <label className={label}>{tr("accSettings.primaryNiches", "Primary niches")}</label>
+              <input className={input} value={form.primary_niches} onChange={set("primary_niches")} placeholder={tr("accSettings.phNiches", "Couples, Luxury Europe, Honeymoons")} />
+              <p className={hint}>{tr("accSettings.commasTagsCard", "Separate with commas \u2014 these become the tags on your profile and card.")}</p>
             </div>
             <div>
-              <label className={label}>Primary regions</label>
+              <label className={label}>{tr("accSettings.primaryRegions", "Primary regions")}</label>
               <div className="mt-2 flex gap-3">
                 <div className="flex-1">
                   <GoogleCityAutocomplete
                     value={regionQuery}
                     onChange={setRegionQuery}
                     types={["(regions)"]}
-                    placeholder="Search a country or region — e.g. Portugal"
+                    placeholder={tr("accSettings.phRegionSearch", "Search a country or region \u2014 e.g. Portugal")}
                   />
                 </div>
                 <button type="button" onClick={addRegion}
@@ -514,7 +516,7 @@ export default function CreatorSettingsPage() {
               {regionList.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {regionList.map((r) => (
-                    <button key={r} type="button" onClick={() => removeRegion(r)} title="Remove"
+                    <button key={r} type="button" onClick={() => removeRegion(r)} title={tr("accSettings.remove", "Remove")}
                       className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[14.5px] text-[#0a2225] hover:bg-[#C7A962]/35">
                       {r} ×
                     </button>
@@ -523,15 +525,15 @@ export default function CreatorSettingsPage() {
               )}
             </div>
             <div>
-              <label className={label}>Specialties</label>
-              <input className={input} value={form.specialties} onChange={set("specialties")} placeholder="Food tours, Photography spots" />
+              <label className={label}>{tr("accSettings.specialties", "Specialties")}</label>
+              <input className={input} value={form.specialties} onChange={set("specialties")} placeholder={tr("accSettings.phSpecC", "Food tours, Photography spots")} />
             </div>
           </div>
         </section>
 
         {/* My travel map */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">My travel map</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.myTravelMap", "My travel map")}</h2>
           <p className={hint}>
             Add every country you've traveled — they light up gold on your profile map, and your countries count shows on your card.
           </p>
@@ -539,7 +541,7 @@ export default function CreatorSettingsPage() {
             className={input}
             value={countryQuery}
             onChange={(e) => setCountryQuery(e.target.value)}
-            placeholder="Search countries — e.g. Japan"
+            placeholder={tr("accSettings.phMapSearch", "Search countries \u2014 e.g. Japan")}
           />
           {countryMatches.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -570,7 +572,7 @@ export default function CreatorSettingsPage() {
                     key={name}
                     type="button"
                     onClick={() => toggleCountry(name)}
-                    title="Remove"
+                    title={tr("accSettings.remove", "Remove")}
                     className="rounded-full bg-[#C7A962]/20 px-4 py-1.5 text-[14.5px] text-[#0a2225] hover:bg-[#C7A962]/35"
                   >
                     {name} ×
@@ -584,7 +586,7 @@ export default function CreatorSettingsPage() {
         {/* Upcoming trips */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <div className="flex items-center justify-between">
-            <h2 className="font-secondary text-2xl text-[#0a2225]">Where you're headed</h2>
+            <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.whereHeaded", "Where you're headed")}</h2>
             <button type="button"
               onClick={() => setUpcoming((u) => [...u, { destination: "", timing: "" }])}
               className="rounded-full border border-[#0a2225]/25 px-4 py-2 text-[14.5px] text-[#0a2225] hover:bg-white">
@@ -596,9 +598,9 @@ export default function CreatorSettingsPage() {
             {upcoming.map((t, i) => (
               <div key={i} className="flex flex-col gap-3 md:flex-row">
                 <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[16px] text-[#0a2225] outline-none focus:border-[#C7A962]"
-                  value={t.destination} onChange={(e) => updateUpcoming(i, "destination", e.target.value)} placeholder="Patagonia" />
+                  value={t.destination} onChange={(e) => updateUpcoming(i, "destination", e.target.value)} placeholder={tr("accSettings.phUpcomingDest", "Patagonia")} />
                 <input className="w-full rounded-xl border border-[#E5DFC6] bg-white px-4 py-2.5 text-[16px] text-[#0a2225] outline-none focus:border-[#C7A962] md:w-44"
-                  value={t.timing} onChange={(e) => updateUpcoming(i, "timing", e.target.value)} placeholder="August 2026" />
+                  value={t.timing} onChange={(e) => updateUpcoming(i, "timing", e.target.value)} placeholder={tr("accSettings.phTiming", "August 2026")} />
                 <button type="button" onClick={() => setUpcoming((u) => u.filter((_, j) => j !== i))}
                   className="shrink-0 rounded-full border border-[#0a2225]/20 px-3 py-2 text-[13.5px] text-[#0a2225]/70 hover:bg-white">
                   Remove
@@ -610,7 +612,7 @@ export default function CreatorSettingsPage() {
 
         {/* Collaborations */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Work with brands</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.workWithBrands", "Work with brands")}</h2>
           <label className="mt-5 flex items-center gap-3 text-[16px] text-[#0a2225]">
             <input type="checkbox" checked={collab.open}
               onChange={(e) => setCollab((cb) => ({ ...cb, open: e.target.checked }))}
@@ -618,14 +620,14 @@ export default function CreatorSettingsPage() {
             Open to collaborations (shows a "Work with me" section on your profile)
           </label>
           <div className="mt-5">
-            <label className={label}>Collaboration types</label>
+            <label className={label}>{tr("accSettings.collabTypes", "Collaboration types")}</label>
             <input className={input} value={collab.types}
               onChange={(e) => setCollab((cb) => ({ ...cb, types: e.target.value }))}
-              placeholder="Sponsored posts, Hotel reviews, Press trips, Destination campaigns" />
-            <p className={hint}>Separate with commas.</p>
+              placeholder={tr("accSettings.phCollab", "Sponsored posts, Hotel reviews, Press trips, Destination campaigns")} />
+            <p className={hint}>{tr("accSettings.commas", "Separate with commas.")}</p>
           </div>
           <div className="mt-5">
-            <label className={label}>Media kit</label>
+            <label className={label}>{tr("accSettings.mediaKit", "Media kit")}</label>
             <input id="mediakit-input" type="file" accept=".pdf,image/*" className="hidden"
               onChange={(e) => e.target.files?.[0] && uploadMediaKit(e.target.files[0])} />
             <div className="mt-2 flex items-center gap-3">
@@ -654,7 +656,7 @@ export default function CreatorSettingsPage() {
           </p>
           <textarea className={`${input} min-h-[90px]`} value={aiSummary}
             onChange={(e) => setAiSummary(e.target.value)}
-            placeholder="Generate below — then edit to taste and Save." />
+            placeholder={tr("accSettings.phMediaKit", "Generate below \u2014 then edit to taste and Save.")} />
           <button type="button" onClick={generateSummary} disabled={summarizing}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0c4d47] px-7 py-3 text-[15px] font-medium text-[#f7f3ea] hover:bg-[#0a2225] disabled:opacity-50">
             {summarizing && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -664,7 +666,7 @@ export default function CreatorSettingsPage() {
 
         {/* Stay connected */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
-          <h2 className="font-secondary text-2xl text-[#0a2225]">Stay connected</h2>
+          <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.stayConnected", "Stay connected")}</h2>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             <div>
               <label className={label}>TikTok</label>
@@ -675,7 +677,7 @@ export default function CreatorSettingsPage() {
               <input className={input} value={form.instagram_handle} onChange={set("instagram_handle")} placeholder="@yourhandle" />
             </div>
             <div>
-              <label className={label}>Website</label>
+              <label className={label}>{tr("accSettings.website", "Website")}</label>
               <input className={input} value={form.website} onChange={set("website")} placeholder="https://…" />
             </div>
             <div>
