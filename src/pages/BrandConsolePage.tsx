@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { gsIntlLocale } from "@/lib/i18nFormat";
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -187,12 +188,13 @@ export default function BrandConsolePage() {
     }
   }
 
+  const { t } = useTranslation();
   const tabBtn = (val: typeof activeTab, label: string) => (
     <button
       key={val}
       type="button"
       onClick={() => setActiveTab(val)}
-      className={`whitespace-nowrap pb-4 text-[12px] uppercase tracking-[0.22em] transition-colors ${
+      className={`shrink-0 whitespace-nowrap pb-4 text-[11px] sm:text-[12px] uppercase tracking-[0.16em] sm:tracking-[0.22em] transition-colors ${
         activeTab === val
           ? "border-b-2 border-[#0a2225] text-[#0a2225]"
           : "border-b-2 border-transparent text-[#0a2225]/50 hover:text-[#0a2225]"
@@ -294,11 +296,11 @@ export default function BrandConsolePage() {
               </div>
 
               {/* ── Tabs ── */}
-              <div className="mt-12 flex items-center gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {tabBtn("house", "House")}
-                {tabBtn("collections", "Collections")}
-                {tabBtn("inquiries", `Inquiries${inquiries.filter((i) => i.status === "new").length ? ` (${inquiries.filter((i) => i.status === "new").length})` : ""}`)}
-                {tabBtn("performance", "Performance")}
+              <div className="mt-12 flex flex-nowrap items-center gap-6 sm:gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {tabBtn("house", t("brandConsole.house", "House"))}
+                {tabBtn("collections", t("brandConsole.collections", "Collections"))}
+                {tabBtn("inquiries", `${t("brandConsole.inquiries", "Inquiries")}${inquiries.filter((i) => i.status === "new").length ? ` (${inquiries.filter((i) => i.status === "new").length})` : ""}`)}
+                {tabBtn("performance", t("brandConsole.performance", "Performance"))}
               </div>
 
               {activeTab === "house" && (
