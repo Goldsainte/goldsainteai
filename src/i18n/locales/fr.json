@@ -2561,7 +2561,26 @@
       "cbUploadTab": "Votre propre contrat",
       "cbUploaded": "Contrat téléversé",
       "cbUploadedDesc": "Signez ci-dessous, puis envoyez-le à votre voyageur.",
-      "cbUploading": "Téléversement…"
+      "cbUploading": "Téléversement…",
+      "briefs": "Briefs",
+      "pipeline": "Pipeline",
+      "more": "Plus",
+      "viewPublicProfile": "Voir le profil public",
+      "view": "Voir",
+      "addPhotosVideo": "Ajouter photos et vidéo",
+      "profileNotFound": "Profil d'agent introuvable",
+      "createProfile": "Créer un profil d'agent",
+      "startHere": "Commencez ici",
+      "twoWays": "Deux façons de gagner",
+      "answerBrief": "Répondre à un brief",
+      "ab1": "Les voyageurs publient les voyages qu'ils veulent. Choisissez un brief qui correspond à votre expertise.",
+      "ab2": "Envoyez une proposition sur mesure — itinéraire, prix et calendrier — rédigée avec Goldsainte AI en moins d'une minute.",
+      "ab3": "Ils acceptent et versent l'acompte — sans jamais quitter la conversation.",
+      "publishOwn": "Publiez le vôtre",
+      "po1": "Packagez un voyage que vous connaissez par cœur — ou un guide numérique — dans le créateur de voyages.",
+      "po2": "Il s'affiche sur la marketplace avec votre nom et votre prix.",
+      "po3": "Les voyageurs réservent directement — sans proposition, vous vous réveillez avec des réservations.",
+      "howPaid": "Comment vous êtes payé"
     }
   },
   "chk": {
