@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "Describe your refund policy...",
     "termsConditions": "Terms & conditions",
     "termsPh": "Additional terms and conditions..."
+  },
+  "trdp": {
+    "wentWrong": "Something went wrong",
+    "engagement": "The Engagement",
+    "hiredFor": "Hired for",
+    "aboutTrip": "About This Trip",
+    "specialRequests": "Special requests",
+    "tripDetails": "Trip Details",
+    "interests": "Interests",
+    "mustHaves": "Must-Haves",
+    "dealbreakers": "Dealbreakers",
+    "visualBrief": "Visual Brief",
+    "proposalsReceived": "Proposals Received",
+    "noProposals": "No proposals yet",
+    "byAccepting": "By accepting this proposal",
+    "byAcceptingRest": ", your trip and payments stay protected by Goldsainte.",
+    "moneyGlance": "The money, at a glance",
+    "deposit": "Deposit",
+    "depositD": "25% at acceptance, paid at booking",
+    "balance": "Balance",
+    "balanceD": "Due before departure, same secure checkout"
   }
 }
