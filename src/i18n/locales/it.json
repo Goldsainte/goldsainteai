@@ -2830,5 +2830,26 @@
     "refundPolicyPh": "Descrivi la tua politica di rimborso...",
     "termsConditions": "Termini e condizioni",
     "termsPh": "Termini e condizioni aggiuntivi..."
+  },
+  "trdp": {
+    "wentWrong": "Qualcosa è andato storto",
+    "engagement": "L'incarico",
+    "hiredFor": "Ingaggiato per",
+    "aboutTrip": "Su questo viaggio",
+    "specialRequests": "Richieste speciali",
+    "tripDetails": "Dettagli del viaggio",
+    "interests": "Interessi",
+    "mustHaves": "Irrinunciabili",
+    "dealbreakers": "Esclusioni",
+    "visualBrief": "Brief visivo",
+    "proposalsReceived": "Proposte ricevute",
+    "noProposals": "Ancora nessuna proposta",
+    "byAccepting": "Accettando questa proposta",
+    "byAcceptingRest": ", il tuo viaggio e i pagamenti restano protetti da Goldsainte.",
+    "moneyGlance": "Il denaro, a colpo d'occhio",
+    "deposit": "Acconto",
+    "depositD": "25% all'accettazione, pagato alla prenotazione",
+    "balance": "Saldo",
+    "balanceD": "Dovuto prima della partenza, stesso pagamento sicuro"
   }
 }
