@@ -380,11 +380,11 @@ export default function AgentDashboard() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Agent Profile Not Found</h3>
+              <h3 className="text-lg font-semibold mb-2">{tr("dash.a.profileNotFound", "Agent Profile Not Found")}</h3>
               <p className="text-muted-foreground text-center mb-4">
                 {tr("dash.a.needProfile", "You need to create an agent profile first")}
               </p>
-              <Button onClick={() => navigate('/apply/agent')}>Create Agent Profile</Button>
+              <Button onClick={() => navigate('/apply/agent')}>{tr("dash.a.createProfile", "Create Agent Profile")}</Button>
             </CardContent>
           </Card>
         </main>
@@ -405,7 +405,7 @@ export default function AgentDashboard() {
       key={val}
       type="button"
       onClick={() => setActiveTab(val)}
-      className={`whitespace-nowrap pb-4 text-[12px] uppercase tracking-[0.22em] transition-colors ${
+      className={`shrink-0 whitespace-nowrap pb-4 text-[11px] sm:text-[12px] uppercase tracking-[0.16em] sm:tracking-[0.22em] transition-colors ${
         activeTab === val
           ? "border-b-2 border-[#0a2225] text-[#0a2225]"
           : "border-b-2 border-transparent text-[#0a2225]/50 hover:text-[#0a2225]"
@@ -424,7 +424,7 @@ export default function AgentDashboard() {
       <p className="mt-1.5 font-secondary text-[30px] leading-none text-[#0a2225]">
         {value ?? "—"}
       </p>
-      <p className="mt-2 text-[12px] text-[#8D6B2F]">View →</p>
+      <p className="mt-2 text-[12px] text-[#8D6B2F]">{tr("dash.a.view", "View")} →</p>
     </button>
   );
 
@@ -464,7 +464,7 @@ export default function AgentDashboard() {
               onClick={() => navigate(`/agents/${agent.user_id}`)}
               className="inline-flex items-center gap-2 rounded-full border border-[#0a2225]/25 px-6 py-3.5 text-[14px] text-[#0a2225] transition-colors hover:bg-white"
             >
-              <ExternalLink className="h-4 w-4" /> View public profile
+              <ExternalLink className="h-4 w-4" /> {tr("dash.a.viewPublicProfile", "View public profile")}
             </button>
             {isAdmin && (
               <div className="flex items-center gap-2">
@@ -506,7 +506,7 @@ export default function AgentDashboard() {
           onClick={() => navigate("/profile/media")}
           className="mt-4 inline-flex items-center gap-2 text-[15px] text-[#0a2225]"
         >
-          Add photos & video <ArrowRight className="h-4 w-4 text-[#8D6B2F]" />
+          {tr("dash.a.addPhotosVideo", "Add photos & video")} <ArrowRight className="h-4 w-4 text-[#8D6B2F]" />
         </button>
 
         {!agent.is_verified && (
@@ -542,17 +542,17 @@ export default function AgentDashboard() {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-12 space-y-10">
-          <div className="flex items-center gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-nowrap items-center gap-6 sm:gap-8 overflow-x-auto border-b border-[#0a2225]/12 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabBtn("desk", tr("dash.a.desk", "Desk"))}
-            {tabBtn("available", `Briefs (${jobs.length})`)}
+            {tabBtn("available", `${tr("dash.a.briefs", "Briefs")} (${jobs.length})`)}
             {/* Direct requests were invisible to agents entirely — the Briefs
                 tab reads marketplace_jobs, a different table (Jul 26). */}
             {tabBtn("direct", tr("dash.c.directRequests", "Direct requests"))}
-            {tabBtn("my-bids", `Pipeline (${myBids.length})`)}
+            {tabBtn("my-bids", `${tr("dash.a.pipeline", "Pipeline")} (${myBids.length})`)}
             {/* creator-collabs tab hidden for launch — unfinished feature, undecided economics (see handoff) */}
             {tabBtn("guides", tr("dash.c.catalog", "Catalog"))}
             {tabBtn("performance", tr("dash.c.performance", "Performance"))}
-            <div className="ml-auto pb-2">
+            <div className="ml-auto shrink-0 pb-2 pl-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -561,7 +561,7 @@ export default function AgentDashboard() {
                       activeMore ? "text-[#0a2225]" : "text-[#0a2225]/50 hover:text-[#0a2225]"
                     }`}
                   >
-                    {activeMore ? activeMore.label : "More"} <ChevronDown className="h-3.5 w-3.5" />
+                    {activeMore ? activeMore.label : tr("dash.a.more", "More")} <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="!rounded-2xl !border-0 !bg-white !shadow-[0_8px_28px_rgba(10,34,37,0.22)]">
@@ -582,7 +582,7 @@ export default function AgentDashboard() {
           {/* ── Desk: the Bureau overview ── */}
           <TabsContent value="desk" className="space-y-0">
             <div className="border-b border-[#0a2225]/10 pb-16 pt-6">
-              <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">Start here</p>
+              <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">{tr("dash.a.startHere", "Start here")}</p>
               <h2 className="mt-4 max-w-3xl font-secondary text-[44px] leading-[1.08] text-[#0a2225] md:text-[58px]">
                 {tr("dash.a.heroTitle", "Find a brief, design the trip, get paid.")}
               </h2>
@@ -611,24 +611,24 @@ export default function AgentDashboard() {
               <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">
                 {tr("dash.a.hwAgents", "How Goldsainte works for agents")}
               </p>
-              <h2 className="mt-3 font-secondary text-[38px] text-[#0a2225]">Two ways to earn</h2>
+              <h2 className="mt-3 font-secondary text-[38px] text-[#0a2225]">{tr("dash.a.twoWays", "Two ways to earn")}</h2>
               <div className="mt-10 grid gap-14 md:grid-cols-2">
                 <div>
                   <p className="font-secondary text-[20px] text-[#8D6B2F]">01</p>
-                  <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">Answer a brief</h3>
+                  <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">{tr("dash.a.answerBrief", "Answer a brief")}</h3>
                   <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>Travelers post the journeys they want. Pick a brief that fits your expertise.</p>
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>Send a tailored proposal — itinerary, price, and timeline — drafted with Goldsainte AI in under a minute.</p>
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>They accept and pay the deposit — all without leaving the thread.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>{tr("dash.a.ab1", "Travelers post the journeys they want. Pick a brief that fits your expertise.")}</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>{tr("dash.a.ab2", "Send a tailored proposal \u2014 itinerary, price, and timeline \u2014 drafted with Goldsainte AI in under a minute.")}</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>{tr("dash.a.ab3", "They accept and pay the deposit \u2014 all without leaving the thread.")}</p>
                   </div>
                 </div>
                 <div>
                   <p className="font-secondary text-[20px] text-[#8D6B2F]">02</p>
-                  <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">Publish your own</h3>
+                  <h3 className="mt-1.5 font-secondary text-[26px] text-[#0a2225]">{tr("dash.a.publishOwn", "Publish your own")}</h3>
                   <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-[#0a2225]/80">
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>Package a trip you know by heart — or a digital guide — in the trip builder.</p>
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>It lists on the marketplace with your name and your price.</p>
-                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>Travelers book it directly — no proposal needed, you wake up to bookings.</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">i.</i>{tr("dash.a.po1", "Package a trip you know by heart \u2014 or a digital guide \u2014 in the trip builder.")}</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">ii.</i>{tr("dash.a.po2", "It lists on the marketplace with your name and your price.")}</p>
+                    <p className="flex gap-4"><i className="shrink-0 font-secondary italic text-[#8D6B2F]">iii.</i>{tr("dash.a.po3", "Travelers book it directly \u2014 no proposal needed, you wake up to bookings.")}</p>
                   </div>
                 </div>
               </div>
@@ -636,7 +636,7 @@ export default function AgentDashboard() {
 
             <div className="grid items-center gap-10 border-b border-[#0a2225]/10 py-14 md:grid-cols-[1fr_auto]">
               <div>
-                <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">How you get paid</p>
+                <p className="text-[12.5px] uppercase tracking-[0.34em] text-[#8D6B2F]">{tr("dash.a.howPaid", "How you get paid")}</p>
                 <p className="mt-4 max-w-2xl text-[16px] leading-[1.7] text-[#0a2225]/80">
                   {tr("dash.a.feeBody", "You set your price — your costs and your margin are yours to build in. Travelers pay a 3.5% service fee on top; a matching 3.5% platform fee comes out of your payout. That is Goldsainte's entire take: 7% total, flat, on every booking. Every payment is charged directly to your own Stripe account at booking — you're the merchant of record on every trip you sell.")}
                 </p>
