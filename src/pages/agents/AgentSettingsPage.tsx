@@ -286,6 +286,11 @@ export default function AgentSettingsPage() {
         </div>
 
         {/* Identity */}
+        {/* Goldsainte Verified */}
+        <div className="mt-10">
+          <GetVerifiedCard role="agent" />
+        </div>
+
         <section className="mt-10 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <h2 className="font-secondary text-2xl text-[#0a2225]">{t("accSettings.identity", "Identity")}</h2>
           <div className="mt-6 flex flex-wrap items-start gap-8">
@@ -482,11 +487,6 @@ export default function AgentSettingsPage() {
             </div>
           </div>
         </section>
-
-        {/* Goldsainte Verified */}
-        <div className="mt-6">
-          <GetVerifiedCard role="agent" />
-        </div>
 
         {/* Stay connected */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
