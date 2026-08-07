@@ -352,6 +352,11 @@ export default function CreatorSettingsPage() {
         </section>
 
         {/* Identity */}
+        {/* Goldsainte Verified */}
+        <div className="mt-10">
+          <GetVerifiedCard role="creator" />
+        </div>
+
         <section className="mt-10 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
           <h2 className="font-secondary text-2xl text-[#0a2225]">{tr("accSettings.identity", "Identity")}</h2>
           <div className="mt-6 flex flex-wrap items-start gap-8">
@@ -664,11 +669,6 @@ export default function CreatorSettingsPage() {
             {summarizing ? "Writing…" : aiSummary ? "Regenerate" : "Generate my AI summary"}
           </button>
         </section>
-
-        {/* Goldsainte Verified */}
-        <div className="mt-6">
-          <GetVerifiedCard role="creator" />
-        </div>
 
         {/* Stay connected */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
