@@ -5,6 +5,8 @@ import { CountryTile } from "./CountryTile";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 
 // ============================================================================
 // PartnerDirectory — the shared Fora-/advisors-model directory (Jul 16 AM).
@@ -113,6 +115,11 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
   const copy = COPY[kind];
   const [cards, setCards] = useState<DirectoryCard[]>([]);
   const [loading, setLoading] = useState(true);
+  // Goldsainte Verified seals for every card in the loaded set (batched, cached,
+  // fail-open). DirectoryCard.userId is the profiles id for both kinds:
+  // creators use creator_profiles.id (== auth uid) and agents use
+  // travel_agents.user_id, so one hook seals both directories.
+  const sealMap = useVerifiedSeals(cards.map((c) => c.userId));
 
   // ── Filtering (Jul 25) — the directory will hold thousands of profiles;
   // search + specialty chips keep it navigable. Client-side over the ranked
@@ -335,7 +342,12 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                     </div>
                   )}
                 </div>
-                <h2 className="mt-3 font-secondary text-lg leading-snug text-[#0a2225] sm:mt-6 sm:text-2xl">{a.name}</h2>
+                <h2 className="mt-3 font-secondary text-lg leading-snug text-[#0a2225] sm:mt-6 sm:text-2xl">
+                  <span className="inline-flex items-center gap-1.5">
+                    {a.name}
+                    {sealMap.get(a.userId) && <VerifiedSeal size={18} />}
+                  </span>
+                </h2>
                 {specialtyLine(a.tags) && (
                   <p className="mt-1 text-[12px] leading-snug text-[#0a2225]/60 sm:mt-2 sm:text-[15px]">{specialtyLine(a.tags)}</p>
                 )}
