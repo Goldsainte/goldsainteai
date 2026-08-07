@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "Neutral third-party facilitation if needed",
     "binding_resolution_through_aaa": "Binding resolution through AAA",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "You",
+    "activeLine": "Your gold seal is active everywhere on Goldsainte.",
+    "renews": "Renews {{date}} · receipt emailed monthly",
+    "manage": "Manage subscription",
+    "oneStep": "One step left: confirm your identity to display your seal.",
+    "idWhy": "Every seal on Goldsainte is backed by a real identity check — that's what makes it worth wearing.",
+    "confirmId": "Confirm my identity",
+    "b1": "The gold seal beside your name — on your profile, cards, proposals, and messages.",
+    "b2": "Backed by a real identity check, so travelers know the seal means something.",
+    "b3": "A receipt lands in your inbox at signup and after every monthly renewal.",
+    "perMonth": "/month · cancel anytime",
+    "cta": "Get Verified",
+    "error": "Something went wrong — please try again."
   }
 }
