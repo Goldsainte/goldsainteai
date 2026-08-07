@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "Facilitação por terceiro neutro se preciso",
     "binding_resolution_through_aaa": "Resolução vinculante pela AAA",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "Você",
+    "activeLine": "Seu selo dourado está ativo em todo o Goldsainte.",
+    "renews": "Renova em {{date}} · recibo por e-mail todo mês",
+    "manage": "Gerenciar assinatura",
+    "oneStep": "Falta um passo: confirme sua identidade para exibir seu selo.",
+    "idWhy": "Cada selo no Goldsainte é respaldado por uma verificação de identidade real — é isso que o torna valioso.",
+    "confirmId": "Confirmar minha identidade",
+    "b1": "O selo dourado ao lado do seu nome — no perfil, cartões, propostas e mensagens.",
+    "b2": "Respaldado por verificação de identidade real: viajantes sabem que ele significa algo.",
+    "b3": "Um recibo chega no seu e-mail na adesão e após cada renovação mensal.",
+    "perMonth": "/mês · cancele quando quiser",
+    "cta": "Seja verificado",
+    "error": "Algo deu errado — tente novamente."
   }
 }
