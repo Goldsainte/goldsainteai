@@ -138,12 +138,12 @@ function SocialIcon({ href, label, children }: { href: string; label: string; ch
 }
 
 export function PartnerProfileFora(props: PartnerProfileForaProps) {
-  const sealMap = useVerifiedSeals([userId]);
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location, languages,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
     reviews, reviewCount, ctaLabel, onCta, ownerActions, contentSlot, hideBottomGallery, stats, belowCta,
   } = props;
+  const sealMap = useVerifiedSeals([userId]);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showAllIdeas, setShowAllIdeas] = useState(false);
   const [ideas, setIdeas] = useState<TravelIdea[]>([]);
