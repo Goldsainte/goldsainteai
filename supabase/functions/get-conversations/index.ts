@@ -66,6 +66,26 @@ serve(async (req) => {
     }
 
     // Process conversations to add other participant info and unread count
+    // Read-receipt preferences of every counterparty in ONE query (service
+    // role bypasses message_settings RLS). Missing row = defaults = receipts on.
+    const otherIds = Array.from(
+      new Set(
+        (conversations ?? []).map((conv: any) =>
+          conv.participant_1 === user.id ? conv.participant_2 : conv.participant_1,
+        ),
+      ),
+    );
+    const receiptOptOuts = new Set<string>();
+    if (otherIds.length > 0) {
+      const { data: settingsRows } = await supabase
+        .from("message_settings")
+        .select("user_id, show_read_receipts")
+        .in("user_id", otherIds);
+      (settingsRows ?? []).forEach((row: any) => {
+        if (row.show_read_receipts === false) receiptOptOuts.add(row.user_id);
+      });
+    }
+
     const processedConversations = conversations?.map((conv) => {
       const isP1 = conv.participant_1 === user.id;
       const otherParticipant = isP1 ? conv.participant_2_profile : conv.participant_1_profile;
@@ -99,14 +119,21 @@ serve(async (req) => {
           avatarUrl: otherParticipant?.avatar_url,
           accountType: otherParticipant?.account_type,
           isVerified: otherParticipant?.is_verified,
+          // False when this person turned OFF "show read receipts": the client
+          // then renders sent messages as delivered-only, never read.
+          showsReadReceipts: !receiptOptOuts.has(otherParticipant?.id),
         },
+        isFiltered: (conv as any).is_filtered === true,
         createdAt: conv.created_at,
       };
     }) || [];
 
     // Categorize conversations
     const requests = processedConversations.filter(
-      (c) => c.status === "request" && !c.isInitiator
+      // Spam-filtered requests are hidden from the RECIPIENT (that's the
+      // "Filter low-quality requests" toggle); the sender still sees their
+      // own thread via the primary/initiator bucket below.
+      (c) => c.status === "request" && !c.isInitiator && !c.isFiltered
     );
     const primary = processedConversations.filter(
       (c) => c.status === "active" || (c.status === "request" && c.isInitiator)
