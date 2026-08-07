@@ -1342,6 +1342,31 @@ serve(async (req: Request) => {
           const verificationSession =
             event.data.object as VerificationSession;
           await processVerificationCompleted(verificationSession, logger);
+
+          // Goldsainte Verified: on a fully verified session, also stamp the
+          // USER's profile (badge = paid subscription + identity check).
+          // Resolved by session metadata user_id, falling back to email.
+          if (event.type === "identity.verification_session.verified") {
+            try {
+              const meta = (verificationSession.metadata ?? {}) as Record<string, string>;
+              const stamp = { identity_verified_at: new Date().toISOString() };
+              if (meta.user_id) {
+                await supabaseClient.from("profiles").update(stamp).eq("id", meta.user_id);
+                logger.info("Profile identity stamped by user_id", { userId: meta.user_id });
+              } else if (meta.email) {
+                await supabaseClient.from("profiles").update(stamp).ilike("email", meta.email);
+                logger.info("Profile identity stamped by email", { email: meta.email });
+              } else {
+                logger.warn("Verified session had no user_id/email metadata; profile not stamped", {
+                  sessionId: verificationSession.id,
+                });
+              }
+            } catch (stampError: any) {
+              logger.error("Failed to stamp profiles.identity_verified_at", {
+                error: stampError.message,
+              });
+            }
+          }
           break;
         }
 
