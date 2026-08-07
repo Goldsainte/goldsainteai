@@ -1,3 +1,5 @@
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 import { useTranslation } from "react-i18next";
 import { useTranslatedContent } from "@/hooks/useTranslatedContent";
 import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
@@ -130,6 +132,11 @@ export function DirectMessageInbox() {
     manageConversation,
     refetch: refetchConversations,
   } = useDirectMessages();
+  const sealMap = useVerifiedSeals([
+    ...conversations.primary.map((c) => c.otherParticipant.id),
+    ...conversations.requests.map((c) => c.otherParticipant.id),
+    ...conversations.archived.map((c) => c.otherParticipant.id),
+  ]);
 
   const { messages, loading: messagesLoading, refetch: refetchMessages } = useConversationMessages(
     selectedConversation?.id || null
@@ -630,8 +637,9 @@ export function DirectMessageInbox() {
                 </Avatar>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-secondary font-semibold text-[#0a2225] truncate">
+                    <span className="font-secondary font-semibold text-[#0a2225] truncate inline-flex items-center gap-1.5">
                       {selectedConversation.otherParticipant.displayName}
+                      {sealMap.get(selectedConversation.otherParticipant.id) && <VerifiedSeal size={16} />}
                     </span>
                     {selectedConversation.otherParticipant.isVerified && (
                       <Shield className="h-3.5 w-3.5 shrink-0 text-[#C7A962]" />
@@ -1007,7 +1015,10 @@ function ConversationItem({
           </Avatar>
           <div className="flex-1 min-w-0" style={{ fontFamily: "Inter, sans-serif" }}>
             <p className={`truncate text-[16px] leading-5 ${unread ? "font-semibold text-[#0a2225]" : "font-normal text-[#0a2225]"}`}>
-              {conversation.otherParticipant.displayName}
+              <span className="inline-flex items-center gap-1.5">
+                {conversation.otherParticipant.displayName}
+                {sealMap.get(conversation.otherParticipant.id) && <VerifiedSeal size={13} />}
+              </span>
             </p>
             {conversation.tripTitle && (
               <p className="truncate text-[12px] uppercase tracking-[0.18em] text-[#8D6B2F]">
