@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,9 @@ interface HotelDetailsModalProps {
   onSelectRoom: (room: RoomOption) => void;
 }
 
-export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelDetailsModalProps) => {
+export const HotelDetailsModal = ({
+  open, onClose, hotel, onSelectRoom }: HotelDetailsModalProps) => {
+  const { t } = useTranslation();
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [reviewSort, setReviewSort] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
   
@@ -213,18 +216,18 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
         <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-6 overflow-x-auto scrollbar-hide">
-          <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
-          <TabsTrigger value="rooms" className="whitespace-nowrap">Rooms</TabsTrigger>
-          <TabsTrigger value="amenities" className="whitespace-nowrap">Amenities</TabsTrigger>
-          <TabsTrigger value="location" className="whitespace-nowrap">Location</TabsTrigger>
+          <TabsTrigger value="overview" className="whitespace-nowrap">{t("hdm.overview", "Overview")}</TabsTrigger>
+          <TabsTrigger value="rooms" className="whitespace-nowrap">{t("hdm.rooms", "Rooms")}</TabsTrigger>
+          <TabsTrigger value="amenities" className="whitespace-nowrap">{t("hdm.amenities", "Amenities")}</TabsTrigger>
+          <TabsTrigger value="location" className="whitespace-nowrap">{t("hdm.location", "Location")}</TabsTrigger>
           <TabsTrigger value="reviews" className="whitespace-nowrap">Reviews ({allReviews.length})</TabsTrigger>
-          <TabsTrigger value="photos" className="whitespace-nowrap">Photos</TabsTrigger>
+          <TabsTrigger value="photos" className="whitespace-nowrap">{t("hdm.photos", "Photos")}</TabsTrigger>
         </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-4">
             {/* Hotel Description */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">About This Hotel</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("hdm.about_this_hotel", "About This Hotel")}</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Experience luxury and comfort at {hotelName}. Our property offers world-class amenities, 
                 exceptional service, and perfectly appointed rooms designed for the modern traveler. 
@@ -238,34 +241,34 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {/* Quick Facts */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Quick Facts</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("hdm.quick_facts", "Quick Facts")}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-start gap-3">
                   <Clock className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <div className="font-medium">Check-in / Check-out</div>
+                    <div className="font-medium">{t("hdm.check_in_check_out", "Check-in / Check-out")}</div>
                     <div className="text-sm text-muted-foreground">3:00 PM / 11:00 AM</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Bed className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <div className="font-medium">Room Types</div>
+                    <div className="font-medium">{t("hdm.room_types", "Room Types")}</div>
                     <div className="text-sm text-muted-foreground">{roomOptions.length} options available</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CreditCard className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <div className="font-medium">Payment Options</div>
-                    <div className="text-sm text-muted-foreground">Visa, Mastercard, Amex accepted</div>
+                    <div className="font-medium">{t("hdm.payment_options", "Payment Options")}</div>
+                    <div className="text-sm text-muted-foreground">{t("hdm.visa_mastercard_amex_accepted", "Visa, Mastercard, Amex accepted")}</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Shield className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <div className="font-medium">Cancellation</div>
-                    <div className="text-sm text-muted-foreground">Free cancellation up to 24h before</div>
+                    <div className="font-medium">{t("hdm.cancellation", "Cancellation")}</div>
+                    <div className="text-sm text-muted-foreground">{t("hdm.free_cancellation_up_to_24h_before", "Free cancellation up to 24h before")}</div>
                   </div>
                 </div>
               </div>
@@ -275,35 +278,35 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {/* Popular Amenities */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Popular Amenities</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("hdm.popular_amenities", "Popular Amenities")}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="flex items-center gap-2 text-sm">
                   <Wifi className="h-4 w-4 text-primary" />
-                  <span>Free WiFi</span>
+                  <span>{t("hdm.free_wifi", "Free WiFi")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Utensils className="h-4 w-4 text-primary" />
-                  <span>Restaurant</span>
+                  <span>{t("hdm.restaurant", "Restaurant")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Dumbbell className="h-4 w-4 text-primary" />
-                  <span>Fitness Center</span>
+                  <span>{t("hdm.fitness_center", "Fitness Center")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <ParkingCircle className="h-4 w-4 text-primary" />
-                  <span>Free Parking</span>
+                  <span>{t("hdm.free_parking", "Free Parking")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Coffee className="h-4 w-4 text-primary" />
-                  <span>Breakfast Available</span>
+                  <span>{t("hdm.breakfast_available", "Breakfast Available")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Wind className="h-4 w-4 text-primary" />
-                  <span>Air Conditioning</span>
+                  <span>{t("hdm.air_conditioning", "Air Conditioning")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Bath className="h-4 w-4 text-primary" />
-                  <span>Spa Services</span>
+                  <span>{t("hdm.spa_services", "Spa Services")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-primary" />
@@ -316,49 +319,49 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {/* Policies */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Hotel Policies</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("hdm.hotel_policies", "Hotel Policies")}</h3>
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="checkin">
-                  <AccordionTrigger>Check-in & Check-out</AccordionTrigger>
+                  <AccordionTrigger>{t("hdm.check_in_check_out2", "Check-in & Check-out")}</AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 text-sm">
-                      <div><strong>Check-in:</strong> 3:00 PM onwards</div>
-                      <div><strong>Check-out:</strong> 11:00 AM</div>
-                      <div><strong>Early Check-in:</strong> Subject to availability, may incur additional charges</div>
-                      <div><strong>Late Check-out:</strong> Available upon request, additional fees may apply</div>
+                      <div><strong>{t("hdm.check_in", "Check-in:")}</strong> 3:00 PM onwards</div>
+                      <div><strong>{t("hdm.check_out", "Check-out:")}</strong> 11:00 AM</div>
+                      <div><strong>{t("hdm.early_check_in", "Early Check-in:")}</strong> Subject to availability, may incur additional charges</div>
+                      <div><strong>{t("hdm.late_check_out", "Late Check-out:")}</strong> Available upon request, additional fees may apply</div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="cancellation">
-                  <AccordionTrigger>Cancellation Policy</AccordionTrigger>
+                  <AccordionTrigger>{t("hdm.cancellation_policy", "Cancellation Policy")}</AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 text-sm">
-                      <div>Free cancellation up to 24 hours before check-in</div>
-                      <div>Cancellations within 24 hours will be charged one night's stay</div>
-                      <div>No-shows will be charged the full amount of the reservation</div>
-                      <div>Non-refundable rates are not eligible for cancellation</div>
+                      <div>{t("hdm.free_cancellation_up_to_24_hours_before_", "Free cancellation up to 24 hours before check-in")}</div>
+                      <div>{t("hdm.cancellations_within_24_hours_will_be_ch", "Cancellations within 24 hours will be charged one night's stay")}</div>
+                      <div>{t("hdm.no_shows_will_be_charged_the_full_amount", "No-shows will be charged the full amount of the reservation")}</div>
+                      <div>{t("hdm.non_refundable_rates_are_not_eligible_fo", "Non-refundable rates are not eligible for cancellation")}</div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="payment">
-                  <AccordionTrigger>Payment & Deposits</AccordionTrigger>
+                  <AccordionTrigger>{t("hdm.payment_deposits", "Payment & Deposits")}</AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 text-sm">
-                      <div><strong>Accepted:</strong> Visa, Mastercard, American Express, Discover</div>
-                      <div><strong>Deposit:</strong> Credit card hold of {currencySymbol}100 per night required at check-in</div>
-                      <div><strong>Incidentals:</strong> Additional charges for room service, minibar, etc.</div>
-                      <div><strong>Currency:</strong> {currencyCode} accepted, other currencies subject to conversion fees</div>
+                      <div><strong>{t("hdm.accepted", "Accepted:")}</strong> Visa, Mastercard, American Express, Discover</div>
+                      <div><strong>{t("hdm.deposit", "Deposit:")}</strong> Credit card hold of {currencySymbol}100 per night required at check-in</div>
+                      <div><strong>{t("hdm.incidentals", "Incidentals:")}</strong> Additional charges for room service, minibar, etc.</div>
+                      <div><strong>{t("hdm.currency", "Currency:")}</strong> {currencyCode} accepted, other currencies subject to conversion fees</div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="pets">
-                  <AccordionTrigger>Pets & Children</AccordionTrigger>
+                  <AccordionTrigger>{t("hdm.pets_children", "Pets & Children")}</AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 text-sm">
-                      <div><strong>Pets:</strong> Small pets allowed with {currencySymbol}50/night fee (max 2 pets, 25 lbs each)</div>
-                      <div><strong>Children:</strong> Children of all ages welcome</div>
-                      <div><strong>Cribs:</strong> Available upon request, complimentary</div>
-                      <div><strong>Extra Beds:</strong> {currencySymbol}30 per night for guests over 12 years old</div>
+                      <div><strong>{t("hdm.pets", "Pets:")}</strong> Small pets allowed with {currencySymbol}50/night fee (max 2 pets, 25 lbs each)</div>
+                      <div><strong>{t("hdm.children", "Children:")}</strong> Children of all ages welcome</div>
+                      <div><strong>{t("hdm.cribs", "Cribs:")}</strong> Available upon request, complimentary</div>
+                      <div><strong>{t("hdm.extra_beds", "Extra Beds:")}</strong> {currencySymbol}30 per night for guests over 12 years old</div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -368,8 +371,8 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
           <TabsContent value="rooms" className="space-y-4 mt-4">
             <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2">Choose Your Room</h3>
-              <p className="text-sm text-muted-foreground">All rooms include complimentary WiFi, daily housekeeping, and access to hotel amenities</p>
+              <h3 className="text-lg font-semibold mb-2">{t("hdm.choose_your_room", "Choose Your Room")}</h3>
+              <p className="text-sm text-muted-foreground">{t("hdm.all_rooms_include_complimentary_wifi_dai", "All rooms include complimentary WiFi, daily housekeeping, and access to hotel amenities")}</p>
             </div>
 
             {roomOptions.map((room) => (
@@ -417,7 +420,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     </div>
 
                     <div>
-                      <div className="text-xs font-medium text-muted-foreground mb-1">Room Amenities:</div>
+                      <div className="text-xs font-medium text-muted-foreground mb-1">{t("hdm.room_amenities", "Room Amenities:")}</div>
                       <div className="flex flex-wrap gap-2">
                         {room.amenities.map((amenity, idx) => (
                           <Badge key={idx} variant="secondary" className="text-xs">
@@ -432,11 +435,11 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                       <div className="text-xs text-muted-foreground space-y-1">
                         <div className="flex items-center gap-1">
                           <Check className="h-3 w-3 text-primary" />
-                          <span>Free cancellation up to 24 hours before check-in</span>
+                          <span>{t("hdm.free_cancellation_up_to_24_hours_before_", "Free cancellation up to 24 hours before check-in")}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Check className="h-3 w-3 text-primary" />
-                          <span>No prepayment needed - pay at the property</span>
+                          <span>{t("hdm.no_prepayment_needed_pay_at_the_property", "No prepayment needed - pay at the property")}</span>
                         </div>
                       </div>
                     </div>
@@ -457,7 +460,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {selectedRoomId && (
               <div className="sticky bottom-0 bg-background border-t pt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
+                <Button variant="outline" onClick={onClose}>{t("hdm.cancel", "Cancel")}</Button>
                 <Button onClick={() => {
                   const room = roomOptions.find(r => r.id === selectedRoomId);
                   if (room) onSelectRoom(room);
@@ -470,7 +473,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
           <TabsContent value="amenities" className="space-y-6 mt-4">
             <div>
-              <h3 className="text-lg font-semibold mb-4">All Amenities</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("hdm.all_amenities", "All Amenities")}</h3>
               
               <div className="space-y-6">
                 {/* Room Features */}
@@ -482,35 +485,35 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Air Conditioning</span>
+                      <span>{t("hdm.air_conditioning", "Air Conditioning")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Flat-screen TV</span>
+                      <span>{t("hdm.flat_screen_tv", "Flat-screen TV")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Mini Refrigerator</span>
+                      <span>{t("hdm.mini_refrigerator", "Mini Refrigerator")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Safe Deposit Box</span>
+                      <span>{t("hdm.safe_deposit_box", "Safe Deposit Box")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Coffee/Tea Maker</span>
+                      <span>{t("hdm.coffee_tea_maker", "Coffee/Tea Maker")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Iron & Ironing Board</span>
+                      <span>{t("hdm.iron_ironing_board", "Iron & Ironing Board")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Work Desk</span>
+                      <span>{t("hdm.work_desk", "Work Desk")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Blackout Curtains</span>
+                      <span>{t("hdm.blackout_curtains", "Blackout Curtains")}</span>
                     </div>
                   </div>
                 </div>
@@ -526,27 +529,27 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Private Bathroom</span>
+                      <span>{t("hdm.private_bathroom", "Private Bathroom")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Bathtub or Shower</span>
+                      <span>{t("hdm.bathtub_or_shower", "Bathtub or Shower")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Hairdryer</span>
+                      <span>{t("hdm.hairdryer", "Hairdryer")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Free Toiletries</span>
+                      <span>{t("hdm.free_toiletries", "Free Toiletries")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Bathrobes & Slippers</span>
+                      <span>{t("hdm.bathrobes_slippers", "Bathrobes & Slippers")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Hot Water</span>
+                      <span>{t("hdm.hot_water", "Hot Water")}</span>
                     </div>
                   </div>
                 </div>
@@ -566,31 +569,31 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Concierge Service</span>
+                      <span>{t("hdm.concierge_service", "Concierge Service")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Room Service</span>
+                      <span>{t("hdm.room_service", "Room Service")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Laundry Service</span>
+                      <span>{t("hdm.laundry_service", "Laundry Service")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Luggage Storage</span>
+                      <span>{t("hdm.luggage_storage", "Luggage Storage")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Express Check-in/out</span>
+                      <span>{t("hdm.express_check_in_out", "Express Check-in/out")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Currency Exchange</span>
+                      <span>{t("hdm.currency_exchange", "Currency Exchange")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Tour Desk</span>
+                      <span>{t("hdm.tour_desk", "Tour Desk")}</span>
                     </div>
                   </div>
                 </div>
@@ -606,27 +609,27 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>On-site Restaurant</span>
+                      <span>{t("hdm.on_site_restaurant", "On-site Restaurant")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Bar/Lounge</span>
+                      <span>{t("hdm.bar_lounge", "Bar/Lounge")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Breakfast Available</span>
+                      <span>{t("hdm.breakfast_available", "Breakfast Available")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Room Service</span>
+                      <span>{t("hdm.room_service", "Room Service")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Coffee Shop</span>
+                      <span>{t("hdm.coffee_shop", "Coffee Shop")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Vending Machines</span>
+                      <span>{t("hdm.vending_machines", "Vending Machines")}</span>
                     </div>
                   </div>
                 </div>
@@ -642,27 +645,27 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Fitness Center</span>
+                      <span>{t("hdm.fitness_center", "Fitness Center")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Swimming Pool</span>
+                      <span>{t("hdm.swimming_pool", "Swimming Pool")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Spa & Wellness Center</span>
+                      <span>{t("hdm.spa_wellness_center", "Spa & Wellness Center")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Sauna</span>
+                      <span>{t("hdm.sauna", "Sauna")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Hot Tub</span>
+                      <span>{t("hdm.hot_tub", "Hot Tub")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Massage Services</span>
+                      <span>{t("hdm.massage_services", "Massage Services")}</span>
                     </div>
                   </div>
                 </div>
@@ -678,19 +681,19 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Free WiFi (all areas)</span>
+                      <span>{t("hdm.free_wifi_all_areas", "Free WiFi (all areas)")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Business Center</span>
+                      <span>{t("hdm.business_center", "Business Center")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Meeting Rooms</span>
+                      <span>{t("hdm.meeting_rooms", "Meeting Rooms")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Fax/Photocopying</span>
+                      <span>{t("hdm.fax_photocopying", "Fax/Photocopying")}</span>
                     </div>
                   </div>
                 </div>
@@ -706,19 +709,19 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Free On-site Parking</span>
+                      <span>{t("hdm.free_on_site_parking", "Free On-site Parking")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Valet Parking</span>
+                      <span>{t("hdm.valet_parking", "Valet Parking")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Electric Vehicle Charging</span>
+                      <span>{t("hdm.electric_vehicle_charging", "Electric Vehicle Charging")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Airport Shuttle (surcharge)</span>
+                      <span>{t("hdm.airport_shuttle_surcharge", "Airport Shuttle (surcharge)")}</span>
                     </div>
                   </div>
                 </div>
@@ -734,19 +737,19 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Wheelchair Accessible</span>
+                      <span>{t("hdm.wheelchair_accessible", "Wheelchair Accessible")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Elevator</span>
+                      <span>{t("hdm.elevator", "Elevator")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Accessible Parking</span>
+                      <span>{t("hdm.accessible_parking", "Accessible Parking")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Lowered Sinks</span>
+                      <span>{t("hdm.lowered_sinks", "Lowered Sinks")}</span>
                     </div>
                   </div>
                 </div>
@@ -762,19 +765,19 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Cribs Available</span>
+                      <span>{t("hdm.cribs_available", "Cribs Available")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Children's Menu</span>
+                      <span>{t("hdm.children_s_menu", "Children's Menu")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Babysitting Service</span>
+                      <span>{t("hdm.babysitting_service", "Babysitting Service")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
-                      <span>Family Rooms</span>
+                      <span>{t("hdm.family_rooms", "Family Rooms")}</span>
                     </div>
                   </div>
                 </div>
@@ -785,7 +788,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
           <TabsContent value="location" className="space-y-6 mt-4">
             {/* Map */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Location & Map</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("hdm.location_map", "Location & Map")}</h3>
               <LazyHotelMap
                 latitude={hotelLatitude}
                 longitude={hotelLongitude}
@@ -803,40 +806,40 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {/* Nearby Attractions */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Nearby Landmarks & Attractions</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("hdm.nearby_landmarks_attractions", "Nearby Landmarks & Attractions")}</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-lg border">
                   <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <div className="font-medium">City Center</div>
+                    <div className="font-medium">{t("hdm.city_center", "City Center")}</div>
                     <div className="text-sm text-muted-foreground">0.5 miles • 10 min walk</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg border">
                   <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <div className="font-medium">Main Train Station</div>
+                    <div className="font-medium">{t("hdm.main_train_station", "Main Train Station")}</div>
                     <div className="text-sm text-muted-foreground">0.8 miles • 5 min drive</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg border">
                   <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <div className="font-medium">Museum District</div>
+                    <div className="font-medium">{t("hdm.museum_district", "Museum District")}</div>
                     <div className="text-sm text-muted-foreground">1.2 miles • 15 min walk</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg border">
                   <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <div className="font-medium">Shopping District</div>
+                    <div className="font-medium">{t("hdm.shopping_district", "Shopping District")}</div>
                     <div className="text-sm text-muted-foreground">1.5 miles • 10 min drive</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg border">
                   <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <div className="font-medium">International Airport</div>
+                    <div className="font-medium">{t("hdm.international_airport", "International Airport")}</div>
                     <div className="text-sm text-muted-foreground">12 miles • 25 min drive</div>
                   </div>
                 </div>
@@ -847,7 +850,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {/* Neighborhood Info */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">About the Neighborhood</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("hdm.about_the_neighborhood", "About the Neighborhood")}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                 Located in the vibrant heart of the city, this hotel offers unparalleled access to the area's 
                 best attractions, restaurants, and entertainment venues. The neighborhood is known for its 
@@ -865,22 +868,22 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
             {/* Getting Around */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Getting Around</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("hdm.getting_around", "Getting Around")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 rounded-lg border">
-                  <div className="font-medium mb-2">Public Transportation</div>
+                  <div className="font-medium mb-2">{t("hdm.public_transportation", "Public Transportation")}</div>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <div>Metro Station - 0.3 mi</div>
-                    <div>Bus Stop - 0.1 mi</div>
-                    <div>Tram Station - 0.4 mi</div>
+                    <div>{t("hdm.metro_station_0_3_mi", "Metro Station - 0.3 mi")}</div>
+                    <div>{t("hdm.bus_stop_0_1_mi", "Bus Stop - 0.1 mi")}</div>
+                    <div>{t("hdm.tram_station_0_4_mi", "Tram Station - 0.4 mi")}</div>
                   </div>
                 </div>
                 <div className="p-4 rounded-lg border">
-                  <div className="font-medium mb-2">Transportation Services</div>
+                  <div className="font-medium mb-2">{t("hdm.transportation_services", "Transportation Services")}</div>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <div>Airport Shuttle Available</div>
-                    <div>Taxi Stand Nearby</div>
-                    <div>Bike Rental - 0.2 mi</div>
+                    <div>{t("hdm.airport_shuttle_available", "Airport Shuttle Available")}</div>
+                    <div>{t("hdm.taxi_stand_nearby", "Taxi Stand Nearby")}</div>
+                    <div>{t("hdm.bike_rental_0_2_mi", "Bike Rental - 0.2 mi")}</div>
                   </div>
                 </div>
               </div>
@@ -906,10 +909,10 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
-                    <SelectItem value="highest">Highest Rated</SelectItem>
-                    <SelectItem value="lowest">Lowest Rated</SelectItem>
+                    <SelectItem value="newest">{t("hdm.newest_first", "Newest First")}</SelectItem>
+                    <SelectItem value="oldest">{t("hdm.oldest_first", "Oldest First")}</SelectItem>
+                    <SelectItem value="highest">{t("hdm.highest_rated", "Highest Rated")}</SelectItem>
+                    <SelectItem value="lowest">{t("hdm.lowest_rated", "Lowest Rated")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -919,7 +922,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
               {allReviews.length === 0 ? (
                 <div className="py-12 text-center">
                   <Star className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-                  <h3 className="text-lg font-semibold mb-2">No reviews available</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t("hdm.no_reviews_available", "No reviews available")}</h3>
                   <p className="text-sm text-muted-foreground">
                     This property doesn't have verified reviews yet.
                   </p>
@@ -964,7 +967,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
           <TabsContent value="photos" className="mt-4">
             {customerPhotos.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-muted-foreground">No verified photos available for this property yet.</p>
+                <p className="text-muted-foreground">{t("hdm.no_verified_photos_available_for_this_pr", "No verified photos available for this property yet.")}</p>
               </div>
             ) : (
               <>
