@@ -77,6 +77,40 @@ export function GetVerifiedCard({ role }: { role: Role }) {
     }
   }, []);
 
+  const invoke = async (fn: string, kind: typeof busy, body: Record<string, unknown> = {}) => {
+    if (busy) return;
+    setBusy(kind);
+    setError(false);
+    setErrorDetail(null);
+    try {
+      const { data, error } = await supabase.functions.invoke(fn, { body });
+      if (error) {
+        // Pull the real message out of the edge function's error response so
+        // setup problems (e.g. a missing price secret) are visible on sight.
+        let detail = error.message ?? String(error);
+        try {
+          const body = await (error as any)?.context?.json?.();
+          if (body?.error) detail = body.error;
+        } catch { /* keep generic detail */ }
+        console.error(`[GoldsainteVerified] ${fn} failed:`, detail, error);
+        throw new Error(detail);
+      }
+      if (data?.recovered) {
+        // The server found an existing paid subscription and repaired the
+        // profile — no new charge. Refresh into the subscribed state.
+        await fetchState();
+        setBusy("");
+        return;
+      }
+      if (!data?.url) throw new Error("No redirect URL returned");
+      window.location.href = data.url;
+    } catch (e: any) {
+      setError(true);
+      setErrorDetail(typeof e?.message === "string" ? e.message : null);
+      setBusy("");
+    }
+  };
+
   useEffect(() => {
     fetchState();
   }, [fetchState]);
@@ -112,45 +146,26 @@ export function GetVerifiedCard({ role }: { role: Role }) {
         params.delete("verification");
         const qs = params.toString();
         window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
+        // One continuous motion (the Meta lesson): payment confirmed but the
+        // ID half still missing → chain straight into Stripe Identity instead
+        // of stranding the user on another button.
+        if (fresh?.verification_active && !fresh?.identity_verified) {
+          const { data: auth } = await supabase.auth.getUser();
+          if (auth.user) {
+            invoke("create-identity-verification", "identity", {
+              email: auth.user.email,
+              userId: auth.user.id,
+              applicationType: role,
+              returnUrl: `${window.location.origin}/settings?identity=complete`,
+            });
+          }
+        }
       }
     }, 1500);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const invoke = async (fn: string, kind: typeof busy, body: Record<string, unknown> = {}) => {
-    if (busy) return;
-    setBusy(kind);
-    setError(false);
-    setErrorDetail(null);
-    try {
-      const { data, error } = await supabase.functions.invoke(fn, { body });
-      if (error) {
-        // Pull the real message out of the edge function's error response so
-        // setup problems (e.g. a missing price secret) are visible on sight.
-        let detail = error.message ?? String(error);
-        try {
-          const body = await (error as any)?.context?.json?.();
-          if (body?.error) detail = body.error;
-        } catch { /* keep generic detail */ }
-        console.error(`[GoldsainteVerified] ${fn} failed:`, detail, error);
-        throw new Error(detail);
-      }
-      if (data?.recovered) {
-        // The server found an existing paid subscription and repaired the
-        // profile — no new charge. Refresh into the subscribed state.
-        await fetchState();
-        setBusy("");
-        return;
-      }
-      if (!data?.url) throw new Error("No redirect URL returned");
-      window.location.href = data.url;
-    } catch (e: any) {
-      setError(true);
-      setErrorDetail(typeof e?.message === "string" ? e.message : null);
-      setBusy("");
-    }
-  };
 
   const name = state?.full_name || t("gv.you", "You");
   const subscribed = !!state?.verification_active;
