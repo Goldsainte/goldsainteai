@@ -8,13 +8,34 @@
 //
 // All money actions go through edge functions; prices shown here are labels only —
 // the real price is resolved server-side from the user's role.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
 import { Loader2 } from "lucide-react";
 
 type Role = "agent" | "creator" | "traveler";
+
+// Private copy of the gold seal. This settings-only card deliberately does NOT
+// import the shared seal module used by public marketplace/profile chunks:
+// that import welded the settings chunk into the public chunk graph and
+// produced a Rollup chunk-order TDZ crash in production. Keep this local.
+function SealGlyph({ size = 16, className = "" }: { size?: number; className?: string }) {
+  const gid = useId();
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={`inline-block align-middle shrink-0 ${className}`} role="img" aria-label="Goldsainte Verified">
+      <defs>
+        <linearGradient id={gid} x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#EDD494" />
+          <stop offset="0.45" stopColor="#C9A14C" />
+          <stop offset="1" stopColor="#9A7A2E" />
+        </linearGradient>
+      </defs>
+      <path d="M23 12l-2.44-2.79.34-3.69-3.61-.82-1.89-3.2L12 2.96 8.6 1.5 6.71 4.69l-3.61.82.34 3.69L1 12l2.44 2.79-.34 3.7 3.61.82L8.6 22.5l3.4-1.47 3.4 1.46 1.89-3.19 3.61-.82-.34-3.69L23 12z" fill={`url(#${gid})`} />
+      <path d="M23 12l-2.44-2.79.34-3.69-3.61-.82-1.89-3.2L12 2.96 8.6 1.5 6.71 4.69l-3.61.82.34 3.69L1 12l2.44 2.79-.34 3.7 3.61.82L8.6 22.5l3.4-1.47 3.4 1.46 1.89-3.19 3.61-.82-.34-3.69L23 12z" fill="none" stroke="#8A6B28" strokeWidth="0.6" opacity="0.55" />
+      <path d="M10.09 16.72l-3.8-3.81 1.48-1.48 2.32 2.33 5.85-5.87 1.48 1.48z" fill="#FFFFFF" />
+    </svg>
+  );
+}
 
 const PRICE_LABEL: Record<Role, string> = {
   agent: "$8.99",
@@ -147,7 +168,7 @@ export function GetVerifiedCard({ role }: { role: Role }) {
   return (
     <section className="rounded-3xl border border-[#E5DFC6] bg-[#FDFBF7] p-6 md:p-8">
       <h2 className="font-secondary text-2xl text-[#0a2225] flex items-center gap-2">
-        {t("gv.title", "Goldsainte Verified")} <VerifiedSeal size={20} />
+        {t("gv.title", "Goldsainte Verified")} <SealGlyph size={20} />
       </h2>
 
       {/* ---- Preview: your name wearing the seal (the IG moment) ---- */}
@@ -158,7 +179,7 @@ export function GetVerifiedCard({ role }: { role: Role }) {
           <div className="h-12 w-12 rounded-full bg-[#0c4d47]/10 border border-[#E5DFC6]" />
         )}
         <span className="text-[16px] font-medium text-[#0a2225] inline-flex items-center gap-1.5">
-          {name} <VerifiedSeal size={16} />
+          {name} <SealGlyph size={16} />
         </span>
       </div>
 
@@ -219,15 +240,15 @@ export function GetVerifiedCard({ role }: { role: Role }) {
         <>
           <ul className="mt-5 space-y-2.5 text-[14px] text-[#0a2225]/85">
             <li className="flex gap-2.5">
-              <VerifiedSeal size={15} className="mt-0.5" />
+              <SealGlyph size={15} className="mt-0.5" />
               {t("gv.b1", "The gold seal beside your name — on your profile, cards, proposals, and messages.")}
             </li>
             <li className="flex gap-2.5">
-              <VerifiedSeal size={15} className="mt-0.5" />
+              <SealGlyph size={15} className="mt-0.5" />
               {t("gv.b2", "Backed by a real identity check, so travelers know the seal means something.")}
             </li>
             <li className="flex gap-2.5">
-              <VerifiedSeal size={15} className="mt-0.5" />
+              <SealGlyph size={15} className="mt-0.5" />
               {t("gv.b3", "A receipt lands in your inbox at signup and after every monthly renewal.")}
             </li>
           </ul>
