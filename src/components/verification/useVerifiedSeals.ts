@@ -22,13 +22,15 @@ export function useVerifiedSeals(ids: Array<string | null | undefined>): Map<str
     missing.forEach((id) => inFlight.add(id));
     (async () => {
       try {
+        // profiles RLS hides other users' rows, so seal lookups go through the
+        // public verified_seals view: presence in the view = wears the seal.
         const { data } = await supabase
-          .from("profiles")
-          .select("id, verification_active, identity_verified")
+          .from("verified_seals" as any)
+          .select("id")
           .in("id", missing);
         missing.forEach((id) => cache.set(id, false));
         (data ?? []).forEach((row: any) => {
-          cache.set(row.id, !!row.verification_active && !!row.identity_verified);
+          cache.set(row.id, true);
         });
       } catch {
         missing.forEach((id) => cache.set(id, false)); // fail-open: no seal, no crash
