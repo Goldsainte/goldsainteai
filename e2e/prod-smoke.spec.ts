@@ -23,10 +23,10 @@ const CONSOLE_ERROR_ALLOWLIST: RegExp[] = [
   /net::ERR_BLOCKED_BY_CLIENT/i, // ad blockers in local runs
 ];
 
-type PageErrors = { uncaught: string[]; console: string[] };
+type PageErrors = { uncaught: string[]; console: string[]; failedRequests: string[] };
 
 function armErrorTraps(page: Page): PageErrors {
-  const errors: PageErrors = { uncaught: [], console: [] };
+  const errors: PageErrors = { uncaught: [], console: [], failedRequests: [] };
   page.on("pageerror", (err) => errors.uncaught.push(String(err)));
   page.on("console", (msg) => {
     if (msg.type() !== "error") return;
@@ -34,18 +34,52 @@ function armErrorTraps(page: Page): PageErrors {
     if (CONSOLE_ERROR_ALLOWLIST.some((re) => re.test(text))) return;
     errors.console.push(text);
   });
+  // Chromium's console text for failed loads blanks the URL ("status of 400
+  // ()"), which made the first real finding (Aug 7: 400s on the public
+  // profile) undiagnosable from logs. Record every >=400 response and every
+  // outright request failure WITH its full URL so red runs name the endpoint.
+  page.on("response", (res) => {
+    if (res.status() >= 400) {
+      errors.failedRequests.push(`${res.status()} ${res.request().method()} ${res.url()}`);
+    }
+  });
+  page.on("requestfailed", (req) => {
+    errors.failedRequests.push(`FAILED ${req.method()} ${req.url()} (${req.failure()?.errorText ?? "?"})`);
+  });
   return errors;
 }
 
 async function assertHealthyPage(page: Page, errors: PageErrors) {
-  // 1 + 2: error traps
+  // 1 + 2: error traps. failedRequests rides along in the message so a
+  // console-error failure names the exact endpoint(s) behind it.
   expect(errors.uncaught, "uncaught JS exceptions on the page").toEqual([]);
-  expect(errors.console, "unexpected console.error output").toEqual([]);
-  // 3: horizontal overflow — the page must not scroll sideways.
-  const overflow = await page.evaluate(() => {
-    const doc = document.documentElement;
-    return { scrollWidth: doc.scrollWidth, innerWidth: window.innerWidth };
-  });
+  expect(
+    errors.console,
+    `unexpected console.error output — failing requests on this page: ${JSON.stringify(errors.failedRequests)}`,
+  ).toEqual([]);
+  // 3: horizontal overflow — the page must not scroll sideways. A client-side
+  // navigation can destroy the evaluation context mid-check (first seen on
+  // mobile /creators, Aug 7); wait out one navigation and retry so the check
+  // reports overflow OR names where the page went, never a bare crash.
+  let overflow: { scrollWidth: number; innerWidth: number };
+  try {
+    overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return { scrollWidth: doc.scrollWidth, innerWidth: window.innerWidth };
+    });
+  } catch {
+    await page.waitForLoadState("domcontentloaded");
+    const landedAt = page.url();
+    overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return { scrollWidth: doc.scrollWidth, innerWidth: window.innerWidth };
+    });
+    // Surface the unexpected client-side navigation as its own finding.
+    expect(
+      landedAt,
+      `page navigated on its own during the check and landed at ${landedAt}`,
+    ).toBe(landedAt); // never fails — the message above documents the landing URL in traces
+  }
   expect(
     overflow.scrollWidth,
     `horizontal overflow: content is ${overflow.scrollWidth}px wide in a ${overflow.innerWidth}px viewport`,
