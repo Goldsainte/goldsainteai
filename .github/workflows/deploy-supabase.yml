@@ -48,12 +48,20 @@ jobs:
         with:
           version: latest
 
-      - name: Link project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      # NOTE (Aug 7 2026): the standalone "Link project" step was removed.
+      # `supabase link` fetches the project's api keys, and on the evening of
+      # Aug 7 Supabase's platform began returning them in a shape the CLI's
+      # validator rejects ("failed to get api keys: SchemaError ... inserted_at"),
+      # killing every deploy at the link step. Link was never needed for the
+      # functions deploy below (it already passes --project-ref and uses
+      # SUPABASE_ACCESS_TOKEN); only `db push` needs a linked project, so the
+      # link now lives inside that rarely-used step.
 
       - name: Push database migrations
         if: ${{ github.event.inputs.skip_db_push == 'false' }}
-        run: supabase db push
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push
 
       - name: Deploy edge functions
         # esm.sh (the CDN functions import from) occasionally times out
