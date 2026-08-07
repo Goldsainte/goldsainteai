@@ -538,6 +538,19 @@ async function createPaymentNotification(
  * Handle subscription created/updated
  */
 // ============ Goldsainte Verified helpers ============
+// Stripe API versions from 2025 onward moved current_period_start/end off the
+// Subscription object onto its SubscriptionItems. Resolve from either shape
+// and never hand an invalid value to Date.
+function getPeriodEnd(sub: {
+  current_period_end?: number | null;
+  items?: { data?: Array<{ current_period_end?: number | null }> };
+}): number | null {
+  const v = sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end;
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+function toIsoOrNull(epochSeconds: number | null): string | null {
+  return epochSeconds == null ? null : new Date(epochSeconds * 1000).toISOString();
+}
 const VERIFICATION_PLAN_NAMES: Record<string, string> = {
   agent: "Goldsainte Verified — Agent",
   creator: "Goldsainte Verified — Creator",
@@ -565,10 +578,11 @@ async function syncVerificationProfile(
   subscription: SubscriptionWithMetadata,
   logger: Logger
 ): Promise<{ becameActive: boolean }> {
-  const { metadata, id, status, current_period_end } = subscription;
+  const { metadata, id, status } = subscription;
   const userId = metadata.user_id;
   const role = (metadata as Record<string, string>).verification_role || "traveler";
   const active = status === "active" || status === "trialing";
+  const periodEndIso = toIsoOrNull(getPeriodEnd(subscription));
 
   const { data: before } = await supabaseClient
     .from("profiles")
@@ -582,7 +596,7 @@ async function syncVerificationProfile(
       verification_active: active,
       verification_role: role,
       verification_subscription_id: id,
-      verification_period_end: new Date(current_period_end * 1000).toISOString(),
+      verification_period_end: periodEndIso,
     })
     .eq("id", userId);
   if (error) {
@@ -597,8 +611,12 @@ async function handleSubscriptionUpdated(
   subscription: SubscriptionWithMetadata,
   logger: Logger
 ): Promise<void> {
-  const { metadata, id, customer, status, current_period_start, current_period_end, cancel_at_period_end, items } = subscription;
+  const { metadata, id, customer, status, cancel_at_period_end, items } = subscription;
   const { user_id, tier } = metadata;
+  const _rawStart = (subscription as any).current_period_start ?? items?.data?.[0]?.current_period_start;
+  const _rawEnd = (subscription as any).current_period_end ?? (items?.data?.[0] as any)?.current_period_end;
+  const current_period_start = typeof _rawStart === "number" && Number.isFinite(_rawStart) ? _rawStart : Math.floor(Date.now() / 1000);
+  const current_period_end = typeof _rawEnd === "number" && Number.isFinite(_rawEnd) ? _rawEnd : Math.floor(Date.now() / 1000);
 
   // Goldsainte Verified subscriptions have their own profile sync + welcome receipt.
   if (metadata.subscription_type === "verification" && user_id) {
@@ -620,7 +638,7 @@ async function handleSubscriptionUpdated(
             name: prof.full_name || "",
             planName: VERIFICATION_PLAN_NAMES[role] || VERIFICATION_PLAN_NAMES.traveler,
             amount: formatAmount(item?.price?.unit_amount, item?.price?.currency),
-            nextBillingDate: new Date(current_period_end * 1000).toISOString().slice(0, 10),
+            nextBillingDate: (toIsoOrNull(getPeriodEnd(subscription)) ?? "").slice(0, 10),
           },
         });
       }
@@ -1177,9 +1195,7 @@ serve(async (req: Request) => {
                     planName: VERIFICATION_PLAN_NAMES[role] || VERIFICATION_PLAN_NAMES.traveler,
                     amount: formatAmount(invoice.amount_paid, invoice.currency),
                     invoiceNumber: invoice.number || invoice.id,
-                    periodEnd: sub.current_period_end
-                      ? new Date(sub.current_period_end * 1000).toISOString().slice(0, 10)
-                      : "",
+                    periodEnd: (toIsoOrNull(getPeriodEnd(sub as any)) ?? "").slice(0, 10),
                   },
                 });
               }
@@ -1188,9 +1204,7 @@ serve(async (req: Request) => {
                 .from("profiles")
                 .update({
                   verification_active: true,
-                  verification_period_end: sub.current_period_end
-                    ? new Date(sub.current_period_end * 1000).toISOString()
-                    : null,
+                  verification_period_end: toIsoOrNull(getPeriodEnd(sub as any)),
                 })
                 .eq("id", meta.user_id);
             }
