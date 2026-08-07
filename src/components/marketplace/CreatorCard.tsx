@@ -1,3 +1,5 @@
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { useNavigate } from "react-router-dom";
 import { BadgeCheck } from "lucide-react";
@@ -22,6 +24,7 @@ interface CreatorCardProps {
 }
 
 export const CreatorCard = ({ creator }: CreatorCardProps) => {
+  const sealMap = useVerifiedSeals([creator.id]);
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -64,7 +67,7 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <span className="font-secondary text-base font-semibold text-[#0a2225]">
-              {creator.full_name || creator.username}
+              <span className="inline-flex items-center gap-1.5">{creator.full_name || creator.username}{sealMap.get(creator.id) && <VerifiedSeal size={15} />}</span>
             </span>
             {creator.identity_verified && (
               <span className="inline-flex items-center gap-1 rounded-full bg-[#C7A962]/10 px-2 py-0.5 text-[10px] font-medium text-[#0a2225]">
