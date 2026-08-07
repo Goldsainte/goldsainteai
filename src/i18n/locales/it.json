@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "Facilitazione di terzi neutrale se necessario",
     "binding_resolution_through_aaa": "Risoluzione vincolante tramite AAA",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "Tu",
+    "activeLine": "Il tuo sigillo dorato è attivo ovunque su Goldsainte.",
+    "renews": "Si rinnova il {{date}} · ricevuta via email ogni mese",
+    "manage": "Gestisci abbonamento",
+    "oneStep": "Manca un passo: conferma la tua identità per mostrare il sigillo.",
+    "idWhy": "Ogni sigillo su Goldsainte poggia su una vera verifica d'identità — è questo che gli dà valore.",
+    "confirmId": "Conferma la mia identità",
+    "b1": "Il sigillo dorato accanto al tuo nome — su profilo, card, proposte e messaggi.",
+    "b2": "Sostenuto da una vera verifica d'identità: i viaggiatori sanno che significa qualcosa.",
+    "b3": "Una ricevuta arriva nella tua casella all'iscrizione e dopo ogni rinnovo mensile.",
+    "perMonth": "/mese · annulli quando vuoi",
+    "cta": "Fatti verificare",
+    "error": "Qualcosa è andato storto — riprova."
   }
 }
