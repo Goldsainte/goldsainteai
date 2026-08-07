@@ -586,6 +586,7 @@ export function DirectMessageInbox() {
                   <ConversationItem
                     key={conv.id}
                     conversation={conv}
+                    sealed={!!sealMap.get(conv.otherParticipant.id)}
                     isActive={selectedConversation?.id === conv.id}
                     onClick={() => handleSelectConversation(conv)}
                     onDelete={activeTab === "archived" ? async () => {
@@ -980,11 +981,16 @@ function ConversationItem({
   isActive,
   onClick,
   onDelete,
+  sealed,
 }: {
   conversation: Conversation;
   isActive: boolean;
   onClick: () => void;
   onDelete?: () => void;
+  // Passed down from DirectMessageInbox's sealMap — this component must not
+  // reference sealMap directly (it's a separate function; free identifiers
+  // compile fine and then ReferenceError at runtime — the Aug 7 /messages crash).
+  sealed?: boolean;
 }) {
   // Instagram-style compact relative time: 5m, 2h, 3d, 2w.
   const compactTime = (iso: string) => {
@@ -1017,7 +1023,7 @@ function ConversationItem({
             <p className={`truncate text-[16px] leading-5 ${unread ? "font-semibold text-[#0a2225]" : "font-normal text-[#0a2225]"}`}>
               <span className="inline-flex items-center gap-1.5">
                 {conversation.otherParticipant.displayName}
-                {sealMap.get(conversation.otherParticipant.id) && <VerifiedSeal size={13} />}
+                {sealed && <VerifiedSeal size={13} />}
               </span>
             </p>
             {conversation.tripTitle && (
