@@ -8,7 +8,7 @@
 //
 // All money actions go through edge functions; prices shown here are labels only —
 // the real price is resolved server-side from the user's role.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
@@ -35,34 +35,75 @@ export function GetVerifiedCard({ role }: { role: Role }) {
   const [state, setState] = useState<ProfileState | null>(null);
   const [busy, setBusy] = useState<"" | "checkout" | "identity" | "portal">("");
   const [error, setError] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [finalizing, setFinalizing] = useState(false);
+
+  const fetchState = useCallback(async (): Promise<ProfileState | null> => {
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("verification_active, verification_period_end, stripe_verified_at, full_name, avatar_url")
+        .eq("id", auth.user.id)
+        .single();
+      if (data) setState(data as ProfileState);
+      return (data as ProfileState) ?? null;
+    } catch {
+      return null; /* fail-open */
+    }
+  }, []);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { data: auth } = await supabase.auth.getUser();
-        if (!auth.user) return;
-        const { data } = await supabase
-          .from("profiles")
-          .select("verification_active, verification_period_end, stripe_verified_at, full_name, avatar_url")
-          .eq("id", auth.user.id)
-          .single();
-        if (data) setState(data as ProfileState);
-      } catch {
-        /* fail-open: card simply stays in loading-less default */
+    fetchState();
+  }, [fetchState]);
+
+  // Returning from Stripe with ?verification=success: the webhook may still be
+  // in flight, so acknowledge the payment and poll briefly until the seal
+  // state lands, then clean the URL.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("verification") !== "success") return;
+    setFinalizing(true);
+    let attempts = 0;
+    const timer = setInterval(async () => {
+      attempts += 1;
+      const fresh = await fetchState();
+      if (fresh?.verification_active || attempts >= 8) {
+        clearInterval(timer);
+        setFinalizing(false);
+        params.delete("verification");
+        const qs = params.toString();
+        window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
       }
-    })();
+    }, 1500);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const invoke = async (fn: string, kind: typeof busy) => {
     if (busy) return;
     setBusy(kind);
     setError(false);
+    setErrorDetail(null);
     try {
       const { data, error } = await supabase.functions.invoke(fn, { body: {} });
-      if (error || !data?.url) throw error ?? new Error("no url");
+      if (error) {
+        // Pull the real message out of the edge function's error response so
+        // setup problems (e.g. a missing price secret) are visible on sight.
+        let detail = error.message ?? String(error);
+        try {
+          const body = await (error as any)?.context?.json?.();
+          if (body?.error) detail = body.error;
+        } catch { /* keep generic detail */ }
+        console.error(`[GoldsainteVerified] ${fn} failed:`, detail, error);
+        throw new Error(detail);
+      }
+      if (!data?.url) throw new Error("No redirect URL returned");
       window.location.href = data.url;
-    } catch {
+    } catch (e: any) {
       setError(true);
+      setErrorDetail(typeof e?.message === "string" ? e.message : null);
       setBusy("");
     }
   };
@@ -98,7 +139,12 @@ export function GetVerifiedCard({ role }: { role: Role }) {
         </span>
       </div>
 
-      {fullyVerified ? (
+      {finalizing && !subscribed ? (
+        <p className="mt-4 text-[14px] text-[#0c4d47] inline-flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {t("gv.finalizing", "Payment received — activating your seal\u2026")}
+        </p>
+      ) : fullyVerified ? (
         <>
           <p className="mt-4 text-[14px] text-[#0a2225]/80">
             {t("gv.activeLine", "Your gold seal is active everywhere on Goldsainte.")}
@@ -164,9 +210,14 @@ export function GetVerifiedCard({ role }: { role: Role }) {
       )}
 
       {error && (
-        <p className="mt-3 text-[13px] text-red-700/80">
-          {t("gv.error", "Something went wrong — please try again.")}
-        </p>
+        <div className="mt-3">
+          <p className="text-[13px] text-red-700/80">
+            {t("gv.error", "Something went wrong — please try again.")}
+          </p>
+          {errorDetail && (
+            <p className="mt-1 text-[11.5px] font-mono text-red-700/60 break-words">{errorDetail}</p>
+          )}
+        </div>
       )}
     </section>
   );
