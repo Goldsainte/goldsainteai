@@ -123,7 +123,11 @@ export default function CreatorProfileForaPage() {
           .from("reviews")
           .select("id, comment, rating, created_at, reviewer_id, booking_id", { count: "exact" })
           .eq("creator_id", id) // reviews table keys the reviewed party by role: agent_id / creator_id (no reviewee_id column)
-          .eq("is_public", true)
+          // No is_public filter: reviews has NO such column (verified against
+          // live PostgREST, Aug 7 — the phantom filter 400'd this query on
+          // EVERY public profile view since shipping, silently blanking the
+          // reviews section; the synthetic monitor caught it). Row visibility
+          // is RLS's job, not a client-side flag.
           .order("created_at", { ascending: false })
           .limit(30);
         const rows = reviewRows ?? [];
