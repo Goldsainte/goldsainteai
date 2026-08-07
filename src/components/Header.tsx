@@ -399,7 +399,7 @@ export const Header = () => {
 
 
                             <DropdownMenuItem
-                              onClick={() => navigate(isAgentAccount ? '/agent-settings' : isCreator ? '/creator-settings' : '/travel-settings')}
+                              onClick={() => navigate(isAgentAccount ? '/agent-settings' : isCreator ? '/creator-settings' : '/traveler?tab=settings')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Settings className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
@@ -796,7 +796,7 @@ export const Header = () => {
 
 
                             <DropdownMenuItem
-                              onClick={() => navigate(isAgentAccount ? '/agent-settings' : isCreator ? '/creator-settings' : '/travel-settings')}
+                              onClick={() => navigate(isAgentAccount ? '/agent-settings' : isCreator ? '/creator-settings' : '/traveler?tab=settings')}
                               className="mx-2 px-4 py-3 min-h-[44px] gap-4 cursor-pointer rounded-2xl hover:bg-[#f7f3ea] focus:bg-[#f7f3ea] touch-manipulation"
                             >
                               <Settings className="h-5 w-5 text-[#0a2225] flex-shrink-0" />
