@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "필요시 중립적 제3자 진행",
     "binding_resolution_through_aaa": "AAA를 통한 구속력 있는 해결",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "나",
+    "activeLine": "골드 인증 씰이 Goldsainte 전체에서 활성화되어 있습니다.",
+    "renews": "{{date}} 갱신 · 매월 영수증 이메일 발송",
+    "manage": "구독 관리",
+    "oneStep": "마지막 한 단계: 신원을 확인하면 씰이 표시됩니다.",
+    "idWhy": "Goldsainte의 모든 씰은 실제 신원 확인으로 뒷받침됩니다 — 그래서 가치가 있습니다.",
+    "confirmId": "신원 확인하기",
+    "b1": "이름 옆의 골드 씰 — 프로필, 카드, 제안, 메시지에 표시됩니다.",
+    "b2": "실제 신원 확인으로 뒷받침되어 여행자가 그 의미를 신뢰합니다.",
+    "b3": "가입 시와 매월 갱신 후 영수증이 메일로 도착합니다.",
+    "perMonth": "/월 · 언제든 해지 가능",
+    "cta": "인증 받기",
+    "error": "문제가 발생했습니다 — 다시 시도해주세요."
   }
 }
