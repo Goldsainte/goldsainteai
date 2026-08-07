@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "如需可由中立第三方协调",
     "binding_resolution_through_aaa": "经 AAA 作出有约束力的裁决",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "你",
+    "activeLine": "你的金色认证徽章已在 Goldsainte 全站生效。",
+    "renews": "{{date}} 续订 · 每月邮件发送收据",
+    "manage": "管理订阅",
+    "oneStep": "最后一步：完成身份核验即可展示徽章。",
+    "idWhy": "Goldsainte 的每枚徽章都以真实身份核验为支撑 — 这正是它的价值所在。",
+    "confirmId": "核验我的身份",
+    "b1": "你名字旁的金色徽章 — 展示在主页、卡片、提案和消息中。",
+    "b2": "以真实身份核验为支撑，旅行者知道它货真价实。",
+    "b3": "开通时及每月续费后，收据都会发送到你的邮箱。",
+    "perMonth": "/月 · 随时可取消",
+    "cta": "获取认证",
+    "error": "出了点问题 — 请重试。"
   }
 }
