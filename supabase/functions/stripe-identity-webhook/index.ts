@@ -1349,7 +1349,7 @@ serve(async (req: Request) => {
           if (event.type === "identity.verification_session.verified") {
             try {
               const meta = (verificationSession.metadata ?? {}) as Record<string, string>;
-              const stamp = { identity_verified_at: new Date().toISOString() };
+              const stamp = { identity_verified: true };
               if (meta.user_id) {
                 await supabaseClient.from("profiles").update(stamp).eq("id", meta.user_id);
                 logger.info("Profile identity stamped by user_id", { userId: meta.user_id });
@@ -1362,7 +1362,7 @@ serve(async (req: Request) => {
                 });
               }
             } catch (stampError: any) {
-              logger.error("Failed to stamp profiles.identity_verified_at", {
+              logger.error("Failed to stamp profiles.identity_verified", {
                 error: stampError.message,
               });
             }
