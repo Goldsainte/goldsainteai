@@ -25,7 +25,7 @@ const PRICE_LABEL: Record<Role, string> = {
 interface ProfileState {
   verification_active: boolean;
   verification_period_end: string | null;
-  stripe_verified_at: string | null;
+  identity_verified: boolean | null;
   full_name: string | null;
   avatar_url: string | null;
 }
@@ -37,14 +37,16 @@ export function GetVerifiedCard({ role }: { role: Role }) {
   const [error, setError] = useState(false);
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [finalizing, setFinalizing] = useState(false);
+  const [authUser, setAuthUser] = useState<{ id: string; email: string } | null>(null);
 
   const fetchState = useCallback(async (): Promise<ProfileState | null> => {
     try {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) return null;
+      setAuthUser({ id: auth.user.id, email: auth.user.email ?? "" });
       const { data } = await supabase
         .from("profiles")
-        .select("verification_active, verification_period_end, stripe_verified_at, full_name, avatar_url")
+        .select("verification_active, verification_period_end, identity_verified, full_name, avatar_url")
         .eq("id", auth.user.id)
         .single();
       if (data) setState(data as ProfileState);
@@ -81,13 +83,13 @@ export function GetVerifiedCard({ role }: { role: Role }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const invoke = async (fn: string, kind: typeof busy) => {
+  const invoke = async (fn: string, kind: typeof busy, body: Record<string, unknown> = {}) => {
     if (busy) return;
     setBusy(kind);
     setError(false);
     setErrorDetail(null);
     try {
-      const { data, error } = await supabase.functions.invoke(fn, { body: {} });
+      const { data, error } = await supabase.functions.invoke(fn, { body });
       if (error) {
         // Pull the real message out of the edge function's error response so
         // setup problems (e.g. a missing price secret) are visible on sight.
@@ -117,7 +119,7 @@ export function GetVerifiedCard({ role }: { role: Role }) {
 
   const name = state?.full_name || t("gv.you", "You");
   const subscribed = !!state?.verification_active;
-  const idPassed = !!state?.stripe_verified_at;
+  const idPassed = !!state?.identity_verified;
   const fullyVerified = subscribed && idPassed;
   const renewDate = state?.verification_period_end
     ? new Date(state.verification_period_end).toLocaleDateString()
@@ -177,7 +179,19 @@ export function GetVerifiedCard({ role }: { role: Role }) {
             {t("gv.idWhy", "Every seal on Goldsainte is backed by a real identity check — that's what makes it worth wearing.")}
           </p>
           <div className="mt-5 space-y-2.5">
-            <button type="button" className={goldBtn} disabled={busy !== ""} onClick={() => invoke("create-identity-verification", "identity")}>
+            <button
+              type="button"
+              className={goldBtn}
+              disabled={busy !== ""}
+              onClick={() =>
+                invoke("create-identity-verification", "identity", {
+                  email: authUser?.email,
+                  userId: authUser?.id,
+                  applicationType: role,
+                  returnUrl: `${window.location.origin}/settings?identity=complete`,
+                })
+              }
+            >
               {busy === "identity" && <Loader2 className="h-4 w-4 animate-spin" />}
               {t("gv.confirmId", "Confirm my identity")}
             </button>
