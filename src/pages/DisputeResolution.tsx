@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +29,7 @@ const disputeSchema = z.object({
 type DisputeFormValues = z.infer<typeof disputeSchema>;
 
 const DisputeResolution = () => {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -59,8 +61,8 @@ const DisputeResolution = () => {
       if (data && (data as any).error) throw new Error((data as any).error);
 
       toast({
-        title: "Dispute Submitted",
-        description: "Your dispute has been submitted successfully. We will review it within 30 days.",
+        title: t("dr.dispute_submitted", "Dispute Submitted"),
+        description: t("dr.your_dispute_has_been_submitted_successf", "Your dispute has been submitted successfully. We will review it within 30 days."),
       });
 
       form.reset();
@@ -68,8 +70,8 @@ const DisputeResolution = () => {
     } catch (error) {
       console.error("Error submitting dispute:", error);
       toast({
-        title: "Submission Failed",
-        description: "There was an error submitting your dispute. Please try again.",
+        title: t("dr.submission_failed", "Submission Failed"),
+        description: t("dr.there_was_an_error_submitting_your_dispu", "There was an error submitting your dispute. Please try again."),
         variant: "destructive",
       });
     } finally {
@@ -82,16 +84,16 @@ const DisputeResolution = () => {
       <BackButton className="mb-6" />
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Dispute Resolution</h1>
+        <h1 className="text-4xl font-bold mb-4">{t("dr.dispute_resolution", "Dispute Resolution")}</h1>
         <p className="text-muted-foreground text-lg">
           We are committed to resolving any disputes fairly and efficiently. Please use the form below to submit your dispute.
         </p>
         <div className="mt-4 rounded-xl border border-[#E5DFC6] bg-[#F5F0E0]/50 p-4 flex items-center justify-between gap-4">
           <p className="text-sm text-[#0a2225]">
-            <strong>Have an existing booking issue?</strong> You can file a dispute directly from your booking details page for faster resolution.
+            <strong>{t("dr.have_an_existing_booking_issue", "Have an existing booking issue?")}</strong> You can file a dispute directly from your booking details page for faster resolution.
           </p>
           <Button variant="outline" size="sm" asChild className="shrink-0">
-            <a href="/my-bookings">My Bookings</a>
+            <a href="/my-bookings">{t("dr.my_bookings", "My Bookings")}</a>
           </Button>
         </div>
       </div>
@@ -101,7 +103,7 @@ const DisputeResolution = () => {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Submit a Dispute</CardTitle>
+              <CardTitle>{t("dr.submit_a_dispute", "Submit a Dispute")}</CardTitle>
               <CardDescription>
                 Fill out this form to initiate the dispute resolution process. We will respond within 30 days.
               </CardDescription>
@@ -117,7 +119,7 @@ const DisputeResolution = () => {
                         <FormItem>
                           <FormLabel>Full Name *</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" {...field} />
+                            <Input placeholder={t("dr.john_doe", "John Doe")} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -145,7 +147,7 @@ const DisputeResolution = () => {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
+                          <FormLabel>{t("dr.phone_number", "Phone Number")}</FormLabel>
                           <FormControl>
                             <Input type="tel" placeholder="+1 (555) 000-0000" {...field} />
                           </FormControl>
@@ -159,7 +161,7 @@ const DisputeResolution = () => {
                       name="bookingReference"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Booking Reference</FormLabel>
+                          <FormLabel>{t("dr.booking_reference", "Booking Reference")}</FormLabel>
                           <FormControl>
                             <Input placeholder="e.g., BK123456" {...field} />
                           </FormControl>
@@ -178,14 +180,14 @@ const DisputeResolution = () => {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select dispute type" />
+                              <SelectValue placeholder={t("dr.select_dispute_type", "Select dispute type")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="informal">Informal Resolution Request</SelectItem>
-                            <SelectItem value="mediation">Mediation Request</SelectItem>
-                            <SelectItem value="arbitration">Arbitration Request</SelectItem>
-                            <SelectItem value="other">General Inquiry</SelectItem>
+                            <SelectItem value="informal">{t("dr.informal_resolution_request", "Informal Resolution Request")}</SelectItem>
+                            <SelectItem value="mediation">{t("dr.mediation_request", "Mediation Request")}</SelectItem>
+                            <SelectItem value="arbitration">{t("dr.arbitration_request", "Arbitration Request")}</SelectItem>
+                            <SelectItem value="other">{t("dr.general_inquiry", "General Inquiry")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -223,12 +225,12 @@ const DisputeResolution = () => {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select contact method" />
+                              <SelectValue placeholder={t("dr.select_contact_method", "Select contact method")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="email">Email</SelectItem>
-                            <SelectItem value="phone">Phone</SelectItem>
+                            <SelectItem value="email">{t("dr.email", "Email")}</SelectItem>
+                            <SelectItem value="phone">{t("dr.phone", "Phone")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -264,15 +266,15 @@ const DisputeResolution = () => {
             <CardContent className="space-y-3 text-sm">
               <div>
                 <p className="font-semibold mb-1">1. Informal Resolution</p>
-                <p className="text-muted-foreground">We review your case within 30 days</p>
+                <p className="text-muted-foreground">{t("dr.we_review_your_case_within_30_days", "We review your case within 30 days")}</p>
               </div>
               <div>
                 <p className="font-semibold mb-1">2. Mediation</p>
-                <p className="text-muted-foreground">Neutral third-party facilitation if needed</p>
+                <p className="text-muted-foreground">{t("dr.neutral_third_party_facilitation_if_need", "Neutral third-party facilitation if needed")}</p>
               </div>
               <div>
                 <p className="font-semibold mb-1">3. Arbitration</p>
-                <p className="text-muted-foreground">Binding resolution through AAA</p>
+                <p className="text-muted-foreground">{t("dr.binding_resolution_through_aaa", "Binding resolution through AAA")}</p>
               </div>
             </CardContent>
           </Card>
@@ -285,7 +287,7 @@ const DisputeResolution = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <p className="font-semibold">Goldsainte Ai / Goldsainte Inc.</p>
+              <p className="font-semibold">{t("dr.goldsainte_ai_goldsainte_inc", "Goldsainte Ai / Goldsainte Inc.")}</p>
               <p className="text-muted-foreground">
                 850 New Burton Road, Suite 201<br />
                 Dover, DE 19904<br />
