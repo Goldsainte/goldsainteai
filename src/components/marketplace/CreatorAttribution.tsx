@@ -1,3 +1,5 @@
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 import { Link } from "react-router-dom";
 
 interface CreatorAttributionProps {
@@ -18,6 +20,7 @@ interface CreatorAttributionProps {
  * Leads with the human behind the trip — soft serif, gold accents, no chrome.
  */
 export function CreatorAttribution({ creator, variant = "card", className = "" }: CreatorAttributionProps) {
+  const sealMap = useVerifiedSeals([creator.id]);
   if (!creator) return null;
   const name = creator.full_name || "Goldsainte Concierge";
   const initial = name.charAt(0).toUpperCase();
@@ -41,7 +44,7 @@ export function CreatorAttribution({ creator, variant = "card", className = "" }
       )}
       <span className={`${labelSize} text-[#7A7151] truncate`}>
         <span className="text-[#6B7280]">Curated by </span>
-        <span className="font-secondary italic text-[#0a2225]">{name}</span>
+        <span className="font-secondary italic text-[#0a2225] inline-flex items-center gap-1">{name}{sealMap.get(creator.id) && <VerifiedSeal size={13} />}</span>
         {creator.home_base && (
           <span className="text-[#6B7280]"> · {creator.home_base}</span>
         )}
