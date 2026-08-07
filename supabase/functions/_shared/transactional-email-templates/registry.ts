@@ -14,6 +14,8 @@ import { template as tripRequestReceived } from './trip-request-received.tsx'
 import { template as newProposalReceived } from './new-proposal-received.tsx'
 import { template as bookingConfirmationTraveler } from './booking-confirmation-traveler.tsx'
 import { template as paymentReceipt } from './payment-receipt.tsx'
+import { template as verificationWelcome } from './verification-welcome.tsx'
+import { template as verificationReceipt } from './verification-receipt.tsx'
 import { template as newMessageTraveler } from './new-message-traveler.tsx'
 import { template as tripReminder } from './trip-reminder.tsx'
 import { template as reviewRequest } from './review-request.tsx'
@@ -46,6 +48,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'new-proposal-received': newProposalReceived,
   'booking-confirmation-traveler': bookingConfirmationTraveler,
   'payment-receipt': paymentReceipt,
+  'verification-welcome': verificationWelcome,
+  'verification-receipt': verificationReceipt,
   'new-message-traveler': newMessageTraveler,
   'trip-reminder': tripReminder,
   'review-request': reviewRequest,
