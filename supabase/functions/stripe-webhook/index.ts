@@ -532,12 +532,96 @@ async function createPaymentNotification(
 /**
  * Handle subscription created/updated
  */
+// ============ Goldsainte Verified helpers ============
+const VERIFICATION_PLAN_NAMES: Record<string, string> = {
+  agent: "Goldsainte Verified — Agent",
+  creator: "Goldsainte Verified — Creator",
+  traveler: "Goldsainte Verified — Traveler",
+};
+
+function sendVerificationEmail(payload: Record<string, unknown>): void {
+  fetch(`${SUPABASE_URL}/functions/v1/send-transactional-email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+    },
+    body: JSON.stringify(payload),
+  }).catch((e) => console.error("verification email dispatch failed", e));
+}
+
+function formatAmount(amountCents: number | null | undefined, currency: string | null | undefined): string {
+  if (amountCents == null) return "";
+  const cur = (currency || "usd").toUpperCase();
+  return `${cur} ${(amountCents / 100).toFixed(2)}`;
+}
+
+async function syncVerificationProfile(
+  subscription: SubscriptionWithMetadata,
+  logger: Logger
+): Promise<{ becameActive: boolean }> {
+  const { metadata, id, status, current_period_end } = subscription;
+  const userId = metadata.user_id;
+  const role = (metadata as Record<string, string>).verification_role || "traveler";
+  const active = status === "active" || status === "trialing";
+
+  const { data: before } = await supabaseClient
+    .from("profiles")
+    .select("verification_active")
+    .eq("id", userId)
+    .single();
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({
+      verification_active: active,
+      verification_role: role,
+      verification_subscription_id: id,
+      verification_period_end: new Date(current_period_end * 1000).toISOString(),
+    })
+    .eq("id", userId);
+  if (error) {
+    logger.error("Failed to sync verification profile", { error });
+    throw error;
+  }
+  logger.info("Verification profile synced", { userId, role, active });
+  return { becameActive: active && !before?.verification_active };
+}
+
 async function handleSubscriptionUpdated(
   subscription: SubscriptionWithMetadata,
   logger: Logger
 ): Promise<void> {
   const { metadata, id, customer, status, current_period_start, current_period_end, cancel_at_period_end, items } = subscription;
   const { user_id, tier } = metadata;
+
+  // Goldsainte Verified subscriptions have their own profile sync + welcome receipt.
+  if (metadata.subscription_type === "verification" && user_id) {
+    const { becameActive } = await syncVerificationProfile(subscription, logger);
+    if (becameActive) {
+      const role = (metadata as Record<string, string>).verification_role || "traveler";
+      const item = subscription.items?.data?.[0];
+      const { data: prof } = await supabaseClient
+        .from("profiles")
+        .select("email, preferred_language, full_name")
+        .eq("id", user_id)
+        .single();
+      if (prof?.email) {
+        sendVerificationEmail({
+          templateName: "verification-welcome",
+          recipientEmail: prof.email,
+          templateData: {
+            lang: prof.preferred_language?.split("-")[0] || "en",
+            name: prof.full_name || "",
+            planName: VERIFICATION_PLAN_NAMES[role] || VERIFICATION_PLAN_NAMES.traveler,
+            amount: formatAmount(item?.price?.unit_amount, item?.price?.currency),
+            nextBillingDate: new Date(current_period_end * 1000).toISOString().slice(0, 10),
+          },
+        });
+      }
+    }
+    return; // verification subs do not participate in the generic tier system
+  }
 
   logger.info("Processing subscription update", {
     subscriptionId: id,
@@ -618,6 +702,17 @@ async function handleSubscriptionDeleted(
 ): Promise<void> {
   const { metadata, id } = subscription;
   const { user_id } = metadata;
+
+  if (metadata.subscription_type === "verification" && user_id) {
+    const { error } = await supabaseClient
+      .from("profiles")
+      .update({ verification_active: false })
+      .eq("id", user_id)
+      .eq("verification_subscription_id", id);
+    if (error) logger.error("Failed to deactivate verification", { error });
+    else logger.info("Verification deactivated", { userId: user_id, subscriptionId: id });
+    return;
+  }
 
   logger.info("Processing subscription deletion", {
     subscriptionId: id,
@@ -1052,6 +1147,51 @@ serve(async (req: Request) => {
         case "customer.subscription.deleted":
           await handleSubscriptionDeleted(event.data.object as SubscriptionWithMetadata, logger);
           break;
+
+        case "invoice.paid": {
+          const invoice = event.data.object as Stripe.Invoice;
+          // Monthly receipt for Goldsainte Verified renewals (skip the first
+          // invoice — the welcome email doubles as the signup receipt).
+          if (invoice.billing_reason === "subscription_cycle" && invoice.subscription) {
+            const sub = await stripe.subscriptions.retrieve(invoice.subscription as string);
+            const meta = (sub.metadata || {}) as Record<string, string>;
+            if (meta.subscription_type === "verification" && meta.user_id) {
+              const role = meta.verification_role || "traveler";
+              const { data: prof } = await supabaseClient
+                .from("profiles")
+                .select("email, preferred_language, full_name")
+                .eq("id", meta.user_id)
+                .single();
+              if (prof?.email) {
+                sendVerificationEmail({
+                  templateName: "verification-receipt",
+                  recipientEmail: prof.email,
+                  templateData: {
+                    lang: prof.preferred_language?.split("-")[0] || "en",
+                    name: prof.full_name || "",
+                    planName: VERIFICATION_PLAN_NAMES[role] || VERIFICATION_PLAN_NAMES.traveler,
+                    amount: formatAmount(invoice.amount_paid, invoice.currency),
+                    invoiceNumber: invoice.number || invoice.id,
+                    periodEnd: sub.current_period_end
+                      ? new Date(sub.current_period_end * 1000).toISOString().slice(0, 10)
+                      : "",
+                  },
+                });
+              }
+              // Keep the profile window fresh on every renewal.
+              await supabaseClient
+                .from("profiles")
+                .update({
+                  verification_active: true,
+                  verification_period_end: sub.current_period_end
+                    ? new Date(sub.current_period_end * 1000).toISOString()
+                    : null,
+                })
+                .eq("id", meta.user_id);
+            }
+          }
+          break;
+        }
 
         // Payouts (Stripe Connect)
         case "payout.paid":
