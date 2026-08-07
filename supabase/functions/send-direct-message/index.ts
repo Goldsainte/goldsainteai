@@ -417,12 +417,29 @@ serve(async (req) => {
         }
         targetConversationId = existingConversation.id;
       } else {
+        // Message settings enforcement at REQUEST creation (non-booking only —
+        // booking threads are contracted relationships, no request gate):
+        // - allow_message_requests=false → the recipient takes no requests at
+        //   all; reject before anything is created. Missing row/null = allow.
+        // - filter_requests (default ON) + a message the spam/contact filter
+        //   flagged → the thread is created but marked is_filtered, and
+        //   get-conversations hides it from the recipient's Requests tab.
+        if (!bookingId && recipientSettings?.allow_message_requests === false) {
+          return new Response(
+            JSON.stringify({ error: "This user is not accepting message requests" }),
+            { status: 403, headers: { ...corsHeaders(req), "Content-Type": "application/json" } }
+          );
+        }
+        const filteredAsSpam =
+          !bookingId && flagged && recipientSettings?.filter_requests !== false;
+
         // Create new conversation as "request"
         const { data: newConversation, error: convError } = await supabase
           .from("dm_conversations")
           .insert({
             participant_1: p1,
             participant_2: p2,
+            is_filtered: filteredAsSpam,
             // Booking threads start "active": the parties are already in a
             // contracted relationship — no accept-gate. General DMs keep the
             // request flow.
