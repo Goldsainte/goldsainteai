@@ -128,6 +128,13 @@ serve(async (req) => {
         (sub) => (sub.metadata?.subscription_type === "verification")
       );
       if (verSub) {
+        // API 2025+ moved current_period_end onto subscription items.
+        const rawEnd = (verSub as any).current_period_end ??
+          (verSub.items?.data?.[0] as any)?.current_period_end;
+        const periodEndIso =
+          typeof rawEnd === "number" && Number.isFinite(rawEnd)
+            ? new Date(rawEnd * 1000).toISOString()
+            : null;
         const healedRole =
           (verSub.metadata?.verification_role as string) || role;
         await supabaseAdmin
@@ -136,9 +143,7 @@ serve(async (req) => {
             verification_active: true,
             verification_role: healedRole,
             verification_subscription_id: verSub.id,
-            verification_period_end: new Date(
-              verSub.current_period_end * 1000
-            ).toISOString(),
+            verification_period_end: periodEndIso,
           })
           .eq("id", user.id);
 
@@ -171,9 +176,7 @@ serve(async (req) => {
                 lang: prof.preferred_language?.split("-")[0] || "en",
                 planName: planNames[healedRole] || planNames.traveler,
                 amount,
-                nextBillingDate: new Date(verSub.current_period_end * 1000)
-                  .toISOString()
-                  .slice(0, 10),
+                nextBillingDate: (periodEndIso ?? "").slice(0, 10),
               },
             }),
           }).catch((e) => console.error("welcome email dispatch failed", e));
