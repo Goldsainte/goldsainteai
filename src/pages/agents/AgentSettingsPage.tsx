@@ -1,3 +1,4 @@
+import { GetVerifiedCard } from "@/components/verification/GetVerifiedCard";
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { WORLD_COUNTRIES } from "@/lib/residency";
@@ -481,6 +482,11 @@ export default function AgentSettingsPage() {
             </div>
           </div>
         </section>
+
+        {/* Goldsainte Verified */}
+        <div className="mt-6">
+          <GetVerifiedCard role="agent" />
+        </div>
 
         {/* Stay connected */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
