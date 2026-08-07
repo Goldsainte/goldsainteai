@@ -120,7 +120,11 @@ export function RecipientSearchModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[min(72vh,640px)] max-w-xl flex-col gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0 [&>button]:hidden">
+      <DialogContent className="flex h-[min(72vh,640px)] max-w-xl flex-col gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0 sm:w-[36rem] sm:max-w-[36rem] sm:p-0 [&>button]:hidden">
+        {/* The dialog base ships sm:w-auto / sm:max-w-lg / sm:p-6, and sm:-
+            prefixed classes outrank unprefixed ones — so the pinned width and
+            zero padding must ALSO be sm:-prefixed or the sheet breathes with
+            its content (the "three different sizes" bug, Aug 7). */}
         {/* Header */}
         <div className="relative flex h-14 shrink-0 items-center justify-center border-b border-[#E5DFC6]">
           <h2 className="font-secondary text-[18px] font-semibold text-[#0a2225]">
