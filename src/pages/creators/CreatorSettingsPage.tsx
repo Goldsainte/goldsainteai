@@ -1,3 +1,4 @@
+import { GetVerifiedCard } from "@/components/verification/GetVerifiedCard";
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -663,6 +664,11 @@ export default function CreatorSettingsPage() {
             {summarizing ? "Writing…" : aiSummary ? "Regenerate" : "Generate my AI summary"}
           </button>
         </section>
+
+        {/* Goldsainte Verified */}
+        <div className="mt-6">
+          <GetVerifiedCard role="creator" />
+        </div>
 
         {/* Stay connected */}
         <section className="mt-6 rounded-3xl border border-[#E5DFC6] bg-white/60 p-6 md:p-8">
