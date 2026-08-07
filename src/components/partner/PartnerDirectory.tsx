@@ -343,10 +343,25 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                   )}
                 </div>
                 <h2 className="mt-3 font-secondary text-lg leading-snug text-[#0a2225] sm:mt-6 sm:text-2xl">
-                  <span className="inline-flex items-center gap-1.5">
-                    {a.name}
-                    {sealMap.get(a.userId) && <VerifiedSeal size={18} />}
-                  </span>
+                  {/* Names wrap to two lines at grid widths by design; the seal
+                      flows inline as the "next word" after the last name (IG
+                      style), glued via nowrap so it never orphans on its own
+                      line and never floats beside the whole block. */}
+                  {sealMap.get(a.userId)
+                    ? (() => {
+                        const words = a.name.trim().split(/\s+/);
+                        const last = words.pop() ?? "";
+                        return (
+                          <>
+                            {words.length > 0 ? words.join(" ") + " " : ""}
+                            <span className="whitespace-nowrap">
+                              {last}
+                              <VerifiedSeal size={18} className="ml-1.5 align-[-2px]" />
+                            </span>
+                          </>
+                        );
+                      })()
+                    : a.name}
                 </h2>
                 {specialtyLine(a.tags) && (
                   <p className="mt-1 text-[12px] leading-snug text-[#0a2225]/60 sm:mt-2 sm:text-[15px]">{specialtyLine(a.tags)}</p>
