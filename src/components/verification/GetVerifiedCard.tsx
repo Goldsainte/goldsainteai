@@ -155,8 +155,15 @@ export function GetVerifiedCard({ role }: { role: Role }) {
             invoke("create-identity-verification", "identity", {
               email: auth.user.email,
               userId: auth.user.id,
-              applicationType: role,
+              // create-identity-verification only accepts agent/brand/traveler,
+              // and agent/brand require an application row. "traveler" is its
+              // per-user path (keyed by userId, no application lookup) — the
+              // right shape for the badge flow regardless of the user's role.
+              // Our explicit returnUrl overrides the traveler default, and the
+              // session metadata still carries user_id for the webhook stamp.
+              applicationType: "traveler",
               returnUrl: `${window.location.origin}/settings?identity=complete`,
+              metadata: { flow: "badge", badge_role: role },
             });
           }
         }
@@ -237,8 +244,10 @@ export function GetVerifiedCard({ role }: { role: Role }) {
                 invoke("create-identity-verification", "identity", {
                   email: authUser?.email,
                   userId: authUser?.id,
-                  applicationType: role,
+                  // "traveler" = the fn's per-user path; see auto-chain note above.
+                  applicationType: "traveler",
                   returnUrl: `${window.location.origin}/settings?identity=complete`,
+                  metadata: { flow: "badge", badge_role: role },
                 })
               }
             >
