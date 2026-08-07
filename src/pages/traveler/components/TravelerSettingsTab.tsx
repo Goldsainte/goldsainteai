@@ -1,3 +1,4 @@
+import { GetVerifiedCard } from "@/components/verification/GetVerifiedCard";
 import { useState, useEffect } from "react";
 import { Globe, ShieldCheck, AlertCircle } from "lucide-react";
 import {
@@ -79,6 +80,7 @@ export function TravelerSettingsTab({ userId }: TravelerSettingsTabProps) {
 
   return (
     <div className="space-y-6">
+      <GetVerifiedCard role="traveler" />
       {/* Payment Methods (shared) */}
       <ManagePaymentsSection userId={userId} />
 
