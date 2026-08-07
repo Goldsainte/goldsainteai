@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useTranslatedContent } from "@/hooks/useTranslatedContent";
 import { TranslatedMessageText } from "@/components/messaging/TranslatedMessageText";
 import { ComposeTranslateAssist } from "@/components/messaging/ComposeTranslateAssist";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow, isToday, isYesterday, isSameDay } from "date-fns";
 import {
@@ -137,6 +137,20 @@ export function DirectMessageInbox() {
     ...conversations.requests.map((c) => c.otherParticipant.id),
     ...conversations.archived.map((c) => c.otherParticipant.id),
   ]);
+  // IG's "New message" sheet suggests your recent people before you type —
+  // ours does the same: conversation counterparties, primary first, deduped.
+  const recipientSuggestions = useMemo(() => {
+    const seen = new Set<string>();
+    const out: Array<{ id: string; name: string; avatarUrl?: string | null; accountType?: string | null }> = [];
+    for (const c of [...conversations.primary, ...conversations.archived]) {
+      const p = c.otherParticipant;
+      if (!p?.id || seen.has(p.id)) continue;
+      seen.add(p.id);
+      out.push({ id: p.id, name: p.displayName, avatarUrl: p.avatarUrl, accountType: p.accountType });
+      if (out.length >= 12) break;
+    }
+    return out;
+  }, [conversations.primary, conversations.archived]);
 
   const { messages, loading: messagesLoading, refetch: refetchMessages } = useConversationMessages(
     selectedConversation?.id || null
@@ -956,6 +970,7 @@ export function DirectMessageInbox() {
       <RecipientSearchModal
         open={showRecipientSearch}
         onOpenChange={setShowRecipientSearch}
+        suggestions={recipientSuggestions}
         onSelectRecipient={(recipient) => {
           setSelectedRecipient(recipient);
           setShowRecipientSearch(false);
