@@ -3,6 +3,8 @@ import { Check, Loader2, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 
 // IG-replica "New message" sheet in the Goldsainte palette: To: row with a
 // selected-recipient chip, live results as you type, Chat button at the
@@ -19,10 +21,21 @@ type Recipient = {
   is_verified?: boolean | null;
 };
 
+export type SuggestedRecipient = {
+  id: string;
+  name: string;
+  username?: string | null;
+  avatarUrl?: string | null;
+  accountType?: string | null;
+};
+
 interface RecipientSearchModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectRecipient: (recipient: { id: string; name: string }) => void;
+  /** Recent conversation counterparties, shown as IG's "Suggested" list before
+      the user types. Deduped/capped by the caller. */
+  suggestions?: SuggestedRecipient[];
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -36,6 +49,7 @@ export function RecipientSearchModal({
   open,
   onOpenChange,
   onSelectRecipient,
+  suggestions = [],
 }: RecipientSearchModalProps) {
   const { user } = useAuth();
   const [search, setSearch] = useState("");
@@ -43,6 +57,10 @@ export function RecipientSearchModal({
   const [selected, setSelected] = useState<Recipient | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const sealMap = useVerifiedSeals([
+    ...results.map((r) => r.id),
+    ...suggestions.map((s) => s.id),
+  ]);
 
   useEffect(() => {
     if (!open) {
@@ -87,12 +105,24 @@ export function RecipientSearchModal({
   };
 
   const q = search.trim().replace(/^@+/, "");
+  const showSuggested = q.length < 2;
+  // Pre-typing, the body shows recent counterparties in the same row shape the
+  // search results use — one renderer for both lists.
+  const suggestedAsRecipients: Recipient[] = suggestions.map((s) => ({
+    id: s.id,
+    display_name: s.name,
+    full_name: s.name,
+    username: s.username ?? null,
+    avatar_url: s.avatarUrl ?? null,
+    account_type: s.accountType ?? null,
+  }));
+  const visibleRows = showSuggested ? suggestedAsRecipients : results;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0 [&>button]:hidden">
+      <DialogContent className="flex h-[min(72vh,640px)] max-w-xl flex-col gap-0 overflow-hidden rounded-2xl border border-[#E5DFC6] bg-[#FDF9F0] p-0 [&>button]:hidden">
         {/* Header */}
-        <div className="relative flex h-14 items-center justify-center border-b border-[#E5DFC6]">
+        <div className="relative flex h-14 shrink-0 items-center justify-center border-b border-[#E5DFC6]">
           <h2 className="font-secondary text-[18px] font-semibold text-[#0a2225]">
             New message
           </h2>
@@ -106,7 +136,7 @@ export function RecipientSearchModal({
         </div>
 
         {/* To: row */}
-        <div className="flex min-h-[56px] flex-wrap items-center gap-2 border-b border-[#E5DFC6] px-5 py-2">
+        <div className="flex min-h-[56px] shrink-0 flex-wrap items-center gap-2 border-b border-[#E5DFC6] px-5 py-2">
           <span className="text-[15px] font-semibold text-[#0a2225]">To:</span>
           {selected ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0c4d47] py-1 pl-3 pr-1.5 text-[13px] font-medium text-[#f7f3ea]">
@@ -131,12 +161,15 @@ export function RecipientSearchModal({
           )}
         </div>
 
-        {/* Results */}
-        <div
-          className={`overflow-y-auto py-2 transition-all ${
-            q.length >= 2 || selected ? "h-[320px]" : "h-[120px]"
-          }`}
-        >
+        {/* Body — IG structure: fixed-height sheet; "Suggested" (recent
+            conversations) fills it before the user types, live results while
+            typing. IG never shows a "type N characters" hint, so neither do we. */}
+        <div className="min-h-0 flex-1 overflow-y-auto py-2">
+          {showSuggested && suggestions.length > 0 && (
+            <p className="px-5 pb-1 pt-2 text-[15px] font-semibold text-[#0a2225]">
+              Suggested
+            </p>
+          )}
           {loading && (
             <div className="flex items-center gap-2 px-5 py-3 text-sm text-[#0a2225]/50">
               <Loader2 className="h-4 w-4 animate-spin" /> Searching…
@@ -145,17 +178,12 @@ export function RecipientSearchModal({
           {!loading && searchError && (
             <p className="px-5 py-3 text-sm text-[#993c1d]">{searchError}</p>
           )}
-          {!loading && !searchError && q.length < 2 && !selected && (
-            <p className="px-5 py-3 text-sm text-[#0a2225]/45">
-              Type at least 2 characters to search.
-            </p>
-          )}
           {!loading && !searchError && q.length >= 2 && results.length === 0 && (
             <p className="px-5 py-3 text-sm text-[#0a2225]/55">
               No account matches — check the spelling of their name or @handle.
             </p>
           )}
-          {results.map((r) => {
+          {visibleRows.map((r) => {
             const isSelected = selected?.id === r.id;
             const name = r.display_name || r.full_name || "User";
             return (
@@ -176,7 +204,10 @@ export function RecipientSearchModal({
                   </span>
                 )}
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15px] text-[#0a2225]">{name}</span>
+                  <span className="block truncate text-[15px] text-[#0a2225]">
+                    {name}
+                    {sealMap.get(r.id) && <VerifiedSeal size={14} className="ml-1.5 align-[-2px]" />}
+                  </span>
                   <span className="block truncate text-[13px] text-[#0a2225]/55">
                     {r.username && <span className="text-[#8D6B2F]">@{r.username}</span>}
                     {r.username && r.account_type && " · "}
@@ -198,7 +229,7 @@ export function RecipientSearchModal({
         </div>
 
         {/* Chat button */}
-        <div className="border-t border-[#E5DFC6] p-4">
+        <div className="shrink-0 border-t border-[#E5DFC6] p-4">
           <button
             disabled={!selected}
             onClick={startChat}
