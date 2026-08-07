@@ -1,0 +1,64 @@
+name: Synthetic Monitor (prod smoke)
+
+# Phase 0 of the QA program (Aug 7 2026): an hourly READ-ONLY smoke run
+# against the live site. It navigates key pages and asserts:
+#   - no uncaught JS exceptions, no unexpected console errors
+#   - no horizontal overflow (desktop + mobile viewports)
+#   - the Goldsainte Verified badge pipeline is intact end-to-end
+#   - the Supabase REST platform answers correctly
+# It never signs up, never submits forms, never touches Stripe. Write-path
+# journeys (account creation, subscriptions) are Phase 1 and run on staging.
+#
+# Alerting: GitHub emails the workflow's committer when a scheduled run fails.
+# Check the Actions tab for traces + screenshots attached to failed runs.
+
+on:
+  schedule:
+    # Hourly, at :17 past (offset avoids GitHub's congested top-of-hour cron slot).
+    - cron: '17 * * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: synthetic-monitor
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Prod smoke (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright (Chromium only)
+        # Both projects in playwright.prod.config.ts are Chromium-based,
+        # so one browser install keeps the hourly run fast and cheap.
+        run: npx playwright install --with-deps chromium
+
+      - name: Run prod smoke suite
+        run: npx playwright test --config=playwright.prod.config.ts
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-smoke-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Synthetic monitor — prod smoke" >> $GITHUB_STEP_SUMMARY
+          echo "Target: \`${PLAYWRIGHT_BASE_URL:-https://goldsainte.ai}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Result: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
