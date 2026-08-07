@@ -44,6 +44,9 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
+      {/* This close button is an opaque 36px box floating over the top-right
+          corner of EVERY dialog — DialogHeader reserves pr-12 so titles and
+          descriptions can never run underneath it (founder catch, Aug 7). */}
       <DialogPrimitive.Close className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5DFC6] bg-white opacity-100 transition-colors hover:bg-[#f7f3ea] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-[#f7f3ea] disabled:pointer-events-none">
         <X className="h-4 w-4 text-[#0a2225]" strokeWidth={1.75} />
         <span className="sr-only">Close</span>
@@ -54,7 +57,7 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
+  <div className={cn("flex flex-col space-y-1.5 pr-12 text-center sm:text-left", className)} {...props} />
 );
 DialogHeader.displayName = "DialogHeader";
 
