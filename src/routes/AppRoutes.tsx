@@ -191,6 +191,7 @@ const NewsroomWorldCupArticle = lazy(() => import('@/pages/newsroom/WorldCupArti
 const AdminNewsroomList = lazy(() => import('@/pages/admin/AdminNewsroomList'));
 const AdminArticleEditor = lazy(() => import('@/pages/admin/AdminArticleEditor'));
 const AdminNewsroomAuthors = lazy(() => import('@/pages/admin/AdminNewsroomAuthors'));
+const SettingsRedirect = lazy(() => import("@/pages/SettingsRedirect"));
 
 export const AppRoutes = () => (
   <Routes>
@@ -286,6 +287,7 @@ export const AppRoutes = () => (
     </Route>
 
     <Route element={<MemberLayout />}>
+      <Route path="/settings" element={<RequireAuth><SettingsRedirect /></RequireAuth>} />
       <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
       <Route path="/travel-profile" element={<TravelProfileRedirect />} />
       <Route path="/travel-profile/:userId" element={<TravelProfileRedirect />} />
