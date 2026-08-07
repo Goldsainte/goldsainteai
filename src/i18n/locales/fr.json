@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "Facilitation par un tiers neutre si nécessaire",
     "binding_resolution_through_aaa": "Résolution contraignante via l'AAA",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "Vous",
+    "activeLine": "Votre sceau doré est actif partout sur Goldsainte.",
+    "renews": "Renouvellement le {{date}} · reçu envoyé chaque mois",
+    "manage": "Gérer l'abonnement",
+    "oneStep": "Une dernière étape : confirmez votre identité pour afficher votre sceau.",
+    "idWhy": "Chaque sceau Goldsainte repose sur une vraie vérification d'identité — c'est ce qui fait sa valeur.",
+    "confirmId": "Confirmer mon identité",
+    "b1": "Le sceau doré à côté de votre nom — profil, cartes, propositions et messages.",
+    "b2": "Adossé à une vraie vérification d'identité : les voyageurs savent qu'il a du sens.",
+    "b3": "Un reçu arrive dans votre boîte mail à l'inscription et après chaque renouvellement.",
+    "perMonth": "/mois · annulable à tout moment",
+    "cta": "Se faire vérifier",
+    "error": "Une erreur est survenue — veuillez réessayer."
   }
 }
