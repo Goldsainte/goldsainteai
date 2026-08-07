@@ -4,6 +4,7 @@
 // Mount it anywhere with <LanguageSelector /> — no props required.
 import { Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { syncPreferredLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -49,6 +50,9 @@ export const LanguageSelector = ({
     }
     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = code;
+    // A click here is a deliberate choice — persist it as the account's email
+    // language. (Page loads no longer sync; see LanguageContext.)
+    syncPreferredLanguage(code);
   };
 
   return (
