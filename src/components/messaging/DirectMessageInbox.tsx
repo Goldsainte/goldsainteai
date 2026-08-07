@@ -818,6 +818,7 @@ export function DirectMessageInbox() {
                             </div>
                           ) : (
                             <MessageBubble
+                              readReceipts={selectedConversation.otherParticipant.showsReadReceipts ?? true}
                               key={msg.id}
                               message={msg}
                               isSelf={msg.sender_id === user?.id}
@@ -1079,6 +1080,7 @@ function ConversationItem({
 }
 
 function MessageBubble({
+  readReceipts = true,
   message,
   isSelf,
   onDelete,
@@ -1087,6 +1089,8 @@ function MessageBubble({
   onOpenAttachment,
 }: {
   message: { id: string; body: string; created_at: string; is_read: boolean };
+  /** Counterparty's "show read receipts" — false forces delivered-only. */
+  readReceipts?: boolean;
   isSelf: boolean;
   onDelete?: (id: string) => void;
   currentUserId: string;
@@ -1274,7 +1278,7 @@ function MessageBubble({
             {format(new Date(message.created_at), "HH:mm")}
           </span>
           {isSelf && (
-            message.is_read ? (
+            message.is_read && readReceipts ? (
               <CheckCheck className="h-3 w-3 text-[#C7A962]" />
             ) : (
               <Check className="h-3 w-3 text-[#9CA3AF]" />
