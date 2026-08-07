@@ -60,6 +60,20 @@ export function GetVerifiedCard({ role }: { role: Role }) {
     fetchState();
   }, [fetchState]);
 
+  // Returning from the Stripe billing portal via the browser's Back button can
+  // restore a cached page snapshot from BEFORE activation. Refetch whenever the
+  // page is restored or refocused so the card never lies about status.
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => { if (e.persisted) fetchState(); };
+    const onFocus = () => fetchState();
+    window.addEventListener("pageshow", onShow);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("pageshow", onShow);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [fetchState]);
+
   // Returning from Stripe with ?verification=success: the webhook may still be
   // in flight, so acknowledge the payment and poll briefly until the seal
   // state lands, then clean the URL.
