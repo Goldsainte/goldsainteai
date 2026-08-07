@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "必要に応じて中立の第三者が仲介",
     "binding_resolution_through_aaa": "AAAによる拘束力ある解決",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "あなた",
+    "activeLine": "ゴールドの認証シールが Goldsainte 全体で有効です。",
+    "renews": "{{date}} に更新 · 領収書を毎月メール送付",
+    "manage": "サブスクリプションを管理",
+    "oneStep": "あと一歩：本人確認を完了するとシールが表示されます。",
+    "idWhy": "Goldsainte のシールはすべて実際の本人確認に基づいています — だから価値があるのです。",
+    "confirmId": "本人確認をする",
+    "b1": "お名前の横にゴールドのシール — プロフィール、カード、提案、メッセージに表示。",
+    "b2": "実際の本人確認に裏づけられ、旅行者にも意味が伝わります。",
+    "b3": "登録時と毎月の更新後に領収書がメールで届きます。",
+    "perMonth": "/月 · いつでも解約可",
+    "cta": "認証を受ける",
+    "error": "問題が発生しました — もう一度お試しください。"
   }
 }
