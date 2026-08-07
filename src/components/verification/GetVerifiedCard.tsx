@@ -99,6 +99,13 @@ export function GetVerifiedCard({ role }: { role: Role }) {
         console.error(`[GoldsainteVerified] ${fn} failed:`, detail, error);
         throw new Error(detail);
       }
+      if (data?.recovered) {
+        // The server found an existing paid subscription and repaired the
+        // profile — no new charge. Refresh into the subscribed state.
+        await fetchState();
+        setBusy("");
+        return;
+      }
       if (!data?.url) throw new Error("No redirect URL returned");
       window.location.href = data.url;
     } catch (e: any) {
