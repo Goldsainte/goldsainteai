@@ -1,3 +1,5 @@
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 import { useNavigate } from "react-router-dom";
 
 interface AgentCardProps {
@@ -23,6 +25,7 @@ interface AgentCardProps {
 }
 
 export const AgentCard = ({ agent }: AgentCardProps) => {
+  const sealMap = useVerifiedSeals([agent.user_id ?? agent.id]);
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -74,7 +77,7 @@ export const AgentCard = ({ agent }: AgentCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="truncate font-secondary text-base font-semibold text-[#0a2225]">
-              {agent.agency_name}
+              <span className="inline-flex items-center gap-1.5">{agent.agency_name}{sealMap.get(agent.user_id ?? agent.id) && <VerifiedSeal size={15} />}</span>
             </h3>
             {agent.is_verified && (
               <span className="rounded-full bg-[#C7A962]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#0a2225]">
