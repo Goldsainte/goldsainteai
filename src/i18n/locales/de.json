@@ -3492,5 +3492,21 @@
     "neutral_third_party_facilitation_if_need": "Neutrale Drittvermittlung falls nötig",
     "binding_resolution_through_aaa": "Bindende Entscheidung über die AAA",
     "goldsainte_ai_goldsainte_inc": "Goldsainte Ai / Goldsainte Inc."
+  },
+  "gv": {
+    "title": "Goldsainte Verified",
+    "you": "Sie",
+    "activeLine": "Ihr goldenes Siegel ist überall auf Goldsainte aktiv.",
+    "renews": "Verlängert sich am {{date}} · Quittung monatlich per E-Mail",
+    "manage": "Abo verwalten",
+    "oneStep": "Noch ein Schritt: Bestätigen Sie Ihre Identität, um Ihr Siegel anzuzeigen.",
+    "idWhy": "Jedes Siegel auf Goldsainte beruht auf einer echten Identitätsprüfung — das macht es wertvoll.",
+    "confirmId": "Identität bestätigen",
+    "b1": "Das goldene Siegel neben Ihrem Namen — auf Profil, Karten, Angeboten und Nachrichten.",
+    "b2": "Gestützt auf eine echte Identitätsprüfung: Reisende wissen, dass es etwas bedeutet.",
+    "b3": "Eine Quittung erreicht Sie bei der Anmeldung und nach jeder monatlichen Verlängerung.",
+    "perMonth": "/Monat · jederzeit kündbar",
+    "cta": "Jetzt verifizieren",
+    "error": "Etwas ist schiefgelaufen — bitte erneut versuchen."
   }
 }
