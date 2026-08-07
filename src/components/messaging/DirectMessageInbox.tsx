@@ -1164,20 +1164,31 @@ function MessageBubble({
       }}
     >
       <div className={`flex items-center gap-1.5 ${isSelf ? "justify-end" : "justify-start"} relative`}>
-      {isSelf && hovered && onDelete && (
+      {/* Action buttons keep their slot at all times and only fade —
+          conditional mounting inserted ~26px into the row on hover, shoving
+          every bubble sideways (the "bubble overlapping on the side" bug). */}
+      {isSelf && onDelete && (
         <button
           onClick={() => onDelete(message.id)}
-          className="p-1.5 rounded-full text-[#9CA3AF] hover:text-red-500 hover:bg-red-50 transition-colors"
+          className={`p-1.5 rounded-full text-[#9CA3AF] hover:text-red-500 hover:bg-red-50 transition-colors ${
+            hovered ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
           title="Delete message"
+          aria-hidden={!hovered}
+          tabIndex={hovered ? 0 : -1}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       )}
-      {!isSelf && hovered && (
+      {!isSelf && (
         <button
           onClick={() => setShowPicker((v) => !v)}
-          className="p-1.5 rounded-full text-[#9CA3AF] hover:text-[#C7A962] hover:bg-[#F6F0E4] transition-colors"
+          className={`p-1.5 rounded-full text-[#9CA3AF] hover:text-[#C7A962] hover:bg-[#F6F0E4] transition-colors ${
+            hovered ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
           title="Add reaction"
+          aria-hidden={!hovered}
+          tabIndex={hovered ? 0 : -1}
         >
           <SmilePlus className="h-3.5 w-3.5" />
         </button>
@@ -1186,7 +1197,7 @@ function MessageBubble({
         className={`max-w-[min(29rem,calc(100vw-6rem))] rounded-[22px] px-4 py-2 ${
           isSelf
             ? "bg-[#0c4d47] text-[#f7f3ea]"
-            : "bg-white text-[#0a2225] ring-1 ring-[#E5DFC6]"
+            : "bg-white text-[#0a2225] ring-1 ring-inset ring-[#E5DFC6]"
         }`}
       >
         <p
