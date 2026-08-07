@@ -1,3 +1,5 @@
+import { VerifiedSeal } from "@/components/verification/VerifiedSeal";
+import { useVerifiedSeals } from "@/components/verification/useVerifiedSeals";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
@@ -136,6 +138,7 @@ function SocialIcon({ href, label, children }: { href: string; label: string; ch
 }
 
 export function PartnerProfileFora(props: PartnerProfileForaProps) {
+  const sealMap = useVerifiedSeals([userId]);
   const {
     kind, userId, name, avatarUrl, logoUrl, businessName, tierLabel, location, languages,
     startingPricePerNight, askUsAbout, story, travelStyle, photos, social,
@@ -205,7 +208,7 @@ export function PartnerProfileFora(props: PartnerProfileForaProps) {
             </div>
 
             <div className="px-4 pb-5 pt-6">
-              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225]">{name}</h2>
+              <h2 className="font-secondary text-2xl md:text-3xl text-[#0a2225] inline-flex items-center gap-2">{name}{sealMap.get(userId ?? "") && <VerifiedSeal size={22} />}</h2>
               {tierLabel && (
                 <p className="mt-1 text-[13px] uppercase tracking-[0.18em] text-[#8D6B2F]">{tierLabel}</p>
               )}
