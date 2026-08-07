@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
@@ -37,7 +37,17 @@ export default function TravelerDashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<DashboardStats>({ tripRequests: 0, bookings: 0 });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+  const VALID_TABS = ["overview", "journeys", "profile", "settings"];
+  const initialTab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(
+    initialTab && VALID_TABS.includes(initialTab) ? initialTab : "overview"
+  );
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && VALID_TABS.includes(tab)) setActiveTab(tab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadDashboardData() {
