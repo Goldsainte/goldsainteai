@@ -114,6 +114,78 @@ serve(async (req) => {
       );
     }
 
+    // SELF-HEAL: the profile says "not verified", but Stripe may disagree —
+    // e.g. a payment completed while the webhook wasn't wired. If an active
+    // verification subscription already exists for this customer, repair the
+    // profile right here instead of charging a second time.
+    if (customerId) {
+      const subs = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "active",
+        limit: 20,
+      });
+      const verSub = subs.data.find(
+        (sub) => (sub.metadata?.subscription_type === "verification")
+      );
+      if (verSub) {
+        const healedRole =
+          (verSub.metadata?.verification_role as string) || role;
+        await supabaseAdmin
+          .from("profiles")
+          .update({
+            verification_active: true,
+            verification_role: healedRole,
+            verification_subscription_id: verSub.id,
+            verification_period_end: new Date(
+              verSub.current_period_end * 1000
+            ).toISOString(),
+          })
+          .eq("id", user.id);
+
+        // Send the welcome receipt that the missed webhook never sent.
+        const item = verSub.items?.data?.[0];
+        const { data: prof } = await supabaseAdmin
+          .from("profiles")
+          .select("email, preferred_language")
+          .eq("id", user.id)
+          .single();
+        if (prof?.email) {
+          const amount = item?.price?.unit_amount != null
+            ? `${(item.price.currency || "usd").toUpperCase()} ${(item.price.unit_amount / 100).toFixed(2)}`
+            : "";
+          const planNames: Record<string, string> = {
+            agent: "Goldsainte Verified — Agent",
+            creator: "Goldsainte Verified — Creator",
+            traveler: "Goldsainte Verified — Traveler",
+          };
+          fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-transactional-email`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+            },
+            body: JSON.stringify({
+              templateName: "verification-welcome",
+              recipientEmail: prof.email,
+              templateData: {
+                lang: prof.preferred_language?.split("-")[0] || "en",
+                planName: planNames[healedRole] || planNames.traveler,
+                amount,
+                nextBillingDate: new Date(verSub.current_period_end * 1000)
+                  .toISOString()
+                  .slice(0, 10),
+              },
+            }),
+          }).catch((e) => console.error("welcome email dispatch failed", e));
+        }
+
+        return new Response(
+          JSON.stringify({ recovered: true, role: healedRole }),
+          { headers: { ...corsHeaders(req), "Content-Type": "application/json" }, status: 200 }
+        );
+      }
+    }
+
     const meta = {
       user_id: user.id,
       subscription_type: "verification",
