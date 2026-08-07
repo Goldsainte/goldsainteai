@@ -446,9 +446,14 @@ All colors MUST be HSL.
       height: 100%;
     }
     
-    /* Better tap feedback */
+    /* Better tap feedback.
+       Uses the standalone `scale` property, NOT `transform: scale()`:
+       transform is single-valued, so the old rule OVERWROTE Tailwind's
+       translate utilities on press — buttons positioned with
+       top-1/2 -translate-y-1/2 jumped half their height on mousedown and
+       slipped out from under the cursor (the "X takes 3-4 clicks" bug). */
     button:active, a[role="button"]:active {
-      transform: scale(0.97);
+      scale: 0.97;
     }
     
     /* Smooth scrolling — scope to the document root only.
@@ -609,8 +614,9 @@ All colors MUST be HSL.
   /* Improve tap feedback on mobile */
   button:not([role="checkbox"]):not([role="radio"]):active, 
   a[role="button"]:active {
-    transform: scale(0.98);
-    transition: transform 0.1s ease;
+    /* Standalone `scale` composes with transform — see note above. */
+    scale: 0.98;
+    transition: scale 0.1s ease;
   }
   
   /* Better focus states for keyboard users */
