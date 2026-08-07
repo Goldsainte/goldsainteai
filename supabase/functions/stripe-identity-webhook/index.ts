@@ -1341,21 +1341,25 @@ serve(async (req: Request) => {
 
           const verificationSession =
             event.data.object as VerificationSession;
-          await processVerificationCompleted(verificationSession, logger);
+          const sessionMeta =
+            (verificationSession.metadata ?? {}) as Record<string, string>;
 
-          // Goldsainte Verified: on a fully verified session, also stamp the
-          // USER's profile (badge = paid subscription + identity check).
+          // Goldsainte Verified: on a fully verified session, stamp the USER's
+          // profile FIRST (badge = paid subscription + identity check).
           // Resolved by session metadata user_id, falling back to email.
+          // This runs BEFORE the application/traveler bookkeeping below and
+          // must never depend on it: a swallowed customer_verifications insert
+          // in create-identity-verification once left no row for the router,
+          // the bookkeeping threw, and a real verified user lost their stamp.
           if (event.type === "identity.verification_session.verified") {
             try {
-              const meta = (verificationSession.metadata ?? {}) as Record<string, string>;
               const stamp = { identity_verified: true };
-              if (meta.user_id) {
-                await supabaseClient.from("profiles").update(stamp).eq("id", meta.user_id);
-                logger.info("Profile identity stamped by user_id", { userId: meta.user_id });
-              } else if (meta.email) {
-                await supabaseClient.from("profiles").update(stamp).ilike("email", meta.email);
-                logger.info("Profile identity stamped by email", { email: meta.email });
+              if (sessionMeta.user_id) {
+                await supabaseClient.from("profiles").update(stamp).eq("id", sessionMeta.user_id);
+                logger.info("Profile identity stamped by user_id", { userId: sessionMeta.user_id });
+              } else if (sessionMeta.email) {
+                await supabaseClient.from("profiles").update(stamp).ilike("email", sessionMeta.email);
+                logger.info("Profile identity stamped by email", { email: sessionMeta.email });
               } else {
                 logger.warn("Verified session had no user_id/email metadata; profile not stamped", {
                   sessionId: verificationSession.id,
@@ -1365,6 +1369,25 @@ serve(async (req: Request) => {
               logger.error("Failed to stamp profiles.identity_verified", {
                 error: stampError.message,
               });
+            }
+          }
+
+          try {
+            await processVerificationCompleted(verificationSession, logger);
+          } catch (bookkeepingError: any) {
+            if (sessionMeta.flow === "badge") {
+              // Badge-flow sessions have no application row by design; the
+              // stamp above is the outcome that matters. Log and continue so
+              // the delivery returns 200 instead of Stripe retrying a
+              // delivery that already achieved its purpose. Application-flow
+              // sessions (agent/brand/traveler proper) still rethrow so
+              // Stripe retries them.
+              logger.warn("Bookkeeping failed for badge-flow session (non-fatal)", {
+                error: bookkeepingError.message,
+                sessionId: verificationSession.id,
+              });
+            } else {
+              throw bookkeepingError;
             }
           }
           break;
