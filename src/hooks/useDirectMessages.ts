@@ -18,6 +18,9 @@ export interface Conversation {
     avatarUrl: string | null;
     accountType: string | null;
     isVerified: boolean;
+    /** False when they turned off "show read receipts" — render sent messages
+        as delivered-only for this thread. Absent (older payloads) = true. */
+    showsReadReceipts?: boolean;
   };
   createdAt: string;
 }
