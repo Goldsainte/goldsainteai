@@ -7,7 +7,7 @@ const SUPPORTED = ['en', 'fr', 'es', 'de', 'it', 'pt', 'ar', 'ja', 'ko', 'zh'];
 // Persist the user's language to their profile so backend emails and
 // notifications can be sent in the right language. Fire-and-forget: the UI
 // never waits on it, and signed-out users simply skip it.
-async function syncPreferredLanguage(lng: string) {
+export async function syncPreferredLanguage(lng: string) {
   try {
     if (!SUPPORTED.includes(lng)) return;
     const { data } = await supabase.auth.getUser();
@@ -49,19 +49,12 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // On load (and on sign-in), persist the current choice so profiles created
-  // before this column existed pick up the user's language on their next visit.
-  useEffect(() => {
-    syncPreferredLanguage((i18n.language || 'en').split('-')[0]);
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
-        syncPreferredLanguage((i18n.language || 'en').split('-')[0]);
-      }
-    });
-    return () => {
-      sub.subscription.unsubscribe();
-    };
-  }, []);
+  // Deliberate choices only: syncPreferredLanguage runs when the USER picks a
+  // language (here and in LanguageSelector) — never on page load or sign-in.
+  // The old on-load sync silently promoted whatever language the tab happened
+  // to be in (even a temporary test flip) to the account's permanent email
+  // language — that's how a.powell@cornellfacilities.com got Italian emails.
+  // Its backfill purpose (profiles predating the column) is complete.
 
   const setLanguage = (newLanguage: string) => {
     i18n.changeLanguage(newLanguage);
