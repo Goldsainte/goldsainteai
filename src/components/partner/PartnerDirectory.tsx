@@ -343,10 +343,10 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                   )}
                 </div>
                 <h2 className="mt-3 font-secondary text-lg leading-snug text-[#0a2225] sm:mt-6 sm:text-2xl">
-                  {/* Names wrap to two lines at grid widths by design; the seal
-                      flows inline as the "next word" after the last name (IG
-                      style), glued via nowrap so it never orphans on its own
-                      line and never floats beside the whole block. */}
+                  {/* The seal hangs off the last word via absolute positioning,
+                      so it takes NO layout space: the name centers exactly as it
+                      would without a badge (founder call, Aug 7 — the inline
+                      version shifted "Woods" left of center). */}
                   {sealMap.get(a.userId)
                     ? (() => {
                         const words = a.name.trim().split(/\s+/);
@@ -354,9 +354,12 @@ export function PartnerDirectory({ kind }: { kind: DirectoryKind }) {
                         return (
                           <>
                             {words.length > 0 ? words.join(" ") + " " : ""}
-                            <span className="whitespace-nowrap">
+                            <span className="relative">
                               {last}
-                              <VerifiedSeal size={18} className="ml-1.5 align-[-2px]" />
+                              <VerifiedSeal
+                                size={18}
+                                className="absolute left-full top-1/2 ml-1.5 -translate-y-1/2"
+                              />
                             </span>
                           </>
                         );
