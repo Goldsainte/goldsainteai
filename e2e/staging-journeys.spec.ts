@@ -151,6 +151,9 @@ test.describe.serial("staging journeys — signup to seal", () => {
   test("J2: the traveler subscribes to Goldsainte Verified with a test card", async ({
     page,
   }) => {
+    // Signup + settings + Stripe's page + iframe hunts add up; 180s starved
+    // run 6 moments after the Card click. Give the money journey real room.
+    test.setTimeout(360_000);
     await signUpTraveler(page);
     // Settings is role-forwarded by /settings (SettingsRedirect); the
     // Get Verified card sits at the top of the traveler settings tab.
@@ -166,7 +169,7 @@ test.describe.serial("staging journeys — signup to seal", () => {
 
     // Stripe-hosted Checkout (sandbox), frame-aware — fields live in iframes.
     await page.waitForURL(/checkout\.stripe\.com/, { timeout: 45_000 });
-    await fillInAnyFrame(page, /email/i, EMAIL, 30_000); // may be prefilled/absent
+    // (Checkout prefills the email as read-only text — nothing to fill.)
 
     // The card inputs DON'T EXIST until the "Card" payment-method row is
     // selected (failure screenshot, Aug 8: radio list Card / Cash App Pay,
@@ -192,6 +195,8 @@ test.describe.serial("staging journeys — signup to seal", () => {
         if (!chosen) await page.waitForTimeout(500);
       }
       expect(chosen, "the Card payment method should be selectable").toBe(true);
+      // let the card inputs mount inside their iframe after selection
+      await page.waitForTimeout(1_500);
     }
 
     // Link's "Save my information" is pre-checked and demands a phone number —
