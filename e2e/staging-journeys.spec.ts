@@ -99,6 +99,44 @@ async function signUpTraveler(page: Page) {
   });
 }
 
+// Stripe Checkout (with Link enabled) renders its email/card fields inside
+// IFRAMES (link-login-inner, elements-inner — seen in the Aug 8 trace), so
+// page-level locators never find them. These helpers hunt every frame.
+async function fillInAnyFrame(
+  page: Page,
+  placeholder: RegExp | string,
+  value: string,
+  timeoutMs = 60_000,
+) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    for (const frame of page.frames()) {
+      const loc = frame.getByPlaceholder(placeholder).first();
+      if (await loc.isVisible().catch(() => false)) {
+        await loc.fill(value);
+        return true;
+      }
+    }
+    await page.waitForTimeout(500);
+  }
+  return false;
+}
+
+async function clickInAnyFrame(page: Page, name: RegExp, timeoutMs = 30_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    for (const frame of page.frames()) {
+      const loc = frame.getByRole("button", { name }).first();
+      if (await loc.isVisible().catch(() => false)) {
+        await loc.click();
+        return true;
+      }
+    }
+    await page.waitForTimeout(500);
+  }
+  return false;
+}
+
 test.describe.serial("staging journeys — signup to seal", () => {
   test("J1: a traveler account is born and lands signed in", async ({ page }) => {
     await signUpTraveler(page);
@@ -126,25 +164,17 @@ test.describe.serial("staging journeys — signup to seal", () => {
     });
     await buyButton.click();
 
-    // Stripe-hosted Checkout (sandbox). Stable placeholder-based fills.
+    // Stripe-hosted Checkout (sandbox), frame-aware — fields live in iframes.
     await page.waitForURL(/checkout\.stripe\.com/, { timeout: 45_000 });
-    const emailField = page.getByPlaceholder(/email/i).first();
-    if (await emailField.isVisible().catch(() => false)) {
-      const val = await emailField.inputValue().catch(() => "");
-      if (!val) await emailField.fill(EMAIL);
-    }
-    await page.getByPlaceholder("1234 1234 1234 1234").fill(TEST_CARD);
-    await page.getByPlaceholder("MM / YY").fill("12 / 30");
-    await page.getByPlaceholder("CVC").fill("123");
-    const nameOnCard = page.getByPlaceholder(/full name/i).first();
-    if (await nameOnCard.isVisible().catch(() => false)) {
-      await nameOnCard.fill(`${FIRST} ${LAST}`);
-    }
-    const zip = page.getByPlaceholder(/zip|postal/i).first();
-    if (await zip.isVisible().catch(() => false)) {
-      await zip.fill("28134");
-    }
-    await page.getByRole("button", { name: /subscribe|pay/i }).click();
+    await fillInAnyFrame(page, /email/i, EMAIL, 30_000); // may be prefilled/absent
+    const cardFilled = await fillInAnyFrame(page, "1234 1234 1234 1234", TEST_CARD);
+    expect(cardFilled, "card number field should be found in some frame").toBe(true);
+    await fillInAnyFrame(page, "MM / YY", "12 / 30", 20_000);
+    await fillInAnyFrame(page, "CVC", "123", 20_000);
+    await fillInAnyFrame(page, /full name/i, `${FIRST} ${LAST}`, 10_000);
+    await fillInAnyFrame(page, /zip|postal/i, "28134", 10_000);
+    const paid = await clickInAnyFrame(page, /subscribe|^pay/i);
+    expect(paid, "a Subscribe/Pay button should be clickable in some frame").toBe(true);
 
     // Back on Goldsainte: the card polls the webhook-driven activation and
     // flips to "One step left: confirm your identity". This one assertion
