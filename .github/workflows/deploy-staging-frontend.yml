@@ -1,0 +1,94 @@
+name: Deploy Staging Frontend
+
+# Phase 1: builds the SAME repo with staging Supabase env vars and publishes
+# to GitHub Pages at https://staging.goldsainte.ai. Production (Lovable) is
+# untouched — src/integrations/supabase/client.ts only honors these env vars
+# when they are present at build time.
+#
+# Required repo secrets:
+#   STAGING_SUPABASE_URL       e.g. https://<staging-ref>.supabase.co
+#   STAGING_SUPABASE_ANON_KEY  the staging project's publishable key
+#
+# Also required once: repo Settings -> Pages -> Source: GitHub Actions,
+# and a DNS CNAME  staging -> goldsainte.github.io
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'vite.config.*'
+      - '.github/workflows/deploy-staging-frontend.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: staging-frontend
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: Build + publish staging site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Guard — staging secrets must exist
+        # CRITICAL: the Supabase client falls back to the PRODUCTION project
+        # when these env vars are empty. Without this guard, missing secrets
+        # would silently publish a staging site wired to the live database.
+        run: |
+          if [ -z "${{ secrets.STAGING_SUPABASE_URL }}" ] || [ -z "${{ secrets.STAGING_SUPABASE_ANON_KEY }}" ]; then
+            echo "::error::STAGING_SUPABASE_URL / STAGING_SUPABASE_ANON_KEY secrets are not set — refusing to build (would fall back to PRODUCTION Supabase)."
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        # npm install (not ci): package-lock drift, see synthetic-monitor.yml.
+        run: npm install --no-audit --no-fund
+
+      - name: Build with staging environment
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Add custom domain + SPA fallback
+        run: |
+          echo "staging.goldsainte.ai" > dist/CNAME
+          # GitHub Pages serves 404.html for unknown paths; copying the SPA
+          # entry there makes deep links (/creators/<id>, /messages) work.
+          cp dist/index.html dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          echo "## Staging frontend deployed" >> $GITHUB_STEP_SUMMARY
+          echo "URL: https://staging.goldsainte.ai" >> $GITHUB_STEP_SUMMARY
+          echo "Supabase: staging project (env-injected at build)" >> $GITHUB_STEP_SUMMARY
