@@ -24,9 +24,13 @@ name: Sync Staging Schema (prod -> staging)
 #   STAGING_DB_PASSWORD            staging db password
 #
 # Connections use Supabase's session poolers because GitHub runners have no
-# IPv6 (direct db.<ref>.supabase.co hosts are IPv6-only). The region of each
-# project's pooler isn't recorded anywhere in this repo, so both us-east-1 and
-# us-west-2 are tried automatically.
+# IPv6 (direct db.<ref>.supabase.co hosts are IPv6-only). Pooler hostnames
+# vary by project age (older projects: aws-0-<region>, newer: aws-1-<region>)
+# and by region — first run (Aug 7) proved prod lives on aws-0-us-west-2
+# while the brand-new staging project wasn't on any aws-0 host at all. The
+# resolver therefore sweeps both generations across four US regions.
+# Passwords travel via PGPASSWORD (never inside URLs) so generated passwords
+# containing @ & : etc. can't corrupt a connection string.
 
 on:
   workflow_dispatch: {}
@@ -60,39 +64,50 @@ jobs:
         with:
           version: latest
 
-      - name: Resolve pooler URLs
-        # Tries each pooler region with a trivial query; first success wins.
+      - name: Resolve pooler hosts
+        # Tries every plausible pooler host with a trivial query; first
+        # success wins. PGPASSWORD keeps passwords out of URLs entirely.
         run: |
           resolve() {
             ref="$1"; pass="$2"; out="$3"
-            for region in aws-0-us-east-1 aws-0-us-west-2; do
-              url="postgresql://postgres.${ref}:${pass}@${region}.pooler.supabase.com:5432/postgres"
-              if psql "$url" -c "select 1" >/dev/null 2>&1; then
-                echo "${out}=${url}" >> "$GITHUB_ENV"
-                echo "resolved ${out} via ${region}"
+            for host in \
+              aws-1-us-east-1 aws-1-us-east-2 aws-1-us-west-1 aws-1-us-west-2 \
+              aws-0-us-east-1 aws-0-us-east-2 aws-0-us-west-1 aws-0-us-west-2; do
+              if PGPASSWORD="$pass" psql \
+                   -h "${host}.pooler.supabase.com" -p 5432 \
+                   -U "postgres.${ref}" -d postgres \
+                   -c "select 1" \
+                   --set=connect_timeout=5 >/dev/null 2>&1; then
+                echo "${out}_HOST=${host}.pooler.supabase.com" >> "$GITHUB_ENV"
+                echo "resolved ${out} via ${host}"
                 return 0
               fi
             done
-            echo "::error::could not reach project ${ref} through any pooler region (check the db password)"
+            echo "::error::could not reach project ${ref} on any pooler host — if the password is right, tell Claude and we'll read the exact host off the project's Connect dialog instead"
             return 1
           }
-          resolve "$PROD_REF" "$PROD_DB_PASSWORD" PROD_DB_URL
-          resolve "$STAGING_REF" "$STAGING_DB_PASSWORD" STAGING_DB_URL
+          resolve "$PROD_REF" "$PROD_DB_PASSWORD" PROD
+          resolve "$STAGING_REF" "$STAGING_DB_PASSWORD" STAGING
 
       - name: Dump production schema (read-only)
+        # supabase db dump requires a URL, so the password is percent-encoded
+        # for this one command (PGPASSWORD isn't honored here).
         run: |
-          supabase db dump --db-url "$PROD_DB_URL" -f schema.sql
+          ENC_PASS=$(python3 -c "import urllib.parse,os; print(urllib.parse.quote(os.environ['PROD_DB_PASSWORD'], safe=''))")
+          supabase db dump --db-url "postgresql://postgres.${PROD_REF}:${ENC_PASS}@${PROD_HOST}:5432/postgres" -f schema.sql
           echo "dumped $(wc -l < schema.sql) lines of schema"
 
       - name: Apply schema to staging
         # ON_ERROR_STOP makes the first failure abort loudly instead of psql's
         # default keep-going-and-exit-0, which would fake a green run.
         run: |
-          psql "$STAGING_DB_URL" -v ON_ERROR_STOP=1 -f schema.sql
+          PGPASSWORD="$STAGING_DB_PASSWORD" psql \
+            -h "$STAGING_HOST" -p 5432 -U "postgres.${STAGING_REF}" -d postgres \
+            -v ON_ERROR_STOP=1 -f schema.sql
 
       - name: Verify staging shape
         run: |
-          count=$(psql "$STAGING_DB_URL" -t -A -c "select count(*) from information_schema.tables where table_schema='public'")
+          count=$(PGPASSWORD="$STAGING_DB_PASSWORD" psql -h "$STAGING_HOST" -p 5432 -U "postgres.${STAGING_REF}" -d postgres -t -A -c "select count(*) from information_schema.tables where table_schema='public'")
           echo "staging now has ${count} public tables"
           if [ "$count" -lt 10 ]; then
             echo "::error::staging has suspiciously few tables after sync"; exit 1
