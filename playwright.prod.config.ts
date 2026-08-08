@@ -18,7 +18,10 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
-    // Pixel 5 is Chromium-based, so the workflow only installs one browser.
+    // Pixel 5 is Chromium-based — shares the Chromium install.
     { name: "mobile", use: { ...devices["Pixel 5"] } },
+    // Phase 3 wave 1 (Aug 8): real WebKit engine, so Safari-specific
+    // rendering/JS quirks stop passing unseen. Workflow installs webkit too.
+    { name: "safari", use: { ...devices["Desktop Safari"] } },
   ],
 });
