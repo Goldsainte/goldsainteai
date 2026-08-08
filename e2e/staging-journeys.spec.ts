@@ -167,6 +167,44 @@ test.describe.serial("staging journeys — signup to seal", () => {
     // Stripe-hosted Checkout (sandbox), frame-aware — fields live in iframes.
     await page.waitForURL(/checkout\.stripe\.com/, { timeout: 45_000 });
     await fillInAnyFrame(page, /email/i, EMAIL, 30_000); // may be prefilled/absent
+
+    // The card inputs DON'T EXIST until the "Card" payment-method row is
+    // selected (failure screenshot, Aug 8: radio list Card / Cash App Pay,
+    // neither chosen). Select it, trying radio → button → exact text.
+    {
+      const deadline = Date.now() + 30_000;
+      let chosen = false;
+      while (!chosen && Date.now() < deadline) {
+        for (const frame of page.frames()) {
+          for (const cand of [
+            frame.getByRole("radio", { name: /^card$/i }).first(),
+            frame.getByRole("button", { name: /^card$/i }).first(),
+            frame.getByText("Card", { exact: true }).first(),
+          ]) {
+            if (await cand.isVisible().catch(() => false)) {
+              await cand.click();
+              chosen = true;
+              break;
+            }
+          }
+          if (chosen) break;
+        }
+        if (!chosen) await page.waitForTimeout(500);
+      }
+      expect(chosen, "the Card payment method should be selectable").toBe(true);
+    }
+
+    // Link's "Save my information" is pre-checked and demands a phone number —
+    // uncheck it so the form needs only the card.
+    for (const frame of page.frames()) {
+      const save = frame.getByRole("checkbox").first();
+      if (await save.isVisible().catch(() => false)) {
+        if (await save.isChecked().catch(() => false)) {
+          await save.uncheck().catch(() => {});
+        }
+        break;
+      }
+    }
     const cardFilled = await fillInAnyFrame(page, "1234 1234 1234 1234", TEST_CARD);
     expect(cardFilled, "card number field should be found in some frame").toBe(true);
     await fillInAnyFrame(page, "MM / YY", "12 / 30", 20_000);
