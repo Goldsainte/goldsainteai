@@ -170,64 +170,31 @@ test.describe.serial("staging journeys — signup to seal", () => {
     // Email is always prefilled by Checkout from the session (both failure
     // screenshots prove it) — hunting a fillable email field wasted 30s/run.
 
-    // Selecting "Card": the real radio INPUT is hidden — clicking it lands on
-    // air (Aug 8 screenshot: click "succeeded", radio still unselected). The
-    // clickable thing is the row LABEL. Click candidates and VERIFY selection
-    // took by watching for the card-number field to materialize.
+    // Selecting "Card" — verified by the radio's CHECKED STATE, and touching
+    // absolutely nothing else. (Prior run: a force-click on "the first
+    // checkbox" was actually the payment-method toggle and selected Cash App.)
     {
-      const deadline = Date.now() + 45_000;
-      let cardFieldVisible = false;
-      outer: while (Date.now() < deadline) {
+      const deadline = Date.now() + 60_000;
+      let cardChecked = false;
+      while (!cardChecked && Date.now() < deadline) {
         for (const frame of page.frames()) {
-          for (const cand of [
-            frame.getByText("Card", { exact: true }).first(),
-            frame.getByRole("radio", { name: /^card$/i }).first(),
-          ]) {
-            if (await cand.isVisible().catch(() => false)) {
-              await cand.click({ force: true }).catch(() => {});
-              // verification: did the card number input appear anywhere?
-              const verifyUntil = Date.now() + 4_000;
-              while (Date.now() < verifyUntil) {
-                for (const f2 of page.frames()) {
-                  if (
-                    await f2
-                      .getByPlaceholder("1234 1234 1234 1234")
-                      .first()
-                      .isVisible()
-                      .catch(() => false)
-                  ) {
-                    cardFieldVisible = true;
-                    break outer;
-                  }
-                }
-                await page.waitForTimeout(300);
-              }
-            }
+          const radio = frame.getByRole("radio", { name: /^card$/i }).first();
+          if (await radio.isChecked().catch(() => false)) {
+            cardChecked = true;
+            break;
+          }
+          const label = frame.getByText("Card", { exact: true }).first();
+          if (await label.isVisible().catch(() => false)) {
+            await label.click().catch(() => {});
           }
         }
-        await page.waitForTimeout(500);
+        if (!cardChecked) await page.waitForTimeout(700);
       }
-      expect(cardFieldVisible, "selecting Card should reveal the card number field").toBe(true);
+      expect(cardChecked, "the Card radio should report checked").toBe(true);
     }
 
-    // Link's "Save my information" is pre-checked and wants a phone number.
-    // Uncheck it wherever it lives; if it resists, feed it a test phone.
-    let saveHandled = false;
-    for (const frame of page.frames()) {
-      const save = frame.getByRole("checkbox").first();
-      if (await save.isVisible().catch(() => false)) {
-        if (await save.isChecked().catch(() => false)) {
-          await save.uncheck({ force: true }).catch(() => {});
-          saveHandled = !(await save.isChecked().catch(() => true));
-        } else {
-          saveHandled = true;
-        }
-        if (saveHandled) break;
-      }
-    }
-    if (!saveHandled) {
-      await fillInAnyFrame(page, /\(201\) 555-0123|phone/i, "2015550123", 5_000);
-    }
+    // The Link save-box stays UNTOUCHED; give its phone field what it wants.
+    await fillInAnyFrame(page, "(201) 555-0123", "2015550123", 8_000);
 
     const cardFilled = await fillInAnyFrame(page, "1234 1234 1234 1234", TEST_CARD, 20_000);
     expect(cardFilled, "card number field should be fillable").toBe(true);
