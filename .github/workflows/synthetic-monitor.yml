@@ -46,12 +46,18 @@ jobs:
         # can return to `npm ci`.
         run: npm install --no-audit --no-fund
 
-      - name: Install Playwright (Chromium only)
-        # Both projects in playwright.prod.config.ts are Chromium-based,
-        # so one browser install keeps the hourly run fast and cheap.
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright (Chromium + WebKit)
+        # WebKit added Aug 8 (Phase 3): the safari project catches
+        # Safari-specific quirks the Chromium projects can't see.
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Run prod smoke suite
+        # PROD_MONITOR_* unlock the logged-in checks (Phase 3): a dedicated
+        # real prod account, read-only pages only. Absent secrets = those
+        # checks self-skip and the anonymous suite runs as before.
+        env:
+          PROD_MONITOR_EMAIL: ${{ secrets.PROD_MONITOR_EMAIL }}
+          PROD_MONITOR_PASSWORD: ${{ secrets.PROD_MONITOR_PASSWORD }}
         run: npx playwright test --config=playwright.prod.config.ts
 
       - name: Upload report on failure
