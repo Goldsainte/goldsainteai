@@ -44,6 +44,12 @@ env:
   STAGING_REF: ${{ secrets.STAGING_SUPABASE_PROJECT_REF }}
   PROD_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
   STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+  # Optional overrides: the exact pooler hostname from each project's Connect
+  # dialog (e.g. aws-1-us-east-1.pooler.supabase.com). When set, the resolver
+  # verifies that host directly instead of sweeping candidates — and its
+  # error message can then say definitively that the password/ref is wrong.
+  STAGING_DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+  PROD_DB_HOST: ${{ secrets.PROD_DB_HOST }}
 
 jobs:
   sync:
@@ -68,16 +74,27 @@ jobs:
         # Tries every plausible pooler host with a trivial query; first
         # success wins. PGPASSWORD keeps passwords out of URLs entirely.
         run: |
+          try_host() {
+            # $1=host $2=ref $3=pass — returns 0 if "select 1" succeeds
+            PGPASSWORD="$3" psql \
+              -h "$1" -p 5432 -U "postgres.$2" -d postgres \
+              -c "select 1" --set=connect_timeout=5 >/dev/null 2>&1
+          }
           resolve() {
-            ref="$1"; pass="$2"; out="$3"
+            ref="$1"; pass="$2"; out="$3"; override="$4"
+            if [ -n "$override" ]; then
+              if try_host "$override" "$ref" "$pass"; then
+                echo "${out}_HOST=${override}" >> "$GITHUB_ENV"
+                echo "resolved ${out} via override ${override}"
+                return 0
+              fi
+              echo "::error::${out}: connected-host override ${override} was reachable configuration-wise but auth failed — the password or project ref secret for ${out} is wrong"
+              return 1
+            fi
             for host in \
               aws-1-us-east-1 aws-1-us-east-2 aws-1-us-west-1 aws-1-us-west-2 \
               aws-0-us-east-1 aws-0-us-east-2 aws-0-us-west-1 aws-0-us-west-2; do
-              if PGPASSWORD="$pass" psql \
-                   -h "${host}.pooler.supabase.com" -p 5432 \
-                   -U "postgres.${ref}" -d postgres \
-                   -c "select 1" \
-                   --set=connect_timeout=5 >/dev/null 2>&1; then
+              if try_host "${host}.pooler.supabase.com" "$ref" "$pass"; then
                 echo "${out}_HOST=${host}.pooler.supabase.com" >> "$GITHUB_ENV"
                 echo "resolved ${out} via ${host}"
                 return 0
@@ -86,8 +103,8 @@ jobs:
             echo "::error::could not reach project ${ref} on any pooler host — if the password is right, tell Claude and we'll read the exact host off the project's Connect dialog instead"
             return 1
           }
-          resolve "$PROD_REF" "$PROD_DB_PASSWORD" PROD
-          resolve "$STAGING_REF" "$STAGING_DB_PASSWORD" STAGING
+          resolve "$PROD_REF" "$PROD_DB_PASSWORD" PROD "$PROD_DB_HOST"
+          resolve "$STAGING_REF" "$STAGING_DB_PASSWORD" STAGING "$STAGING_DB_HOST"
 
       - name: Dump production schema (read-only)
         # supabase db dump requires a URL, so the password is percent-encoded
