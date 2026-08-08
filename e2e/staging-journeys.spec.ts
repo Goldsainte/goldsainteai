@@ -47,8 +47,28 @@ async function signUpTraveler(page: Page) {
     .getByRole("button", { name: /create account|sign up|continue|get started/i })
     .last()
     .click();
-  // Confirm-email is OFF on staging, so signup logs straight in. Success =
-  // we leave /auth for anywhere authenticated.
+  // Confirm-email is OFF on staging, so signup logs straight into a session —
+  // but travelers then hit a SECOND screen, /auth/complete-profile (role
+  // re-pick + prefilled names; founder-discovered Aug 8, and note it's still
+  // under /auth, so "left /auth" alone would hang here). Walk it like a human.
+  await page.waitForURL(
+    (url) => !url.pathname.startsWith("/auth") || url.pathname.includes("complete-profile"),
+    { timeout: 45_000 },
+  );
+  if (page.url().includes("complete-profile")) {
+    const travelerCard = page.getByText(/^traveler$/i).first();
+    if (await travelerCard.isVisible().catch(() => false)) {
+      await travelerCard.click();
+    }
+    // Names arrive prefilled from signup metadata; fill only if empty.
+    for (const [sel, val] of [["#firstName", FIRST], ["#lastName", LAST]] as const) {
+      const field = page.locator(sel).first();
+      if (await field.isVisible().catch(() => false)) {
+        if (!(await field.inputValue().catch(() => "x"))) await field.fill(val);
+      }
+    }
+    await page.getByRole("button", { name: /continue to goldsainte|continue/i }).click();
+  }
   await page.waitForURL((url) => !url.pathname.startsWith("/auth"), {
     timeout: 45_000,
   });
