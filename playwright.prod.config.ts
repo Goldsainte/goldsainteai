@@ -10,6 +10,8 @@ export default defineConfig({
   timeout: 60_000,
   retries: 1, // one retry absorbs transient network flakes without hiding real breakage
   fullyParallel: true,
+  workers: 4, // GH runners have 4 cores but Playwright defaults to HALF —
+  // the suite outgrew that (25+ checks incl. nine live sign-ins, Aug 8)
   reporter: [["list"], ["github"], ["html", { open: "never" }]],
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL || "https://goldsainte.ai",
