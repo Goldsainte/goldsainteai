@@ -1,0 +1,81 @@
+name: Deploy Production Frontend
+
+# Lovable-independence (Aug 8): builds the frontend in GitHub Actions and
+# deploys it to Cloudflare Pages — same Cloudflare account that already runs
+# goldsainte.ai's DNS. Until the DNS cutover, deploys go only to the
+# goldsainte-prod.pages.dev preview and live traffic still flows to Lovable;
+# after cutover, every push to main IS a production deploy, with instant
+# per-deployment rollback in the Cloudflare Pages dashboard.
+#
+# Required repo secrets:
+#   CLOUDFLARE_API_TOKEN   (Cloudflare dashboard → My Profile → API Tokens →
+#                           Create Token → "Edit Cloudflare Workers"-style or
+#                           custom with Account.Cloudflare Pages: Edit)
+#   CLOUDFLARE_ACCOUNT_ID  (dashboard → any zone → right sidebar → Account ID)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'vite.config.*'
+      - '.github/workflows/deploy-prod-frontend.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: prod-frontend
+  cancel-in-progress: true
+
+env:
+  # Public values (they ship in every page load) — pinned here so the prod
+  # build never depends on fallbacks or forgets which backend it belongs to.
+  VITE_SUPABASE_URL: https://ktzsgqrqvwtxlimctkaf.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_i5xwYqNzT3JOevhcl7-J3w_J2oofXm5
+
+jobs:
+  deploy:
+    name: Build + deploy production site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Guard — Cloudflare secrets must exist
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] || [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not set"; exit 1
+          fi
+
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler pages project create goldsainte-prod \
+            --production-branch=main 2>/dev/null || true
+          npx wrangler pages deploy dist \
+            --project-name=goldsainte-prod \
+            --branch=main \
+            --commit-dirty=true
+
+      - name: Summary
+        run: |
+          echo "## Production frontend deployed" >> $GITHUB_STEP_SUMMARY
+          echo "Preview: https://goldsainte-prod.pages.dev" >> $GITHUB_STEP_SUMMARY
+          echo "Live domain serves this build only AFTER the DNS cutover." >> $GITHUB_STEP_SUMMARY
