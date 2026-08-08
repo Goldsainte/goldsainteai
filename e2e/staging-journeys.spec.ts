@@ -25,21 +25,21 @@ const LAST = `Traveler${RUN_ID.slice(-4)}`;
 const TEST_CARD = "4242424242424242";
 
 async function signUpTraveler(page: Page) {
-  await page.goto("/auth");
-  // The auth page is stepped: role picker first (traveler/creator/agent),
-  // then the details form. Sign-up may be behind a tab/link on some entry
-  // states — click it if present, harmless if not.
-  const signUpSwitch = page.getByRole("tab", { name: /sign up/i }).or(
-    page.getByRole("button", { name: /sign up/i }),
-  );
-  if (await signUpSwitch.first().isVisible().catch(() => false)) {
-    await signUpSwitch.first().click();
+  // Enter through the same door a human does: ?mode=signup lands directly in
+  // the signup flow. (First run entered at bare /auth — the LOGIN view — and
+  // spent 3 minutes waiting for a signup-only field that never existed there.)
+  await page.goto("/auth?mode=signup");
+  // Role picker precedes the details form; the cards are labeled exactly
+  // "Traveler" / "Creator" / "Travel Agent". If the details form is already
+  // showing (role preselected), skip the click.
+  const emailField = page.locator("#signupEmail");
+  if (!(await emailField.isVisible().catch(() => false))) {
+    await page.getByText("Traveler", { exact: true }).first().click();
   }
-  const travelerRole = page.getByText(/traveler/i).first();
-  if (await travelerRole.isVisible().catch(() => false)) {
-    await travelerRole.click();
-  }
-  await page.locator("#signupEmail").fill(EMAIL);
+  await expect(emailField, "signup details form should appear").toBeVisible({
+    timeout: 20_000,
+  });
+  await emailField.fill(EMAIL);
   await page.locator("#firstName").fill(FIRST);
   await page.locator("#lastName").fill(LAST);
   await page.locator("#password").fill(PASSWORD);
@@ -92,8 +92,9 @@ test.describe.serial("staging journeys — signup to seal", () => {
     // Settings is role-forwarded by /settings (SettingsRedirect); the
     // Get Verified card sits at the top of the traveler settings tab.
     await page.goto("/settings");
+    // Exact CTA from the gv i18n namespace: "Get Verified".
     const buyButton = page
-      .getByRole("button", { name: /get verified|verified/i })
+      .getByRole("button", { name: /^get verified$/i })
       .first();
     await expect(buyButton, "Get Verified card should render in settings").toBeVisible({
       timeout: 30_000,
