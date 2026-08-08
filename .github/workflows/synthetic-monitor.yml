@@ -31,7 +31,10 @@ jobs:
   smoke:
     name: Prod smoke (read-only)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 30, not 15: the suite grew from 12 anonymous checks to 25+ including
+    # nine full UI sign-ins across three engines (Aug 8) — the old cap was
+    # killing healthy runs mid-flight ("operation was canceled").
+    timeout-minutes: 30
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
