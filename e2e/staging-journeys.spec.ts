@@ -52,14 +52,32 @@ async function signUpTraveler(page: Page) {
   // Exact label from auth.createAccount — no fuzzy matching near a screen
   // that also contains Continue-family buttons.
   await page.getByRole("button", { name: "Create Account", exact: true }).click();
-  // Confirm-email is OFF on staging, so signup logs straight into a session —
-  // but travelers then hit a SECOND screen, /auth/complete-profile (role
-  // re-pick + prefilled names; founder-discovered Aug 8, and note it's still
-  // under /auth, so "left /auth" alone would hang here). Walk it like a human.
-  await page.waitForURL(
-    (url) => !url.pathname.startsWith("/auth") || url.pathname.includes("complete-profile"),
-    { timeout: 45_000 },
-  );
+  // Staging signups sometimes report "Account already exists" even though
+  // THIS very request created the user (verified in auth.users, Aug 8 — a
+  // network-layer replay artifact the page can't see past). Both outcomes
+  // mean the credentials are now real, so accept either: navigation, or the
+  // exists-toast → its own Sign In action → password → session.
+  const navigated = () =>
+    page.waitForURL(
+      (url) => !url.pathname.startsWith("/auth") || url.pathname.includes("complete-profile"),
+      { timeout: 45_000 },
+    );
+  const existsToast = page.getByText("Account already exists").first();
+  const outcome = await Promise.race([
+    navigated().then(() => "navigated" as const),
+    existsToast.waitFor({ state: "visible", timeout: 45_000 }).then(() => "exists" as const),
+  ]).catch(() => "neither" as const);
+  if (outcome === "exists") {
+    // Toast action → password-only signin step (email carried in state).
+    await page.getByRole("button", { name: "Sign In", exact: true }).first().click();
+    const pw = page.locator("#password");
+    await expect(pw, "signin password step should appear").toBeVisible({ timeout: 20_000 });
+    await pw.fill(PASSWORD);
+    await page.locator('button[type="submit"]').click();
+    await navigated();
+  } else if (outcome === "neither") {
+    throw new Error("signup neither navigated nor reported an existing account within 45s");
+  }
   if (page.url().includes("complete-profile")) {
     const travelerCard = page.getByText(/^traveler$/i).first();
     if (await travelerCard.isVisible().catch(() => false)) {
