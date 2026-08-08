@@ -16,7 +16,12 @@ on:
   schedule:
     # Hourly, at :17 past (offset avoids GitHub's congested top-of-hour cron slot).
     - cron: '17 * * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Override target (e.g. https://goldsainte-prod.pages.dev to validate a cutover candidate). Default: live prod.'
+        required: false
+        default: 
 
 concurrency:
   group: synthetic-monitor
@@ -58,6 +63,11 @@ jobs:
         env:
           PROD_MONITOR_EMAIL: ${{ secrets.PROD_MONITOR_EMAIL }}
           PROD_MONITOR_PASSWORD: ${{ secrets.PROD_MONITOR_PASSWORD }}
+          PROD_MONITOR_CREATOR_EMAIL: ${{ secrets.PROD_MONITOR_CREATOR_EMAIL }}
+          PROD_MONITOR_CREATOR_PASSWORD: ${{ secrets.PROD_MONITOR_CREATOR_PASSWORD }}
+          PROD_MONITOR_AGENT_EMAIL: ${{ secrets.PROD_MONITOR_AGENT_EMAIL }}
+          PROD_MONITOR_AGENT_PASSWORD: ${{ secrets.PROD_MONITOR_AGENT_PASSWORD }}
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.target_url }}
         run: npx playwright test --config=playwright.prod.config.ts
 
       - name: Upload report on failure
