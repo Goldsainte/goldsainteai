@@ -151,9 +151,7 @@ test.describe.serial("staging journeys — signup to seal", () => {
   test("J2: the traveler subscribes to Goldsainte Verified with a test card", async ({
     page,
   }) => {
-    // Signup + settings + Stripe's page + iframe hunts add up; 180s starved
-    // run 6 moments after the Card click. Give the money journey real room.
-    test.setTimeout(360_000);
+    test.setTimeout(240_000); // Stripe's page is heavy; give the walk headroom
     await signUpTraveler(page);
     // Settings is role-forwarded by /settings (SettingsRedirect); the
     // Get Verified card sits at the top of the traveler settings tab.
@@ -169,49 +167,70 @@ test.describe.serial("staging journeys — signup to seal", () => {
 
     // Stripe-hosted Checkout (sandbox), frame-aware — fields live in iframes.
     await page.waitForURL(/checkout\.stripe\.com/, { timeout: 45_000 });
-    // (Checkout prefills the email as read-only text — nothing to fill.)
+    // Email is always prefilled by Checkout from the session (both failure
+    // screenshots prove it) — hunting a fillable email field wasted 30s/run.
 
-    // The card inputs DON'T EXIST until the "Card" payment-method row is
-    // selected (failure screenshot, Aug 8: radio list Card / Cash App Pay,
-    // neither chosen). Select it, trying radio → button → exact text.
+    // Selecting "Card": the real radio INPUT is hidden — clicking it lands on
+    // air (Aug 8 screenshot: click "succeeded", radio still unselected). The
+    // clickable thing is the row LABEL. Click candidates and VERIFY selection
+    // took by watching for the card-number field to materialize.
     {
-      const deadline = Date.now() + 30_000;
-      let chosen = false;
-      while (!chosen && Date.now() < deadline) {
+      const deadline = Date.now() + 45_000;
+      let cardFieldVisible = false;
+      outer: while (Date.now() < deadline) {
         for (const frame of page.frames()) {
           for (const cand of [
-            frame.getByRole("radio", { name: /^card$/i }).first(),
-            frame.getByRole("button", { name: /^card$/i }).first(),
             frame.getByText("Card", { exact: true }).first(),
+            frame.getByRole("radio", { name: /^card$/i }).first(),
           ]) {
             if (await cand.isVisible().catch(() => false)) {
-              await cand.click();
-              chosen = true;
-              break;
+              await cand.click({ force: true }).catch(() => {});
+              // verification: did the card number input appear anywhere?
+              const verifyUntil = Date.now() + 4_000;
+              while (Date.now() < verifyUntil) {
+                for (const f2 of page.frames()) {
+                  if (
+                    await f2
+                      .getByPlaceholder("1234 1234 1234 1234")
+                      .first()
+                      .isVisible()
+                      .catch(() => false)
+                  ) {
+                    cardFieldVisible = true;
+                    break outer;
+                  }
+                }
+                await page.waitForTimeout(300);
+              }
             }
           }
-          if (chosen) break;
         }
-        if (!chosen) await page.waitForTimeout(500);
+        await page.waitForTimeout(500);
       }
-      expect(chosen, "the Card payment method should be selectable").toBe(true);
-      // let the card inputs mount inside their iframe after selection
-      await page.waitForTimeout(1_500);
+      expect(cardFieldVisible, "selecting Card should reveal the card number field").toBe(true);
     }
 
-    // Link's "Save my information" is pre-checked and demands a phone number —
-    // uncheck it so the form needs only the card.
+    // Link's "Save my information" is pre-checked and wants a phone number.
+    // Uncheck it wherever it lives; if it resists, feed it a test phone.
+    let saveHandled = false;
     for (const frame of page.frames()) {
       const save = frame.getByRole("checkbox").first();
       if (await save.isVisible().catch(() => false)) {
         if (await save.isChecked().catch(() => false)) {
-          await save.uncheck().catch(() => {});
+          await save.uncheck({ force: true }).catch(() => {});
+          saveHandled = !(await save.isChecked().catch(() => true));
+        } else {
+          saveHandled = true;
         }
-        break;
+        if (saveHandled) break;
       }
     }
-    const cardFilled = await fillInAnyFrame(page, "1234 1234 1234 1234", TEST_CARD);
-    expect(cardFilled, "card number field should be found in some frame").toBe(true);
+    if (!saveHandled) {
+      await fillInAnyFrame(page, /\(201\) 555-0123|phone/i, "2015550123", 5_000);
+    }
+
+    const cardFilled = await fillInAnyFrame(page, "1234 1234 1234 1234", TEST_CARD, 20_000);
+    expect(cardFilled, "card number field should be fillable").toBe(true);
     await fillInAnyFrame(page, "MM / YY", "12 / 30", 20_000);
     await fillInAnyFrame(page, "CVC", "123", 20_000);
     await fillInAnyFrame(page, /full name/i, `${FIRST} ${LAST}`, 10_000);
