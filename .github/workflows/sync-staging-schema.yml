@@ -114,6 +114,26 @@ jobs:
           supabase db dump --db-url "postgresql://postgres.${PROD_REF}:${ENC_PASS}@${PROD_HOST}:5432/postgres" -f schema.sql
           echo "dumped $(wc -l < schema.sql) lines of schema"
 
+      - name: Prepare staging shims
+        # Prod has Database Webhooks enabled, so its dump contains triggers
+        # calling supabase_functions.http_request(). A fresh project lacks
+        # that managed schema (first sync died there at line 15481 of the
+        # dump, Aug 7). The shim below satisfies those triggers with a NO-OP —
+        # intentionally: staging must never fire prod's outbound webhooks
+        # (e.g. the make.com hook) from synthetic test activity.
+        run: |
+          PGPASSWORD="$STAGING_DB_PASSWORD" psql \
+            -h "$STAGING_HOST" -p 5432 -U "postgres.${STAGING_REF}" -d postgres \
+            -v ON_ERROR_STOP=1 <<'SQL'
+          create schema if not exists supabase_functions;
+          create or replace function supabase_functions.http_request()
+          returns trigger language plpgsql as $fn$
+          begin
+            return coalesce(new, old);
+          end;
+          $fn$;
+          SQL
+
       - name: Apply schema to staging
         # ON_ERROR_STOP makes the first failure abort loudly instead of psql's
         # default keep-going-and-exit-0, which would fake a green run.
