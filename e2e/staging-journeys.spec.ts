@@ -34,7 +34,9 @@ async function signUpTraveler(page: Page) {
   const stepEmail = page.getByPlaceholder("Email address").first();
   await expect(stepEmail, "email step should appear").toBeVisible({ timeout: 20_000 });
   await stepEmail.fill(EMAIL);
-  await page.getByRole("button", { name: "Continue" }).click();
+  // exact:true — "Continue with Google" also matches a bare 'Continue'
+  // (run 4's strict-mode violation; the log itself printed this fix).
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
 
   const emailField = page.locator("#signupEmail");
   await expect(emailField, "signup details form should appear").toBeVisible({
@@ -47,10 +49,9 @@ async function signUpTraveler(page: Page) {
   await page.locator("#firstName").fill(FIRST);
   await page.locator("#lastName").fill(LAST);
   await page.locator("#password").fill(PASSWORD);
-  await page
-    .getByRole("button", { name: /create account|sign up|continue|get started/i })
-    .last()
-    .click();
+  // Exact label from auth.createAccount — no fuzzy matching near a screen
+  // that also contains Continue-family buttons.
+  await page.getByRole("button", { name: "Create Account", exact: true }).click();
   // Confirm-email is OFF on staging, so signup logs straight into a session —
   // but travelers then hit a SECOND screen, /auth/complete-profile (role
   // re-pick + prefilled names; founder-discovered Aug 8, and note it's still
@@ -71,7 +72,9 @@ async function signUpTraveler(page: Page) {
         if (!(await field.inputValue().catch(() => "x"))) await field.fill(val);
       }
     }
-    await page.getByRole("button", { name: /continue to goldsainte|continue/i }).click();
+    await page
+      .getByRole("button", { name: "Continue to Goldsainte", exact: true })
+      .click();
   }
   await page.waitForURL((url) => !url.pathname.startsWith("/auth"), {
     timeout: 45_000,
