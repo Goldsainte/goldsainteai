@@ -1,0 +1,105 @@
+name: Sync Staging Schema (prod -> staging)
+
+# Phase 1: copies PRODUCTION's live database schema (tables, types, functions,
+# views, triggers, RLS policies) onto the STAGING project. Prod is strictly
+# read-only in this workflow — the only writes go to staging.
+#
+# Why a live dump instead of supabase/migrations: this repo's migrations have
+# always been run by hand in the SQL editor, so the migrations folder does not
+# reflect reality. Prod's actual schema is the only truth worth copying.
+#
+# v1 is a FIRST-RUN tool for an empty staging database. Re-running against a
+# populated staging will error on existing objects — to re-sync from scratch,
+# reset the staging database in its dashboard first, then run this again.
+#
+# NOT copied (known gaps, handled separately):
+#   - table data (journeys create their own; seed data comes later if needed)
+#   - storage buckets (live in the managed storage schema)
+#   - edge functions (deployed by their own workflow) and function secrets
+#   - auth settings (configured in the staging dashboard)
+#
+# Required repo secrets:
+#   SUPABASE_DB_PASSWORD           production db password (already exists)
+#   STAGING_SUPABASE_PROJECT_REF   staging project ref
+#   STAGING_DB_PASSWORD            staging db password
+#
+# Connections use Supabase's session poolers because GitHub runners have no
+# IPv6 (direct db.<ref>.supabase.co hosts are IPv6-only). The region of each
+# project's pooler isn't recorded anywhere in this repo, so both us-east-1 and
+# us-west-2 are tried automatically.
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: staging-schema-sync
+  cancel-in-progress: false
+
+env:
+  PROD_REF: ktzsgqrqvwtxlimctkaf
+  STAGING_REF: ${{ secrets.STAGING_SUPABASE_PROJECT_REF }}
+  PROD_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+  STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+
+jobs:
+  sync:
+    name: Dump prod schema, apply to staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Guard — secrets must exist
+        run: |
+          for v in PROD_DB_PASSWORD STAGING_REF STAGING_DB_PASSWORD; do
+            if [ -z "${!v}" ]; then
+              echo "::error::secret behind $v is not set"; exit 1
+            fi
+          done
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: latest
+
+      - name: Resolve pooler URLs
+        # Tries each pooler region with a trivial query; first success wins.
+        run: |
+          resolve() {
+            ref="$1"; pass="$2"; out="$3"
+            for region in aws-0-us-east-1 aws-0-us-west-2; do
+              url="postgresql://postgres.${ref}:${pass}@${region}.pooler.supabase.com:5432/postgres"
+              if psql "$url" -c "select 1" >/dev/null 2>&1; then
+                echo "${out}=${url}" >> "$GITHUB_ENV"
+                echo "resolved ${out} via ${region}"
+                return 0
+              fi
+            done
+            echo "::error::could not reach project ${ref} through any pooler region (check the db password)"
+            return 1
+          }
+          resolve "$PROD_REF" "$PROD_DB_PASSWORD" PROD_DB_URL
+          resolve "$STAGING_REF" "$STAGING_DB_PASSWORD" STAGING_DB_URL
+
+      - name: Dump production schema (read-only)
+        run: |
+          supabase db dump --db-url "$PROD_DB_URL" -f schema.sql
+          echo "dumped $(wc -l < schema.sql) lines of schema"
+
+      - name: Apply schema to staging
+        # ON_ERROR_STOP makes the first failure abort loudly instead of psql's
+        # default keep-going-and-exit-0, which would fake a green run.
+        run: |
+          psql "$STAGING_DB_URL" -v ON_ERROR_STOP=1 -f schema.sql
+
+      - name: Verify staging shape
+        run: |
+          count=$(psql "$STAGING_DB_URL" -t -A -c "select count(*) from information_schema.tables where table_schema='public'")
+          echo "staging now has ${count} public tables"
+          if [ "$count" -lt 10 ]; then
+            echo "::error::staging has suspiciously few tables after sync"; exit 1
+          fi
+          echo "## Staging schema synced" >> $GITHUB_STEP_SUMMARY
+          echo "Public tables: ${count}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Scrub dump from runner
+        if: always()
+        run: rm -f schema.sql
