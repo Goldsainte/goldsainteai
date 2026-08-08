@@ -1,0 +1,106 @@
+name: AI Triage (failed runs)
+
+# Phase 2, layer 1 (Aug 8): when the prod monitor or staging journeys fail,
+# hand the failed logs to Claude and file the diagnosis as a GitHub issue —
+# root cause, affected surface, suggested fix — before anyone opens a log.
+#
+# Required repo secret:
+#   ANTHROPIC_API_KEY   (console.anthropic.com → API keys → create)
+# Skips gracefully with a warning if the key isn't set.
+#
+# Anti-spam: one open auto-triage issue per workflow; repeat failures append
+# comments to it instead of filing duplicates.
+
+on:
+  workflow_run:
+    workflows:
+      - "Synthetic Monitor (prod smoke)"
+      - "Staging Journeys (signup to seal)"
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  triage:
+    name: Diagnose failure with Claude
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      WF_NAME: ${{ github.event.workflow_run.name }}
+      RUN_URL: ${{ github.event.workflow_run.html_url }}
+    steps:
+      - name: Guard — API key
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "::warning::ANTHROPIC_API_KEY not set — skipping AI triage"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Collect failed logs
+        if: env.SKIP != '1'
+        run: |
+          gh run view "$RUN_ID" -R "${{ github.repository }}" --log-failed > raw.log || true
+          # keep the informative tail; strip timestamps to save tokens
+          tail -c 60000 raw.log | sed -E 's/^[^ ]*Z //' > fail.log
+          wc -c fail.log
+
+      - name: Ask Claude for a diagnosis
+        if: env.SKIP != '1'
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          log = open('fail.log', errors='replace').read()
+          body = {
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 1500,
+            "system": ("You are the on-call senior engineer for Goldsainte, a travel "
+                       "marketplace (React/Vite frontend, Supabase backend, Stripe payments, "
+                       "Playwright synthetic monitoring on prod + staging journeys). "
+                       "Given a failed CI run's logs, produce a concise triage in markdown: "
+                       "## Root cause (1-3 sentences, name the exact failing check/endpoint), "
+                       "## User impact (is production affected? which surface?), "
+                       "## Suggested fix (concrete: file/selector/config to change), "
+                       "## Severity (P1 prod-broken / P2 degraded / P3 test-only). "
+                       "If logs are ambiguous, say what evidence to pull next. No preamble."),
+            "messages": [{"role": "user", "content":
+              f"Workflow: {os.environ['WF_NAME']}\nRun: {os.environ['RUN_URL']}\n\nFailed log tail:\n```\n{log}\n```"}],
+          }
+          req = urllib.request.Request(
+            "https://api.anthropic.com/v1/messages",
+            data=json.dumps(body).encode(),
+            headers={
+              "content-type": "application/json",
+              "x-api-key": os.environ["ANTHROPIC_API_KEY"],
+              "anthropic-version": "2023-06-01",
+            })
+          with urllib.request.urlopen(req, timeout=120) as r:
+            out = json.load(r)
+          text = "".join(b.get("text","") for b in out.get("content",[]))
+          with open("triage.md","w") as f:
+            f.write(f"**Run:** {os.environ['RUN_URL']}\n\n{text}\n\n---\n_Auto-triaged by Claude (Phase 2)._\n")
+          PY
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: File or append to the triage issue
+        if: env.SKIP != '1'
+        run: |
+          gh label create auto-triage -R "${{ github.repository }}" \
+            --description "Filed automatically by AI triage" --color B60205 2>/dev/null || true
+          existing=$(gh issue list -R "${{ github.repository }}" --label auto-triage --state open \
+            --search "\"$WF_NAME\" in:title" --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$existing" ] && [ "$existing" != "null" ]; then
+            gh issue comment "$existing" -R "${{ github.repository }}" --body-file triage.md
+            echo "appended to issue #$existing"
+          else
+            gh issue create -R "${{ github.repository }}" \
+              --title "[auto-triage] $WF_NAME failed" \
+              --label auto-triage \
+              --body-file triage.md
+          fi
