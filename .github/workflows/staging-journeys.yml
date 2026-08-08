@@ -1,0 +1,71 @@
+name: Staging Journeys (signup to seal)
+
+# Phase 1 payoff: every morning a synthetic traveler signs up on staging and
+# subscribes to Goldsainte Verified with a Stripe test card, proving the
+# entire money path — auth, settings, checkout function, test prices, sandbox
+# webhook, activation — before any real user touches it that day.
+#
+# WRITE-PATH: creates accounts and test-mode subscriptions. Staging only —
+# the guard below refuses to run against anything but staging.goldsainte.ai.
+# Synthetic users accumulate; wipe staging periodically via the SQL reset +
+# Sync Staging Schema re-run.
+
+on:
+  schedule:
+    - cron: '43 10 * * *'   # daily ~6:43 AM ET
+  workflow_dispatch: {}
+
+concurrency:
+  group: staging-journeys
+  cancel-in-progress: true
+
+env:
+  STAGING_BASE_URL: https://staging.goldsainte.ai
+
+jobs:
+  journeys:
+    name: Signup-to-seal journeys
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Guard — staging target only
+        # These tests spend test money and create users. They must never be
+        # aimed at production, even by a well-meaning env edit.
+        run: |
+          case "$STAGING_BASE_URL" in
+            *staging.goldsainte.ai*) echo "target ok: $STAGING_BASE_URL" ;;
+            *) echo "::error::refusing to run write-path journeys against $STAGING_BASE_URL"; exit 1 ;;
+          esac
+
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Playwright (Chromium only)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run staging journeys
+        run: npx playwright test --config=playwright.staging.config.ts
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-journeys-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Staging journeys" >> $GITHUB_STEP_SUMMARY
+          echo "Target: $STAGING_BASE_URL" >> $GITHUB_STEP_SUMMARY
+          echo "Result: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
