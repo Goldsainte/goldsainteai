@@ -153,3 +153,59 @@ test.describe("prod smoke — read-only", () => {
     ).toBe(true);
   });
 });
+
+
+// ── Phase 3 wave 1 (Aug 8): logged-in production monitoring ────────────────
+// A dedicated real prod account (created manually, no subscription) signs in
+// and loads the authed surfaces anonymous tests can never see — the exact
+// habitat of the Aug 7 sealMap crash. READ-ONLY: navigations and assertions,
+// no sends, no purchases, no settings changes. Self-skips without the
+// PROD_MONITOR_EMAIL / PROD_MONITOR_PASSWORD secrets.
+// Sign-in walk uses the selectors proven by the staging journeys suite:
+// "Email address" placeholder → exact 'Continue' → #password → submit.
+const MON_EMAIL = process.env.PROD_MONITOR_EMAIL || "";
+const MON_PASSWORD = process.env.PROD_MONITOR_PASSWORD || "";
+
+test.describe("prod smoke — logged in", () => {
+  test.skip(!MON_EMAIL || !MON_PASSWORD, "PROD_MONITOR_* secrets not set");
+
+  async function signIn(page: Page): Promise<PageErrors> {
+    const errors = armErrorTraps(page);
+    await page.goto("/auth");
+    const stepEmail = page.getByPlaceholder("Email address").first();
+    await expect(stepEmail).toBeVisible({ timeout: 20_000 });
+    await stepEmail.fill(MON_EMAIL);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    const pw = page.locator("#password");
+    await expect(pw, "password step should appear").toBeVisible({ timeout: 20_000 });
+    await pw.fill(MON_PASSWORD);
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL((url) => !url.pathname.startsWith("/auth"), {
+      timeout: 45_000,
+    });
+    return errors;
+  }
+
+  test("signed-in landing renders clean", async ({ page }) => {
+    const errors = await signIn(page);
+    await assertHealthyPage(page, errors);
+  });
+
+  test("messages loads clean while signed in", async ({ page }) => {
+    const errors = await signIn(page);
+    await page.goto("/messages");
+    // The Aug 7 sealMap ReferenceError lived exactly here — an uncaught
+    // exception on this page for signed-in users, invisible to every
+    // anonymous check. This assertion is its forever-guard.
+    await expect(page.getByText("Messages").first()).toBeVisible({ timeout: 25_000 });
+    await assertHealthyPage(page, errors);
+  });
+
+  test("settings loads clean while signed in", async ({ page }) => {
+    const errors = await signIn(page);
+    await page.goto("/settings");
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(2_000); // settle redirects + cards
+    await assertHealthyPage(page, errors);
+  });
+});
