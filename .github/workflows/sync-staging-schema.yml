@@ -134,6 +134,41 @@ jobs:
           $fn$;
           SQL
 
+      - name: Pre-create custom roles referenced by the dump
+        # Postgres roles are server-level, so the schema dump GRANTs to them
+        # without creating them. Prod has at least one custom role
+        # (claude_readonly — a past Claude session's read-only role; second
+        # sync died on it at dump line 22408, Aug 7). Rather than fix roles
+        # one failure at a time, scan the dump for EVERY referenced role and
+        # create any that staging lacks, as NOLOGIN shells: enough to satisfy
+        # the grants, no new way to connect.
+        run: |
+          { grep -ohE 'TO [A-Za-z_"][A-Za-z0-9_", ]*;' schema.sql | sed 's/^TO //; s/;$//' ; \
+            grep -ohE 'OWNER TO "?[A-Za-z_][A-Za-z0-9_]*"?' schema.sql | sed 's/OWNER TO //' ; } \
+            | tr ',' '\n' | tr -d '" ' | sort -u > roles.txt
+          : > roles.sql
+          while read -r r; do
+            [ -z "$r" ] && continue
+            case "$r" in
+              postgres|anon|authenticated|authenticator|service_role|PUBLIC|public|dashboard_user|pgbouncer|supabase_admin|supabase_auth_admin|supabase_storage_admin|supabase_functions_admin|supabase_realtime_admin|supabase_replication_admin|supabase_read_only_user|pg_*)
+                continue ;;
+            esac
+            cat >> roles.sql <<EOSQL
+          do \$roles\$ begin
+            if not exists (select from pg_roles where rolname = '$r') then
+              create role "$r" nologin;
+              raise notice 'created shim role: $r';
+            end if;
+          end \$roles\$;
+          EOSQL
+          done < roles.txt
+          echo "custom roles referenced by dump:"; cat roles.txt
+          if [ -s roles.sql ]; then
+            PGPASSWORD="$STAGING_DB_PASSWORD" psql \
+              -h "$STAGING_HOST" -p 5432 -U "postgres.${STAGING_REF}" -d postgres \
+              -v ON_ERROR_STOP=1 -f roles.sql
+          fi
+
       - name: Apply schema to staging
         # ON_ERROR_STOP makes the first failure abort loudly instead of psql's
         # default keep-going-and-exit-0, which would fake a green run.
