@@ -163,49 +163,70 @@ test.describe("prod smoke — read-only", () => {
 // PROD_MONITOR_EMAIL / PROD_MONITOR_PASSWORD secrets.
 // Sign-in walk uses the selectors proven by the staging journeys suite:
 // "Email address" placeholder → exact 'Continue' → #password → submit.
-const MON_EMAIL = process.env.PROD_MONITOR_EMAIL || "";
-const MON_PASSWORD = process.env.PROD_MONITOR_PASSWORD || "";
+async function signInAs(page: Page, email: string, password: string): Promise<PageErrors> {
+  const errors = armErrorTraps(page);
+  await page.goto("/auth");
+  const stepEmail = page.getByPlaceholder("Email address").first();
+  await expect(stepEmail).toBeVisible({ timeout: 20_000 });
+  await stepEmail.fill(email);
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  const pw = page.locator("#password");
+  await expect(pw, "password step should appear").toBeVisible({ timeout: 20_000 });
+  await pw.fill(password);
+  await page.locator('button[type="submit"]').click();
+  await page.waitForURL((url) => !url.pathname.startsWith("/auth"), {
+    timeout: 45_000,
+  });
+  return errors;
+}
 
-test.describe("prod smoke — logged in", () => {
-  test.skip(!MON_EMAIL || !MON_PASSWORD, "PROD_MONITOR_* secrets not set");
+// One logged-in section per role. Traveler uses the dedicated monitor
+// account; creator/agent reuse the EXISTING public test personas (Jordan
+// Woods etc.) — never fresh accounts, which would appear as fake storefronts
+// in the live marketplace. Each section self-skips without its secrets.
+const ROLES = [
+  {
+    name: "traveler",
+    email: process.env.PROD_MONITOR_EMAIL || "",
+    password: process.env.PROD_MONITOR_PASSWORD || "",
+  },
+  {
+    name: "creator",
+    email: process.env.PROD_MONITOR_CREATOR_EMAIL || "",
+    password: process.env.PROD_MONITOR_CREATOR_PASSWORD || "",
+  },
+  {
+    name: "agent",
+    email: process.env.PROD_MONITOR_AGENT_EMAIL || "",
+    password: process.env.PROD_MONITOR_AGENT_PASSWORD || "",
+  },
+] as const;
 
-  async function signIn(page: Page): Promise<PageErrors> {
-    const errors = armErrorTraps(page);
-    await page.goto("/auth");
-    const stepEmail = page.getByPlaceholder("Email address").first();
-    await expect(stepEmail).toBeVisible({ timeout: 20_000 });
-    await stepEmail.fill(MON_EMAIL);
-    await page.getByRole("button", { name: "Continue", exact: true }).click();
-    const pw = page.locator("#password");
-    await expect(pw, "password step should appear").toBeVisible({ timeout: 20_000 });
-    await pw.fill(MON_PASSWORD);
-    await page.locator('button[type="submit"]').click();
-    await page.waitForURL((url) => !url.pathname.startsWith("/auth"), {
-      timeout: 45_000,
+for (const role of ROLES) {
+  test.describe(`prod smoke — logged in (${role.name})`, () => {
+    test.skip(!role.email || !role.password, `${role.name} monitor secrets not set`);
+
+    test(`${role.name}: signed-in landing renders clean`, async ({ page }) => {
+      const errors = await signInAs(page, role.email, role.password);
+      await assertHealthyPage(page, errors);
     });
-    return errors;
-  }
 
-  test("signed-in landing renders clean", async ({ page }) => {
-    const errors = await signIn(page);
-    await assertHealthyPage(page, errors);
-  });
+    test(`${role.name}: messages loads clean`, async ({ page }) => {
+      const errors = await signInAs(page, role.email, role.password);
+      await page.goto("/messages");
+      // The Aug 7 sealMap crash lived exactly here, for signed-in users,
+      // invisible to anonymous checks — this is its forever-guard, now
+      // held for every role.
+      await expect(page.getByText("Messages").first()).toBeVisible({ timeout: 25_000 });
+      await assertHealthyPage(page, errors);
+    });
 
-  test("messages loads clean while signed in", async ({ page }) => {
-    const errors = await signIn(page);
-    await page.goto("/messages");
-    // The Aug 7 sealMap ReferenceError lived exactly here — an uncaught
-    // exception on this page for signed-in users, invisible to every
-    // anonymous check. This assertion is its forever-guard.
-    await expect(page.getByText("Messages").first()).toBeVisible({ timeout: 25_000 });
-    await assertHealthyPage(page, errors);
+    test(`${role.name}: settings loads clean`, async ({ page }) => {
+      const errors = await signInAs(page, role.email, role.password);
+      await page.goto("/settings");
+      await page.waitForLoadState("domcontentloaded");
+      await page.waitForTimeout(2_000); // settle role redirects + cards
+      await assertHealthyPage(page, errors);
+    });
   });
-
-  test("settings loads clean while signed in", async ({ page }) => {
-    const errors = await signIn(page);
-    await page.goto("/settings");
-    await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(2_000); // settle redirects + cards
-    await assertHealthyPage(page, errors);
-  });
-});
+}
