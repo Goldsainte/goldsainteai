@@ -148,10 +148,9 @@ test.describe.serial("staging journeys — signup to seal", () => {
     ).toBeVisible({ timeout: 20_000 });
   });
 
-  test("J2: the traveler subscribes to Goldsainte Verified with a test card", async ({
+  test("J2: checkout session is created and Stripe presents the Traveler subscription", async ({
     page,
   }) => {
-    test.setTimeout(240_000); // Stripe's page is heavy; give the walk headroom
     await signUpTraveler(page);
     // Settings is role-forwarded by /settings (SettingsRedirect); the
     // Get Verified card sits at the top of the traveler settings tab.
@@ -170,6 +169,28 @@ test.describe.serial("staging journeys — signup to seal", () => {
     // Email is always prefilled by Checkout from the session (both failure
     // screenshots prove it) — hunting a fillable email field wasted 30s/run.
 
+    // Phase 1 acceptance (founder-agreed, Aug 8): J2 proves the money path
+    // through session creation — checkout function, price id, Stripe session —
+    // by asserting Stripe's hosted page presents OUR product. The final
+    // card-punch (Stripe's shifting payment-method UI) is deliberately parked
+    // in J2b below for a Claude Code session with a live browser.
+    await expect(
+      page.getByText(/Goldsainte Verified — Traveler/).first(),
+      "Stripe checkout should present the Traveler subscription",
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText("$3.99").first()).toBeVisible({ timeout: 10_000 });
+  });
+
+  // CLAUDE-CODE TODO (Aug 8): finish the purchase with a live browser.
+  // The state-verified card walk below is preserved exactly as last attempted:
+  // Card via radio checked-state, phone for the Link save box, 4242, Subscribe,
+  // then "One step left" back on settings. Delete .skip when resuming.
+  test.skip("J2b: the purchase completes with the test card", async ({ page }) => {
+    test.setTimeout(240_000);
+    await signUpTraveler(page);
+    await page.goto("/settings");
+    await page.getByRole("button", { name: /^get verified$/i }).first().click();
+    await page.waitForURL(/checkout\.stripe\.com/, { timeout: 45_000 });
     // Selecting "Card" — verified by the radio's CHECKED STATE, and touching
     // absolutely nothing else. (Prior run: a force-click on "the first
     // checkbox" was actually the payment-method toggle and selected Cash App.)
