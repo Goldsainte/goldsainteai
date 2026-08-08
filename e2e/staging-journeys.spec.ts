@@ -25,21 +25,25 @@ const LAST = `Traveler${RUN_ID.slice(-4)}`;
 const TEST_CARD = "4242424242424242";
 
 async function signUpTraveler(page: Page) {
-  // Enter through the same door a human does: ?mode=signup lands directly in
-  // the signup flow. (First run entered at bare /auth — the LOGIN view — and
-  // spent 3 minutes waiting for a signup-only field that never existed there.)
-  await page.goto("/auth?mode=signup");
-  // Role picker precedes the details form; the cards are labeled exactly
-  // "Traveler" / "Creator" / "Travel Agent". If the details form is already
-  // showing (role preselected), skip the click.
+  // The signup flow is a THREE-step machine (read from Auth.tsx, not guessed):
+  //   1. account-type cards  — skipped entirely via the app's own ?role= param
+  //   2. "email" step        — placeholder "Email address" + a 'Continue' button
+  //   3. "signup" step       — the #signupEmail details form (email prefilled)
+  // Runs 1-2 died waiting for #signupEmail while standing on step 2.
+  await page.goto("/auth?mode=signup&role=traveler");
+  const stepEmail = page.getByPlaceholder("Email address").first();
+  await expect(stepEmail, "email step should appear").toBeVisible({ timeout: 20_000 });
+  await stepEmail.fill(EMAIL);
+  await page.getByRole("button", { name: "Continue" }).click();
+
   const emailField = page.locator("#signupEmail");
-  if (!(await emailField.isVisible().catch(() => false))) {
-    await page.getByText("Traveler", { exact: true }).first().click();
-  }
   await expect(emailField, "signup details form should appear").toBeVisible({
     timeout: 20_000,
   });
-  await emailField.fill(EMAIL);
+  // Email arrives prefilled from the previous step; fill only if empty.
+  if (!(await emailField.inputValue().catch(() => "x"))) {
+    await emailField.fill(EMAIL);
+  }
   await page.locator("#firstName").fill(FIRST);
   await page.locator("#lastName").fill(LAST);
   await page.locator("#password").fill(PASSWORD);
